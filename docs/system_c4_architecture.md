@@ -1,5 +1,5 @@
 
-# Architektura systemu benchmarkowego HPO – C4 + UML (wersja wstępna)
+# Architektura systemu benchmarkowego HPO – Corvus Corone (WIP)
 
 > **Założenia ogólne / świadome uproszczenia**
 >
@@ -52,23 +52,6 @@ flowchart LR
     linkStyle 5 stroke:#D50000,fill:none
     L_S_A5_0@{ animation: none }
 ```
-Elementy:
-
-- **System S: HPO Benchmarking Platform**
-- Aktorzy:
-  - A1: Badacz / Inżynier ML
-  - A2: Twórca algorytmu HPO
-  - A3: Administrator
-  - A4: Zewnętrzny system AutoML / narzędzie analityczne
-  - A5: Zewnętrzny system bibliograficzny (CrossRef / arXiv / DOI)
-- Relacje (kierunek: → oznacza inicjatora przepływu):
-  - A1 → S: „Konfiguruj i uruchamiaj benchmarki, analizuj wyniki, przeglądaj panel eksperymentów, eksportuj dane.”
-  - A2 → S: „Rejestruj i testuj własne algorytmy HPO (pluginy).”
-  - A3 → S: „Administruj systemem, zasobami i katalogami (algorytmy, benchmarki).”
-  - A4 ↔ S: „Integracja przez API: uruchamianie eksperymentów, pobieranie metryk i wyników.”
-  - S ↔ A5: „Pobieranie / weryfikacja metadanych publikacji (DOI, tytuł, autorzy, BibTeX).”
-
-Słownie: na diagramie kontekstu system S jest centralnym prostokątem; aktorzy A1–A4 są umieszczeni wokół niego, połączeni strzałkami. Zewnętrzny system bibliograficzny A5 jest połączony dwukierunkowo z systemem S.
 
 ### 1.1. Użytkownicy / aktorzy biznesowi
 
@@ -235,225 +218,23 @@ flowchart TB
 
 Dla każdego kontenera: odpowiedzialności, komunikacja (sync/async), rola w PC vs chmura, związek z dobrymi praktykami benchmarkingu.
 
----
-
-#### 2.2.1. Web UI (Frontend)
-
-- **Odpowiedzialności:**
-  - Interfejs użytkownika do:
-    - definicji benchmarków i eksperymentów,
-    - podglądu katalogu algorytmów HPO,
-    - panelu śledzenia eksperymentów,
-    - porównania wyników,
-    - zarządzania publikacjami i generowania raportów,
-    - podstawowej administracji.
-- **Komunikacja:**
-  - REST/GraphQL/WebSocket z **API Gateway** (sync).
-- **Rola PC vs chmura:**
-  - W trybie PC: serwowany z lokalnego kontenera albo nawet plików statycznych.
-  - W chmurze: standardowy frontend (np. hostowany w CDN / storage).  
-- **Związek z benchmarkingiem:**
-  - Umożliwia jasne prezentowanie celów eksperymentu, konfiguracji, wyników i statystyk.
-
----
-
-#### 2.2.2. API Gateway / Backend API
-
-- **Odpowiedzialności:**
-  - Pojedynczy punkt wejścia dla Web UI i zewnętrznych systemów.
-  - Routing żądań do usług domenowych: Orchestrator, Benchmark Definition, Algorithm Registry, Experiment Tracking, Publication & Reference, Metrics & Analysis.
-  - Autoryzacja / uwierzytelnianie.
-- **Komunikacja:**
-  - Z Web UI / systemami zewn.: HTTP REST/GraphQL (sync).
-  - Z usługami wewn.: HTTP/gRPC (sync) oraz publikacja zdarzeń do Message Broker (async).
-- **PC vs chmura:**
-  - W PC: jeden kontener, monolityczny backend lub prosty gateway.
-  - W chmurze: gateway (np. API Gateway + microservices).
-
----
-
-#### 2.2.3. Experiment Orchestrator Service
-
-- **Odpowiedzialności:**
-  - Przyjmowanie definicji eksperymentów, walidacja planu eksperymentu (dobór algorytmów, instancji).
-  - Tworzenie „planu runów” (macierz: algorytm × instancja × seed × budżet).
-  - Zlecanie runów do Workerów poprzez Message Broker.
-  - Zarządzanie stanem eksperymentu (pending/running/completed/failed).
-  - Kontrola powtarzalności (przekazywanie seedów, snapshotów konfiguracji).
-- **Komunikacja:**
-  - Sync: z API Gateway (definicje eksperymentów).
-  - Async: do Worker Runtime (kolejka runów poprzez Message Broker), odbiór zdarzeń „RunCompleted/RunFailed”.
-- **PC vs chmura:**
-  - PC: jedna instancja, pojedynczy proces/ kontener.
-  - Chmura: skalowalny microservice; może być HA.
-- **Benchmarking:**
-  - Implementuje **plan eksperymentu** (Główne dobre praktyki: plan, kontrola budżetu, coverage instancji).
-
----
-
-#### 2.2.4. Worker Runtime / Execution Engine
-
-- **Odpowiedzialności:**
-  - Wykonywanie pojedynczych runów eksperymentu:
-    - ładowanie benchmarku i instancji (dataset),
-    - ładowanie i uruchamianie algorytmu HPO (plugin/wbudowany),
-    - raportowanie metryk do Experiment Tracking Service.
-- **Komunikacja:**
-  - Async: odbiór zadań z Message Broker.
-  - Sync/Async: zapisy do Experiment Tracking Service (REST/gRPC + batch/stream), logi do Logging Stack.
-  - Dostęp do File/Object Storage po dataset i artefakty.
-- **PC vs chmura:**
-  - PC: 1–N workerów jako procesy/kontenery, uruchamiane przez docker-compose.
-  - Chmura: worker pods w K8s, autoscaling na podstawie kolejki.
-- **Benchmarking:**
-  - Wymusza jednolite środowisko uruchomieniowe (konteneryzacja), co wspiera reprodukowalność i porównywalność.
-
----
-
-#### 2.2.5. Benchmark Definition Service
-
-- **Odpowiedzialności:**
-  - Przechowywanie i wersjonowanie definicji benchmarków:
-    - listy datasetów,
-    - definicji problemów (np. klasyfikacja, regresja),
-    - dostępnych metryk,
-    - znanych optimum/best-known wartości.
-- **Komunikacja:**
-  - Sync: API dla Orchestratora i Web UI (GET/POST/PUT).
-- **PC vs chmura:**
-  - Jeden kontener, bez szczególnych wymagań skalowalności.
-- **Benchmarking:**
-  - Realizuje dobór i opis instancji problemowych (zróżnicowanie, reprezentatywność).
-
----
-
-#### 2.2.6. Algorithm Registry Service
-
-- **Odpowiedzialności:**
-  - Rejestr i wersjonowanie algorytmów HPO (wbudowane + pluginy).
-  - Przechowywanie metadanych: nazwa, typ, parametry, wymagania środowiskowe, powiązane publikacje.
-  - Walidacja kompatybilności z benchmarkami (obszar rozwiązywanych problemów).
-- **Komunikacja:**
-  - Sync: API dla Web UI, Orchestratora i Plugin Runtime.
-- **Benchmarking:**
-  - Ułatwia świadomy dobór algorytmów i ich konfiguracji; wspiera cele G1–G5.
-
----
-
-#### 2.2.7. Algorithm SDK / Plugin Runtime
-
-- **Odpowiedzialności:**
-  - Dostarczenie standardowego **interfejsu pluginu** (IAlgorithmPlugin).
-  - Ładowanie pluginów (np. Python packages, gRPC serwisy) w sposób izolowany.
-  - Walidacja zgodności pluginu z interfejsem.
-- **Komunikacja:**
-  - Używany lokalnie przez Worker Runtime (biblioteka / sidecar).
-  - Może komunikować się z Workerem przez lokalne API lub bezpośrednie wywołania językowe.
-- **PC vs chmura:**
-  - Ten sam kod w obu przypadkach, różni się jedynie środowiskiem wykonawczym (docker image).
-- **Benchmarking:**
-  - Umożliwia łatwe dodawanie nowych algorytmów w ujednoliconym środowisku.
-
----
-
-#### 2.2.8. Experiment Tracking Service
-
-- **Odpowiedzialności:**
-  - API do rejestrowania runów, metryk, parametrów, tagów i logów.
-  - Przechowywanie powiązań między eksperymentem, runem, algorytmem, benchmarkiem i publikacją.
-- **Komunikacja:**
-  - Sync: API używane przez Worker Runtime, Orchestrator, Web UI.
-- **Benchmarking:**
-  - Stanowi centralny **panel śledzenia**, wspiera analizę wyników i reprodukowalność.
-
----
-
-#### 2.2.9. Metrics & Analysis Service
-
-- **Odpowiedzialności:**
-  - Agregowanie wyników (średnie, wariancje, rankingi).
-  - Obliczanie złożonych metryk (np. czas do osiągnięcia danego poziomu błędu).
-  - Testy statystyczne, wykresy porównawcze (seria czasowa, boxplot, ranking).  
-- **Komunikacja:**
-  - Sync: API używane przez Web UI (porównania), ewentualnie Orchestrator (walidacje).
-  - Async: może słuchać zdarzeń „RunCompleted” w celu preagregacji.
-- **Benchmarking:**
-  - Bezpośrednio implementuje część **analizy i prezentacji wyników**.
-
----
-
-#### 2.2.10. Publication & Reference Service
-
-- **Odpowiedzialności:**
-  - Katalog publikacji (DOI, BibTeX, linki).
-  - Powiązania publikacji z algorytmami, benchmarkami, eksperymentami.
-  - Generowanie sekcji bibliografii w raportach.
-  - Integracja z zewnętrznymi usługami bibliograficznymi.
-- **Komunikacja:**
-  - Sync: API dla Web UI, Algorithm Registry, Experiment Tracking, Reportowania.
-  - Sync/Async: wywołania do zewnętrznych systemów bibliograficznych.
-- **Benchmarking:**
-  - Wspiera łączenie wyników z literaturą i teoretycznym uzasadnieniem algorytmów.
-
----
-
-#### 2.2.11. Results Store (Relacyjna baza danych)
-
-- **Odpowiedzialności:**
-  - Przechowywanie danych domenowych:
-    - Experiments, Runs, Metrics, Algorithms, Benchmarks, Publications, Linkowania, Konfiguracje.
-- **Komunikacja:**
-  - Internal: używana przez Experiment Tracking, Benchmark Definition, Algorithm Registry, Publication & Reference.
-- **Technicznie:**
-  - np. PostgreSQL / inny RDBMS, z migracjami schematu.
-- **Benchmarking:**
-  - Centralne repo do analizy i reprodukowalności.
-
----
-
-#### 2.2.12. File / Object Storage
-
-- **Odpowiedzialności:**
-  - Przechowywanie dużych artefaktów:
-    - datasetów,
-    - modeli,
-    - logów w plikach,
-    - wygenerowanych raportów.
-- **PC vs chmura:**
-  - PC: lokalny dysk / MinIO.
-  - Cloud: S3 / GCS / Azure Blob.
-- **Benchmarking:**
-  - Zapewnia przechowywanie datasetów i wyników w sposób odtwarzalny.
-
----
-
-#### 2.2.13. Message Broker
-
-- **Odpowiedzialności:**
-  - Kolejka zadań runów.
-  - Kanał zdarzeń systemowych (RunStarted, RunCompleted, RunFailed, ExperimentCompleted).
-- **Benchmarking:**
-  - Umożliwia elastyczny plan eksperymentu i skalowanie warstwy wykonawczej.
-
----
-
-#### 2.2.14. Monitoring & Logging Stack
-
-- **Odpowiedzialności:**
-  - Zbieranie logów z kontenerów.
-  - Metryki (czas trwania runów, obciążenie workerów, błędy).
-- **Benchmarking:**
-  - Wspiera obserwowalność i analizę wydajności algorytmów i samego systemu.
-
----
-
-#### 2.2.15. Auth / Identity Integration
-
-- **Odpowiedzialności:**
-  - Integracja z IdP (OIDC/SAML).
-  - Mapowanie użytkowników na role (Badacz, Twórca pluginu, Admin).
-- **Benchmarking:**
-  - Pozwala kontrolować, kto może modyfikować benchmarki, zatwierdzać algorytmy itd.
+| ID    | Komponent                      | Odpowiedzialności | Komunikacja | PC vs chmura | Związek z benchmarkingiem |
+|-------|--------------------------------|--------------------|-------------|-------------|---------------------------|
+| 2.2.1 | Web UI (Frontend)              | Interfejs użytkownika do: definicji benchmarków i eksperymentów, podglądu katalogu algorytmów HPO, panelu śledzenia eksperymentów, porównania wyników, zarządzania publikacjami i generowania raportów, podstawowej administracji. | REST/GraphQL/WebSocket z **API Gateway** (sync). | **PC:** serwowany z lokalnego kontenera lub plików statycznych. <br> **Chmura:** standardowy frontend (np. CDN / storage). | Umożliwia jasne prezentowanie celów eksperymentu, konfiguracji, wyników i statystyk. |
+| 2.2.2 | API Gateway / Backend API      | Pojedynczy punkt wejścia dla Web UI i systemów zewnętrznych. Routing żądań do usług: Orchestrator, Benchmark Definition, Algorithm Registry, Experiment Tracking, Publication & Reference, Metrics & Analysis. Autoryzacja / uwierzytelnianie. | Z Web UI / systemami zewn.: HTTP REST/GraphQL (sync). <br> Z usługami wewn.: HTTP/gRPC (sync) + publikacja zdarzeń do Message Broker (async). | **PC:** jeden kontener, monolityczny backend lub prosty gateway. <br> **Chmura:** gateway (np. API Gateway + microservices). | Centralny punkt integracji warstw benchmarkingu i udostępniania funkcji na zewnątrz. |
+| 2.2.3 | Experiment Orchestrator Service | Przyjmowanie definicji eksperymentów, walidacja planu (dobór algorytmów, instancji). Tworzenie planu runów (algorytm × instancja × seed × budżet). Zlecanie runów Workerom przez Message Broker. Zarządzanie stanem eksperymentu. Kontrola powtarzalności (seedy, snapshoty konfiguracji). | Sync: z API Gateway (definicje eksperymentów). <br> Async: do Worker Runtime (kolejka runów przez Message Broker), odbiór zdarzeń „RunCompleted/RunFailed”. | **PC:** jedna instancja, pojedynczy proces/kontener. <br> **Chmura:** skalowalny microservice, możliwe HA. | Implementuje **plan eksperymentu**, kontrolę budżetu i coverage instancji – kluczowe dobre praktyki benchmarkingu. |
+| 2.2.4 | Worker Runtime / Execution Engine | Wykonywanie pojedynczych runów: ładowanie benchmarku i instancji (dataset), ładowanie i uruchamianie algorytmu HPO (plugin/wbudowany), raportowanie metryk do Experiment Tracking Service. | Async: odbiór zadań z Message Broker. <br> Sync/Async: zapisy do Experiment Tracking Service (REST/gRPC, batch/stream), logi do Logging Stack. <br> Dostęp do File/Object Storage. | **PC:** 1–N workerów jako procesy/kontenery (docker-compose). <br> **Chmura:** worker pods w K8s, autoscaling wg kolejki. | Wymusza jednolite środowisko uruchomieniowe (konteneryzacja) → reprodukowalność i porównywalność runów. |
+| 2.2.5 | Benchmark Definition Service    | Przechowywanie i wersjonowanie definicji benchmarków: listy datasetów, definicji problemów (klasyfikacja, regresja, …), dostępnych metryk, znanych optimum / best-known values. | Sync: API dla Orchestratora i Web UI (GET/POST/PUT). | Jeden kontener, brak szczególnych wymagań skalowalności (PC i chmura tak samo). | Realizuje dobór i opis instancji problemowych (zróżnicowanie, reprezentatywność). |
+| 2.2.6 | Algorithm Registry Service      | Rejestr i wersjonowanie algorytmów HPO (wbudowane + pluginy). Przechowywanie metadanych: nazwa, typ, parametry, wymagania środowiskowe, powiązane publikacje. Walidacja kompatybilności z benchmarkami. | Sync: API dla Web UI, Orchestratora i Plugin Runtime. | Jeden kontener / usługa (PC i chmura, skalowanie wg potrzeb). | Ułatwia świadomy dobór algorytmów i ich konfiguracji; wspiera cele G1–G5 benchmarkingu. |
+| 2.2.7 | Algorithm SDK / Plugin Runtime  | Dostarczenie standardowego interfejsu pluginu (**IAlgorithmPlugin**). Ładowanie pluginów (np. Python packages, gRPC services) w sposób izolowany. Walidacja zgodności pluginu z interfejsem. | Używany lokalnie przez Worker Runtime (biblioteka / sidecar). Może rozmawiać z Workerem przez lokalne API lub wywołania językowe. | Ten sam kod dla PC i chmury, różnice tylko w środowisku (docker image). | Umożliwia łatwe dodawanie nowych algorytmów w ujednoliconym środowisku, co ułatwia porównywanie HPO. |
+| 2.2.8 | Experiment Tracking Service     | API do rejestrowania runów, metryk, parametrów, tagów i logów. Przechowywanie powiązań: eksperyment–run–algorytm–benchmark–publikacja. | Sync: API używane przez Worker Runtime, Orchestrator, Web UI. | Usługa korzystająca z relacyjnej bazy danych (PC: 1 kontener; chmura: skalowalny microservice). | Centralny panel śledzenia, wspiera analizę wyników i reprodukowalność eksperymentów. |
+| 2.2.9 | Metrics & Analysis Service      | Agregowanie wyników (średnie, wariancje, rankingi). Obliczanie złożonych metryk (np. czas do osiągnięcia poziomu błędu). Testy statystyczne, wykresy porównawcze (serie czasowe, boxplot, ranking). | Sync: API używane przez Web UI (porównania), opcjonalnie Orchestrator (walidacje). <br> Async: może słuchać zdarzeń „RunCompleted” do preagregacji. | Elastyczna usługa analityczna (PC: 1 kontener; chmura: skalowalny microservice). | Bezpośrednio implementuje **analizę i prezentację wyników** benchmarków. |
+| 2.2.10 | Publication & Reference Service | Katalog publikacji (DOI, BibTeX, linki). Powiązania publikacji z algorytmami, benchmarkami, eksperymentami. Generowanie sekcji bibliografii w raportach. Integracja z zewnętrznymi usługami bibliograficznymi. | Sync: API dla Web UI, Algorithm Registry, Experiment Tracking, raportowania. <br> Sync/Async: wywołania do zewnętrznych systemów bibliograficznych. | Usługa integracyjna (PC i chmura – podobny model, różne skale). | Łączy wyniki z literaturą i teoretycznym uzasadnieniem algorytmów, wspiera interpretację benchmarków. |
+| 2.2.11 | Results Store (Relacyjna baza danych) | Przechowywanie danych domenowych: Experiments, Runs, Metrics, Algorithms, Benchmarks, Publications, linkowania, konfiguracje. | Internal: używana przez Experiment Tracking, Benchmark Definition, Algorithm Registry, Publication & Reference. | np. PostgreSQL / inny RDBMS, z migracjami schematu; może być lokalny (PC) lub zarządzany (chmura). | Centralne repozytorium danych do analizy i zapewnienia reprodukowalności benchmarków. |
+| 2.2.12 | File / Object Storage          | Przechowywanie dużych artefaktów: datasety, modele, logi w plikach, wygenerowane raporty. | Dostęp z Workerów, Web UI / backendu i innych usług (protokół zależny od wdrożenia – S3/API plikowe). | **PC:** lokalny dysk / MinIO. <br> **Chmura:** S3 / GCS / Azure Blob. | Zapewnia odtwarzalne przechowywanie datasetów i wyników (artefaktów) benchmarków. |
+| 2.2.13 | Message Broker                 | Kolejka zadań runów. Kanał zdarzeń systemowych (RunStarted, RunCompleted, RunFailed, ExperimentCompleted). | Async: wymiana komunikatów między Orchestrator, Worker Runtime, Metrics & Analysis itd. | **PC:** pojedyncza instancja (np. RabbitMQ/Redis/Kafka w kontenerze). <br> **Chmura:** zarządzany lub skalowany klaster brokera. | Umożliwia elastyczny plan eksperymentu i skalowanie warstwy wykonawczej → efektywny benchmarking na dużą skalę. |
+| 2.2.14 | Monitoring & Logging Stack     | Zbieranie logów z kontenerów. Zbieranie metryk (czas trwania runów, obciążenie workerów, błędy). | Integracje z usługami (agenty, eksportery, log shippers). Odczyt przez dashboardy / alerting. | **PC:** uproszczony stack (np. 1–2 kontenery). <br> **Chmura:** pełny, skalowalny stack obserwowalności. | Wspiera obserwowalność i analizę wydajności algorytmów oraz systemu benchmarkującego. |
+| 2.2.15 | Auth / Identity Integration    | Integracja z IdP (OIDC/SAML). Mapowanie użytkowników na role (Badacz, Twórca pluginu, Admin). | Sync: wywołania do IdP w toku uwierzytelniania / autoryzacji; przekazywanie tokenów/claimów do usług. | W PC może być prostsza (lokalne konta / lightweight IdP); w chmurze – pełna integracja z firmowym/uczelniowym IdP. | Pozwala kontrolować, kto może modyfikować benchmarki, zatwierdzać algorytmy itp., co jest ważne dla jakości i wiarygodności benchmarków. |
 
 ---
 
@@ -2973,42 +2754,15 @@ Przypomnienie (w skrócie):
 
 Poniżej lista praktyk i powiązania z architekturą.
 
-1. **Jasno określone cele eksperymentu (G1–G5)**  
-   - Kontenery: Web UI (ExperimentDesignerUI), Experiment Orchestrator.  
-   - UC: UC1 (konfiguracja celu), UC4 (interpretacja wyników).  
-
-2. **Dobrze zdefiniowane problemy / instancje benchmarku**  
-   - Benchmark Definition Service + BenchmarkRepository, ProblemInstanceManager.  
-   - UC: UC1 (wybór instancji).  
-
-3. **Świadomy dobór algorytmów / konfiguracji**  
-   - Algorithm Registry + AlgorithmMetadataStore, CompatibilityChecker.  
-   - UC: UC1, UC2, UC3.  
-
-4. **Dobrze zdefiniowane miary wydajności**  
-   - Metrics & Analysis + MetricCalculator.  
-   - UC: UC1 (wybór metryk), UC4 (analiza).  
-
-5. **Plan eksperymentu (design), w tym budżety i powtórzenia**  
-   - Experiment Orchestrator + ExperimentPlanBuilder, RunScheduler.  
-   - UC: UC1.  
-
-6. **Analiza wyników i prezentacja**  
-   - Metrics & Analysis, Web UI (ComparisonView, dashboardy).  
-   - UC: UC4, UC5.  
-
-7. **Pełna reprodukowalność**  
-   - ReproducibilityManager, LineageTracker, Results Store, Object Storage.  
-   - UC: UC1 (zapisywanie konfiguracji), UC9 (eksport i raport).  
-
-8. **Możliwość powiązania wyników z literaturą naukową**  
-   - Publication & Reference Service, ReferenceLinker.  
-   - UC: UC6, UC3 (przypisanie publikacji do pluginu).  
-
-9. **Iteracyjne projektowanie i testowanie algorytmów HPO**  
-   - Algorithm SDK / Plugin Runtime, Algorithm Registry, Experiment Orchestrator.  
-   - UC: UC3 (dodanie algorytmu), UC1 (uruchamianie kolejnych eksperymentów), UC4 (porównania), UC5 (panel śledzenia).  
-
-10. **Cloud-ready, PC-first**  
-    - Jasny podział na warstwę kontrolną (API, Orchestrator, Registry, Benchmark Definition, Publication) i warstwę wykonawczą (Workery).  
-    - UC7/UC8 – operacyjne procedury deploymentu i skalowania.
+| ID | Cel / dobra praktyka                                          | Powiązane komponenty / kontenery                                                                                       | Powiązane UC                                      |
+|----|---------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------|
+| 1  | Jasno określone cele eksperymentu (G1–G5)                     | Web UI (**ExperimentDesignerUI**), Experiment Orchestrator                                                             | UC1 (konfiguracja celu), UC4 (interpretacja wyników) |
+| 2  | Dobrze zdefiniowane problemy / instancje benchmarku           | Benchmark Definition Service, **BenchmarkRepository**, **ProblemInstanceManager**                                      | UC1 (wybór instancji)                             |
+| 3  | Świadomy dobór algorytmów / konfiguracji                      | Algorithm Registry, **AlgorithmMetadataStore**, **CompatibilityChecker**                                              | UC1, UC2, UC3                                     |
+| 4  | Dobrze zdefiniowane miary wydajności                          | Metrics & Analysis, **MetricCalculator**                                                                               | UC1 (wybór metryk), UC4 (analiza)                 |
+| 5  | Plan eksperymentu (design), w tym budżety i powtórzenia       | Experiment Orchestrator, **ExperimentPlanBuilder**, **RunScheduler**                                                   | UC1                                               |
+| 6  | Analiza wyników i prezentacja                                 | Metrics & Analysis, Web UI (**ComparisonView**, dashboardy)                                                            | UC4, UC5                                          |
+| 7  | Pełna reprodukowalność                                         | **ReproducibilityManager**, **LineageTracker**, Results Store, Object Storage                                          | UC1 (zapisywanie konfiguracji), UC9 (eksport i raport) |
+| 8  | Możliwość powiązania wyników z literaturą naukową            | Publication & Reference Service, **ReferenceLinker**                                                                   | UC6, UC3 (przypisanie publikacji do pluginu)      |
+| 9  | Iteracyjne projektowanie i testowanie algorytmów HPO          | Algorithm SDK / Plugin Runtime, Algorithm Registry, Experiment Orchestrator                                            | UC3 (dodanie algorytmu), UC1 (kolejne eksperymenty), UC4 (porównania), UC5 (panel śledzenia) |
+| 10 | Cloud-ready, PC-first                                         | Warstwa kontrolna: API, Orchestrator, Registry, Benchmark Definition, Publication. <br> Warstwa wykonawcza: Workery. | UC7, UC8 (procedury deploymentu i skalowania)     |

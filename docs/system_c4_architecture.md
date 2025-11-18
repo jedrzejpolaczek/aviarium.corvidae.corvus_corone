@@ -1796,7 +1796,7 @@ Uruchomienie kompletnego systemu benchmarkowego HPO na pojedynczym komputerze (t
 5. Po starcie kontenerów:
    - 5.1. Kontener DB inicjalizuje się i nasłuchuje na połączenia,
    - 5.2. Message Broker uruchamia kolejki (np. RunJob),
-   - 5.3. API/Orchestrator łączy się z DB i Brokerem,
+   - 5.3. API Gateway + usługi domenowe (Tracking, Benchmark Definition, Algorithm Registry) łączą się z DB i Brokerem,
    - 5.4. Tracking Service wykonuje migracje schematu bazy danych,
    - 5.5. Workery rejestrują się (subskrybują kolejkę RunJob),
    - 5.6. Web UI uruchamia serwer HTTP i jest dostępny pod adresem `http://localhost:<PORT>`.
@@ -1840,11 +1840,24 @@ flowchart LR
     Admin["Administrator"] --> Repo["Repozytorium / paczka\n(konfiguracja docker-compose, .env)"] & Shell["Shell / Terminal"]
     Repo --> FS["System plików PC"]
     Shell --> Docker["Docker Engine / docker-compose"]
+
     Docker --> C_DB["Kontener DB\n(Results Store)"] & C_MB["Kontener Message Broker"] & C_API["Kontener API Gateway + Orchestrator"] & C_TRK["Kontener Tracking Service"] & C_W["Kontener(y) Worker Runtime"] & C_UI["Kontener Web UI"] & C_MON["Kontener Monitoring / Logging"]
-    C_API --> C_DB
+
+    %% POPRAWIONE POŁĄCZENIA
+    %% API/Orchestrator NIE łączy się z DB – tylko z usługami i brokerem
+    C_API --> C_TRK
+    C_API --> C_MB
+
+    %% Tracking Service rozmawia z DB – to on jest „frontem” do Results Store
     C_TRK --> C_DB
-    C_W --> C_MB & C_TRK
+
+    %% Workery gadają z brokerem i Trackingiem (logowanie runów)
+    C_W --> C_MB 
+    C_W --> C_TRK
+
+    %% Monitoring może czytać z DB (metryki, logi) – zostawiam jak było
     C_MON --> C_DB
+
     Admin -- git clone / pobranie archiwum --> Repo
     Admin -- "docker-compose up -d" --> Shell
     Shell -- tworzenie sieci, wolumenów,\nuruchamianie kontenerów --> Docker

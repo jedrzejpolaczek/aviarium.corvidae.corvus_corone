@@ -52,6 +52,23 @@ flowchart LR
     linkStyle 5 stroke:#D50000,fill:none
     L_S_A5_0@{ animation: none }
 ```
+Elementy:
+
+- **System S: HPO Benchmarking Platform**
+- Aktorzy:
+  - A1: Badacz / Inżynier ML
+  - A2: Twórca algorytmu HPO
+  - A3: Administrator
+  - A4: Zewnętrzny system AutoML / narzędzie analityczne
+  - A5: Zewnętrzny system bibliograficzny (CrossRef / arXiv / DOI)
+- Relacje (kierunek: → oznacza inicjatora przepływu):
+  - A1 → S: „Konfiguruj i uruchamiaj benchmarki, analizuj wyniki, przeglądaj panel eksperymentów, eksportuj dane.”
+  - A2 → S: „Rejestruj i testuj własne algorytmy HPO (pluginy).”
+  - A3 → S: „Administruj systemem, zasobami i katalogami (algorytmy, benchmarki).”
+  - A4 ↔ S: „Integracja przez API: uruchamianie eksperymentów, pobieranie metryk i wyników.”
+  - S ↔ A5: „Pobieranie / weryfikacja metadanych publikacji (DOI, tytuł, autorzy, BibTeX).”
+
+Słownie: na diagramie kontekstu system S jest centralnym prostokątem; aktorzy A1–A4 są umieszczeni wokół niego, połączeni strzałkami. Zewnętrzny system bibliograficzny A5 jest połączony dwukierunkowo z systemem S.
 
 ### 1.1. Użytkownicy / aktorzy biznesowi
 
@@ -87,27 +104,7 @@ Główny system wspierający:
 - zarządzanie algorytmami HPO (wbudowane + pluginy),
 - zarządzanie referencjami do publikacji.
 
-### 1.3. Diagram kontekstu C4 – opis słowny
-
-Elementy:
-
-- **System S: HPO Benchmarking Platform**
-- Aktorzy:
-  - A1: Badacz / Inżynier ML
-  - A2: Twórca algorytmu HPO
-  - A3: Administrator
-  - A4: Zewnętrzny system AutoML / narzędzie analityczne
-  - A5: Zewnętrzny system bibliograficzny (CrossRef / arXiv / DOI)
-- Relacje (kierunek: → oznacza inicjatora przepływu):
-  - A1 → S: „Konfiguruj i uruchamiaj benchmarki, analizuj wyniki, przeglądaj panel eksperymentów, eksportuj dane.”
-  - A2 → S: „Rejestruj i testuj własne algorytmy HPO (pluginy).”
-  - A3 → S: „Administruj systemem, zasobami i katalogami (algorytmy, benchmarki).”
-  - A4 ↔ S: „Integracja przez API: uruchamianie eksperymentów, pobieranie metryk i wyników.”
-  - S ↔ A5: „Pobieranie / weryfikacja metadanych publikacji (DOI, tytuł, autorzy, BibTeX).”
-
-Słownie: na diagramie kontekstu system S jest centralnym prostokątem; aktorzy A1–A4 są umieszczeni wokół niego, połączeni strzałkami. Zewnętrzny system bibliograficzny A5 jest połączony dwukierunkowo z systemem S.
-
-### 1.4. Wymagania funkcjonalne (R1–R15)
+### 1.3. Wymagania funkcjonalne (R1–R15)
 
 **Katalog funkcjonalny:**
 
@@ -127,7 +124,7 @@ Słownie: na diagramie kontekstu system S jest centralnym prostokątem; aktorzy 
 - **R14.** Eksport danych (wyniki, metryki, konfiguracje) do formatów zewnętrznych (CSV/JSON/Parquet) dla narzędzi analitycznych.  
 - **R15.** Uruchamianie systemu w trybie **PC-local** i **cloud / K8s** (w tym skalowanie workerów).  
 
-### 1.5. Wymagania niefunkcjonalne (RNF1–RNF8)
+### 1.4. Wymagania niefunkcjonalne (RNF1–RNF8)
 
 - **RNF1 – Skalowalność:**  
   - Możliwość uruchamiania wielu workerów równolegle, zarówno lokalnie (wiele procesów / kontenerów), jak i w chmurze (K8s, autoscaling).  
@@ -153,6 +150,7 @@ Słownie: na diagramie kontekstu system S jest centralnym prostokątem; aktorzy 
 ```mermaid
 ---
 config:
+  look: neo
   layout: elk
   theme: redux-dark
 ---
@@ -194,6 +192,25 @@ flowchart TB
     style ExecLayer stroke:#D50000
     style Core stroke:#C8E6C9
     style Client stroke:#FFE0B2
+    linkStyle 0 stroke:#757575,fill:none
+    linkStyle 2 stroke:#FFD600,fill:none
+    linkStyle 3 stroke:#FFD600,fill:none
+    linkStyle 4 stroke:#FFD600,fill:none
+    linkStyle 5 stroke:#FFD600,fill:none
+    linkStyle 6 stroke:#FFD600,fill:none
+    linkStyle 7 stroke:#FFD600,fill:none
+    linkStyle 8 stroke:#FFD600,fill:none
+    linkStyle 10 stroke:#00C853,fill:none
+    linkStyle 11 stroke:#00C853,fill:none
+    linkStyle 12 stroke:#00C853,fill:none
+    linkStyle 13 stroke:#00C853,fill:none
+    linkStyle 14 stroke:#00C853,fill:none
+    linkStyle 15 stroke:#00C853,fill:none
+    linkStyle 16 stroke:#2962FF,fill:none
+    linkStyle 17 stroke:#AA00FF,fill:none
+    linkStyle 18 stroke:#D50000,fill:none
+    linkStyle 19 stroke:#FFF9C4,fill:none
+    linkStyle 20 stroke:#C8E6C9
 ```
 
 ### 2.1. Lista kontenerów
@@ -442,6 +459,293 @@ Dla każdego kontenera: odpowiedzialności, komunikacja (sync/async), rola w PC 
 
 ## 3. Komponenty (C4-3)
 
+Ogólny:
+```mermaid
+---
+config:
+  layout: elk
+  theme: redux-dark
+---
+classDiagram
+direction LR
+class WebUI {
+  +ExperimentDesignerUI
+  +TrackingDashboardUI
+  +ComparisonViewUI
+  +BenchmarkCatalogUI
+  +AlgorithmCatalogUI
+  +PublicationManagerUI
+  +AdminSettingsUI
+}
+class APIGateway {
+  +REST/GraphQL API
+  +AuthN/AuthZ
+  +Routing
+}
+class ExperimentOrchestrator {
+  +ExperimentConfigManager
+  +ExperimentPlanBuilder
+  +RunScheduler
+  +ExperimentStateStore
+  +ReproducibilityManager
+  +EventPublisher
+}
+class ExperimentTrackingService {
+  +TrackingAPI
+  +RunLifecycleManager
+  +TaggingAndSearchEngine
+  +LineageTracker
+}
+class MetricsAnalysisService {
+  +MetricCalculator
+  +AggregationEngine
+  +StatisticalTestsEngine
+  +VisualizationQueryAdapter
+}
+class BenchmarkDefinitionService {
+  +BenchmarkRepository
+  +ProblemInstanceManager
+  +BenchmarkVersioning
+}
+class AlgorithmRegistryService {
+  +AlgorithmMetadataStore
+  +AlgorithmVersionManager
+  +CompatibilityChecker
+}
+class PublicationService {
+  +ReferenceCatalog
+  +CitationFormatter
+  +ReferenceLinker
+  +ExternalBibliographyClient
+}
+class WorkerRuntime {
+  +RunExecutor
+  +DatasetLoader
+  +MetricReporter
+  +ArtifactUploader
+}
+class PluginRuntime {
+  +PluginLoader
+  +SandboxManager
+  +PluginValidator
+  +IAlgorithmPlugin
+}
+class ResultsStore {
+  +ExperimentDAO
+  +RunDAO
+  +MetricDAO
+  +AlgorithmDAO
+  +BenchmarkDAO
+  +PublicationDAO
+  +LinkDAO
+}
+class ObjectStorage {
+  +DatasetStorage
+  +ArtifactStorage
+  +ReportStorage
+}
+class MessageBroker {
+  +RunJobQueue
+  +EventBus
+}
+class MonitoringStack {
+  +LogCollector
+  +MetricsCollector
+  +Dashboards
+}
+class AuthService {
+  +TokenValidation
+  +RoleMapping
+}
+WebUI --> APIGateway : HTTP
+APIGateway --> ExperimentOrchestrator : IExperimentOrchestration
+APIGateway --> ExperimentTrackingService : ITrackingAPI
+APIGateway --> MetricsAnalysisService : IAnalysisAPI
+APIGateway --> BenchmarkDefinitionService : IBenchmarkCatalog
+APIGateway --> AlgorithmRegistryService : IAlgorithmCatalog
+APIGateway --> PublicationService : IPublicationAPI
+APIGateway --> AuthService : AuthN/AuthZ
+ExperimentOrchestrator --> BenchmarkDefinitionService : validateBenchmarks()
+ExperimentOrchestrator --> AlgorithmRegistryService : validateAlgorithms()
+ExperimentOrchestrator --> ExperimentTrackingService : registerExperiment(), registerRuns()
+ExperimentOrchestrator --> MessageBroker : publish(RunJob)
+ExperimentOrchestrator --> ResultsStore : experimentState
+WorkerRuntime --> MessageBroker : consume(RunJob)
+WorkerRuntime --> BenchmarkDefinitionService : getBenchmarkInstance()
+WorkerRuntime --> AlgorithmRegistryService : getAlgorithmVersion()
+WorkerRuntime --> PluginRuntime : executeAlgorithm()
+WorkerRuntime --> ExperimentTrackingService : logRun(), logMetrics(), logArtifacts()
+WorkerRuntime --> ObjectStorage : uploadArtifacts()
+PluginRuntime --> ResultsStore : storeValidationResults()
+PluginRuntime --> ObjectStorage : read/write plugin artifacts
+ExperimentTrackingService --> ResultsStore : CRUD Experiments/Runs/Metrics
+MetricsAnalysisService --> ResultsStore : readMetrics(), readRuns()
+PublicationService --> ResultsStore : CRUD Publications + Links
+BenchmarkDefinitionService --> ResultsStore : CRUD Benchmarks/Instances
+AlgorithmRegistryService --> ResultsStore : CRUD Algorithms/Versions
+MonitoringStack --> ExperimentOrchestrator : collects logs/metrics
+MonitoringStack --> WorkerRuntime : collects logs/metrics
+MonitoringStack --> APIGateway : collects logs/metrics
+```
+
+Control plane, ten widok pokazuje komponenty, które „sterują” systemem i przechowują stan:
+```mermaid
+---
+config:
+  layout: elk
+  theme: redux-dark
+---
+classDiagram
+direction TB
+class WebUI {
+  +configureExperiment()
+  +viewTracking()
+  +compareAlgorithms()
+  +manageBenchmarks()
+  +manageAlgorithms()
+  +managePublications()
+}
+class APIGateway {
+  +REST/GraphQL
+  +AuthN/AuthZ
+}
+class ExperimentOrchestrator {
+  +createExperiment()
+  +startExperiment()
+  +scheduleRuns()
+  +updateStatus()
+}
+class ExperimentTrackingService {
+  +createExperiment()
+  +createRun()
+  +updateRunStatus()
+  +logMetric()
+  +searchExperiments()
+}
+class MetricsAnalysisService {
+  +compareAlgorithms()
+  +aggregateMetrics()
+  +runStatisticalTests()
+}
+class BenchmarkDefinitionService {
+  +createBenchmark()
+  +listBenchmarks()
+  +getBenchmarkInstances()
+}
+class AlgorithmRegistryService {
+  +registerAlgorithm()
+  +registerAlgorithmVersion()
+  +listAlgorithms()
+  +checkCompatibility()
+}
+class PublicationService {
+  +addPublication()
+  +linkPublication()
+  +listPublications()
+}
+class ResultsStore
+WebUI --> APIGateway
+APIGateway --> ExperimentOrchestrator
+APIGateway --> ExperimentTrackingService
+APIGateway --> MetricsAnalysisService
+APIGateway --> BenchmarkDefinitionService
+APIGateway --> AlgorithmRegistryService
+APIGateway --> PublicationService
+ExperimentOrchestrator --> ExperimentTrackingService
+ExperimentOrchestrator --> BenchmarkDefinitionService
+ExperimentOrchestrator --> AlgorithmRegistryService
+ExperimentTrackingService --> ResultsStore
+MetricsAnalysisService --> ResultsStore
+BenchmarkDefinitionService --> ResultsStore
+AlgorithmRegistryService --> ResultsStore
+PublicationService --> ResultsStore
+```
+
+Execution plane, tu mamy czystą „ścieżkę runów”, orkiestrator, kolejka, workery, pluginy
+```mermaid
+---
+config:
+  layout: elk
+  theme: redux-dark
+---
+classDiagram
+direction LR
+class ExperimentOrchestrator {
+  +scheduleRuns()
+}
+class MessageBroker {
+  +RunJobQueue
+}
+class WorkerRuntime {
+  +RunExecutor
+  +DatasetLoader
+  +MetricReporter
+  +ArtifactUploader
+}
+class PluginRuntime {
+  +PluginLoader
+  +SandboxManager
+  +PluginValidator
+  +IAlgorithmPlugin
+}
+class BenchmarkDefinitionService
+class AlgorithmRegistryService
+class ExperimentTrackingService
+class ObjectStorage
+ExperimentOrchestrator --> MessageBroker : publish(RunJob)
+WorkerRuntime --> MessageBroker : consume(RunJob)
+WorkerRuntime --> BenchmarkDefinitionService : loadBenchmark()
+WorkerRuntime --> AlgorithmRegistryService : loadAlgorithmVersion()
+WorkerRuntime --> PluginRuntime : runHPO()
+WorkerRuntime --> ExperimentTrackingService : logRun()+logMetrics()
+WorkerRuntime --> ObjectStorage : uploadArtifacts()
+```
+
+Publikacje, raportowanie, porównania, osobny diagram dla referencji do publikacji, analytics i generatora raportów:
+```mermaid
+---
+config:
+  layout: elk
+  theme: redux-dark
+---
+classDiagram
+direction TB
+class WebUI {
+  +openComparisonView()
+  +openPublicationManager()
+  +downloadReport()
+}
+class MetricsAnalysisService {
+  +compareAlgorithms()
+  +prepareVisualizationData()
+}
+class ExperimentTrackingService {
+  +getRuns()
+  +getMetrics()
+}
+class PublicationService {
+  +ReferenceCatalog
+  +ReferenceLinker
+  +CitationFormatter
+}
+class ReportGenerator {
+  +generateReport()
+}
+class ResultsStore
+class ObjectStorage
+WebUI --> MetricsAnalysisService : requestComparison()
+WebUI --> PublicationService : managePublications()
+WebUI --> ReportGenerator : requestReport()
+MetricsAnalysisService --> ExperimentTrackingService : fetchRuns+Metrics()
+MetricsAnalysisService --> ResultsStore : readData()
+PublicationService --> ResultsStore : CRUD publications+links
+ReportGenerator --> ExperimentTrackingService : getExperimentDetails()
+ReportGenerator --> MetricsAnalysisService : getAggregatedResults()
+ReportGenerator --> PublicationService : getReferences()
+ReportGenerator --> ObjectStorage : storeReport()
+ExperimentTrackingService --> ResultsStore
+```
+
 Poniżej wewnętrzna struktura najważniejszych kontenerów.
 
 ### 3.1. Experiment Orchestrator Service – komponenty
@@ -659,7 +963,41 @@ Przykładowy model (w skrócie):
 
 ---
 
-## 5. Przypadki użycia i opis UC
+## 5. Przypadki użycia
+
+```mermaid
+---
+config:
+  layout: elk
+  theme: redux-dark
+---
+flowchart LR
+    A1(("Badacz / Inżynier ML")) --> UC1[["UC1: Skonfiguruj i uruchom eksperyment"]] & UC4[["UC4: Porównaj wyniki algorytmów"]] & UC5[["UC5: Przeglądaj i filtruj eksperymenty"]] & UC6[["UC6: Zarządzaj referencjami do artykułów"]] & UC9[["UC9: Eksportuj dane do analizy zewnętrznej"]]
+    A2(("Twórca algorytmu HPO")) --> UC3[["UC3: Zaimplementuj i zarejestruj algorytm HPO plugin"]] & UC4 & UC5
+    A3(("Administrator")) --> UC2[["UC2: Dodaj wbudowany algorytm HPO"]] & UC6 & UC7[["UC7: Uruchom system lokalnie na PC"]] & UC8[["UC8: Uruchom system w chmurze / skaluj workerów"]]
+    A4(("Zewnętrzny system AutoML")) --> UC1 & UC4 & UC5 & UC9
+     A1:::Peach
+     A2:::Peach
+     A3:::Peach
+     A4:::Peach
+    classDef Peach stroke-width:1px, stroke-dasharray:none, stroke:#FBB35A, fill:#FFEFDB, color:#8F632D
+    style A1 color:#000000
+    style A2 color:#000000
+    style A3 color:#000000
+    style A4 color:#000000
+    linkStyle 0 stroke:#AA00FF,fill:none
+    linkStyle 1 stroke:#AA00FF,fill:none
+    linkStyle 2 stroke:#AA00FF,fill:none
+    linkStyle 3 stroke:#AA00FF
+    linkStyle 4 stroke:#AA00FF,fill:none
+    linkStyle 5 stroke:#FFD600,fill:none
+    linkStyle 6 stroke:#FFD600,fill:none
+    linkStyle 7 stroke:#FFD600,fill:none
+    linkStyle 12 stroke:#00C853,fill:none
+    linkStyle 13 stroke:#00C853,fill:none
+    linkStyle 14 stroke:#00C853,fill:none
+    linkStyle 15 stroke:#00C853,fill:none
+```
 
 ### 5.1. Lista przypadków użycia
 
@@ -673,45 +1011,7 @@ Przykładowy model (w skrócie):
 - **UC8:** Uruchom system w chmurze / skaluj workerów.  
 - **UC9:** Eksportuj dane do analizy zewnętrznej.  
 
-### 5.2. Diagram przypadków użycia – opis słowny
-
-**Aktorzy:**
-
-- A1: Badacz / Inżynier ML  
-- A2: Twórca algorytmu HPO  
-- A3: Administrator  
-- A4: Zewnętrzny system AutoML / narzędzie analityczne  
-
-**Powiązania:**
-
-- A1:
-  - UC1, UC4, UC5, UC6, UC9.
-- A2:
-  - UC3, UC4 (jako konsument wyników), UC5 (podgląd wyników własnych algorytmów).
-- A3:
-  - UC2, UC7, UC8, UC6 (walidacja referencji), częściowo UC1 (zatwierdzanie benchmarków).
-- A4:
-  - UC1 (poprzez API – inicjowanie eksperymentów),
-  - UC4, UC5 (pobieranie wyników i metryk),
-  - UC9 (masowy eksport).
-
-**Relacje include/extend (logiczne):**
-
-- UC1 **include**:
-  - „Zapisz konfigurację eksperymentu” (część obsługi przez Experiment Tracking).
-  - „Waliduj plan eksperymentu” (przez Orchestrator).  
-- UC3 **include**:
-  - „Walidacja pluginu” (PluginValidator).
-  - „Rejestracja algorytmu w Algorithm Registry”.  
-- UC4 **include**:
-  - „Pobierz metryki z Tracking Service”.
-  - „Przeprowadź analizę statystyczną (Metrics & Analysis)”.  
-- UC5 **extend**:
-  - „Otwórz szczegóły runu” (rozszerzenie panelu).  
-- UC9 **include**:
-  - „Wygeneruj raport”, „Wyeksportuj dane surowe”.  
-
-### 5.3. Opisy wybranych przypadków użycia
+### 5.2. Opisy przypadków użycia
 
 #### UC1: Skonfiguruj i uruchom eksperyment benchmarkowy
 
@@ -750,6 +1050,401 @@ Przykładowy model (w skrócie):
   - Wszystkie runy mają metryki i logi zapisane w Tracking Service.
   - Dane są gotowe do analizy (UC4).
 
+```mermaid
+---
+config:
+  layout: elk
+  theme: redux-dark
+---
+flowchart LR
+ subgraph subGraph0["Przepływ danych"]
+        UI["Web UI\n(Kreator eksperymentu)"]
+        U["Badacz / Inżynier ML"]
+        API["API Gateway"]
+        ORCH["Experiment Orchestrator"]
+        BENCH["Benchmark Definition Service"]
+        ALG["Algorithm Registry Service"]
+        TRK["Experiment Tracking Service"]
+        MB["Message Broker\nRunJob queue"]
+        W["Worker Runtime"]
+        OBJ["Object Storage\n(artefakty, modele)"]
+        DB[("Results Store\n(Experiments, Runs, Metrics)")]
+  end
+    U --> UI
+    UI --> API
+    API --> ORCH
+    ORCH --> BENCH & ALG & TRK & MB
+    MB --> W
+    W --> TRK & OBJ
+    TRK --> DB
+    U -- konfiguracja eksperymentu\n(benchmarki, algorytmy, budżety) --> UI
+    UI -- config JSON --> API
+    API -- createExperiment(config) --> ORCH
+    ORCH -- pobierz definicje instancji --> BENCH
+    ORCH -- pobierz definicje algorytmów --> ALG
+    ORCH -- registerExperiment, registerRuns --> TRK
+    ORCH -- RunJob --> MB
+    W -- logRun, logMetrics, logArtifacts --> TRK
+    W -- modele, logi, artefakty --> OBJ
+    TRK -- INSERT Experiments/Runs/Metrics --> DB
+    UI <-- status eksperymentu, wyniki --> API
+    linkStyle 3 stroke:#FFD600,fill:none
+    linkStyle 4 stroke:#FFD600,fill:none
+    linkStyle 5 stroke:#FFD600,fill:none
+    linkStyle 6 stroke:#FFD600,fill:none
+    linkStyle 8 stroke:#00C853,fill:none
+    linkStyle 9 stroke:#00C853,fill:none
+    linkStyle 14 stroke:#FFD600,fill:none
+    linkStyle 15 stroke:#FFD600,fill:none
+    linkStyle 16 stroke:#FFD600,fill:none
+    linkStyle 17 stroke:#FFD600,fill:none
+    linkStyle 18 stroke:#00C853,fill:none
+    linkStyle 19 stroke:#00C853
+```
+
+```mermaid
+---
+config:
+  layout: elk
+  theme: redux-dark
+---
+flowchart TB
+ subgraph User["Badacz / Inżynier ML"]
+        U1["Otwórz kreator eksperymentu"]
+        U2["Wybierz benchmarki i instancje"]
+        U3["Wybierz algorytmy HPO i parametry"]
+        U4["Ustaw cele (metryki, G1–G5) i budżety"]
+        U5["Zapisz i uruchom eksperyment"]
+  end
+ subgraph UI["Web UI"]
+        W1["Pobierz listę benchmarków i algorytmów"]
+        W2["Walidacja formularza po stronie UI"]
+        W3["Wyślij config do API"]
+        W4["Wyświetl status eksperymentu\n(running/completed/failed)"]
+  end
+ subgraph ORCH["Experiment Orchestrator"]
+        O1["Odbierz konfigurację eksperymentu"]
+        O2["Waliduj config z Benchmark/Algorithm Registry"]
+        D1{"Konfiguracja poprawna?"}
+        O3["Utwórz plan runów\n(alg × instancja × seed)"]
+        O4["Zapisz eksperyment + runy w Tracking Service"]
+        O5["Wyślij zadania RunJob do kolejki"]
+        O6["Monitoruj runy,\naktualizuj status eksperymentu"]
+  end
+ subgraph Worker["Worker Runtime"]
+        R1["Pobierz RunJob z kolejki"]
+        R2["Załaduj instancję benchmarku i algorytm"]
+        R3["Uruchom proces HPO\n(trenowanie modelu itp.)"]
+        R4["Loguj metryki, logi, artefakty do Tracking/Object Storage"]
+  end
+    U1 --> W1
+    W1 --> U2
+    U2 --> U3
+    U3 --> U4
+    U4 --> W2
+    W2 --> U5
+    U5 --> W3
+    W3 --> O1
+    O1 --> O2
+    O2 --> D1
+    D1 -- Nie --> W2
+    D1 -- Tak --> O3
+    O3 --> O4
+    O4 --> O5
+    O5 --> R1
+    R1 --> R2
+    R2 --> R3
+    R3 --> R4
+    R4 --> O6
+    O6 --> W4
+    linkStyle 0 stroke:#00C853,fill:none
+    linkStyle 1 stroke:#00C853,fill:none
+    linkStyle 2 stroke:#2962FF,fill:none
+    linkStyle 3 stroke:#2962FF,fill:none
+    linkStyle 4 stroke:#2962FF,fill:none
+    linkStyle 5 stroke:#2962FF,fill:none
+    linkStyle 6 stroke:#FFD600,fill:none
+    linkStyle 7 stroke:#FFD600,fill:none
+    linkStyle 10 stroke:#AA00FF,fill:none
+    linkStyle 19 stroke:#FF6D00
+```
+
+```mermaid
+---
+config:
+  theme: redux-dark-color
+---
+sequenceDiagram
+    autonumber
+    actor User as Badacz
+    participant UI as WebUI
+    participant API as APIGateway
+    participant ORCH as ExperimentOrchestrator
+    participant BENCH as BenchmarkDefinition
+    participant ALG as AlgorithmRegistry
+    participant TRK as TrackingService
+    participant MB as MessageBroker
+    participant W as Worker
+    participant OBJ as ObjectStorage
+    participant DB as ResultsStore
+    User->>UI: openExperimentWizard()
+    UI->>API: getBenchmarks()
+    API->>BENCH: listBenchmarks()
+    BENCH-->>API: benchmarks[]
+    API-->>UI: benchmarks[]
+    UI->>API: getAlgorithms()
+    API->>ALG: listAlgorithms()
+    ALG-->>API: algorithms[]
+    API-->>UI: algorithms[]
+    User->>UI: fillExperimentForm()
+    UI->>API: createExperiment(config)
+    API->>ORCH: createExperiment(config)
+    ORCH->>BENCH: validateBenchmarks(config)
+    ORCH->>ALG: validateAlgorithms(config)
+    ORCH->>TRK: registerExperiment(config)
+    TRK->>DB: insertExperiment+Runs
+    DB-->>TRK: ok
+    TRK-->>ORCH: experimentId
+    User->>UI: startExperiment(experimentId)
+    UI->>API: startExperiment(experimentId)
+    API->>ORCH: startExperiment(experimentId)
+    ORCH->>MB: publish(RunJob*)
+    loop for each RunJob
+        W->>MB: consume(RunJob)
+        W->>BENCH: getBenchmarkInstance()
+        W->>ALG: getAlgorithmVersion()
+        W->>TRK: logRunStarted()
+        W->>TRK: logMetrics()
+        W->>OBJ: uploadArtifacts()
+        W->>TRK: logRunCompleted()
+        TRK->>DB: insertMetrics+updateRun
+        TRK-->>ORCH: runCompleted(runId)
+    end
+    ORCH->>TRK: updateExperimentStatus()
+    UI->>API: getExperimentStatus()
+    API->>TRK: getExperiment(experimentId)
+    TRK->>DB: selectExperiment+Runs
+    DB-->>TRK: data
+    TRK-->>API: experimentStatus
+    API-->>UI: experimentStatus
+    UI-->>User: showStatusAndResults()
+```
+
+---
+
+#### UC2: Dodaj nowy wbudowany algorytm HPO
+
+**Aktorzy główni:**
+- Administrator (Primary)
+
+**Aktorzy poboczni:**
+- Algorithm Registry Service
+- Publication & Reference Service
+
+**Cel:**
+Dodanie do systemu nowego *wbudowanego* algorytmu HPO, który będzie dostępny w katalogu algorytmów dla wszystkich użytkowników oraz – opcjonalnie – powiązany z publikacjami naukowymi.
+
+**Warunki początkowe:**
+- Administrator jest uwierzytelniony i posiada uprawnienia administracyjne (rola Administrator).
+- System jest uruchomiony w trybie lokalnym lub chmurowym (Web UI, API Gateway, Algorithm Registry, Publication Service, Results Store dostępne).
+- Administrator zna podstawowe informacje o algorytmie:
+  - Nazwa, opis, typ algorytmu (np. Bayesian, TPE, random search),
+  - Definicja przestrzeni hiperparametrów,
+  - Informacja o implementacji (np. moduł w repozytorium kodu),
+  - Opcjonalnie: DOI lub inne identyfikatory publikacji.
+
+**Główny scenariusz:**
+1. Administrator otwiera w Web UI panel **„Algorytmy HPO”**.
+2. System wyświetla listę zarejestrowanych algorytmów (wbudowanych oraz pluginów).
+3. Administrator wybiera akcję **„Dodaj algorytm wbudowany”**.
+4. System wyświetla formularz z polami:
+   - Nazwa algorytmu, krótki opis,
+   - Typ algorytmu (klasa/rodzina HPO),
+   - Przestrzeń hiperparametrów (schemat),
+   - Domyślne parametry,
+   - Flaga `is_builtin`,
+   - Informacja o implementacji (np. nazwa klasy, modułu),
+   - Opcjonalne powiązane DOI / identyfikatory publikacji.
+5. Administrator wypełnia formularz danymi algorytmu.
+6. Web UI wykonuje wstępną walidację (pola wymagane, format DOI, poprawność schematu przestrzeni hiperparametrów).
+7. Administrator potwierdza zapis algorytmu.
+8. Web UI wysyła do API Gateway żądanie `createBuiltinAlgorithm(metadata, pubIds?)`.
+9. API Gateway:
+   - 9.1. Sprawdza uprawnienia użytkownika (rola Administrator),
+   - 9.2. W przypadku braku uprawnień odrzuca żądanie (patrz scenariusz alternatywny).
+10. API przekazuje metadane do **Algorithm Registry Service**.
+11. Algorithm Registry:
+    - 11.1. Waliduje metadane algorytmu (np. unikalność nazwy, poprawność przestrzeni hiperparametrów),
+    - 11.2. Tworzy rekord **Algorithm** z flagą `is_builtin = true`,
+    - 11.3. Tworzy rekord **AlgorithmVersion** (np. `v1.0`, status `approved` lub `draft` wg polityki).
+12. Algorithm Registry zapisuje dane w Results Store.
+13. API otrzymuje informację o utworzeniu algorytmu (`algorithmId`, `versionId`).
+14. Jeżeli w żądaniu podano listę DOI / identyfikatorów publikacji:
+    - 14.1. API wywołuje **Publication & Reference Service** z żądaniem `createPublicationLinks(algorithmId, pubIds)`,
+    - 14.2. Publication Service tworzy brakujące rekordy `Publication` na podstawie DOI (w razie potrzeby),
+    - 14.3. Publication Service tworzy rekordy `PublicationLink` łączące algorytm z publikacjami.
+15. API zwraca do Web UI informację o sukcesie oraz identyfikatory nowego algorytmu i wersji.
+16. Web UI:
+    - 16.1. Wyświetla komunikat sukcesu,
+    - 16.2. Odświeża listę algorytmów, pokazując nowy algorytm w katalogu.
+
+**Scenariusze alternatywne / błędy:**
+
+- **2A. Brak uprawnień administratora**
+  1. W kroku 9.1 API stwierdza, że użytkownik nie ma roli Administrator.
+  2. API zwraca błąd autoryzacji (np. 403 Forbidden).
+  3. Web UI wyświetla komunikat o braku uprawnień i nie zapisuje algorytmu.
+
+- **2B. Błędy walidacji po stronie UI**
+  1. W kroku 6 Web UI wykrywa błędy (np. brak nazwy algorytmu, niepoprawny format DOI).
+  2. System podświetla błędne pola i wyświetla komunikaty walidacyjne.
+  3. Administrator poprawia dane i wraca do kroku 7.
+
+- **2C. Błąd walidacji po stronie Algorithm Registry**
+  1. W kroku 11 walidacja metadanych nie przechodzi (np. nazwa algorytmu już istnieje, schemat parametrów jest niepoprawny).
+  2. Algorithm Registry zwraca błąd walidacji do API.
+  3. API przekazuje szczegóły błędów do Web UI.
+  4. Web UI wyświetla komunikat o błędzie z informacją, które pola należy poprawić.
+  5. Administrator poprawia dane i ponawia próbę od kroku 7.
+
+- **2D. Błąd komunikacji z Publication Service**
+  1. W kroku 14 Publication Service nie jest dostępny lub zwraca błąd.
+  2. API może:
+     - 2D.1. Zwrócić częściowy sukces (algorytm zapisany, ale publikacje niepowiązane),
+     - 2D.2. Lub przerwać operację w całości (w zależności od przyjętej polityki).
+  3. Web UI wyświetla odpowiedni komunikat:
+     - a) „Algorytm zapisany, ale publikacje nie zostały powiązane”,
+     - b) lub „Nie udało się zapisać algorytmu – spróbuj ponownie”.
+
+**Warunki końcowe:**
+- W przypadku sukcesu:
+  - Nowy wbudowany algorytm HPO jest zapisany w Results Store (Algorithm + AlgorithmVersion),
+  - Jest widoczny w katalogu algorytmów i może być używany w eksperymentach benchmarkowych,
+  - Jeżeli podano DOI – algorytm jest powiązany z odpowiednimi publikacjami.
+- W przypadku błędu:
+  - System pozostaje w stanie spójnym – albo nie powstał żaden nowy algorytm, albo algorytm powstał, ale brak jest częściowo powiązań z publikacjami (w zależności od scenariusza).
+
+```mermaid
+---
+config:
+  layout: elk
+  theme: redux-dark
+---
+flowchart LR
+    Admin(["Administrator"]) --> UI["Web UI\n(Panel algorytmów HPO)"]
+    UI --> API["API Gateway"]
+    API --> REG["Algorithm Registry Service"] & PUB["Publication Service"]
+    REG --> DBALG[("Results Store\nAlgorithm/AlgorithmVersion")]
+    PUB --> DBPUB[("Results Store\nPublication/PublicationLink")]
+    Admin -- metadane algorytmu\n(nazwa, typ, parametry,\nflaga is_builtin) --> UI
+    UI -- createBuiltinAlgorithm() --> API
+    API -- alg metadata --> REG
+    REG -- INSERT Algorithm + AlgorithmVersion --> DBALG
+    UI -- opcjonalne DOI / publikacje --> API
+    API -- linkPublication(algorithmId, pubIds) --> PUB
+    PUB -- INSERT PublicationLink --> DBPUB
+```
+
+```mermaid
+---
+config:
+  layout: elk
+  theme: redux-dark
+---
+flowchart TB
+ subgraph Swim_Admin["Administrator"]
+        A1@{ label: "Otwórz panel 'Algorytmy HPO'" }
+        A2@{ label: "Kliknij 'Dodaj algorytm wbudowany'" }
+        A3["Wypełnij formularz\n(nazwa, typ, parametry, is_builtin,\nDOI opcjonalnie)"]
+        A4["Zatwierdź dodanie algorytmu"]
+  end
+ subgraph Swim_UI["Web UI"]
+        U1["Wyświetl formularz algorytmu"]
+        U2["Waliduj pola formularza"]
+        U3["Wyślij createBuiltinAlgorithm() do API"]
+        U4["Wyświetl komunikat sukcesu / błąd"]
+  end
+ subgraph Swim_API["API Gateway"]
+        G1["Sprawdź uprawnienia (rola Administrator)"]
+        G2["Przekaż metadane do Algorithm Registry"]
+        G3["Jeśli podano DOI: przekazuj do Publication Service"]
+  end
+ subgraph Swim_REG["Algorithm Registry"]
+        R1["Waliduj metadane algorytmu"]
+        R2["Zapisz Algorithm(is_builtin=true)"]
+        R3["Zapisz AlgorithmVersion(status=approved/draft)"]
+  end
+ subgraph Swim_PUB["Publication Service"]
+        P1["Pobierz/zweryfikuj metadane publikacji (DOI)"]
+        P2["Zapisz PublicationLink Algorithm↔Publication"]
+  end
+    A1 --> A2
+    A2 --> U1
+    U1 --> A3
+    A3 --> U2
+    U2 --> A4
+    A4 --> U3
+    U3 --> G1
+    G1 --> G2
+    G2 --> R1 & U4
+    R1 --> R2
+    R2 --> R3
+    R3 --> G2
+    G3 --> P1
+    P1 --> P2
+    A1@{ shape: rect}
+    A2@{ shape: rect}
+    linkStyle 0 stroke:#FFD600,fill:none
+    linkStyle 1 stroke:#FFD600,fill:none
+    linkStyle 2 stroke:#FFD600,fill:none
+    linkStyle 3 stroke:#00C853,fill:none
+    linkStyle 4 stroke:#00C853,fill:none
+    linkStyle 5 stroke:#2962FF,fill:none
+    linkStyle 6 stroke:#2962FF,fill:none
+    linkStyle 7 stroke:#2962FF,fill:none
+    linkStyle 8 stroke:#FF6D00,fill:none
+    linkStyle 9 stroke:#2962FF
+    linkStyle 10 stroke:#FF6D00,fill:none
+    linkStyle 11 stroke:#FF6D00,fill:none
+    linkStyle 12 stroke:#FF6D00,fill:none
+```
+
+```mermaid
+---
+config:
+  theme: redux-dark-color
+---
+sequenceDiagram
+    autonumber
+    actor Admin as Administrator
+    participant UI as WebUI
+    participant API as APIGateway
+    participant REG as AlgorithmRegistry
+    participant PUB as PublicationService
+    participant DB as ResultsStore
+    Admin->>UI: openAlgorithmCatalog()
+    UI-->>API: listAlgorithms()
+    API->>REG: listAlgorithms()
+    REG-->>API: algorithms[]
+    API-->>UI: algorithms[]
+    Admin->>UI: clickAddBuiltinAlgorithm()
+    UI-->>Admin: showForm()
+    Admin->>UI: submitForm(metadata, is_builtin=true, pubIds?)
+    UI->>API: createBuiltinAlgorithm(metadata, pubIds?)
+    API->>REG: createAlgorithm(metadata, is_builtin=true)
+    REG->>DB: insert Algorithm, AlgorithmVersion
+    DB-->>REG: ok
+    REG-->>API: algorithmCreated(algorithmId, versionId)
+    alt pubIds provided
+        API->>PUB: createLinks(algorithmId, pubIds)
+        PUB->>DB: insert PublicationLink(s)
+        DB-->>PUB: ok
+        PUB-->>API: linksCreated()
+    end
+    API-->>UI: success(algorithmId, versionId)
+    UI-->>Admin: showSuccess()
+```
+
 ---
 
 #### UC3: Zaimplementuj i zarejestruj własny algorytm HPO (plugin)
@@ -781,6 +1476,139 @@ Przykładowy model (w skrócie):
 - **Warunki końcowe:**  
   - Nowy algorytm HPO jest dostępny w Algorithm Registry i może być użyty w UC1.
 
+```mermaid
+---
+config:
+  layout: elk
+  theme: redux-dark
+---
+flowchart LR
+    Dev["Twórca algorytmu HPO"] --> SDK["Algorithm SDK\n(Plugin Runtime lokalnie)"] & UI["Web UI\n(Panel rejestracji pluginu)"]
+    UI --> API["API Gateway"]
+    API --> REG["Algorithm Registry Service"] & PUB["Publication Service"]
+    REG --> DBALG[("Results Store\nAlgorithm/AlgorithmVersion")]
+    PUB --> DBPUB[("Results Store\nPublication/PublicationLink")]
+    Dev -- kod pluginu\n(implementacja IAlgorithmPlugin) --> SDK
+    SDK -- walidacja, testy symulacyjne --> Dev
+    Dev -- metadane algorytmu + lokalizacja pluginu\n(URL/paczka/obraz) --> UI
+    UI -- registerPluginAlgorithm() --> API
+    API -- metadata + pluginLocation --> REG
+    REG -- INSERT Algorithm + AlgorithmVersion(draft) --> DBALG
+    UI -- powiązane DOI --> API
+    API -- linkPublication(algorithmId, pubIds) --> PUB
+    PUB -- INSERT PublicationLink --> DBPUB
+```
+
+```mermaid
+---
+config:
+  layout: elk
+  theme: redux-dark
+---
+flowchart TB
+ subgraph Dev["Twórca algorytmu HPO"]
+        D1["Zaimplementuj IAlgorithmPlugin\n(init, suggest, observe, itp.)"]
+        D2["Uruchom walidację SDK\n(hpo-sdk validate)"]
+        D3["Popraw błędy implementacji\n(jeśli wystąpią)"]
+        D4["Zbuduj paczkę pluginu\n(wheel/obraz kontenera)"]
+        D5@{ label: "Otwórz Web UI – panel 'Rejestruj algorytm'" }
+        D6["Wprowadź metadane + lokalizację pluginu,\npowiąż publikacje"]
+  end
+ subgraph SDK["Algorithm SDK / PluginRuntime (lokalnie)"]
+        S1["Załaduj plugin"]
+        S2["Sprawdź zgodność z interfejsem"]
+        S3["Wykonaj testową symulację HPO"]
+  end
+ subgraph UI["Web UI"]
+        U1["Wyświetl formularz rejestracji algorytmu"]
+        U2["Walidacja podstawowa danych"]
+        U3["Wyślij registerAlgorithm() do API"]
+  end
+ subgraph API["API Gateway"]
+        A1["Sprawdź uprawnienia\n(Twórca pluginu)"]
+        A2["Przekaż dane do Algorithm Registry"]
+        A3["Przekaż DOI do Publication Service"]
+  end
+ subgraph REG["Algorithm Registry"]
+        R1["Waliduj metadane i lokalizację pluginu"]
+        R2["Zapisz Algorithm"]
+        R3["Zapisz AlgorithmVersion(status=draft)"]
+  end
+ subgraph PUB["Publication Service"]
+        P1["Opcjonalnie pobierz metadane DOI"]
+        P2["Zapisz PublicationLink Algorithm↔Publication"]
+  end
+    D1 --> D2
+    D2 --> S1
+    S1 --> S2
+    S2 --> S3
+    S3 --> D4
+    D4 --> D5
+    D5 --> U1
+    U1 --> D6
+    D6 --> U2
+    U2 --> U3
+    U3 --> A1
+    A1 --> A2
+    A2 --> R1
+    R1 --> R2
+    R2 --> R3
+    A3 --> P1
+    P1 --> P2
+    D5@{ shape: rect}
+    linkStyle 0 stroke:#FF6D00,fill:none
+    linkStyle 1 stroke:#FF6D00,fill:none
+    linkStyle 2 stroke:#FF6D00,fill:none
+    linkStyle 3 stroke:#FF6D00,fill:none
+    linkStyle 4 stroke:#FF6D00,fill:none
+    linkStyle 5 stroke:#FFD600,fill:none
+    linkStyle 6 stroke:#FFD600,fill:none
+    linkStyle 7 stroke:#FFD600,fill:none
+    linkStyle 8 stroke:#00C853,fill:none
+    linkStyle 9 stroke:#00C853,fill:none
+    linkStyle 10 stroke:#00C853,fill:none
+    linkStyle 11 stroke:#00C853,fill:none
+    linkStyle 12 stroke:#00C853,fill:none
+    linkStyle 13 stroke:#00C853,fill:none
+    linkStyle 14 stroke:#00C853
+```
+
+```mermaid
+---
+config:
+  theme: redux-dark-color
+---
+sequenceDiagram
+    autonumber
+    actor Author as Twórca pluginu
+    participant SDK as Local SDK
+    participant UI as WebUI
+    participant API as APIGateway
+    participant REG as AlgorithmRegistry
+    participant PUB as PublicationService
+    participant DB as ResultsStore
+    Author->>SDK: validatePlugin(localPath)
+    SDK->>SDK: loadPlugin() + checkInterface()
+    SDK->>SDK: runTestSimulation()
+    SDK-->>Author: validationOK()
+    Author->>UI: openRegisterAlgorithm()
+    UI-->>Author: showRegistrationForm()
+    Author->>UI: submitAlgorithm(metadata, pluginLocation, pubIds?)
+    UI->>API: registerAlgorithm(metadata, pluginLocation, pubIds?)
+    API->>REG: createAlgorithm(metadata, pluginLocation)
+    REG->>DB: insert Algorithm, AlgorithmVersion(draft)
+    DB-->>REG: ok
+    REG-->>API: algorithmCreated(algorithmId, versionId)
+    alt pubIds provided
+        API->>PUB: createLinks(algorithmId, pubIds)
+        PUB->>DB: insert PublicationLink(s)
+        DB-->>PUB: ok
+        PUB-->>API: linksCreated()
+    end
+    API-->>UI: success(algorithmId, versionId)
+    UI-->>Author: showSuccess()
+```
+
 ---
 
 #### UC4: Porównaj wyniki algorytmów (w tym autorskich)
@@ -809,6 +1637,136 @@ Przykładowy model (w skrócie):
 - **Warunki końcowe:**  
   - A1 uzyskuje porównanie algorytmów, może podjąć decyzję badawczą i ewentualnie opublikować wyniki.
 
+```mermaid
+---
+config:
+  theme: redux-dark
+  layout: elk
+---
+flowchart LR
+    U["Badacz / Inżynier ML"] --> UI["Web UI\n(Widok porównań)"]
+    UI --> API["API Gateway"]
+    API --> TRK["Experiment Tracking Service"] & ANAL["Metrics & Analysis Service"]
+    TRK --> DB[("Results Store\nExperiments/Runs/Metrics")]
+    U -- wybór eksperymentów, algorytmów,\nbenchmarków, metryk --> UI
+    UI -- compareRequest() --> API
+    API -- getRunsForComparison() --> TRK
+    TRK -- SELECT Runs + Metrics --> DB
+    DB -- wyniki --> TRK
+    TRK -- dane wejściowe do analizy --> ANAL
+    ANAL -- agregaty, testy statystyczne,\nrankingi --> API
+    API -- wynik porównania --> UI
+    linkStyle 0 stroke:#FFD600,fill:none
+    linkStyle 1 stroke:#FF6D00,fill:none
+    linkStyle 2 stroke:#FF6D00,fill:none
+    linkStyle 3 stroke:#FF6D00,fill:none
+    linkStyle 4 stroke:#00C853,fill:none
+    linkStyle 5 stroke:#FFD600,fill:none
+    linkStyle 6 stroke:#AA00FF
+    linkStyle 7 stroke:#FF6D00,fill:none
+    linkStyle 8 stroke:#00C853,fill:none
+    linkStyle 9 stroke:#D50000,fill:none
+    linkStyle 10 stroke:#00C853,fill:none
+    linkStyle 11 stroke:#2962FF,fill:none
+    linkStyle 12 stroke:#FF6D00,fill:none
+```
+
+```mermaid
+---
+config:
+  layout: elk
+  theme: redux-dark
+---
+flowchart TB
+ subgraph Swim_User["Badacz / Inżynier ML"]
+        U1@{ label: "Otwórz widok 'Porównaj algorytmy'" }
+        U2["Wybierz eksperymenty / zakres danych"]
+        U3["Wybierz algorytmy, metryki, benchmarki"]
+        U4["Uruchom porównanie"]
+        U5["Analizuj wykresy, tabele, statystyki"]
+  end
+ subgraph Swim_UI["Web UI"]
+        W1["Załaduj listę eksperymentów/runów (filtry)"]
+        W2["Zbuduj zapytanie porównawcze\n(experimentIds, algorithmIds, metrics)"]
+        W3["Wywołaj compare() w API"]
+        W4["Wyświetl wyniki (wykresy, tabele)"]
+  end
+ subgraph Swim_API["API Gateway"]
+        A1["Pobierz runy i metryki z Tracking Service"]
+        A2["Przekaż dane wejściowe do Metrics & Analysis"]
+  end
+ subgraph Swim_TRK["Tracking Service"]
+        T1["Pobierz runy i metryki z DB"]
+  end
+ subgraph Swim_ANAL["Metrics & Analysis Service"]
+        M1["Oblicz agregaty (średnie, odchylenia)"]
+        M2["Przeprowadź testy statystyczne\n(np. rankingi, testy parowane)"]
+        M3["Przygotuj dane do wizualizacji"]
+  end
+    U1 --> W1
+    W1 --> U2
+    U2 --> U3
+    U3 --> U4
+    U4 --> W2
+    W2 --> W3
+    W3 --> A1
+    A1 --> T1
+    T1 --> A2
+    A2 --> M1
+    M1 --> M2
+    M2 --> M3
+    M3 --> W4
+    W4 --> U5
+    U1@{ shape: rect}
+    linkStyle 1 stroke:#FF6D00,fill:none
+    linkStyle 2 stroke:#FF6D00,fill:none
+    linkStyle 3 stroke:#FF6D00,fill:none
+    linkStyle 4 stroke:#FF6D00,fill:none
+    linkStyle 5 stroke:#FFD600,fill:none
+    linkStyle 6 stroke:#FFD600,fill:none
+    linkStyle 7 stroke:#FFD600,fill:none
+    linkStyle 8 stroke:#00C853,fill:none
+    linkStyle 9 stroke:#00C853,fill:none
+    linkStyle 10 stroke:#2962FF,fill:none
+    linkStyle 11 stroke:#2962FF,fill:none
+    linkStyle 12 stroke:#2962FF,fill:none
+    linkStyle 13 stroke:#2962FF
+```
+
+```mermaid
+---
+config:
+  theme: redux-dark-color
+---
+sequenceDiagram
+    autonumber
+    actor User as Badacz
+    participant UI as WebUI
+    participant API as APIGateway
+    participant TRK as TrackingService
+    participant DB as ResultsStore
+    participant ANAL as MetricsAnalysis
+    User->>UI: openComparisonView()
+    UI->>API: listExperiments(filters)
+    API->>TRK: listExperiments(filters)
+    TRK->>DB: select Experiments
+    DB-->>TRK: experiments[]
+    TRK-->>API: experiments[]
+    API-->>UI: experiments[]
+    User->>UI: selectExperimentsAndAlgorithms()
+    UI->>API: compare(experimentIds, algorithmIds, metricNames)
+    API->>TRK: getRunsForComparison(...)
+    TRK->>DB: select Runs+Metrics
+    DB-->>TRK: runs+metrics
+    TRK-->>API: runs+metrics
+    API->>ANAL: compare(runs+metrics)
+    ANAL->>ANAL: computeAggregates()
+    ANAL->>ANAL: runStatTests()
+    ANAL-->>API: comparisonResult
+    API-->>UI: comparisonResult
+    UI-->>User: showPlotsAndTables()
+```
+
 ---
 
 #### UC5: Przeglądaj i filtruj eksperymenty w panelu śledzenia
@@ -831,6 +1789,161 @@ Przykładowy model (w skrócie):
   - 2a. Duża liczba eksperymentów – paginacja, cache, lazy loading.
 - **Warunki końcowe:**  
   - Użytkownik może efektywnie nawigować po historii eksperymentów.
+
+```mermaid
+---
+config:
+  theme: redux-dark
+  layout: elk
+---
+flowchart LR
+    U["Badacz / Twórca pluginu"] --> UI["Web UI\n(Panel śledzenia)"]
+    UI --> API["API Gateway"] & OBJ["Object Storage\n(logi, artefakty)\n*pobieranie po linkach*"]
+    API --> TRK["Experiment Tracking Service"]
+    TRK --> DB[("Results Store\nExperiments/Runs/Metrics")]
+    U -- filtry: tagi, status, algorytmy,\nbenchmarki, daty --> UI
+    UI -- listExperiments(filters) --> API
+    API -- listExperiments(filters) --> TRK
+    TRK -- SELECT Experiments --> DB
+    DB -- lista eksperymentów --> TRK
+    TRK -- "experiments[] + agregaty (liczba runów itp.)" --> API
+    API -- experiments[] --> UI
+    U -- kliknięcie w eksperyment/run --> UI
+    UI -- getRunDetails(runId) --> API
+    API -- getRunDetails(runId) --> TRK
+    TRK -- SELECT Run, Metrics --> DB
+    DB -- Run + Metrics --> TRK
+    TRK -- Run + Metrics + links do artefaktów --> API
+    API -- dane runu --> UI
+    UI -- pobranie logów/artefaktów\npo URL --> OBJ
+    linkStyle 1 stroke:#FF6D00,fill:none
+    linkStyle 2 stroke:#FF6D00,fill:none
+    linkStyle 3 stroke:#FFD600,fill:none
+    linkStyle 4 stroke:#AA00FF,fill:none
+    linkStyle 6 stroke:#FF6D00,fill:none
+    linkStyle 7 stroke:#FFD600,fill:none
+    linkStyle 8 stroke:#AA00FF,fill:none
+    linkStyle 9 stroke:#D50000
+    linkStyle 10 stroke:#2962FF,fill:none
+    linkStyle 11 stroke:#00C853,fill:none
+    linkStyle 13 stroke:#FF6D00,fill:none
+    linkStyle 14 stroke:#FFD600,fill:none
+    linkStyle 15 stroke:#AA00FF,fill:none
+    linkStyle 16 stroke:#D50000,fill:none
+    linkStyle 17 stroke:#2962FF,fill:none
+    linkStyle 18 stroke:#00C853,fill:none
+    linkStyle 19 stroke:#FF6D00,fill:none
+```
+
+```mermaid
+---
+config:
+  layout: elk
+  theme: redux-dark
+---
+flowchart TB
+ subgraph Swim_User["Badacz / Twórca pluginu"]
+        U1["Otwórz panel śledzenia"]
+        U2["Ustaw filtry (status, tagi,\nalgorytmy, benchmarki)"]
+        U3["Przeglądaj listę eksperymentów"]
+        U4["Wejdź w szczegóły konkretnego eksperymentu"]
+        U5["Wejdź w szczegóły wybranego runu"]
+        U6["Otwórz logi / modele / artefakty"]
+  end
+ subgraph Swim_UI["Web UI"]
+        W1["Wyslij listExperiments(filters) do API"]
+        W2["Wyświetl tabelę eksperymentów + paginacja"]
+        W3["Wyslij getExperimentDetails(experimentId)"]
+        W4["Wyświetl listę runów dla eksperymentu"]
+        W5["Wyslij getRunDetails(runId)"]
+        W6["Wyświetl metryki, logi, linki do artefaktów"]
+  end
+ subgraph Swim_API["API Gateway"]
+        A1["Przekaż zapytania do Tracking Service"]
+  end
+ subgraph Swim_TRK["Tracking Service"]
+        T1["SELECT Experiments/Runs/Metrics z DB"]
+  end
+ subgraph Swim_OBJ["Object Storage"]
+        O1["Serwowanie plików logów, modeli,\nartefaktów po URL"]
+  end
+    U1 --> W1
+    W1 --> A1
+    A1 --> T1 & T1 & T1
+    T1 --> W2 & W4 & W6
+    W2 --> U2
+    U2 --> U3
+    U3 --> U4
+    U4 --> W3
+    W3 --> A1
+    W4 --> U5
+    U5 --> W5
+    W5 --> A1
+    W6 --> U6
+    U6 --> O1
+    linkStyle 0 stroke:#2962FF,fill:none
+    linkStyle 1 stroke:#2962FF,fill:none
+    linkStyle 5 stroke:#D50000,fill:none
+    linkStyle 6 stroke:#D50000,fill:none
+    linkStyle 7 stroke:#D50000,fill:none
+    linkStyle 8 stroke:#FF6D00,fill:none
+    linkStyle 9 stroke:#FF6D00,fill:none
+    linkStyle 10 stroke:#FF6D00,fill:none
+    linkStyle 11 stroke:#FF6D00,fill:none
+    linkStyle 12 stroke:#FFD600,fill:none
+    linkStyle 13 stroke:#00C853,fill:none
+    linkStyle 14 stroke:#00C853,fill:none
+    linkStyle 15 stroke:#00C853
+```
+
+```mermaid
+---
+config:
+  theme: redux-dark-color
+---
+sequenceDiagram
+    autonumber
+    actor User as Badacz/Twórca
+    participant UI as WebUI
+    participant API as APIGateway
+    participant TRK as TrackingService
+    participant DB as ResultsStore
+    participant OBJ as ObjectStorage
+    User->>UI: openTrackingDashboard()
+    UI->>API: listExperiments(defaultFilters)
+    API->>TRK: listExperiments(defaultFilters)
+    TRK->>DB: select Experiments
+    DB-->>TRK: experiments[]
+    TRK-->>API: experiments[]
+    API-->>UI: experiments[]
+    UI-->>User: showExperimentsTable()
+    User->>UI: applyFilters(...)
+    UI->>API: listExperiments(newFilters)
+    API->>TRK: listExperiments(newFilters)
+    TRK->>DB: select Experiments
+    DB-->>TRK: experiments[]
+    TRK-->>API: experiments[]
+    API-->>UI: experiments[]
+    UI-->>User: showFilteredExperiments()
+    User->>UI: openExperimentDetails(experimentId)
+    UI->>API: getExperimentDetails(experimentId)
+    API->>TRK: getExperimentDetails(experimentId)
+    TRK->>DB: select Runs+Metrics
+    DB-->>TRK: runs+metrics
+    TRK-->>API: runs+metrics
+    API-->>UI: runs+metrics
+    UI-->>User: showRunsList()
+    User->>UI: openRunDetails(runId)
+    UI->>API: getRunDetails(runId)
+    API->>TRK: getRunDetails(runId)
+    TRK->>DB: select Run, Metrics
+    DB-->>TRK: run+metrics
+    TRK-->>API: run+metrics+artifactLinks
+    API-->>UI: run+metrics+artifactLinks
+    UI-->>User: showRunDetails()
+    User->>OBJ: downloadArtifact(log/model)  
+    OBJ-->>User: file
+```
 
 ---
 
@@ -855,308 +1968,747 @@ Przykładowy model (w skrócie):
 - **Warunki końcowe:**  
   - Publikacje są dostępne w systemie i poprawnie powiązane z artefaktami benchmarku.
 
+```mermaid
 ---
+config:
+  theme: redux-dark
+  layout: elk
+---
+flowchart LR
+    U["Badacz / Administrator"] --> UI@{ label: "Web UI\\n(Moduł 'Publikacje')" }
+    UI --> API["API Gateway"]
+    API --> PUB["Publication & Reference Service"] & REG["Algorithm Registry"] & TRK["Tracking Service"]
+    PUB --> DBPUB[("Results Store\nPublication/PublicationLink")] & BIB["Zewnętrzne systemy bibliograficzne\n(CrossRef / arXiv / DOI)"]
+    U -- DOI / dane publikacji --> UI
+    UI -- "addPublication(doi/...)" --> API
+    API -- addPublication() --> PUB
+    PUB -- fetch metadata --> BIB
+    BIB -- metadata --> PUB
+    PUB -- INSERT Publication --> DBPUB
+    U -- powiąż publikację z algorytmem,\nbenchmarkiem, eksperymentem --> UI
+    UI -- linkPublication(entityType, entityId, pubId) --> API
+    API -- "linkPublication(...)" --> PUB
+    PUB -- INSERT PublicationLink --> DBPUB
+    REG -. odczyt linków publikacji\nprzy widoku algorytmów .-> DBPUB
+    TRK -. odczyt linków publikacji\nprzy widoku eksperymentów .-> DBPUB
+    UI@{ shape: rect}
+    linkStyle 5 stroke:#FF6D00,fill:none
+    linkStyle 6 stroke:#FF6D00,fill:none
+    linkStyle 10 stroke:#FF6D00,fill:none
+    linkStyle 11 stroke:#00C853
+    linkStyle 12 stroke:#FF6D00,fill:none
+    linkStyle 16 stroke:#FF6D00,fill:none
+```
 
-## 6. Diagram komponentów (UML)
+```mermaid
+---
+config:
+  layout: elk
+  theme: redux-dark
+---
+flowchart TB
+ subgraph Swim_User["Badacz / Administrator"]
+        U1@{ label: "Otwórz moduł 'Publikacje'" }
+        U2["Wprowadź DOI lub dane publikacji"]
+        U3["Zatwierdź dodanie publikacji"]
+        U4["Wybierz algorytm / benchmark / eksperyment"]
+        U5["Dodaj powiązanie z wybraną publikacją"]
+  end
+ subgraph Swim_UI["Web UI"]
+        W1["Wyświetl listę publikacji"]
+        W2["Wyświetl formularz dodawania publikacji"]
+        W3["Wyślij addPublication() do API"]
+        W4["Wyświetl listę obiektów do powiązania\n(algorytmy, benchmarki, eksperymenty)"]
+        W5["Wyślij linkPublication() do API"]
+  end
+ subgraph Swim_API["API Gateway"]
+        A1["Przekaż żądania do Publication Service"]
+  end
+ subgraph Swim_PUB["Publication Service"]
+        P1["Jeśli jest DOI: pobierz metadane\nz systemu bibliograficznego"]
+        P2["Zapisz Publication w DB"]
+        P3["Zapisz PublicationLink(entityType, entityId, pubId)"]
+  end
+ subgraph Swim_BIB["Zewnętrzne systemy bibliograficzne"]
+        B1["Zapytanie o publikację po DOI"]
+  end
+    U1 --> W1
+    W1 --> U2
+    U2 --> W2
+    W2 --> U3
+    U3 --> W3
+    W3 --> A1
+    A1 --> P1 & P3
+    P1 --> B1
+    B1 --> P2
+    P2 --> W1
+    U4 --> W4
+    W4 --> U5
+    U5 --> W5
+    W5 --> A1
+    P3 --> W4
+    U1@{ shape: rect}
+    linkStyle 1 stroke:#2962FF,fill:none
+    linkStyle 2 stroke:#2962FF,fill:none
+    linkStyle 3 stroke:#2962FF,fill:none
+    linkStyle 4 stroke:#2962FF,fill:none
+    linkStyle 5 stroke:#2962FF,fill:none
+    linkStyle 6 stroke:#FF6D00,fill:none
+    linkStyle 7 stroke:#00C853,fill:none
+    linkStyle 8 stroke:#FF6D00,fill:none
+    linkStyle 9 stroke:#FF6D00,fill:none
+    linkStyle 10 stroke:#FF6D00,fill:none
+    linkStyle 11 stroke:#AA00FF
+    linkStyle 12 stroke:#FFD600,fill:none
+    linkStyle 13 stroke:#FFD600,fill:none
+    linkStyle 14 stroke:#FFD600,fill:none
+    linkStyle 15 stroke:#00C853,fill:none
+```
 
-### 6.1. Komponenty i interfejsy
+```mermaid
+---
+config:
+  theme: redux-dark-color
+---
+sequenceDiagram
+    autonumber
+    actor User as Badacz/Admin
+    participant UI as WebUI
+    participant API as APIGateway
+    participant PUB as PublicationService
+    participant BIB as ExternalBibliography
+    participant DB as ResultsStore
+    User->>UI: openPublicationsModule()
+    UI->>API: listPublications()
+    API->>PUB: listPublications()
+    PUB->>DB: select Publications
+    DB-->>PUB: publications[]
+    PUB-->>API: publications[]
+    API-->>UI: publications[]
+    UI-->>User: showPublications()
+    User->>UI: addPublication(doi)
+    UI->>API: addPublication(doi)
+    API->>PUB: addPublication(doi)
+    PUB->>BIB: fetchMetadata(doi)
+    BIB-->>PUB: metadata
+    PUB->>DB: insert Publication
+    DB-->>PUB: ok
+    PUB-->>API: publicationCreated(pubId)
+    API-->>UI: publicationCreated(pubId)
+    UI-->>User: showNewPublication()
+    User->>UI: linkPublicationToAlgorithm(pubId, algorithmId)
+    UI->>API: linkPublication(entityType="Algorithm", entityId=algorithmId, pubId)
+    API->>PUB: createPublicationLink(...)
+    PUB->>DB: insert PublicationLink
+    DB-->>PUB: ok
+    PUB-->>API: linkCreated()
+    API-->>UI: linkCreated()
+    UI-->>User: showLinkedPublication()
+```
 
-Przykładowe komponenty UML (z poziomu logicznego):
+--- 
 
-- **ExperimentOrchestrator (komponent)**  
-  - Dostępne interfejsy:
-    - `IExperimentOrchestration` – przyjmowanie definicji eksperymentu (API Gateway).  
-- **AlgorithmRegistry (komponent)**  
-  - Interfejs:
-    - `IAlgorithmCatalog` – zarządzanie algorytmami/wersjami.  
-- **PluginRuntime (komponent)**  
-  - Interfejs:
-    - `IAlgorithmPluginRuntime` – uruchamianie pluginu HPO.  
-- **TrackingService (komponent)**  
-  - Interfejs:
-    - `ITrackingAPI` – logowanie runów, metryk, artefaktów.  
-- **MetricsAnalysis (komponent)**  
-  - Interfejs:
-    - `IAnalysisAPI` – żądania porównań i agregacji.  
-- **BenchmarkDefinition (komponent)**  
-  - Interfejs:
-    - `IBenchmarkCatalog` – definicje benchmarków i instancji.  
-- **PublicationService (komponent)**  
-  - Interfejs:
-    - `IPublicationAPI` – publikacje i linki.  
-- **ReportGenerator (komponent)**  
-  - Interfejs:
-    - `IReportAPI` – generowanie raportów z wynikami i bibliografią.  
-- **WebUI (komponent)**  
-  - Korzysta z interfejsów powyższych komponentów.
+#### UC7: Uruchom system lokalnie na PC
 
-### 6.2. Relacje między komponentami – opis słowny
+**Aktorzy główni:**
+- Administrator (Primary)
 
-- **WebUI** → `IExperimentOrchestration` (utworzenie i uruchomienie eksperymentu).  
-- **WebUI** → `IAlgorithmCatalog` (przegląd i rejestracja algorytmów).  
-- **WebUI** → `ITrackingAPI` (panel śledzenia).  
-- **WebUI** → `IAnalysisAPI` (porównania).  
-- **WebUI** → `IPublicationAPI` (zarządzanie publikacjami).  
-- **ReportGenerator** → `ITrackingAPI`, `IAnalysisAPI`, `IPublicationAPI` (zbiera dane do raportu).  
-- **ExperimentOrchestrator** → `IBenchmarkCatalog` (walidacja instancji).  
-- **ExperimentOrchestrator** → `IAlgorithmCatalog` (walidacja algorytmów).  
-- **ExperimentOrchestrator** → `ITrackingAPI` (rejestracja eksperymentu).  
-- **WorkerRuntime / PluginRuntime** → `ITrackingAPI` (logowanie metryk).  
-- **MetricsAnalysis** → bazuje na danych z `ITrackingAPI` (pośrednio: DB).  
-- **PublicationService** ↔ `AlgorithmRegistry` i `ExperimentTracking` (poprzez linki PublicationLink).  
+**Aktorzy poboczni:**
+- Docker Engine / środowisko kontenerowe
+- Komponenty systemu (DB, Message Broker, API/Orchestrator, Tracking Service, Worker Runtime, Web UI, Monitoring)
+
+**Cel:**
+Uruchomienie kompletnego systemu benchmarkowego HPO na pojedynczym komputerze (tryb „local deployment”), w konfiguracji opartej na `docker-compose` lub równoważnej, tak aby wszystkie funkcjonalności (eksperymenty, tracking, raporty) były dostępne na jednym hoście.
+
+**Warunki początkowe:**
+- Na PC zainstalowany jest Docker / Docker Desktop lub kompatybilne środowisko kontenerowe.
+- Administrator ma dostęp do repozytorium z konfiguracją systemu (np. git) lub paczki zawierającej pliki `docker-compose.yml`, `.env` itp.
+- Porty lokalne wymagane przez system (UI, API, DB) są wolne lub odpowiednio skonfigurowane.
+
+**Główny scenariusz:**
+1. Administrator klonuje repozytorium / pobiera paczkę z konfiguracją systemu na PC.
+2. Administrator otwiera plik `.env` i konfiguruje podstawowe parametry:
+   - Porty publikowane (np. 8080 dla UI),
+   - Ścieżki do wolumenów (np. katalog na dane DB),
+   - Dane dostępowe (hasła do DB itp.).
+3. Administrator uruchamia w terminalu polecenie `docker-compose up -d` (lub równoważne skryptem).
+4. Docker Engine:
+   - 4.1. Wczytuje plik `docker-compose.yml` i `.env`,
+   - 4.2. Tworzy potrzebne sieci i wolumeny,
+   - 4.3. Uruchamia kontenery systemu:
+     - bazę danych (Results Store),
+     - message broker,
+     - API Gateway + Orchestrator,
+     - Experiment Tracking Service,
+     - jednego lub więcej Worker Runtime,
+     - Web UI,
+     - Monitoring / Logging (opcjonalnie).
+5. Po starcie kontenerów:
+   - 5.1. Kontener DB inicjalizuje się i nasłuchuje na połączenia,
+   - 5.2. Message Broker uruchamia kolejki (np. RunJob),
+   - 5.3. API/Orchestrator łączy się z DB i Brokerem,
+   - 5.4. Tracking Service wykonuje migracje schematu bazy danych,
+   - 5.5. Workery rejestrują się (subskrybują kolejkę RunJob),
+   - 5.6. Web UI uruchamia serwer HTTP i jest dostępny pod adresem `http://localhost:<PORT>`.
+6. Administrator sprawdza status kontenerów poprzez:
+   - 6.1. `docker ps` / logi kontenerów,
+   - 6.2. ewentualnie endpointy health-check (np. `/healthz` dla API).
+7. Administrator otwiera Web UI w przeglądarce (`http://localhost:<PORT>`).
+8. System wyświetla stronę logowania / ekran główny, sygnalizując gotowość do pracy.
+
+**Scenariusze alternatywne / błędy:**
+
+- **7A. Brak Dockera lub błędna instalacja**
+  1. W kroku 3 wywołanie `docker-compose` kończy się błędem (komenda nieznana lub brak uprawnień).
+  2. Administrator instaluję lub naprawia Dockera (poza zakresem systemu HPO).
+  3. Po naprawie wraca do kroku 3.
+
+- **7B. Konflikt portów**
+  1. W kroku 4 Docker zgłasza błąd, że port UI/API jest już w użyciu.
+  2. Administrator modyfikuje plik `.env` / `docker-compose.yml`, zmieniając porty.
+  3. Ponownie uruchamia `docker-compose up -d` (wraca do kroku 3/4).
+
+- **7C. Błąd startu jednego z kontenerów (np. DB)**
+  1. W kroku 5 logi kontenera wskazują na błąd (np. brak uprawnień do katalogu danych).
+  2. Administrator analizuje logi, poprawia konfigurację (np. prawa do katalogu, zmiana ścieżki wolumenu).
+  3. Restartuje konkretny kontener lub cały stos (wraca do kroku 3–4).
+
+**Warunki końcowe:**
+- W przypadku sukcesu:
+  - Na PC działa pełny zestaw kontenerów systemu HPO.
+  - Web UI jest dostępny lokalnie i umożliwia tworzenie eksperymentów, śledzenie runów, analizę wyników.
+- W przypadku błędu:
+  - System nie jest w pełni dostępny, ale konfiguracja nie jest trwale uszkodzona – po poprawkach (porty, wolumeny, Docker) można powtórzyć procedurę startu.
+
+```mermaid
+---
+config:
+  theme: redux-dark
+  layout: elk
+---
+flowchart LR
+    Admin["Administrator"] --> Repo["Repozytorium / paczka\n(konfiguracja docker-compose, .env)"] & Shell["Shell / Terminal"]
+    Repo --> FS["System plików PC"]
+    Shell --> Docker["Docker Engine / docker-compose"]
+    Docker --> C_DB["Kontener DB\n(Results Store)"] & C_MB["Kontener Message Broker"] & C_API["Kontener API Gateway + Orchestrator"] & C_TRK["Kontener Tracking Service"] & C_W["Kontener(y) Worker Runtime"] & C_UI["Kontener Web UI"] & C_MON["Kontener Monitoring / Logging"]
+    C_API --> C_DB
+    C_TRK --> C_DB
+    C_W --> C_MB & C_TRK
+    C_MON --> C_DB
+    Admin -- git clone / pobranie archiwum --> Repo
+    Admin -- "docker-compose up -d" --> Shell
+    Shell -- tworzenie sieci, wolumenów,\nuruchamianie kontenerów --> Docker
+```
+
+```mermaid
+---
+config:
+  theme: redux-dark
+  layout: elk
+---
+flowchart TB
+ subgraph Swim_Admin["Administrator (na PC)"]
+        A1["Sklonuj repozytorium / pobierz paczkę\nz konfiguracją (docker-compose, .env)"]
+        A2["Skonfiguruj plik .env\n(porty, ścieżki, hasła lokalne)"]
+        A3@{ label: "Uruchom 'docker-compose up -d'" }
+        A4["Sprawdź status kontenerów\n(docker ps / logi)"]
+        A5["Otwórz Web UI w przeglądarce"]
+  end
+ subgraph Swim_Host["Host PC / Docker"]
+        H1["Odczytaj docker-compose.yml i .env"]
+        H2["Utwórz sieci i wolumeny Dockera"]
+        H3["Uruchom kontenery:\nDB, Broker, API/Orch, Tracking, Workers, UI, Monitoring"]
+        H4["Wykonaj healthchecki\n(API /healthz, DB ready itp.)"]
+  end
+ subgraph Swim_System["Kontenery systemu HPO"]
+        S1["DB startuje i jest gotowa na połączenia"]
+        S2["Message Broker startuje\n(kolejka RunJob)"]
+        S3["API/Orchestrator startuje\n(łączenie z DB i Brokerem)"]
+        S4["Tracking Service uruchamia migracje schematu"]
+        S5["Workers startują i rejestrują się\n(subskrypcja kolejki)"]
+        S6["Web UI startuje i jest dostępne\nna localhost:port"]
+  end
+    A1 --> A2
+    A2 --> A3
+    A3 --> H1
+    H1 --> H2
+    H2 --> H3
+    H3 --> H4 & S1
+    H4 --> A4
+    A4 --> A5
+    S1 --> S2
+    S2 --> S3
+    S3 --> S4
+    S4 --> S5
+    S5 --> S6
+    A3@{ shape: rect}
+    linkStyle 0 stroke:#FF6D00,fill:none
+    linkStyle 1 stroke:#FF6D00,fill:none
+    linkStyle 2 stroke:#FF6D00,fill:none
+    linkStyle 3 stroke:#FF6D00,fill:none
+    linkStyle 4 stroke:#FF6D00,fill:none
+    linkStyle 5 stroke:#FFD600,fill:none
+    linkStyle 7 stroke:#FFD600,fill:none
+    linkStyle 8 stroke:#FFD600
+```
+
+```mermaid
+---
+config:
+  theme: redux-dark-color
+---
+sequenceDiagram
+    autonumber
+    actor Admin as Administrator
+    participant Repo as Repo (config)
+    participant FS as FileSystem
+    participant Shell as Shell / CLI
+    participant Docker as Docker Engine
+    participant DB as DB Container
+    participant MB as Broker Container
+    participant API as API/Orchestrator Container
+    participant TRK as Tracking Container
+    participant W as Worker Container
+    participant UI as WebUI Container
+    Admin->>Repo: cloneConfigRepo()
+    Repo-->>Admin: docker-compose.yml, .env
+    Admin->>FS: edit(.env)
+    FS-->>Admin: saved .env
+    Admin->>Shell: docker-compose up -d
+    Shell->>Docker: start(stack)
+    Docker->>DB: start()
+    Docker->>MB: start()
+    Docker->>API: start()
+    Docker->>TRK: start()
+    Docker->>W: start()
+    Docker->>UI: start()
+    API->>DB: connect()
+    TRK->>DB: migrateSchema()
+    W->>MB: subscribe(runJobQueue)
+    Admin->>Shell: docker ps / docker logs
+    Shell-->>Admin: status containers
+    Admin->>UI: open http://localhost:PORT
+    UI-->>Admin: render login / main page
+```
+
+--- 
+
+#### UC8: Uruchom system w chmurze / skaluj workerów
+
+**Aktorzy główni:**
+- Administrator DevOps (Primary)
+
+**Aktorzy poboczni:**
+- CI/CD / GitOps (np. GitHub Actions, ArgoCD)
+- Kubernetes (API, Scheduler, HPA)
+- Monitoring / Metrics (Prometheus, itp.)
+
+**Cel:**
+Uruchomienie systemu HPO Benchmarking w środowisku chmurowym (np. klaster Kubernetes) w sposób skalowalny – z możliwością automatycznego poziomego skalowania workerów w zależności od obciążenia (np. długości kolejki RunJob, użycia CPU).
+
+**Warunki początkowe:**
+- Istnieje klaster Kubernetes (managed lub self-hosted).
+- Repozytorium z manifestami / chartami Helm systemu HPO jest dostępne.
+- Administrator DevOps ma dostęp do klastra (kubeconfig) i/lub skonfigurowany pipeline CI/CD / GitOps.
+- Monitoring i metryki są dostępne (np. Prometheus, Metrics Server) lub przewidziane w manifestach.
+
+**Główny scenariusz:**
+1. Administrator DevOps przygotowuje konfigurację chmurową (np. plik `values-cloud.yaml` dla Helma):
+   - Informacje o adresach usług zarządzanych (DB, Message Broker, Object Storage),
+   - Limity zasobów dla podów (CPU, RAM),
+   - Konfigurację HPA dla Workerów (min/max replik, metryki).
+2. Administrator commit’uje zmiany konfiguracji do repozytorium.
+3. CI/CD / GitOps:
+   - 3.1. Wykrywa zmiany w repozytorium,
+   - 3.2. Uruchamia pipeline wdrożeniowy (np. `helm upgrade` / `kubectl apply`).
+4. Pipeline wysyła manifesty / chart do Kubernetes API.
+5. Kubernetes:
+   - 5.1. Tworzy / aktualizuje Deploymenty i Service’y dla:
+     - API Gateway + Orchestrator,
+     - Experiment Tracking Service,
+     - Worker Runtime (Deployment Workerów),
+     - Web UI,
+     - ewentualnie Monitoring / Logging.
+   - 5.2. Upewnia się, że konfiguracja (ConfigMap, Secrets) jest wstrzyknięta do podów.
+6. Pody startują:
+   - 6.1. API/Orchestrator łączy się z zarządzaną DB i Brokerem,
+   - 6.2. Tracking Service wykonuje migracje,
+   - 6.3. Worker Runtime rejestruje się i subskrybuje kolejkę zadań,
+   - 6.4. Web UI jest wystawiony przez Ingress / LoadBalancer.
+7. Monitoring / Prometheus:
+   - 7.1. Zbiera metryki z podów (API, Tracking, Worker),
+   - 7.2. Udostępnia je dla HPA.
+8. Kontroler HPA:
+   - 8.1. Okresowo odczytuje metryki (np. CPU, length of RunJob queue),
+   - 8.2. W razie potrzeby zwiększa liczbę replik Deploymentu Workerów,
+   - 8.3. Gdy obciążenie spada – zmniejsza liczbę replik w granicach `min/max`.
+9. Administrator DevOps monitoruje stan klastra (np. `kubectl get pods`, dashboardy) i potwierdza, że system działa poprawnie.
+
+**Scenariusze alternatywne / błędy:**
+
+- **8A. Błąd w konfiguracji chmurowej (values-cloud.yaml / manifesty)**
+  1. W kroku 3 pipeline CI/CD kończy się błędem (np. niepoprawny YAML).
+  2. Administrator analizuje logi pipeline’u, poprawia konfigurację.
+  3. Ponownie commit’uje zmiany i wraca do kroku 3.
+
+- **8B. Problemy z zasobami klastra**
+  1. W kroku 5 Kubernetes nie może uruchomić części podów (brak CPU/RAM).
+  2. Pody pozostają w stanie `Pending`.
+  3. Administrator powiększa zasoby klastra lub zmniejsza wymagania podów.
+  4. Po zmianach pody startują poprawnie.
+
+- **8C. HPA nie skaluje Workerów**
+  1. W kroku 7–8 HPA nie podejmuje akcji, bo nie widzi metryk (np. brak Prometheusa / Metrics Server).
+  2. Administrator konfiguruje / naprawia monitoring (wdrożenie Prometheusa/adaptera).
+  3. Po naprawie HPA zaczyna reagować na obciążenie.
+
+**Warunki końcowe:**
+- W przypadku sukcesu:
+  - System HPO działa w klastrze Kubernetes, dostępny przez Web UI/Ingress,
+  - Worker Runtime’y są automatycznie skalowane na podstawie metryk,
+  - System jest gotowy do uruchamiania eksperymentów w skali.
+- W przypadku błędów:
+  - Wdrożenie może być częściowe (np. część usług nie działa),
+  - Zespół DevOps ma logi i manifesty do korekty, po której można powtórzyć procedurę.
+
+```mermaid
+---
+config:
+  layout: elk
+  theme: redux-dark
+---
+flowchart LR
+    Admin["Administrator DevOps"] --> Repo["Repozytorium\n(Helm charts / manifesty K8s)"]
+    Repo --> CI["CI/CD / GitOps"]
+    CI --> K8SAPI["Kubernetes API"]
+    K8SAPI --> NS["Namespace: hpo-benchmark"]
+    NS --> DEP_API["Deployment API/Orchestrator"] & DEP_TRK["Deployment Tracking Service"] & DEP_W["Deployment Workers"] & DEP_UI["Deployment WebUI"] & ST_DB[("Managed DB\n(Results Store)")] & ST_OBJ[("Object Storage\n(S3/GCS/MinIO)")] & ST_MB[("Managed Message Broker")] & MON["Monitoring / Prometheus / Grafana"]
+    HPA["Horizontal Pod Autoscaler"] --> DEP_W
+    Admin -- "helm install/upgrade\nvalues-cloud.yaml" --> CI
+    CI -- apply manifests / helm upgrade --> K8SAPI
+    DEP_API --> ST_DB
+    DEP_TRK --> ST_DB
+    DEP_W --> ST_MB & ST_OBJ
+```
+
+```mermaid
+---
+config:
+  theme: redux-dark
+  layout: elk
+---
+flowchart TB
+ subgraph DevOps["Administrator DevOps"]
+        A1["Przygotuj konfigurację chmurową\n(values-cloud.yaml / manifests)"]
+        A2["Zacommituj zmiany do repo"]
+        A3@{ label: "Uruchom 'helm install/upgrade'\\nlub poczekaj na GitOps" }
+        A4["Skonfiguruj HPA dla Workerów\n(np. min=1, max=50)"]
+        A5["Monitoruj metryki obciążenia\n(kolejka, CPU, czas oczekiwania runów)"]
+  end
+ subgraph CI["CI/CD / GitOps"]
+        C1["Wykryj zmianę w repo"]
+        C2["Zastosuj zmiany do klastra\n(kubectl apply / helm upgrade)"]
+  end
+ subgraph K8s["Kubernetes"]
+        K1["Tworzenie / aktualizacja Deploymentów,\nService, Ingress, ConfigMap, Secret"]
+        K2["Uruchamianie podów\n(API, Tracking, Workers, WebUI, Broker)"]
+        K3["HPA pobiera metryki z Prometheus\nlub Metrics Server"]
+        K4["HPA skaluje Deployment Workers\n(liczba replik)"]
+  end
+ subgraph Monitoring["Monitoring / Prometheus"]
+        M1["Zbieranie metryk z podów\n(API, Tracking, Workers)"]
+  end
+    A1 --> A2
+    A2 --> C1
+    C1 --> C2
+    C2 --> K1
+    K1 --> K2
+    A3 --> C2
+    K2 --> M1
+    M1 --> K3
+    K3 --> K4
+    K4 --> A4
+    A4 --> A5
+    A3@{ shape: rect}
+    linkStyle 0 stroke:#FF6D00,fill:none
+    linkStyle 1 stroke:#FF6D00,fill:none
+    linkStyle 2 stroke:#FF6D00,fill:none
+    linkStyle 3 stroke:#FFD600,fill:none
+    linkStyle 4 stroke:#FFD600,fill:none
+    linkStyle 5 stroke:#00C853
+    linkStyle 6 stroke:#FFD600,fill:none
+    linkStyle 7 stroke:#FFD600,fill:none
+    linkStyle 8 stroke:#FFD600,fill:none
+    linkStyle 9 stroke:#FFD600,fill:none
+    linkStyle 10 stroke:#FFD600,fill:none
+```
+
+```mermaid
+---
+config:
+  theme: redux-dark-color
+---
+sequenceDiagram
+    autonumber
+    actor DevOps as Admin DevOps
+    participant Repo as Git Repo
+    participant CI as CI/GitOps
+    participant K8s as KubernetesAPI
+    participant DEP_API as Deployment API/Orch
+    participant DEP_TRK as Deployment Tracking
+    participant DEP_W as Deployment Workers
+    participant HPA as HPA Controller
+    participant METRICS as Monitoring/Prometheus
+    DevOps->>Repo: push(config changes)
+    Repo-->>CI: webhook / trigger
+    CI->>K8s: apply/helm upgrade (API, TRK, Workers, WebUI)
+    K8s-->>DEP_API: create/update pods
+    K8s-->>DEP_TRK: create/update pods
+    K8s-->>DEP_W: create/update worker pods
+    DEP_API->>METRICS: expose metrics
+    DEP_TRK->>METRICS: expose metrics
+    DEP_W->>METRICS: expose metrics
+    loop continuous
+        HPA->>METRICS: getMetrics(CPU, queue length)
+        METRICS-->>HPA: metrics
+        HPA->>K8s: scale(DEP_W, replicasN)
+    end
+    DevOps->>K8s: kubectl get pods
+    K8s-->>DevOps: statusRunning()
+```
+
+--- 
+
+#### UC9: Eksportuj dane do analizy zewnętrznej
+
+**Aktorzy główni:**
+- Badacz / Inżynier ML (Primary)
+
+**Aktorzy poboczni:**
+- Experiment Tracking Service
+- Export / ReportGenerator Service
+- Object Storage
+
+**Cel:**
+Eksport danych eksperymentów (konfiguracje, runy, metryki) w formacie nadającym się do dalszej analizy w zewnętrznych narzędziach (np. Python/Notebooks, R, narzędzia BI) – z zachowaniem spójności i reprodukowalności.
+
+**Warunki początkowe:**
+- Użytkownik jest zalogowany do systemu.
+- Posiada uprawnienia dostępu do danych eksperymentów, które chce eksportować.
+- Eksperymenty, runy i metryki są zapisane w Results Store (co najmniej jeden eksperyment z runami).
+
+**Główny scenariusz:**
+1. Użytkownik otwiera w Web UI moduł **„Eksport danych”**.
+2. System wyświetla formularz:
+   - Zakres eksportu (poziom: eksperyment, run, metryka),
+   - Filtry (daty, benchmarki, algorytmy, tagi, statusy),
+   - Format pliku (np. CSV, JSON, Parquet).
+3. Użytkownik wybiera zakres eksportu, ustawia filtry i wybiera format.
+4. Web UI wykonuje walidację formularza (np. sprawdza, czy wybrano co najmniej jeden eksperyment / filtr).
+5. Użytkownik uruchamia eksport, klikając **„Generuj eksport”**.
+6. Web UI wysyła do API Gateway żądanie `exportData(scope, filters, format)`.
+7. API:
+   - 7.1. Tworzy zadanie eksportu (ewentualnie asynchroniczne),
+   - 7.2. Przekazuje żądanie do **Export / ReportGenerator Service**.
+8. ExportService:
+   - 8.1. Wywołuje **Tracking Service** w celu pobrania danych zgodnie z zakresem i filtrami (np. `getExperimentsRunsMetrics`),
+   - 8.2. Tracking Service wykonuje zapytania do Results Store i zwraca znormalizowany zestaw danych.
+9. ExportService:
+   - 9.1. Przetwarza dane (filtrowanie, agregacja, normalizacja do wybranego formatu),
+   - 9.2. Generuje plik eksportu (CSV/JSON/Parquet),
+   - 9.3. Zapisuje plik w Object Storage.
+10. Object Storage zwraca URL / ścieżkę do wygenerowanego pliku.
+11. ExportService przekazuje URL pliku do API.
+12. API zwraca do Web UI informację, że eksport jest gotowy, wraz z linkiem do pliku.
+13. Web UI wyświetla użytkownikowi link do pobrania pliku.
+14. Użytkownik pobiera plik i wykorzystuje go w zewnętrznych narzędziach (np. notebook, R, BI).
+
+**Scenariusze alternatywne / błędy:**
+
+- **9A. Brak danych do eksportu (puste wyniki filtrów)**
+  1. W kroku 8.2 Tracking Service stwierdza, że zapytanie nie zwraca żadnych eksperymentów/runów.
+  2. ExportService zgłasza do API pusty wynik.
+  3. API przekazuje do Web UI informację: „Brak danych spełniających podane kryteria”.
+  4. Użytkownik może zmienić filtry i wrócić do kroku 3.
+
+- **9B. Błąd w generowaniu pliku (problem z Object Storage)**
+  1. W kroku 9.3 zapis pliku do Object Storage kończy się błędem (np. brak uprawnień, błąd sieci).
+  2. ExportService zgłasza błąd do API.
+  3. API przekazuje błąd do Web UI.
+  4. Web UI informuje użytkownika o niepowodzeniu eksportu i sugeruje ponowną próbę lub kontakt z administratorem.
+
+- **9C. Zbyt duży zakres danych (limit rozmiaru / timeout)**
+  1. W kroku 8.2 lub 9.1 zapytania do DB / przetwarzanie trwają zbyt długo lub przekraczają limit pamięci.
+  2. System może:
+     - 2a. Zwrócić błąd „zbyt duży zakres, zawęź filtry”,
+     - 2b. Albo przetwarzać zadanie w trybie w pełni asynchronicznym (np. kolejka zadań), a UI pokazuje „Eksport w toku”.
+  3. Użytkownik może zawęzić zakres (mniej eksperymentów, węższe daty) i spróbować ponownie.
+
+**Warunki końcowe:**
+- W przypadku sukcesu:
+  - Użytkownik ma dostęp do pliku z danymi eksperymentów w wybranym formacie,
+  - Plik może być wykorzystany do dalszej analizy w zewnętrznych narzędziach,
+  - Eksport jest powtarzalny (po tych samych filtrach otrzymamy spójne dane, o ile stan bazy się nie zmieni).
+- W przypadku błędu:
+  - System nie generuje pliku eksportu,
+  - Użytkownik otrzymuje stosowny komunikat i może spróbować ponownie po korekcie filtrów lub po interwencji administratora.
+
+```mermaid
+---
+config:
+  layout: elk
+  theme: redux-dark
+---
+flowchart LR
+    U["Badacz / Inżynier ML"] --> UI["Web UI\n(Moduł eksportu)"]
+    UI --> API["API Gateway"]
+    API --> TRK["Experiment Tracking Service"] & REP["Export / ReportGenerator Service"]
+    TRK --> DB[("Results Store\nExperiments / Runs / Metrics")]
+    REP --> OBJ[("Object Storage\n(pliki eksportu)")] & DB
+    U -- wybór zakresu: eksperymenty,\nruny, metryki, format (CSV/JSON/Parquet) --> UI
+    UI -- exportData(scope, filters, format) --> API
+    API -- fetchData(scope, filters) --> TRK
+    TRK -- zapytania SQL/ORM --> DB
+    DB -- zestaw danych --> TRK
+    TRK -- zestaw danych --> REP
+    REP -- agregacja, transformacja,\nformatowanie --> OBJ
+    OBJ -- URL pliku eksportu --> REP
+    REP -- fileUrl --> API
+    API -- fileUrl --> UI
+    UI -- pobieranie pliku --> U
+    linkStyle 1 stroke:#2962FF,fill:none
+    linkStyle 2 stroke:#FFD600,fill:none
+    linkStyle 3 stroke:#FFD600,fill:none
+    linkStyle 5 stroke:#FF6D00,fill:none
+    linkStyle 6 stroke:#FF6D00,fill:none
+    linkStyle 8 stroke:#00C853,fill:none
+    linkStyle 9 stroke:#FFD600,fill:none
+    linkStyle 11 stroke:#424242
+    linkStyle 13 stroke:#FF6D00,fill:none
+    linkStyle 15 stroke:#AA00FF,fill:none
+    linkStyle 16 stroke:#FFD600,fill:none
+```
+
+```mermaid
+---
+config:
+  layout: elk
+  theme: redux-dark
+---
+flowchart TB
+ subgraph User["Badacz / Inżynier ML"]
+        U1@{ label: "Otwórz moduł 'Eksport danych'" }
+        U2["Wybierz zakres eksportu\n(eksperymenty, runy, metryki)"]
+        U3["Ustaw filtry (daty, benchmarki,\nalgorytmy, tagi)"]
+        U4["Wybierz format (CSV/JSON/Parquet)"]
+        U5@{ label: "Kliknij 'Generuj eksport'" }
+        U6["Pobierz wygenerowany plik\nlub skopiuj link"]
+  end
+ subgraph WebUI["Web UI"]
+        W1["Załaduj formularz eksportu z możliwymi opcjami"]
+        W2["Waliduj dane wejściowe użytkownika"]
+        W3["Wyślij exportData(scope, filters, format) do API"]
+        W4["Prezentuj status (oczekuje / gotowy)"]
+        W5["Wyświetl link do pliku eksportu"]
+  end
+ subgraph API["API Gateway / Export API"]
+        A1["Przyjmij żądanie eksportu"]
+        A2["Przekaż zadanie do ExportService / ReportGenerator"]
+  end
+ subgraph TRK["Tracking Service / DB"]
+        T1["Pobierz eksperymenty, runy, metryki\nzgodnie z filtrami"]
+  end
+ subgraph REP["Export / ReportGenerator"]
+        R1["Przetwórz dane (agregacja, filtrowanie,\nmapowanie do formatu)"]
+        R2["Zapisz plik do Object Storage"]
+        R3["Zwróć URL pliku do API"]
+  end
+ subgraph OBJ["Object Storage"]
+        O1["Przechowuj plik eksportu\n(późniejsze pobranie)"]
+  end
+    U1 --> W1
+    W1 --> U2
+    U2 --> U3
+    U3 --> U4
+    U4 --> U5
+    U5 --> W2
+    W2 --> W3
+    W3 --> A1
+    A1 --> A2
+    A2 --> T1
+    T1 --> R1
+    R1 --> R2
+    R2 --> O1
+    O1 --> R3
+    R3 --> W4
+    W4 --> W5
+    W5 --> U6
+    U1@{ shape: rect}
+    U5@{ shape: rect}
+    linkStyle 0 stroke:#D50000,fill:none
+    linkStyle 1 stroke:#FF6D00,fill:none
+    linkStyle 2 stroke:#FF6D00,fill:none
+    linkStyle 3 stroke:#FF6D00,fill:none
+    linkStyle 4 stroke:#FF6D00,fill:none
+    linkStyle 5 stroke:#FF6D00,fill:none
+    linkStyle 6 stroke:#FFD600,fill:none
+    linkStyle 7 stroke:#FFD600,fill:none
+    linkStyle 8 stroke:#FFD600,fill:none
+    linkStyle 9 stroke:#FFD600,fill:none
+    linkStyle 10 stroke:#FFD600,fill:none
+    linkStyle 11 stroke:#FFD600,fill:none
+    linkStyle 12 stroke:#FFD600,fill:none
+    linkStyle 13 stroke:#FFD600,fill:none
+    linkStyle 14 stroke:#FFD600,fill:none
+    linkStyle 15 stroke:#FFD600,fill:none
+    linkStyle 16 stroke:#FFD600
+```
+
+```mermaid
+---
+config:
+  theme: redux-dark-color
+---
+sequenceDiagram
+    autonumber
+    actor User as Badacz
+    participant UI as WebUI
+    participant API as APIGateway
+    participant TRK as TrackingService
+    participant DB as ResultsStore
+    participant REP as ExportService
+    participant OBJ as ObjectStorage
+    User->>UI: openExportView()
+    UI->>API: getExportOptions()
+    API-->>UI: options()
+    UI-->>User: showOptions()
+    User->>UI: selectScopeAndFilters()
+    UI->>API: exportData(scope, filters, format)
+    API->>REP: createExportJob(scope, filters, format)
+    REP->>TRK: fetchData(scope, filters)
+    TRK->>DB: SELECT Experiments/Runs/Metrics
+    DB-->>TRK: dataSet
+    TRK-->>REP: dataSet
+    REP->>REP: aggregateAndFormat(dataSet, format)
+    REP->>OBJ: uploadFile(exportFile)
+    OBJ-->>REP: fileUrl
+    REP-->>API: exportReady(fileUrl)
+    API-->>UI: exportReady(fileUrl)
+    UI-->>User: showDownloadLink(fileUrl)
+    User->>OBJ: downloadFile(fileUrl)
+    OBJ-->>User: file
+```
+
+--- 
 
 Na diagramie UML komponenty są prostokątami z nazwą; interfejsy reprezentowane lollipopami. Strzałki pokazują zależności „używa”.
 
 ---
 
-## 7. Przepływy danych i diagramy aktywności
 
-Dla kluczowych UC: UC1, UC3, UC4, UC5, UC6.
+### 5.3 Pokrycie wymagań przez UC (traceability)
 
-### 7.1. UC1 – przepływ danych (DFD, wysoki poziom)
-
-**Strumienie danych:**
-
-1. **Konfiguracja eksperymentu**  
-   - Badacz → Web UI → API → Orchestrator → Tracking Service → DB.  
-2. **Zadania runów**  
-   - Orchestrator → Message Broker → WorkerRuntime.  
-3. **Wyniki runów (metryki, logi, artefakty)**  
-   - WorkerRuntime → Tracking Service → Results Store + Object Storage.  
-4. **Status eksperymentu**  
-   - Orchestrator → Tracking Service → Web UI.
-
-**Powiązanie z komponentami:**
-
-- `ExperimentDesignerUI`, `ExperimentOrchestrator`, `RunScheduler`, `TrackingAPI`, `ExperimentDAO`, `MetricDAO`, `ObjectStorageClient`.
-
-### 7.2. UC1 – diagram aktywności (swimlane’y)
-
-**Swimlane’y:** Użytkownik, Web UI, API Gateway, Orchestrator, Worker, Tracking Service.
-
-Kroki:
-
-1. **Użytkownik**: Start → „Otwórz kreator eksperymentu”.
-2. **Web UI**: „Pobierz listę benchmarków/algorytmów” → odwołania do API.
-3. **Użytkownik**: „Wprowadź konfigurację eksperymentu”.
-4. **Web UI**: „Wyślij konfigurację eksperymentu” → API Gateway.
-5. **API Gateway**: „Przekaż konfigurację do Orchestratora”.
-6. **Orchestrator**: Akcja „Waliduj konfigurację” (decyzja: OK? / Błąd).  
-   - Jeśli błąd → powrót do UI z listą błędów.  
-7. **Orchestrator**: „Utwórz plan eksperymentu” → „Zapisz eksperyment w Tracking Service”.
-8. **Użytkownik**: „Kliknij Start”.
-9. **Orchestrator**: „Zaplanuj runy” → „Wyślij zadania do kolejki”.
-10. **Worker**: „Pobierz zadanie” → „Wykonaj run (ładowanie benchmarku, algorytmu)” → „Raportuj metryki/logi do Tracking Service”.
-11. **Tracking Service**: „Zapisz run, metryki, logi, artefakty”.
-12. **Orchestrator**: „Monitoruj status runów, aktualizuj status eksperymentu”.
-13. **Web UI**: „Odśwież panel eksperymentu”.  
-
-Decyzje: walidacja, retry runów (pętla).
-
----
-
-### 7.3. UC3 – przepływ danych
-
-**Strumienie danych:**
-
-1. **Kod pluginu** – Twórca pluginu ↔ SDK / lokalne środowisko.
-2. **Metadane algorytmu** – Web UI → API → Algorithm Registry → DB.
-3. **Powiązania publikacji** – Web UI → Publication Service → DB.
-
-### 7.4. UC3 – diagram aktywności
-
-Swimlane’y: Twórca pluginu, SDK/PluginRuntime, Web UI, API, Algorithm Registry.
-
-1. Twórca: „Implementuje IAlgorithmPlugin”.
-2. SDK: „Uruchom `validate`” → „Wczytaj plugin” → „Wykonaj testy symulacyjne”.
-3. Decyzja: „Walidacja OK?”  
-   - jeśli NIE: koniec z błędem, raport do twórcy.  
-4. Twórca: „Zbuduj paczkę pluginu”.
-5. Twórca: „Otwórz Web UI – Rejestruj algorytm”.
-6. Web UI: „Pobierz formularz”.
-7. Twórca: „Wprowadź metadane, wskaż paczkę / obraz, powiąż publikacje”.
-8. Web UI: „Wyślij dane do API”.
-9. API: „Przekaż do Algorithm Registry”.
-10. Algorithm Registry: „Zapisz Algorithm + AlgorithmVersion (draft)”.
-11. (Opcjonalne) Administrator: „Zatwierdza (approved)”.
-
----
-
-### 7.5. UC4 – przepływ danych
-
-1. Web UI żąda listy eksperymentów i runów z Tracking Service.
-2. Użytkownik wybiera runy / eksperymenty → Web UI formuje zapytanie porównawcze.
-3. Web UI → Metrics & Analysis: lista run_id + metryki do analizy.
-4. Metrics & Analysis:
-   - pobiera metryki z Results Store (MetricDAO),
-   - oblicza agregaty i testy,
-   - zwraca dane do Web UI.
-5. Web UI renderuje wykresy i tabelę porównawczą.
-
-### 7.6. UC4 – diagram aktywności
-
-Swimlane’y: Użytkownik, Web UI, Tracking Service, Metrics & Analysis.
-
-1. Użytkownik: „Otwórz widok porównań”.
-2. Web UI: „Pobierz listę eksperymentów/runów”.
-3. Użytkownik: „Wybierz, co porównać”.
-4. Web UI: „Wyślij żądanie analizy” → Metrics & Analysis.
-5. Metrics & Analysis: „Pobierz metryki (Tracking Service / DB)”.
-6. Metrics & Analysis: „Oblicz agregaty i testy statystyczne”.
-7. Metrics & Analysis: „Zwróć wynik analizy”.
-8. Web UI: „Wyświetl wykresy i tabele”.
-9. Decyzja: „Czy wygenerować raport?” → jeśli tak, wchodzi w pipeline raportowania (osobny diagram).
-
----
-
-### 7.7. UC5 – przepływ danych i aktywności
-
-Analogicznie jak wyżej:
-
-- Strumień: żądanie listy eksperymentów / runów / filtrów i odpowiedzi z Tracking Service.
-- Aktywności: wybór filtrów, paginacja, podgląd runu, pobieranie logów i artefaktów z Object Storage.
-
----
-
-### 7.8. UC6 – przepływ danych
-
-- Dane publikacji (DOI / BibTeX) → Publication Service → DB.
-- Linki PublicationLink → powiązanie z Algorithm / Benchmark / Experiment.
-
-### 7.9. Dodatkowe kluczowe aktywności
-
-#### 7.9.1. Cykl życia pluginu algorytmu HPO
-
-Swimlane’y: Twórca, SDK, Algorithm Registry, WorkerRuntime.
-
-1. Implementacja pluginu.  
-2. Walidacja lokalna.  
-3. Rejestracja w Registry (draft).  
-4. Zatwierdzenie (approved).  
-5. Użycie w eksperymentach (WorkerRuntime ładuje plugin na podstawie AlgorithmVersion).  
-6. Ewentualne wycofanie (status deprecated).  
-
-#### 7.9.2. Pipeline generowania raportu
-
-Swimlane’y: Użytkownik, Web UI, ReportGenerator, Tracking Service, Metrics & Analysis, Publication Service.
-
-1. Użytkownik wybiera eksperyment/eksperymenty.  
-2. Web UI → ReportGenerator: żądanie raportu.  
-3. ReportGenerator pobiera metryki (Tracking), agregaty (Metrics & Analysis), publikacje (Publication Service).  
-4. ReportGenerator składa raport (np. markdown/PDF) i zapisuje do Object Storage.  
-5. Web UI prezentuje link do pobrania.  
-
-#### 7.9.3. Migracja deploymentu z PC do chmury
-
-Swimlane’y: Administrator, DeploymentTooling (helm/terraform), System.
-
-1. Admin eksportuje konfigurację z docker-compose (env, secrets, volume).  
-2. Admin używa skryptów do wygenerowania manifestów K8s.  
-3. Deployment w chmurze (DB, Object Storage, Message Broker, Orchestrator, Workery, Monitoring).  
-4. System w chmurze wskazuje na te same (lub zmigrowane) dane w Results Store / Object Storage.  
-5. Testowe uruchomienie eksperymentu w nowym środowisku.  
-
----
-
-## 8. Diagramy sekwencji
-
-### 8.1. UC1 – Skonfiguruj i uruchom eksperyment
-
-**Uczestnicy:** `User`, `WebUI`, `APIGateway`, `ExperimentOrchestrator`, `BenchmarkDefinition`, `AlgorithmRegistry`, `TrackingService`, `MessageBroker`, `Worker`.
-
-**Kolejność interakcji (skrócona):**
-
-1. `User → WebUI`: openExperimentWizard().  
-2. `WebUI → APIGateway`: getBenchmarks(), getAlgorithms().  
-3. `APIGateway → BenchmarkDefinition`: listBenchmarks().  
-4. `APIGateway → AlgorithmRegistry`: listAlgorithms().  
-5. `WebUI ↔ User`: configureExperiment().  
-6. `WebUI → APIGateway`: createExperiment(config).  
-7. `APIGateway → ExperimentOrchestrator`: createExperiment(config).  
-8. `ExperimentOrchestrator → BenchmarkDefinition`: validateBenchmarks(config).  
-9. `ExperimentOrchestrator → AlgorithmRegistry`: validateAlgorithms(config).  
-10. `ExperimentOrchestrator → TrackingService`: registerExperiment().  
-11. `ExperimentOrchestrator → TrackingService`: registerInitialRuns(plan).  
-12. `User → WebUI`: startExperiment().  
-13. `WebUI → APIGateway`: startExperiment(experimentId).  
-14. `APIGateway → ExperimentOrchestrator`: startExperiment(experimentId).  
-15. `ExperimentOrchestrator → MessageBroker`: publish(RunJob).  
-16. `Worker → MessageBroker`: consume(RunJob).  
-17. `Worker → TrackingService`: logRunStarted().  
-18. `Worker → TrackingService`: logMetrics(), logArtifacts().  
-19. `Worker → TrackingService`: logRunCompleted().  
-20. `TrackingService → ExperimentOrchestrator`: notifyRunCompleted().  
-21. `ExperimentOrchestrator → TrackingService`: updateExperimentStatus().  
-22. `WebUI → APIGateway → TrackingService`: getExperimentStatus(). → `User` (UI update).  
-
-### 8.2. UC3 – Rejestracja własnego algorytmu HPO
-
-**Uczestnicy:** `PluginAuthor`, `SDK`, `WebUI`, `APIGateway`, `AlgorithmRegistry`, `PublicationService`.
-
-1. `PluginAuthor → SDK`: validatePlugin(localPath).  
-2. `SDK → PluginRuntime`: loadPlugin(), runTestSuite().  
-3. `PluginRuntime → SDK`: validationResult(OK).  
-4. `PluginAuthor → WebUI`: openRegisterAlgorithm().  
-5. `WebUI → APIGateway`: getPublicationList() (opcjonalnie).  
-6. `PluginAuthor → WebUI`: submitAlgorithmMetadata(metadata, pluginPackage).  
-7. `WebUI → APIGateway`: registerAlgorithm(metadata, pluginPackage).  
-8. `APIGateway → AlgorithmRegistry`: createAlgorithm(metadata).  
-9. `AlgorithmRegistry → PublicationService`: validateLinkedPublications(pubIds).  
-10. `AlgorithmRegistry → APIGateway`: algorithmCreated(algorithmId, versionId).  
-11. `APIGateway → WebUI`: success().  
-
-### 8.3. UC4 – Porównaj wyniki algorytmów
-
-**Uczestnicy:** `User`, `WebUI`, `APIGateway`, `TrackingService`, `MetricsAnalysis`.
-
-1. `User → WebUI`: openComparisonView().  
-2. `WebUI → APIGateway`: listExperiments(filters).  
-3. `APIGateway → TrackingService`: listExperiments(filters).  
-4. `TrackingService → APIGateway → WebUI`: experimentsList.  
-5. `User → WebUI`: selectExperimentsAndAlgorithms().  
-6. `WebUI → APIGateway`: compare(experimentIds, algorithmIds, metricNames).  
-7. `APIGateway → MetricsAnalysis`: compare(...).  
-8. `MetricsAnalysis → TrackingService`: getMetrics(runIds).  
-9. `TrackingService → MetricsAnalysis`: metrics.  
-10. `MetricsAnalysis`: computeAggregatesAndTests().  
-11. `MetricsAnalysis → APIGateway → WebUI`: comparisonResult.  
-12. `WebUI → User`: showPlotsAndTables().  
-
-### 8.4. UC5 – Przeglądaj i filtruj eksperymenty
-
-**Uczestnicy:** `User`, `WebUI`, `APIGateway`, `TrackingService`.
-
-1. `User → WebUI`: openTrackingDashboard().  
-2. `WebUI → APIGateway`: listExperiments(defaultFilters).  
-3. `APIGateway → TrackingService`: listExperiments(defaultFilters).  
-4. `TrackingService → APIGateway → WebUI`: experiments.  
-5. `User → WebUI`: applyFilters().  
-6. `WebUI → APIGateway → TrackingService`: listExperiments(newFilters).  
-7. `User → WebUI`: openRunDetails(runId).  
-8. `WebUI → APIGateway → TrackingService`: getRunDetails(runId).  
-9. `TrackingService → WebUI`: run details, metrics, logs links.  
-
-### 8.5. UC6 – Zarządzanie referencjami
-
-**Uczestnicy:** `User`, `WebUI`, `APIGateway`, `PublicationService`, `ExternalBibliography`, `AlgorithmRegistry`, `TrackingService`.
-
-1. `User → WebUI`: openPublications().  
-2. `WebUI → APIGateway → PublicationService`: listPublications().  
-3. `User → WebUI`: addPublication(doi).  
-4. `WebUI → APIGateway → PublicationService`: addPublication(doi).  
-5. `PublicationService → ExternalBibliography`: fetchMetadata(doi).  
-6. `ExternalBibliography → PublicationService`: metadata.  
-7. `PublicationService → APIGateway → WebUI`: publicationCreated(pubId).  
-8. `User → WebUI`: linkPublicationToAlgorithm(pubId, algorithmId).  
-9. `WebUI → APIGateway → PublicationService`: createLink(pubId, algorithmId).  
-10. `PublicationService`: zapis PublicationLink.  
-11. Analogicznie dla eksperymentów i benchmarków.  
-
----
-
-## 9. Pokrycie wymagań przez UC (traceability)
-
-### 9.1. Lista wymagań (skrót)
+#### 5.3.1 Lista wymagań
 
 - **R1** – katalog algorytmów wbudowanych  
 - **R2** – pluginy algorytmów HPO  
@@ -1176,7 +2728,7 @@ Swimlane’y: Administrator, DeploymentTooling (helm/terraform), System.
 
 Niefunkcjonalne (RNF1–RNF8) powiązane są raczej z architekturą niż pojedynczym UC, ale wskażemy główne powiązania.
 
-### 9.2. Macierz pokrycia (tabela tekstowa)
+### 5.3.2 Macierz pokrycia (tabela tekstowa)
 
 Legenda: `X` – UC realizuje istotnie wymaganie, `(x)` – częściowo / pomocniczo.
 
@@ -1208,46 +2760,216 @@ Legenda: `X` – UC realizuje istotnie wymaganie, `(x)` – częściowo / pomocn
 - **RNF6 (cloud-ready, PC-first):** UC7, UC8.  
 - **RNF7 (reprodukowalność):** UC1, UC4, UC9.  
 
-### 9.3. Komentarz
+---
 
-- Wszystkie kluczowe wymagania R1–R15 mają pokrycie przez co najmniej jeden UC.  
-- UC2 (dodawanie wbudowanego algorytmu) i UC7/UC8 są bardziej operacyjne, ale bez nich system nie spełnia wymogów architektonicznych (PC-first, rozszerzalność).  
-- Nie ma UC, które nie realizują żadnego wymagania – każdy scenariusz ma uzasadnienie biznesowe lub architektoniczne.
+## 6. Dodatkowe kluczowe aktywności
+
+### 6.1. Cykl życia pluginu algorytmu HPO
+
+```mermaid
+---
+config:
+  layout: elk
+  theme: redux-dark
+---
+flowchart TB
+ subgraph DEV["Twórca algorytmu HPO"]
+        D1["Implementacja pluginu\n(IAlgorithmPlugin – init/suggest/observe/cleanup)"]
+        D2["Uruchom walidację lokalną\n(np. hpo-sdk validate)"]
+        D3["Popraw błędy w kodzie pluginu"]
+        D4["Zbuduj paczkę pluginu\n(wheel/zip/obraz kontenera)"]
+        D5["Zarejestruj plugin w systemie\n(Web UI / API – status draft)"]
+        D6["(opcjonalnie) Zainicjuj proces zatwierdzenia\n(plugin gotowy do użycia)"]
+        D7["(opcjonalnie) Zgłoś plugin do wycofania\n(status deprecated)"]
+  end
+ subgraph SDK["SDK / PluginRuntime (lokalnie)"]
+        S1["Załaduj plugin\n(sprawdź import)"]
+        S2["Sprawdź zgodność z IAlgorithmPlugin\n(obecność metod, sygnatury)"]
+        S3["Wykonaj testowe wywołania\n(np. symulacja kilku iteracji HPO)"]
+        S4{"Walidacja OK?"}
+  end
+ subgraph REG["Algorithm Registry"]
+        R1["Przyjmij metadane pluginu\n(registerAlgorithm)"]
+        R2["Zapamiętaj plugin jako Algorithm\n+ AlgorithmVersion(status = draft)"]
+        R3["Zatwierdź wersję pluginu\n(status = approved)"]
+        R4["Zmień status pluginu na deprecated\n(nowe eksperymenty nie używają wersji)"]
+  end
+ subgraph WRT["WorkerRuntime"]
+        W1["Otrzymaj RunJob z algorytmem pluginowym\n(AlgorithmVersion = approved)"]
+        W2["Załaduj plugin przez PluginRuntime\nna podstawie AlgorithmVersion"]
+        W3["Wywołuj metody pluginu w trakcie eksperymentu\n(init/suggest/observe/...)"]
+        W4["Loguj wyniki i metryki runu\n(Tracking Service)"]
+  end
+    D1 --> D2
+    D2 --> S1
+    S1 --> S2
+    S2 --> S3
+    S3 --> S4
+    S4 -- Nie --> D3
+    D3 --> D2
+    S4 -- Tak --> D4
+    D4 --> D5
+    D5 --> R1
+    R1 --> R2
+    D6 --> R3
+    R3 --> W1
+    W1 --> W2
+    W2 --> W3
+    W3 --> W4
+    D7 --> R4
+```
+
+### 6.2. Pipeline generowania raportu
+
+```mermaid
+---
+config:
+  layout: elk
+  theme: redux-dark
+---
+flowchart TB
+ subgraph USER["Użytkownik (Badacz / Inżynier ML)"]
+        U1["Otwórz widok raportów / podsumowań"]
+        U2["Wybierz eksperyment / eksperymenty\ndo uwzględnienia w raporcie"]
+        U3["Wybrań zakres raportu\n(metryki, algorytmy, benchmarki, zakres czasu)"]
+        U4@{ label: "Kliknij 'Generuj raport'" }
+        U5["Pobierz wygenerowany raport\n(lub otwórz link)"]
+  end
+ subgraph UI["Web UI"]
+        W1["Wyświetl listę eksperymentów i opcji raportu"]
+        W2["Waliduj wybór użytkownika\n(co najmniej 1 eksperyment, poprawne kryteria)"]
+        W3["Wyślij żądanie generateReport(experiments, options)\ndo ReportGenerator"]
+        W4["Odbierz informację o gotowym raporcie\n(URL z Object Storage)"]
+        W5@{ label: "Wyświetl link / przycisk 'Pobierz raport'" }
+  end
+ subgraph REP["ReportGenerator / Report Service"]
+        R1["Przyjmij żądanie generacji raportu"]
+        R2["Pobierz szczegóły eksperymentów i runów\nz Tracking Service"]
+        R3["Pobierz agregaty i porównania\nz Metrics & Analysis"]
+        R4["Pobierz powiązane publikacje\nz Publication Service"]
+        R5["Złóż raport\n(np. Markdown/HTML/PDF)"]
+        R6["Zapisz raport do Object Storage"]
+        R7["Zwróć URL raportu do Web UI / API"]
+  end
+ subgraph TRK["Tracking Service"]
+        T1["Pobierz eksperymenty, runy, metryki\n(SELECT z Results Store)"]
+  end
+ subgraph MNA["Metrics & Analysis Service"]
+        M1["Oblicz agregaty\n(średnie, odchylenia, rankingi)"]
+        M2["Przygotuj dane do wykresów\n(np. przebiegi metryk vs. iteracje)"]
+  end
+ subgraph PUB["Publication & Reference Service"]
+        P1["Pobierz metadane publikacji\npowiązanych z eksperymentami / algorytmami"]
+        P2@{ label: "Przygotuj listę referencji\\n(do sekcji 'Bibliografia' raportu)" }
+  end
+ subgraph OBJ["Object Storage"]
+        O1["Przyjmij plik raportu\n(i nadaj URL / ścieżkę)"]
+  end
+    U1 --> W1
+    W1 --> U2
+    U2 --> U3
+    U3 --> U4
+    U4 --> W2
+    W2 --> W3
+    W3 --> R1
+    R1 --> R2 & R3 & R4
+    R2 --> T1
+    R3 --> M1
+    M1 --> M2
+    R4 --> P1 & R5
+    P1 --> P2
+    T1 --> R2
+    M2 --> R3
+    P2 --> R4
+    R5 --> R6
+    R6 --> O1
+    O1 --> R7
+    R7 --> W4
+    W4 --> W5
+    W5 --> U5
+    U4@{ shape: rect}
+    W5@{ shape: rect}
+    P2@{ shape: rect}
+```
+
+### 6.3. Migracja deploymentu z PC do chmury
+
+```mermaid
+---
+config:
+  layout: elk
+  theme: redux-dark
+---
+flowchart TB
+ subgraph ADMIN["Administrator / DevOps"]
+        A1["Zidentyfikuj aktualną konfigurację lokalną\n(docker-compose, .env, wolumeny)"]
+        A2["Wyeksportuj konfigurację\n(env, secrets, ścieżki danych, porty)"]
+        A3["Uruchom skrypty migracyjne\n(do wygenerowania manifestów K8s / Helm values)"]
+        A4["Zweryfikuj i ewentualnie popraw\nwygenerowane manifesty / values"]
+        A5["Wykonaj deployment w chmurze\n(helm install/upgrade / kubectl apply)"]
+        A6["Skonfiguruj połączenia do\nDB, Object Storage, Message Broker\n(cloud lub zmigrowane)"]
+        A7["Uruchom testowy eksperyment\nw nowym środowisku"]
+        A8["Porównaj wyniki i spójność danych\n(lokalne vs chmura)"]
+  end
+ subgraph TOOL["DeploymentTooling\n(Helm / Terraform / skrypty)"]
+        T1["Wczytaj konfigurację z docker-compose/.env"]
+        T2["Zmapuj usługi lokalne na zasoby chmurowe\n(Deployment, Service, Ingress, PVC itp.)"]
+        T3["Wygeneruj manifesty K8s /\nwartości dla Helm chartów"]
+        T4["Zastosuj manifesty do klastra\n(Kubernetes API)"]
+  end
+ subgraph SYS["System (Deployment w chmurze)"]
+        S1["Utworzenie zasobów:\nDB (managed lub migrowana),\nObject Storage, Message Broker"]
+        S2["Utworzenie Deploymentów:\nAPI/Orchestrator, Tracking, Workers, Web UI, Monitoring"]
+        S3["Połączenie usług ze sobą\n(Services/Ingress/Secrets)"]
+        S4["Wskazanie na istniejące lub zmigrowane dane\n(Results Store / Object Storage)"]
+        S5["Wykonanie testowego eksperymentu\n(z użyciem nowej infrastruktury)"]
+        S6["Logowanie i monitoring\n(ocena poprawności działania)"]
+  end
+    A1 --> A2
+    A2 --> A3
+    A3 --> T1
+    T1 --> T2
+    T2 --> T3
+    T3 --> A4
+    A4 --> A5
+    A5 --> T4
+    T4 --> S1
+    S1 --> S2
+    S2 --> S3
+    S3 --> S4
+    S4 --> A6
+    A6 --> A7
+    A7 --> S5
+    S5 --> S6
+    S6 --> A8
+```  
 
 ---
 
-## 10. Jak architektura wspiera dobre praktyki benchmarkingu
+## 7. Jak architektura wspiera dobre praktyki benchmarkingu
 
-### 10.1. Cele G1–G5 a architektura
+### 7.1. Cele G1–G5 a architektura
 
 Przypomnienie (w skrócie):
 
-- **G1 – Ocena wydajności algorytmu**  
-- **G2 – Porównanie algorytmów między sobą**  
-- **G3 – Analiza wrażliwości / robustności**  
-- **G4 – Ekstrapolacja / generalizacja wyników**  
-- **G5 – Wsparcie teorii i rozwoju algorytmów**  
+- **G1** – Ocena wydajności algorytmu  
+- **G2** – Porównanie algorytmów między sobą  
+- **G3** – Analiza wrażliwości / robustności  
+- **G4** – Ekstrapolacja / generalizacja wyników  
+- **G5** – Wsparcie teorii i rozwoju algorytmów  
 
 **Mapowanie:**
 
-- **G1 (Ocena)**  
-  - Kontenery: Experiment Orchestrator, WorkerRuntime, Experiment Tracking, Metrics & Analysis.  
-  - UC: UC1, UC5.  
-  - Komponenty: MetricCalculator, RunLifecycleManager.  
-- **G2 (Porównanie)**  
-  - Kontenery: Metrics & Analysis, Web UI (ComparisonView), Tracking Service.  
-  - UC: UC4, UC1 (źródło danych).  
-- **G3 (Wrażliwość)**  
-  - Konfiguracja eksperymentu (UC1) pozwala na różne seeds, warianty konfiguracji i instancji benchmarków.  
-  - Metrics & Analysis może obliczać wariancję, robustność; Orchestrator wspiera plany eksperymentów z różnymi parametrami.  
-- **G4 (Ekstrapolacja)**  
-  - Benchmark Definition Service umożliwia definiowanie zróżnicowanych instancji (różne rozmiary, trudności), co pozwala badać skalowalność.  
-  - UC1/UC4 pomagają zorganizować eksperymenty obejmujące szerokie spektrum problemów.  
-- **G5 (Teoria i rozwój)**  
-  - Publication & Reference Service łączy eksperymenty i algorytmy z literaturą.  
-  - Plugin SDK (UC3) ułatwia szybkie wdrażanie nowych pomysłów i testowanie ich w tym samym środowisku, co algorytmy literaturowe.
+| Cel benchmarku | Opis / rola w systemie                                                                                                   | Powiązane kontenery / usługi                                                                                             | Powiązane przypadki użycia        | Kluczowe komponenty / mechanizmy                                                                                           |
+|----------------|--------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------|------------------------------------|----------------------------------------------------------------------------------------------------------------------------|
+| **G1 – Ocena** | Ocena jakości pojedynczych algorytmów HPO na dobrze zdefiniowanych benchmarkach i metrykach.                           | Experiment Orchestrator, WorkerRuntime, Experiment Tracking Service, Metrics & Analysis Service                           | UC1 (Skonfiguruj i uruchom eksperyment), UC5 (Przeglądaj i filtruj eksperymenty) | MetricCalculator, RunLifecycleManager, ExperimentConfigManager, TrackingAPI                                               |
+| **G2 – Porównanie** | Porównanie wielu algorytmów HPO (w tym autorskich) na tych samych benchmarkach i metrykach.                       | Metrics & Analysis Service, Web UI (ComparisonView), Experiment Tracking Service                                          | UC4 (Porównaj wyniki algorytmów), UC1 (jako źródło danych eksperymentów)        | AggregationEngine, StatisticalTestsEngine, ComparisonViewUI, queries w TrackingService                                     |
+| **G3 – Wrażliwość** | Analiza wrażliwości wyników na zmiany konfiguracji, seedów, instancji benchmarków i parametrów.                   | Experiment Orchestrator, Benchmark Definition Service, Metrics & Analysis Service                                         | UC1 (konfiguracja eksperymentu), UC4 (analiza wyników)                          | PlanBuilder (plany z różnymi seedami/parametrami), BenchmarkRepository, MetricCalculator (wariancja, robustność)          |
+| **G4 – Ekstrapolacja** | Badanie, jak algorytmy HPO zachowują się na zróżnicowanych instancjach problemu (skalowalność, trudność, rozmiar). | Benchmark Definition Service, Experiment Orchestrator, WorkerRuntime                                                      | UC1 (eksperymenty na wielu instancjach), UC4 (porównania w różnych skalach)     | ProblemInstanceManager, BenchmarkVersioning, możliwość definiowania familiów instancji, scenariusze w Orchestratorze      |
+| **G5 – Teoria i rozwój** | Wsparcie rozwoju nowych algorytmów HPO oraz powiązanie wyników z teorią i literaturą naukową.                | Publication & Reference Service, Algorithm Registry, Plugin SDK / Plugin Runtime, Web UI (moduł publikacji i algorytmów) | UC3 (Zaimplementuj i zarejestruj algorytm HPO – plugin), UC6 (Zarządzaj referencjami), UC1/UC4 (eksperymenty i analiza) | ReferenceCatalog, ReferenceLinker, CitationFormatter, IAlgorithmPlugin / SDK, AlgorithmMetadataStore, AlgorithmVersionManager |
 
-### 10.2. Checklist dobrych praktyk benchmarkingu i ich wsparcie
+
+### 7.2. Checklist dobrych praktyk benchmarkingu i ich wsparcie
 
 Poniżej lista praktyk i powiązania z architekturą.
 
@@ -1290,7 +3012,3 @@ Poniżej lista praktyk i powiązania z architekturą.
 10. **Cloud-ready, PC-first**  
     - Jasny podział na warstwę kontrolną (API, Orchestrator, Registry, Benchmark Definition, Publication) i warstwę wykonawczą (Workery).  
     - UC7/UC8 – operacyjne procedury deploymentu i skalowania.
-
----
-
-**Koniec dokumentu.**

@@ -18,9 +18,6 @@
 config:
   look: neo
   layout: elk
----
----
-config:
   theme: redux-dark
 ---
 flowchart LR

@@ -197,24 +197,24 @@ flowchart TB
     linkStyle 20 stroke:#C8E6C9
 ```
 
-| Kontener                      | Odpowiedzialności | Komunikacja | PC vs chmura | Związek z benchmarkingiem |
-|-------|--------------------------------|--------------------|-------------|-------------|---------------------------|
-| Web UI (Frontend)              | Interfejs użytkownika do: definicji benchmarków i eksperymentów, podglądu katalogu algorytmów HPO, panelu śledzenia eksperymentów, porównania wyników, zarządzania publikacjami i generowania raportów, podstawowej administracji. | REST/GraphQL/WebSocket z **API Gateway** (sync). | **PC:** serwowany z lokalnego kontenera lub plików statycznych. <br> **Chmura:** standardowy frontend (np. CDN / storage). | Umożliwia jasne prezentowanie celów eksperymentu, konfiguracji, wyników i statystyk. |
-| API Gateway / Backend API      | Pojedynczy punkt wejścia dla Web UI i systemów zewnętrznych. Routing żądań do usług: Orchestrator, Benchmark Definition, Algorithm Registry, Experiment Tracking, Publication & Reference, Metrics & Analysis. Autoryzacja / uwierzytelnianie. | Z Web UI / systemami zewn.: HTTP REST/GraphQL (sync). <br> Z usługami wewn.: HTTP/gRPC (sync) + publikacja zdarzeń do Message Broker (async). | **PC:** jeden kontener, monolityczny backend lub prosty gateway. <br> **Chmura:** gateway (np. API Gateway + microservices). | Centralny punkt integracji warstw benchmarkingu i udostępniania funkcji na zewnątrz. |
+| Kontener | Odpowiedzialności | Komunikacja | PC vs chmura | Związek z benchmarkingiem |
+| --- | --- | --- | --- | --- |
+| Web UI (Frontend) | Interfejs użytkownika do: definicji benchmarków i eksperymentów, podglądu katalogu algorytmów HPO, panelu śledzenia eksperymentów, porównania wyników, zarządzania publikacjami i generowania raportów, podstawowej administracji. | REST/GraphQL/WebSocket z **API Gateway** (sync). | **PC:** serwowany z lokalnego kontenera lub plików statycznych. <br> **Chmura:** standardowy frontend (np. CDN / storage). | Umożliwia jasne prezentowanie celów eksperymentu, konfiguracji, wyników i statystyk. |
+| API Gateway / Backend API | Pojedynczy punkt wejścia dla Web UI i systemów zewnętrznych. Routing żądań do usług: Orchestrator, Benchmark Definition, Algorithm Registry, Experiment Tracking, Publication & Reference, Metrics & Analysis. Autoryzacja / uwierzytelnianie. | Z Web UI / systemami zewn.: HTTP REST/GraphQL (sync). <br> Z usługami wewn.: HTTP/gRPC (sync) + publikacja zdarzeń do Message Broker (async). | **PC:** jeden kontener, monolityczny backend lub prosty gateway. <br> **Chmura:** gateway (np. API Gateway + microservices). | Centralny punkt integracji warstw benchmarkingu i udostępniania funkcji na zewnątrz. |
 | Experiment Orchestrator Service | Przyjmowanie definicji eksperymentów, walidacja planu (dobór algorytmów, instancji). Tworzenie planu runów (algorytm × instancja × seed × budżet). Zlecanie runów Workerom przez Message Broker. Zarządzanie stanem eksperymentu. Kontrola powtarzalności (seedy, snapshoty konfiguracji). | Sync: z API Gateway (definicje eksperymentów). <br> Async: do Worker Runtime (kolejka runów przez Message Broker), odbiór zdarzeń „RunCompleted/RunFailed”. | **PC:** jedna instancja, pojedynczy proces/kontener. <br> **Chmura:** skalowalny microservice, możliwe HA. | Implementuje **plan eksperymentu**, kontrolę budżetu i coverage instancji – kluczowe dobre praktyki benchmarkingu. |
 | Worker Runtime / Execution Engine | Wykonywanie pojedynczych runów: ładowanie benchmarku i instancji (dataset), ładowanie i uruchamianie algorytmu HPO (plugin/wbudowany), raportowanie metryk do Experiment Tracking Service. | Async: odbiór zadań z Message Broker. <br> Sync/Async: zapisy do Experiment Tracking Service (REST/gRPC, batch/stream), logi do Logging Stack. <br> Dostęp do File/Object Storage. | **PC:** 1–N workerów jako procesy/kontenery (docker-compose). <br> **Chmura:** worker pods w K8s, autoscaling wg kolejki. | Wymusza jednolite środowisko uruchomieniowe (konteneryzacja) → reprodukowalność i porównywalność runów. |
-| Benchmark Definition Service    | Przechowywanie i wersjonowanie definicji benchmarków: listy datasetów, definicji problemów (klasyfikacja, regresja, …), dostępnych metryk, znanych optimum / best-known values. | Sync: API dla Orchestratora i Web UI (GET/POST/PUT). | Jeden kontener, brak szczególnych wymagań skalowalności (PC i chmura tak samo). | Realizuje dobór i opis instancji problemowych (zróżnicowanie, reprezentatywność). |
-| Algorithm Registry Service      | Rejestr i wersjonowanie algorytmów HPO (wbudowane + pluginy). Przechowywanie metadanych: nazwa, typ, parametry, wymagania środowiskowe, powiązane publikacje. Walidacja kompatybilności z benchmarkami. | Sync: API dla Web UI, Orchestratora i Plugin Runtime. | Jeden kontener / usługa (PC i chmura, skalowanie wg potrzeb). | Ułatwia świadomy dobór algorytmów i ich konfiguracji; wspiera cele G1–G5 benchmarkingu. |
-| Algorithm SDK / Plugin Runtime  | ładowanie i izolowanie kodu pluginów, obsługa kontraktu API pluginu (wejścia/wyjścia, walidacja), raportowanie wyników i metryk do Worker Runtime / Experiment Tracking Service. | Używany lokalnie przez Worker Runtime (biblioteka / sidecar). Może rozmawiać z Workerem przez lokalne API lub wywołania językowe. | Ten sam kod dla PC i chmury, różnice tylko w środowisku (docker image). | Umożliwia łatwe dodawanie nowych algorytmów w ujednoliconym środowisku, co ułatwia porównywanie HPO. |
-| Experiment Tracking Service     | API do rejestrowania runów, metryk, parametrów, tagów i logów. Przechowywanie powiązań: eksperyment–run–algorytm–benchmark–publikacja. | Sync: API używane przez Worker Runtime, Orchestrator, Web UI. | Usługa korzystająca z relacyjnej bazy danych (PC: 1 kontener; chmura: skalowalny microservice). | Centralny panel śledzenia, wspiera analizę wyników i reprodukowalność eksperymentów. |
-| Metrics & Analysis Service (MetricsAnalysisService)      | Agregowanie wyników (średnie, wariancje, rankingi). Obliczanie złożonych metryk (np. czas do osiągnięcia poziomu błędu). Testy statystyczne, wykresy porównawcze (serie czasowe, boxplot, ranking). | Sync: API używane przez Web UI (porównania), opcjonalnie Orchestrator (walidacje). <br> Async: może słuchać zdarzeń „RunCompleted” do preagregacji. | Elastyczna usługa analityczna (PC: 1 kontener; chmura: skalowalny microservice). | Bezpośrednio implementuje **analizę i prezentację wyników** benchmarków. |
+| Benchmark Definition Service | Przechowywanie i wersjonowanie definicji benchmarków: listy datasetów, definicji problemów (klasyfikacja, regresja, …), dostępnych metryk, znanych optimum / best-known values. | Sync: API dla Orchestratora i Web UI (GET/POST/PUT). | Jeden kontener, brak szczególnych wymagań skalowalności (PC i chmura tak samo). | Realizuje dobór i opis instancji problemowych (zróżnicowanie, reprezentatywność). |
+| Algorithm Registry Service | Rejestr i wersjonowanie algorytmów HPO (wbudowane + pluginy). Przechowywanie metadanych: nazwa, typ, parametry, wymagania środowiskowe, powiązane publikacje. Walidacja kompatybilności z benchmarkami. | Sync: API dla Web UI, Orchestratora i Plugin Runtime. | Jeden kontener / usługa (PC i chmura, skalowanie wg potrzeb). | Ułatwia świadomy dobór algorytmów i ich konfiguracji; wspiera cele G1–G5 benchmarkingu. |
+| Algorithm SDK / Plugin Runtime | Ładowanie i izolowanie kodu pluginów, obsługa kontraktu API pluginu (wejścia/wyjścia, walidacja), raportowanie wyników i metryk do Worker Runtime / Experiment Tracking Service. | Używany lokalnie przez Worker Runtime (biblioteka / sidecar). Może rozmawiać z Workerem przez lokalne API lub wywołania językowe. | Ten sam kod dla PC i chmury, różnice tylko w środowisku (docker image). | Umożliwia łatwe dodawanie nowych algorytmów w ujednoliconym środowisku, co ułatwia porównywanie HPO. |
+| Experiment Tracking Service | API do rejestrowania runów, metryk, parametrów, tagów i logów. Przechowywanie powiązań: eksperyment–run–algorytm–benchmark–publikacja. | Sync: API używane przez Worker Runtime, Orchestrator, Web UI. | Usługa korzystająca z relacyjnej bazy danych (PC: 1 kontener; chmura: skalowalny microservice). | Centralny panel śledzenia, wspiera analizę wyników i reprodukowalność eksperymentów. |
+| Metrics & Analysis Service (MetricsAnalysisService) | Agregowanie wyników (średnie, wariancje, rankingi). Obliczanie złożonych metryk (np. czas do osiągnięcia poziomu błędu). Testy statystyczne, wykresy porównawcze (serie czasowe, boxplot, ranking). | Sync: API używane przez Web UI (porównania), opcjonalnie Orchestrator (walidacje). <br> Async: może słuchać zdarzeń „RunCompleted” do preagregacji. | Elastyczna usługa analityczna (PC: 1 kontener; chmura: skalowalny microservice). | Bezpośrednio implementuje **analizę i prezentację wyników** benchmarków. |
 | Publication & Reference Service (PublicationService) | Katalog publikacji (DOI, BibTeX, linki). Powiązania publikacji z algorytmami, benchmarkami, eksperymentami. Generowanie sekcji bibliografii w raportach. Integracja z zewnętrznymi usługami bibliograficznymi. | Sync: API dla Web UI, Algorithm Registry, Experiment Tracking, raportowania. <br> Sync/Async: wywołania do zewnętrznych systemów bibliograficznych. | Usługa integracyjna (PC i chmura – podobny model, różne skale). | Łączy wyniki z literaturą i teoretycznym uzasadnieniem algorytmów, wspiera interpretację benchmarków. |
 | Results Store (Relacyjna baza danych) | Przechowywanie danych domenowych: Experiments, Runs, Metrics, Algorithms, Benchmarks, Publications, linkowania, konfiguracje. | Internal: używana przez Experiment Tracking, Benchmark Definition, Algorithm Registry, Publication & Reference; Experiment Orchestrator korzysta z tych danych wyłącznie pośrednio – przez API usług domenowych (w szczególności Experiment Tracking Service). | np. PostgreSQL / inny RDBMS, z migracjami schematu; może być lokalny (PC) lub zarządzany (chmura). | Centralne repozytorium danych do analizy i zapewnienia reprodukowalności benchmarków. |
-| File / Object Storage          | Przechowywanie dużych artefaktów: datasety, modele, logi w plikach, wygenerowane raporty. | Dostęp z Workerów, Web UI / backendu i innych usług (protokół zależny od wdrożenia – S3/API plikowe). | **PC:** lokalny dysk / MinIO. <br> **Chmura:** S3 / GCS / Azure Blob. | Zapewnia odtwarzalne przechowywanie datasetów i wyników (artefaktów) benchmarków. |
-| Message Broker                 | Kolejka zadań runów. Kanał zdarzeń systemowych (RunStarted, RunCompleted, RunFailed, ExperimentCompleted). | Async: wymiana komunikatów między Orchestrator, Worker Runtime, Metrics & Analysis itd. | **PC:** pojedyncza instancja (np. RabbitMQ/Redis/Kafka w kontenerze). <br> **Chmura:** zarządzany lub skalowany klaster brokera. | Umożliwia elastyczny plan eksperymentu i skalowanie warstwy wykonawczej → efektywny benchmarking na dużą skalę. |
-| Monitoring & Logging Stack     | Zbieranie logów z kontenerów. Zbieranie metryk (czas trwania runów, obciążenie workerów, błędy). | Integracje z usługami (agenty, eksportery, log shippers). Odczyt przez dashboardy / alerting. | **PC:** uproszczony stack (np. 1–2 kontenery). <br> **Chmura:** pełny, skalowalny stack obserwowalności. | Wspiera obserwowalność i analizę wydajności algorytmów oraz systemu benchmarkującego. |
-| Auth Service / Identity Integration (AuthService)    | Integracja z IdP (OIDC/SAML). Mapowanie użytkowników na role (Badacz, Twórca pluginu, Admin). | Sync: wywołania do IdP w toku uwierzytelniania / autoryzacji; przekazywanie tokenów/claimów do usług. | W PC może być prostsza (lokalne konta / lightweight IdP); w chmurze – pełna integracja z firmowym/uczelniowym IdP. | Pozwala kontrolować, kto może modyfikować benchmarki, zatwierdzać algorytmy itp., co jest ważne dla jakości i wiarygodności benchmarków. |
-| Report Generator Service | Generowanie raportów (HTML/PDF/LaTeX) na podstawie danych z Tracking, Results Store, Metrics & Analysis, Lineage. | Sync: API wywoływane z Web UI oraz Orchestratora (po zakończeniu eksperymentu). | Python / Node.js; proces może działać jako osobny serwis lub moduł w backendzie. |
+| File / Object Storage | Przechowywanie dużych artefaktów: datasety, modele, logi w plikach, wygenerowane raporty. | Dostęp z Workerów, Web UI / backendu i innych usług (protokół zależny od wdrożenia – S3/API plikowe). | **PC:** lokalny dysk / MinIO. <br> **Chmura:** S3 / GCS / Azure Blob. | Zapewnia odtwarzalne przechowywanie datasetów i wyników (artefaktów) benchmarków. |
+| Message Broker | Kolejka zadań runów. Kanał zdarzeń systemowych (RunStarted, RunCompleted, RunFailed, ExperimentCompleted). | Async: wymiana komunikatów między Orchestrator, Worker Runtime, Metrics & Analysis itd. | **PC:** pojedyncza instancja (np. RabbitMQ/Redis/Kafka w kontenerze). <br> **Chmura:** zarządzany lub skalowany klaster brokera. | Umożliwia elastyczny plan eksperymentu i skalowanie warstwy wykonawczej → efektywny benchmarking na dużą skalę. |
+| Monitoring & Logging Stack | Zbieranie logów z kontenerów. Zbieranie metryk (czas trwania runów, obciążenie workerów, błędy). | Integracje z usługami (agenty, eksportery, log shippers). Odczyt przez dashboardy / alerting. | **PC:** uproszczony stack (np. 1–2 kontenery). <br> **Chmura:** pełny, skalowalny stack obserwowalności. | Wspiera obserwowalność i analizę wydajności algorytmów oraz systemu benchmarkującego. |
+| Auth Service / Identity Integration (AuthService) | Integracja z IdP (OIDC/SAML). Mapowanie użytkowników na role (Badacz, Twórca pluginu, Admin). | Sync: wywołania do IdP w toku uwierzytelniania / autoryzacji; przekazywanie tokenów/claimów do usług. | W PC może być prostsza (lokalne konta / lightweight IdP); w chmurze – pełna integracja z firmowym/uczelniowym IdP. | Pozwala kontrolować, kto może modyfikować benchmarki, zatwierdzać algorytmy itp., co jest ważne dla jakości i wiarygodności benchmarków. |
+| Report Generator Service | Generowanie raportów (HTML/PDF/LaTeX) na podstawie danych z Tracking, Results Store, Metrics & Analysis, Lineage. | Sync: API wywoływane z Web UI oraz Orchestratora (po zakończeniu eksperymentu). | Python / Node.js; proces może działać jako osobny serwis lub moduł w backendzie. | Generuje spójne, powtarzalne raporty z wyników benchmarków. |
 
 ---
 
@@ -373,11 +373,8 @@ flowchart LR
 | **ExperimentConfigManager** | Waliduje konfigurację eksperymentu (z Benchmark Definition i Algorithm Registry).          | ↔ Benchmark Definition Service, ↔ Algorithm Registry.                                                                 |
 | **ExperimentPlanBuilder**   | Tworzy plan runów (macierz konfiguracji).                                                  | ← ExperimentConfigManager (zwalidowana konfiguracja); → RunScheduler (plan runów).                                   |
 | **RunScheduler**            | Przekłada plan na zadania w kolejce Message Broker (RunJob).                               | ← ExperimentPlanBuilder; → Message Broker; ↔ Worker Runtime (konsumuje RunJob).                                      |
-| **ExperimentStateStore**    | Logika zarządzania stanem eksperymentów oraz mapowaniem powiązanych artefaktów: utrzymywanie statusów runów: `PENDING`, `RUNNING`, `FAILED`, `COMPLETED`, `CANCELLED`, mapowanie: run → artefakty, metryki, wyniki testów statystycznych, raporty.
-Założenia architektoniczne: ExperimentStateStore **nie posiada własnej bazy danych**, **nie komunikuje się bezpośrednio z Results Store** wszystkie dane odczytuje i aktualizuje wyłącznie poprzez **API Experiment Tracking Service**, zapewnia spójny model stanu eksperymentu widziany przez: Experiment Orchestrator (planowanie i monitorowanie przebiegu eksperymentów), Web UI (dashboardy, widoki szczegółów eksperymentu), inne usługi (np. Report Generator Service, Metrics & Analysis). | ↔ Experiment Tracking Service – odczyt metadanych runów, zapis zmian statusu; ↔ Experiment Orchestrator – zgłaszanie zmian stanu (start, sukces, błąd, anulowanie) |
-| **ReproducibilityManager** | Zarządza seedami, wersjami obrazów, snapshotami konfiguracji. | 
-↔ Experiment Tracking Service (metadane reprodukowalności, snapshoty); 
-↔ Results Store **pośrednio, przez API Experiment Tracking Service**. |
+| **ExperimentStateStore**    | Logika zarządzania stanem eksperymentów oraz mapowaniem powiązanych artefaktów: utrzymywanie statusów runów: `PENDING`, `RUNNING`, `FAILED`, `COMPLETED`, `CANCELLED`, mapowanie: run → artefakty, metryki, wyniki testów statystycznych, raporty. Założenia architektoniczne: ExperimentStateStore **nie posiada własnej bazy danych**, **nie komunikuje się bezpośrednio z Results Store** wszystkie dane odczytuje i aktualizuje wyłącznie poprzez **API Experiment Tracking Service**, zapewnia spójny model stanu eksperymentu widziany przez: Experiment Orchestrator (planowanie i monitorowanie przebiegu eksperymentów), Web UI (dashboardy, widoki szczegółów eksperymentu), inne usługi (np. Report Generator Service, Metrics & Analysis). | ↔ Experiment Tracking Service – odczyt metadanych runów, zapis zmian statusu; ↔ Experiment Orchestrator – zgłaszanie zmian stanu (start, sukces, błąd, anulowanie) |
+| **ReproducibilityManager** | Zarządza seedami, wersjami obrazów, snapshotami konfiguracji. | ↔ Experiment Tracking Service (metadane reprodukowalności, snapshoty), ↔ Results Store **pośrednio, przez API Experiment Tracking Service**. |
 | **EventPublisher**          | Publikuje zdarzenia systemowe (ExperimentStarted/Completed/Failed).                        | → Message Broker/Event Bus; subskrybenci: Monitoring, Web UI, ReportGenerator.                                       |
 
 ### 3.2. Benchmark Definition Service – komponenty
@@ -520,7 +517,7 @@ Uwaga: wszystkie wywołania usług backendu z Web UI przechodzą technicznie prz
 | **MonitoringDashboard**| UI do przeglądania metryk i logów oraz definiowania dashboardów.    | ↔ Administrator, Badacz (podgląd stabilności systemu i obciążenia) |
 | **AlertingEngine**     | Definiowanie reguł alertów i wysyłka powiadomień (np. e-mail / webhook). | ← MetricsCollector, LogCollector; → kanały powiadomień zewnętrznych (np. e-mail, Slack) |
 
-## 4. Szczegóły techniczne / Code (C4-4)
+## 4. Kod (C4-4)
 
 ### 4.1. Wzorce architektoniczne i technologie (przykładowe)
 
@@ -549,77 +546,104 @@ Uwaga: wszystkie wywołania usług backendu z Web UI przechodzą technicznie prz
   - `code_ref`: commit hash / tag repozytorium lub wersja pluginu.  
 - Możliwość odtworzenia runu przez „Re-run with same config/environment”.
 
-### 4.3. Model danych – kluczowe encje
-
-Przykładowy model (w skrócie):
-
-- **Experiment**
-  - `id`
-  - `name`
-  - `description`
-  - `goal_type` (G1–G5 / wielokrotny)
-  - `benchmark_ids[]`
-  - `algorithm_ids[]`
-  - `created_by_user`
-  - `created_at`
-  - `config_json`
-  - `tags[]`
-- **Run**
-  - `id`
-  - `experiment_id`
-  - `algorithm_version_id`
-  - `benchmark_instance_id`
-  - `seed`
-  - `status` (pending/running/completed/failed)
-  - `start_time`, `end_time`
-  - `resource_usage_json`
-  - `environment_snapshot_id`
-- **Metric**
-  - `id`
-  - `run_id`
-  - `name`
-  - `value`
-  - `step` / `epoch` (opcjonalne)
-  - `timestamp`
-- **Algorithm**
-  - `id`
-  - `name`
-  - `type` (bayes, TPE, random, grid, evo, other)
-  - `is_builtin`
-  - `primary_publication_id` (FK)  
-- **AlgorithmVersion**
-  - `id`
-  - `algorithm_id`
-  - `version`
-  - `plugin_location` (np. URL, ścieżka pakietu)
-  - `sdk_version`
-  - `status` (draft/approved/deprecated)
-- **Benchmark**
-  - `id`
-  - `name`
-  - `description`
-  - `problem_type`
-  - `canonical_version`
-- **BenchmarkInstance**
-  - `id`
-  - `benchmark_id`
-  - `dataset_ref`
-  - `config_json`
-  - `best_known_value` (opcjonalnie)
-- **Publication**
-  - `id`
-  - `title`
-  - `authors`
-  - `year`
-  - `venue`
-  - `doi`
-  - `bibtex`
-  - `url`
-- **PublicationLink**
-  - `id`
-  - `publication_id`
-  - `entity_type` (Algorithm, Benchmark, Experiment)
-  - `entity_id`
+### 4.3. Model danych
+```mermaid
+---
+config:
+  layout: elk
+  theme: redux-dark-color
+---
+erDiagram
+    EXPERIMENT {
+        string  id
+        string  name
+        string  description
+        string  goal_type
+        string  created_by_user
+        datetime created_at
+        json    config_json
+        string  tags
+    }
+    RUN {
+        string  id
+        string  experiment_id
+        string  algorithm_version_id
+        string  benchmark_instance_id
+        int     seed
+        string  status
+        datetime start_time
+        datetime end_time
+        json    resource_usage_json
+        string  environment_snapshot_id
+    }
+    METRIC {
+        string  id
+        string  run_id
+        string  name
+        float   value
+        int     step
+        datetime timestamp
+    }
+    ALGORITHM {
+        string  id
+        string  name
+        string  type
+        bool    is_builtin
+        string  primary_publication_id
+    }
+    ALGORITHM_VERSION {
+        string  id
+        string  algorithm_id
+        string  version
+        string  plugin_location
+        string  sdk_version
+        string  status
+    }
+    BENCHMARK {
+        string  id
+        string  name
+        string  description
+        string  problem_type
+        string  canonical_version
+    }
+    BENCHMARK_INSTANCE {
+        string  id
+        string  benchmark_id
+        string  dataset_ref
+        json    config_json
+        float   best_known_value
+    }
+    PUBLICATION {
+        string  id
+        string  title
+        string  authors
+        int     year
+        string  venue
+        string  doi
+        string  bibtex
+        string  url
+    }
+    PUBLICATION_LINK {
+        string  id
+        string  publication_id
+        string  entity_type
+        string  entity_id
+    }
+    ENVIRONMENT_SNAPSHOT {
+        string  id
+        json    environment_json
+    }
+    EXPERIMENT        ||--o{ RUN                : has
+    RUN               ||--o{ METRIC             : logs
+    EXPERIMENT        }o--o{ BENCHMARK          : uses
+    EXPERIMENT        }o--o{ ALGORITHM          : compares
+    ALGORITHM         ||--o{ ALGORITHM_VERSION  : has
+    BENCHMARK         ||--o{ BENCHMARK_INSTANCE : has
+    ALGORITHM_VERSION ||--o{ RUN                : used_in
+    BENCHMARK_INSTANCE||--o{ RUN                : evaluated_in
+    ENVIRONMENT_SNAPSHOT ||--o{ RUN             : used_by
+    PUBLICATION       ||--o{ PUBLICATION_LINK   : has
+```
 
 ---
 

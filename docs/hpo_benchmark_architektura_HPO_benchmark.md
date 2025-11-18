@@ -19,6 +19,10 @@ config:
   look: neo
   layout: elk
 ---
+---
+config:
+  theme: redux-dark
+---
 flowchart LR
     A1["Badacz / Inżynier ML"] -- konfiguruje eksperymenty, analizuje wyniki --> S["HPO Benchmarking Platform"]
     A2["Twórca algorytmu HPO"] -- rejestruje pluginy HPO --> S
@@ -148,6 +152,52 @@ Słownie: na diagramie kontekstu system S jest centralnym prostokątem; aktorzy 
 ---
 
 ## 2. Kontenery (C4-2)
+
+```mermaid
+---
+config:
+  layout: elk
+  theme: redux-dark
+---
+flowchart TB
+ subgraph Client["Client"]
+        UI["Web UI / Frontend"]
+        Ext["Zewnętrzne systemy AutoML / Analiza"]
+  end
+ subgraph ExecLayer["Warstwa wykonawcza"]
+        MB["Message Broker"]
+        WORKER["Worker Runtime / Execution Engine"]
+        PLUGIN["Algorithm SDK / Plugin Runtime"]
+  end
+ subgraph Core["HPO Benchmarking Platform"]
+        APIGW["API Gateway / Backend API"]
+        ORCH["Experiment Orchestrator Service"]
+        TRK["Experiment Tracking Service"]
+        ANALYTICS["Metrics & Analysis Service"]
+        BENCH["Benchmark Definition Service"]
+        ALGREG["Algorithm Registry Service"]
+        PUB["Publication & Reference Service"]
+        ExecLayer
+  end
+    UI -- HTTP --> APIGW
+    Ext -- HTTP API --> APIGW
+    APIGW --> ORCH & TRK & ANALYTICS & BENCH & ALGREG & PUB & AUTH["Auth / Identity"]
+    ORCH --> MB
+    WORKER --> MB & TRK & BENCH & ALGREG & OBJ[("File / Object Storage")] & PLUGIN
+    TRK --> DB[("Results Store - DB")]
+    BENCH --> DB
+    ALGREG --> DB
+    PUB --> DB
+    Core --> MON["Monitoring & Logging Stack"]
+     AUTH:::Sky
+     OBJ:::Sky
+     DB:::Sky
+     MON:::Sky
+    classDef Sky stroke-width:1px, stroke-dasharray:none, stroke:#374D7C, fill:#E2EBFF, color:#374D7C
+    style ExecLayer stroke:#D50000
+    style Core stroke:#C8E6C9
+    style Client stroke:#FFE0B2
+```
 
 ### 2.1. Lista kontenerów
 

@@ -68,6 +68,7 @@ flowchart LR
   - Zarządza deploymentem (PC / chmura).
   - Konfiguruje zasoby, uprawnienia, integracje (IdP, monitoring).
   - Dodaje / zatwierdza wbudowane algorytmy HPO i benchmarki „kanoniczne”.
+  - W praktyce rola ta obejmuje zarówno Administratora lokalnego (środowisko PC/lab), jak i Administratora DevOps/SRE (środowisko chmurowe/K8s).
 - **Zewnętrzny system AutoML / narzędzie analityczne**
   - Wywołuje API w celu uruchamiania eksperymentów.
   - Pobiera wyniki benchmarków do dalszej analizy (np. BI, Jupyter, AutoML pipeline).
@@ -159,7 +160,7 @@ flowchart TB
   end
     UI -- HTTP --> APIGW
     Ext -- HTTP API --> APIGW
-    APIGW --> ORCH & TRK & ANALYTICS & BENCH & ALGREG & PUB & AUTH["Auth / Identity"]
+    APIGW --> ORCH & TRK & ANALYTICS & BENCH & ALGREG & PUB & AUTH["AuthService / Identity"]
     ORCH --> MB
     WORKER --> MB & TRK & BENCH & ALGREG & OBJ[("File / Object Storage")] & PLUGIN
     TRK --> DB[("Results Store - DB")]
@@ -206,13 +207,13 @@ flowchart TB
 | 2.2.6 | Algorithm Registry Service      | Rejestr i wersjonowanie algorytmów HPO (wbudowane + pluginy). Przechowywanie metadanych: nazwa, typ, parametry, wymagania środowiskowe, powiązane publikacje. Walidacja kompatybilności z benchmarkami. | Sync: API dla Web UI, Orchestratora i Plugin Runtime. | Jeden kontener / usługa (PC i chmura, skalowanie wg potrzeb). | Ułatwia świadomy dobór algorytmów i ich konfiguracji; wspiera cele G1–G5 benchmarkingu. |
 | 2.2.7 | Algorithm SDK / Plugin Runtime  | Dostarczenie standardowego interfejsu pluginu (**IAlgorithmPlugin**). Ładowanie pluginów (np. Python packages, gRPC services) w sposób izolowany. Walidacja zgodności pluginu z interfejsem. | Używany lokalnie przez Worker Runtime (biblioteka / sidecar). Może rozmawiać z Workerem przez lokalne API lub wywołania językowe. | Ten sam kod dla PC i chmury, różnice tylko w środowisku (docker image). | Umożliwia łatwe dodawanie nowych algorytmów w ujednoliconym środowisku, co ułatwia porównywanie HPO. |
 | 2.2.8 | Experiment Tracking Service     | API do rejestrowania runów, metryk, parametrów, tagów i logów. Przechowywanie powiązań: eksperyment–run–algorytm–benchmark–publikacja. | Sync: API używane przez Worker Runtime, Orchestrator, Web UI. | Usługa korzystająca z relacyjnej bazy danych (PC: 1 kontener; chmura: skalowalny microservice). | Centralny panel śledzenia, wspiera analizę wyników i reprodukowalność eksperymentów. |
-| 2.2.9 | Metrics & Analysis Service      | Agregowanie wyników (średnie, wariancje, rankingi). Obliczanie złożonych metryk (np. czas do osiągnięcia poziomu błędu). Testy statystyczne, wykresy porównawcze (serie czasowe, boxplot, ranking). | Sync: API używane przez Web UI (porównania), opcjonalnie Orchestrator (walidacje). <br> Async: może słuchać zdarzeń „RunCompleted” do preagregacji. | Elastyczna usługa analityczna (PC: 1 kontener; chmura: skalowalny microservice). | Bezpośrednio implementuje **analizę i prezentację wyników** benchmarków. |
-| 2.2.10 | Publication & Reference Service | Katalog publikacji (DOI, BibTeX, linki). Powiązania publikacji z algorytmami, benchmarkami, eksperymentami. Generowanie sekcji bibliografii w raportach. Integracja z zewnętrznymi usługami bibliograficznymi. | Sync: API dla Web UI, Algorithm Registry, Experiment Tracking, raportowania. <br> Sync/Async: wywołania do zewnętrznych systemów bibliograficznych. | Usługa integracyjna (PC i chmura – podobny model, różne skale). | Łączy wyniki z literaturą i teoretycznym uzasadnieniem algorytmów, wspiera interpretację benchmarków. |
+| 2.2.9 | Metrics & Analysis Service (MetricsAnalysisService)      | Agregowanie wyników (średnie, wariancje, rankingi). Obliczanie złożonych metryk (np. czas do osiągnięcia poziomu błędu). Testy statystyczne, wykresy porównawcze (serie czasowe, boxplot, ranking). | Sync: API używane przez Web UI (porównania), opcjonalnie Orchestrator (walidacje). <br> Async: może słuchać zdarzeń „RunCompleted” do preagregacji. | Elastyczna usługa analityczna (PC: 1 kontener; chmura: skalowalny microservice). | Bezpośrednio implementuje **analizę i prezentację wyników** benchmarków. |
+| 2.2.10 | Publication & Reference Service (PublicationService) | Katalog publikacji (DOI, BibTeX, linki). Powiązania publikacji z algorytmami, benchmarkami, eksperymentami. Generowanie sekcji bibliografii w raportach. Integracja z zewnętrznymi usługami bibliograficznymi. | Sync: API dla Web UI, Algorithm Registry, Experiment Tracking, raportowania. <br> Sync/Async: wywołania do zewnętrznych systemów bibliograficznych. | Usługa integracyjna (PC i chmura – podobny model, różne skale). | Łączy wyniki z literaturą i teoretycznym uzasadnieniem algorytmów, wspiera interpretację benchmarków. |
 | 2.2.11 | Results Store (Relacyjna baza danych) | Przechowywanie danych domenowych: Experiments, Runs, Metrics, Algorithms, Benchmarks, Publications, linkowania, konfiguracje. | Internal: używana przez Experiment Tracking, Benchmark Definition, Algorithm Registry, Publication & Reference. | np. PostgreSQL / inny RDBMS, z migracjami schematu; może być lokalny (PC) lub zarządzany (chmura). | Centralne repozytorium danych do analizy i zapewnienia reprodukowalności benchmarków. |
 | 2.2.12 | File / Object Storage          | Przechowywanie dużych artefaktów: datasety, modele, logi w plikach, wygenerowane raporty. | Dostęp z Workerów, Web UI / backendu i innych usług (protokół zależny od wdrożenia – S3/API plikowe). | **PC:** lokalny dysk / MinIO. <br> **Chmura:** S3 / GCS / Azure Blob. | Zapewnia odtwarzalne przechowywanie datasetów i wyników (artefaktów) benchmarków. |
 | 2.2.13 | Message Broker                 | Kolejka zadań runów. Kanał zdarzeń systemowych (RunStarted, RunCompleted, RunFailed, ExperimentCompleted). | Async: wymiana komunikatów między Orchestrator, Worker Runtime, Metrics & Analysis itd. | **PC:** pojedyncza instancja (np. RabbitMQ/Redis/Kafka w kontenerze). <br> **Chmura:** zarządzany lub skalowany klaster brokera. | Umożliwia elastyczny plan eksperymentu i skalowanie warstwy wykonawczej → efektywny benchmarking na dużą skalę. |
 | 2.2.14 | Monitoring & Logging Stack     | Zbieranie logów z kontenerów. Zbieranie metryk (czas trwania runów, obciążenie workerów, błędy). | Integracje z usługami (agenty, eksportery, log shippers). Odczyt przez dashboardy / alerting. | **PC:** uproszczony stack (np. 1–2 kontenery). <br> **Chmura:** pełny, skalowalny stack obserwowalności. | Wspiera obserwowalność i analizę wydajności algorytmów oraz systemu benchmarkującego. |
-| 2.2.15 | Auth / Identity Integration    | Integracja z IdP (OIDC/SAML). Mapowanie użytkowników na role (Badacz, Twórca pluginu, Admin). | Sync: wywołania do IdP w toku uwierzytelniania / autoryzacji; przekazywanie tokenów/claimów do usług. | W PC może być prostsza (lokalne konta / lightweight IdP); w chmurze – pełna integracja z firmowym/uczelniowym IdP. | Pozwala kontrolować, kto może modyfikować benchmarki, zatwierdzać algorytmy itp., co jest ważne dla jakości i wiarygodności benchmarków. |
+| 2.2.15 | Auth Service / Identity Integration (AuthService)    | Integracja z IdP (OIDC/SAML). Mapowanie użytkowników na role (Badacz, Twórca pluginu, Admin). | Sync: wywołania do IdP w toku uwierzytelniania / autoryzacji; przekazywanie tokenów/claimów do usług. | W PC może być prostsza (lokalne konta / lightweight IdP); w chmurze – pełna integracja z firmowym/uczelniowym IdP. | Pozwala kontrolować, kto może modyfikować benchmarki, zatwierdzać algorytmy itp., co jest ważne dla jakości i wiarygodności benchmarków. |
 
 ---
 
@@ -505,474 +506,138 @@ ReportGenerator --> ObjectStorage : storeReport()
 ExperimentTrackingService --> ResultsStore
 ```
 
-```markdown
-<table>
-  <thead>
-    <tr>
-      <th>Sekcja</th>
-      <th>Komponent nadrzędny / serwis</th>
-      <th>Komponenty (tabela zagnieżdżona)</th>
-    </tr>
-  </thead>
-  <tbody>
+## 3. Komponenty – podsumowanie
 
-    <!-- 3.1 Experiment Orchestrator Service -->
-    <tr>
-      <td>3.1</td>
-      <td><strong>Experiment Orchestrator Service</strong></td>
-      <td>
-        <table>
-          <thead>
-            <tr>
-              <th>Nazwa</th>
-              <th>Opis</th>
-              <th>Interakcje</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><strong>ExperimentConfigManager</strong></td>
-              <td>Waliduje konfigurację eksperymentu (z Benchmark Definition i Algorithm Registry).</td>
-              <td>Dwukierunkowo z Benchmark Definition Service i Algorithm Registry.</td>
-            </tr>
-            <tr>
-              <td><strong>ExperimentPlanBuilder</strong></td>
-              <td>Tworzy plan runów (macierz konfiguracji).</td>
-              <td>Odbiera zwalidowaną konfigurację od ExperimentConfigManager, przekazuje plan do RunScheduler.</td>
-            </tr>
-            <tr>
-              <td><strong>RunScheduler</strong></td>
-              <td>Przekłada plan na zadania w kolejce Message Broker (RunJob).</td>
-              <td>Odbiera plan od ExperimentPlanBuilder, publikuje RunJob do Message Broker, współpracuje z Worker Runtime.</td>
-            </tr>
-            <tr>
-              <td><strong>ExperimentStateStore</strong></td>
-              <td>Warstwa logiczna nad bazą danych; utrzymuje stan eksperymentu, runów, retry.</td>
-              <td>Dwukierunkowo z Results Store oraz Experiment Tracking (statusy runów).</td>
-            </tr>
-            <tr>
-              <td><strong>ReproducibilityManager</strong></td>
-              <td>Zarządza seedami, wersjami obrazów, snapshotami konfiguracji.</td>
-              <td>Dwukierunkowo z Results Store oraz Experiment Tracking (metadane reprodukowalności).</td>
-            </tr>
-            <tr>
-              <td><strong>EventPublisher</strong></td>
-              <td>Publikuje zdarzenia systemowe (ExperimentStarted, ExperimentCompleted, ExperimentFailed).</td>
-              <td>Publikuje do Message Broker lub Event Bus; subskrybenci: Monitoring, Web UI, ReportGenerator.</td>
-            </tr>
-          </tbody>
-        </table>
-      </td>
-    </tr>
+| Sekcja | Serwis / komponent nadrzędny           | Opis skrócony                                   |
+|--------|----------------------------------------|-------------------------------------------------|
+| 3.1    | [Experiment Orchestrator Service](#31-experiment-orchestrator-service--komponenty)     | Orkiestracja eksperymentów i runów              |
+| 3.2    | [Benchmark Definition Service](#32-benchmark-definition-service--komponenty)           | Definicja i wersjonowanie benchmarków           |
+| 3.3    | [Algorithm Registry Service](#33-algorithm-registry-service--komponenty)               | Rejestr algorytmów i ich wersji                 |
+| 3.4    | [Algorithm SDK / Plugin Runtime](#34-algorithm-sdk--plugin-runtime--komponenty)        | Uruchamianie pluginów algorytmów                |
+| 3.5    | [Experiment Tracking Service](#35-experiment-tracking-service--komponenty)             | Śledzenie runów, metryk i powiązań              |
+| 3.6    | [Metrics & Analysis Service](#36-metrics--analysis-service--komponenty)                | Agregacja wyników i analizy statystyczne        |
+| 3.7    | [Publication & Reference Service](#37-publication--reference-service--komponenty)      | Publikacje i referencje naukowe                 |
+| 3.8    | [Results Store](#38-results-store--komponenty-logiczne)                                | Warstwa dostępu do danych (DAO)                 |
+| 3.9    | [Web UI](#39-web-ui--komponenty)                                                       | Interfejsy użytkownika                          |
+| 3.10   | [File / Object Storage](#310-file--object-storage--komponenty-logiczne)                | Artefakty i datasety w Object Storage           |
+| 3.11   | [ReportGenerator](#311-reportgenerator--komponenty)                                    | Generowanie raportów                            |
 
-    <!-- 3.2 Benchmark Definition Service -->
-    <tr>
-      <td>3.2</td>
-      <td><strong>Benchmark Definition Service</strong></td>
-      <td>
-        <table>
-          <thead>
-            <tr>
-              <th>Nazwa</th>
-              <th>Opis</th>
-              <th>Interakcje</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><strong>BenchmarkRepository</strong></td>
-              <td>CRUD benchmarków.</td>
-              <td>Dwukierunkowo z Results Store (BenchmarkDAO) oraz Experiment Orchestrator (walidacja konfiguracji).</td>
-            </tr>
-            <tr>
-              <td><strong>ProblemInstanceManager</strong></td>
-              <td>Zarządza instancjami (dataset plus konfiguracja zadania).</td>
-              <td>Dwukierunkowo z DatasetRepository oraz Algorithm Registry (sprawdzanie kompatybilności).</td>
-            </tr>
-            <tr>
-              <td><strong>BenchmarkVersioning</strong></td>
-              <td>Wersjonowanie benchmarków, oznaczanie wersji kanonicznych.</td>
-              <td>Dwukierunkowo z BenchmarkRepository; współpraca z ExperimentConfigManager przy doborze wersji.</td>
-            </tr>
-          </tbody>
-        </table>
-      </td>
-    </tr>
 
-    <!-- 3.3 Algorithm Registry Service -->
-    <tr>
-      <td>3.3</td>
-      <td><strong>Algorithm Registry Service</strong></td>
-      <td>
-        <table>
-          <thead>
-            <tr>
-              <th>Nazwa</th>
-              <th>Opis</th>
-              <th>Interakcje</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><strong>AlgorithmMetadataStore</strong></td>
-              <td>Przechowuje opis algorytmu: nazwa, typ, parametry, powiązania.</td>
-              <td>Dwukierunkowo z Results Store (AlgorithmDAO) oraz Web UI (AlgorithmCatalogUI).</td>
-            </tr>
-            <tr>
-              <td><strong>AlgorithmVersionManager</strong></td>
-              <td>Zarządza wersjami implementacji algorytmów i ich statusem (draft, approved).</td>
-              <td>Dwukierunkowo z PluginLoader i PluginValidator; współpraca z Experiment Orchestrator przy doborze wersji.</td>
-            </tr>
-            <tr>
-              <td><strong>CompatibilityChecker</strong></td>
-              <td>Sprawdza kompatybilność algorytmu z typami benchmarków.</td>
-              <td>Dwukierunkowo z Benchmark Definition Service (ProblemInstanceManager, BenchmarkRepository).</td>
-            </tr>
-          </tbody>
-        </table>
-      </td>
-    </tr>
+### 3.1. Experiment Orchestrator Service – komponenty
 
-    <!-- 3.4 Algorithm SDK / Plugin Runtime -->
-    <tr>
-      <td>3.4</td>
-      <td><strong>Algorithm SDK / Plugin Runtime</strong></td>
-      <td>
-        <table>
-          <thead>
-            <tr>
-              <th>Nazwa</th>
-              <th>Opis</th>
-              <th>Interakcje</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><strong>IAlgorithmPlugin</strong></td>
-              <td>Interfejs pluginu algorytmu; definiuje metody typu suggest, observe, init; jasno zdefiniowany kontrakt wejścia i wyjścia.</td>
-              <td>Implementowany przez pluginy; wywoływany przez SandboxManager i Worker Runtime.</td>
-            </tr>
-            <tr>
-              <td><strong>PluginLoader</strong></td>
-              <td>Ładuje pluginy (np. z plików pakietów, modułów języka, serwisów gRPC).</td>
-              <td>Dwukierunkowo z AlgorithmVersionManager; współpraca z ObjectStorageClient lub repozytorium pakietów.</td>
-            </tr>
-            <tr>
-              <td><strong>SandboxManager</strong></td>
-              <td>Izoluje pluginy (np. przez procesy potomne lub kontenery).</td>
-              <td>Dwukierunkowo z Worker Runtime i PluginLoader; przesyła logi do TrackingAPI.</td>
-            </tr>
-            <tr>
-              <td><strong>PluginValidator</strong></td>
-              <td>Sprawdza implementację pluginu względem interfejsu na testowym przebiegu.</td>
-              <td>Dwukierunkowo z IAlgorithmPlugin; współpraca z Algorithm Registry przy aktualizacji statusu wersji.</td>
-            </tr>
-          </tbody>
-        </table>
-      </td>
-    </tr>
+| Nazwa                     | Opis                                                                                         | Interakcje                                                                                                            |
+|---------------------------|----------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------|
+| **ExperimentConfigManager** | Waliduje konfigurację eksperymentu (z Benchmark Definition i Algorithm Registry).          | ↔ Benchmark Definition Service, ↔ Algorithm Registry.                                                                 |
+| **ExperimentPlanBuilder**   | Tworzy plan runów (macierz konfiguracji).                                                  | ← ExperimentConfigManager (zwalidowana konfiguracja); → RunScheduler (plan runów).                                   |
+| **RunScheduler**            | Przekłada plan na zadania w kolejce Message Broker (RunJob).                               | ← ExperimentPlanBuilder; → Message Broker; ↔ Worker Runtime (konsumuje RunJob).                                      |
+| **ExperimentStateStore**    | Warstwa logiczna nad DB; utrzymuje stan eksperymentu, runów, retry. ExperimentStateStore nie posiada własnej bazy – korzysta z Results Store wyłącznie przez API Experiment Tracking Service (ewentualnie z lokalnego cache'u w pamięci).                        | ↔ Results Store; ↔ Experiment Tracking (statusy runów).                                                              |
+| **ReproducibilityManager**  | Zarządza seedami, wersjami obrazów, snapshotami konfiguracji.                              | ↔ Results Store; ↔ Experiment Tracking (metadane reprodukowalności).                                                 |
+| **EventPublisher**          | Publikuje zdarzenia systemowe (ExperimentStarted/Completed/Failed).                        | → Message Broker/Event Bus; subskrybenci: Monitoring, Web UI, ReportGenerator.                                       |
 
-    <!-- 3.5 Experiment Tracking Service -->
-    <tr>
-      <td>3.5</td>
-      <td><strong>Experiment Tracking Service</strong></td>
-      <td>
-        <table>
-          <thead>
-            <tr>
-              <th>Nazwa</th>
-              <th>Opis</th>
-              <th>Interakcje</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><strong>TrackingAPI</strong></td>
-              <td>Publiczne API do logowania runów, metryk, artefaktów oraz tagów.</td>
-              <td>Wywoływane przez Worker Runtime, pluginy i Web UI; współpracuje z RunLifecycleManager, TaggingAndSearchEngine, LineageTracker i warstwą DAO.</td>
-            </tr>
-            <tr>
-              <td><strong>RunLifecycleManager</strong></td>
-              <td>Tworzy runy i aktualizuje ich statusy.</td>
-              <td>Dwukierunkowo z Experiment Orchestrator i Results Store (RunDAO); komunikuje się z EventPublisher.</td>
-            </tr>
-            <tr>
-              <td><strong>TaggingAndSearchEngine</strong></td>
-              <td>Zapewnia filtrowanie i tagowanie eksperymentów oraz runów.</td>
-              <td>Dwukierunkowo z Results Store (ExperimentDAO i RunDAO); komunikacja z Web UI (TrackingDashboardUI, ComparisonViewUI).</td>
-            </tr>
-            <tr>
-              <td><strong>LineageTracker</strong></td>
-              <td>Zapisuje powiązania: eksperyment → run → algorytm → benchmark → publikacja.</td>
-              <td>Dwukierunkowo z Results Store (LinkDAO) oraz Publication &amp; Reference Service; współpraca z ReportGenerator.</td>
-            </tr>
-          </tbody>
-        </table>
-      </td>
-    </tr>
 
-    <!-- 3.6 Metrics & Analysis Service -->
-    <tr>
-      <td>3.6</td>
-      <td><strong>Metrics &amp; Analysis Service</strong></td>
-      <td>
-        <table>
-          <thead>
-            <tr>
-              <th>Nazwa</th>
-              <th>Opis</th>
-              <th>Interakcje</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><strong>MetricCalculator</strong></td>
-              <td>Oblicza metryki z surowych wyników, np. accuracy, regret.</td>
-              <td>Dwukierunkowo z TrackingAPI i MetricDAO (dane wejściowe); współpraca z AggregationEngine.</td>
-            </tr>
-            <tr>
-              <td><strong>AggregationEngine</strong></td>
-              <td>Agreguje wyniki po benchmarkach, algorytmach i eksperymentach.</td>
-              <td>Dwukierunkowo z MetricCalculator i StatisticalTestsEngine; współpraca z VisualizationQueryAdapter.</td>
-            </tr>
-            <tr>
-              <td><strong>StatisticalTestsEngine</strong></td>
-              <td>Wykonuje testy statystyczne, np. testy rangowe typu Friedman lub Nemenyi.</td>
-              <td>Dwukierunkowo z AggregationEngine; współpraca z ReportGenerator oraz Web UI (ComparisonViewUI).</td>
-            </tr>
-            <tr>
-              <td><strong>VisualizationQueryAdapter</strong></td>
-              <td>Przygotowuje dane do wykresów dla Web UI.</td>
-              <td>Odbiera zapytania z Web UI; współpracuje z MetricDAO oraz AggregationEngine.</td>
-            </tr>
-          </tbody>
-        </table>
-      </td>
-    </tr>
+### 3.2. Benchmark Definition Service – komponenty
 
-    <!-- 3.7 Publication & Reference Service -->
-    <tr>
-      <td>3.7</td>
-      <td><strong>Publication &amp; Reference Service</strong></td>
-      <td>
-        <table>
-          <thead>
-            <tr>
-              <th>Nazwa</th>
-              <th>Opis</th>
-              <th>Interakcje</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><strong>ReferenceCatalog</strong></td>
-              <td>Baza publikacji (metadane artykułów, identyfikatory DOI itp.).</td>
-              <td>Dwukierunkowo z Results Store (PublicationDAO) oraz Web UI (PublicationManagerUI).</td>
-            </tr>
-            <tr>
-              <td><strong>CitationFormatter</strong></td>
-              <td>Generuje cytowania i formaty typu BibTeX.</td>
-              <td>Dwukierunkowo z ReferenceCatalog; współpraca z Web UI oraz ReportGenerator.</td>
-            </tr>
-            <tr>
-              <td><strong>ReferenceLinker</strong></td>
-              <td>Łączy publikacje z algorytmami, benchmarkami i eksperymentami.</td>
-              <td>Dwukierunkowo z LineageTracker i Results Store (LinkDAO); współpraca z AlgorithmCatalogUI, BenchmarkCatalogUI i PublicationManagerUI.</td>
-            </tr>
-            <tr>
-              <td><strong>ExternalBibliographyClient</strong></td>
-              <td>Klient do zewnętrznych źródeł bibliograficznych (CrossRef, arXiv, usługi DOI).</td>
-              <td>Komunikuje się z serwisami zewnętrznymi; współpraca z ReferenceCatalog przy imporcie i aktualizacji rekordów.</td>
-            </tr>
-          </tbody>
-        </table>
-      </td>
-    </tr>
+| Nazwa                     | Opis                                                                   | Interakcje                                                                                         |
+|---------------------------|------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------|
+| **BenchmarkRepository**   | CRUD benchmarków.                                                      | ↔ Results Store (BenchmarkDAO); ↔ Experiment Orchestrator (walidacja konfiguracji).               |
+| **ProblemInstanceManager**| Zarządza instancjami (dataset + konfiguracja tasku).                  | ↔ DatasetRepository; ↔ Algorithm Registry (kompatybilność).                                       |
+| **BenchmarkVersioning**   | Wersjonowanie benchmarków, oznaczanie wersji kanonicznych.            | ↔ BenchmarkRepository; ↔ ExperimentConfigManager (dobór wersji).                                  |
 
-    <!-- 3.8 Results Store -->
-    <tr>
-      <td>3.8</td>
-      <td><strong>Results Store (warstwa logiczna nad DB)</strong></td>
-      <td>
-        <table>
-          <thead>
-            <tr>
-              <th>Nazwa</th>
-              <th>Opis</th>
-              <th>Interakcje</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><strong>ExperimentDAO</strong></td>
-              <td>Dostęp do danych eksperymentów.</td>
-              <td>Dwukierunkowo z Experiment Orchestrator, Tracking Service oraz Web UI.</td>
-            </tr>
-            <tr>
-              <td><strong>RunDAO</strong></td>
-              <td>Dostęp do danych runów.</td>
-              <td>Dwukierunkowo z RunLifecycleManager, Metrics &amp; Analysis Service oraz Web UI.</td>
-            </tr>
-            <tr>
-              <td><strong>MetricDAO</strong></td>
-              <td>Dostęp do danych metryk.</td>
-              <td>Dwukierunkowo z TrackingAPI, MetricCalculator oraz VisualizationQueryAdapter.</td>
-            </tr>
-            <tr>
-              <td><strong>AlgorithmDAO</strong></td>
-              <td>Dostęp do danych algorytmów.</td>
-              <td>Dwukierunkowo z AlgorithmMetadataStore oraz AlgorithmCatalogUI.</td>
-            </tr>
-            <tr>
-              <td><strong>BenchmarkDAO</strong></td>
-              <td>Dostęp do danych benchmarków.</td>
-              <td>Dwukierunkowo z BenchmarkRepository, BenchmarkCatalogUI oraz CompatibilityChecker.</td>
-            </tr>
-            <tr>
-              <td><strong>PublicationDAO</strong></td>
-              <td>Dostęp do danych publikacji.</td>
-              <td>Dwukierunkowo z ReferenceCatalog, ReportGenerator oraz Web UI.</td>
-            </tr>
-            <tr>
-              <td><strong>LinkDAO</strong></td>
-              <td>Przechowuje powiązania między encjami (eksperyment, algorytm, benchmark, publikacja).</td>
-              <td>Dwukierunkowo z LineageTracker, ReferenceLinker oraz ReportGenerator.</td>
-            </tr>
-          </tbody>
-        </table>
-      </td>
-    </tr>
 
-    <!-- 3.9 Web UI -->
-    <tr>
-      <td>3.9</td>
-      <td><strong>Web UI</strong></td>
-      <td>
-        <table>
-          <thead>
-            <tr>
-              <th>Nazwa</th>
-              <th>Opis</th>
-              <th>Interakcje</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><strong>ExperimentDesignerUI</strong></td>
-              <td>Kreator konfiguracji eksperymentów.</td>
-              <td>Dwukierunkowo z Experiment Orchestrator, Benchmark Definition Service oraz Algorithm Registry.</td>
-            </tr>
-            <tr>
-              <td><strong>TrackingDashboardUI</strong></td>
-              <td>Panel eksperymentów i runów.</td>
-              <td>Dwukierunkowo z TrackingAPI, TaggingAndSearchEngine, RunLifecycleManager oraz ArtifactRepository.</td>
-            </tr>
-            <tr>
-              <td><strong>ComparisonViewUI</strong></td>
-              <td>Wykresy i porównania algorytmów.</td>
-              <td>Dwukierunkowo z Metrics &amp; Analysis Service (VisualizationQueryAdapter, StatisticalTestsEngine) oraz LineageTracker.</td>
-            </tr>
-            <tr>
-              <td><strong>BenchmarkCatalogUI</strong></td>
-              <td>Interfejs katalogu benchmarków.</td>
-              <td>Dwukierunkowo z BenchmarkRepository, BenchmarkVersioning oraz DatasetRepository.</td>
-            </tr>
-            <tr>
-              <td><strong>AlgorithmCatalogUI</strong></td>
-              <td>Interfejs katalogu algorytmów.</td>
-              <td>Dwukierunkowo z AlgorithmMetadataStore, AlgorithmVersionManager oraz CompatibilityChecker.</td>
-            </tr>
-            <tr>
-              <td><strong>PublicationManagerUI</strong></td>
-              <td>Zarządzanie publikacjami i powiązaniami.</td>
-              <td>Dwukierunkowo z ReferenceCatalog, ReferenceLinker oraz ExternalBibliographyClient.</td>
-            </tr>
-            <tr>
-              <td><strong>AdminSettingsUI</strong></td>
-              <td>Panel ustawień administracyjnych.</td>
-              <td>Dwukierunkowo z API Gateway lub Backend API oraz usługą Auth/Identity; konfiguracja Registry, benchmarków, limitów zasobów.</td>
-            </tr>
-          </tbody>
-        </table>
-      </td>
-    </tr>
+### 3.3. Algorithm Registry Service – komponenty
 
-    <!-- 3.10 File / Object Storage -->
-    <tr>
-      <td>3.10</td>
-      <td><strong>File / Object Storage</strong></td>
-      <td>
-        <table>
-          <thead>
-            <tr>
-              <th>Nazwa</th>
-              <th>Opis</th>
-              <th>Interakcje</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><strong>ObjectStorageClient</strong></td>
-              <td>Niskopoziomowy klient do Object Storage (np. S3, MinIO, GCS, Azure Blob); operacje zapisu, odczytu, listowania, zarządzanie bucketami i prefiksami.</td>
-              <td>Używany przez Worker Runtime, Experiment Tracking Service, ReportGenerator, ArtifactRepository oraz DatasetRepository.</td>
-            </tr>
-            <tr>
-              <td><strong>ArtifactRepository</strong></td>
-              <td>Warstwa logiczna nad ObjectStorageClient; zapewnia API domenowe do zapisu i odczytu artefaktów oraz dba o konwencje nazewnicze ścieżek.</td>
-              <td>Odbiera zapisy artefaktów z Worker Runtime; współpracuje z TrackingAPI (linki do artefaktów), ReportGenerator (zapisy raportów) oraz Web UI (pobieranie artefaktów).</td>
-            </tr>
-            <tr>
-              <td><strong>DatasetRepository</strong></td>
-              <td>Udostępnia workerom datasety zapisane w Object Storage; zarządza lokalizacją i wersjonowaniem datasetów spójnym z Benchmark Definition Service.</td>
-              <td>Dwukierunkowo z ProblemInstanceManager (Benchmark Definition Service) oraz Worker Runtime (pobieranie danych).</td>
-            </tr>
-          </tbody>
-        </table>
-      </td>
-    </tr>
+| Nazwa                       | Opis                                                                 | Interakcje                                                                                                       |
+|-----------------------------|----------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------|
+| **AlgorithmMetadataStore**  | Przechowuje opis algorytmu: nazwa, typ, parametry, powiązania.      | ↔ Results Store (AlgorithmDAO); ↔ Web UI (AlgorithmCatalogUI).                                                   |
+| **AlgorithmVersionManager** | Zarządza wersjami implementacji algorytmów, statusem (draft, approved). | ↔ PluginLoader/PluginValidator; ↔ Experiment Orchestrator (dobór wersji).                                   |
+| **CompatibilityChecker**    | Sprawdza kompatybilność algorytmu z typami benchmarków.              | ↔ Benchmark Definition Service (ProblemInstanceManager, BenchmarkRepository).                                    |
 
-    <!-- 3.11 ReportGenerator -->
-    <tr>
-      <td>3.11</td>
-      <td><strong>ReportGenerator</strong></td>
-      <td>
-        <table>
-          <thead>
-            <tr>
-              <th>Nazwa</th>
-              <th>Opis</th>
-              <th>Interakcje</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><strong>ReportTemplateEngine</strong></td>
-              <td>Zarządza szablonami raportów (np. Markdown, HTML, LaTeX); obsługuje warianty: skrót, pełny, raport pod publikację.</td>
-              <td>Dwukierunkowo z ReportAssembler; współpraca z Web UI (wybór szablonu).</td>
-            </tr>
-            <tr>
-              <td><strong>ReportAssembler</strong></td>
-              <td>Łączy dane z Tracking (runy, metryki), Metrics &amp; Analysis (agregaty, testy), Publication &amp; Reference (publikacje, linki) w wewnętrzną strukturę raportu.</td>
-              <td>Dwukierunkowo z TrackingAPI i warstwą DAO, Metrics &amp; Analysis Service oraz ReferenceCatalog i LineageTracker; współpraca z ReportTemplateEngine.</td>
-            </tr>
-            <tr>
-              <td><strong>ReportExporter</strong></td>
-              <td>Generuje pliki raportu (np. PDF, HTML) i zapisuje je do File / Object Storage poprzez ArtifactRepository; zwraca adres raportu do Web UI.</td>
-              <td>Dwukierunkowo z ArtifactRepository (zapis pliku) i ReportMetadataStore; współpraca z Web UI (udostępnianie adresu raportu).</td>
-            </tr>
-            <tr>
-              <td><strong>ReportMetadataStore</strong></td>
-              <td>Przechowuje metadane raportów: identyfikator, typ, powiązane eksperymenty, algorytmy, benchmarki, czas utworzenia oraz autora; umożliwia listowanie i ponowne pobieranie raportów.</td>
-              <td>Dwukierunkowo z Results Store oraz Web UI (lista raportów); współpraca z ReportExporter przy rejestracji metadanych.</td>
-            </tr>
-          </tbody>
-        </table>
-      </td>
-    </tr>
 
-  </tbody>
-</table>
-```
+### 3.4. Algorithm SDK / Plugin Runtime – komponenty
+
+| Nazwa              | Opis                                                                                                                                                | Interakcje                                                                                           |
+|--------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------|
+| **IAlgorithmPlugin** | Interfejs pluginu. Metody m.in.: `suggest(config_space, history)`, `observe(config, result)`, `init(seed, resources)`; jasno zdefiniowany kontrakt input/output. | Implementowany przez pluginy; wywoływany przez SandboxManager/Worker Runtime.                       |
+| **PluginLoader**   | Ładuje pluginy (np. z plików wheel, modułów Python, serwisów gRPC).                                                                                | ↔ AlgorithmVersionManager; ↔ ObjectStorageClient / repo pakietów.                                   |
+| **SandboxManager** | Izoluje pluginy (np. przez subprocess lub kontener).                                                                                               | ↔ Worker Runtime; ↔ PluginLoader; ↔ TrackingAPI (logi z pluginu).                                   |
+| **PluginValidator**| Sprawdza implementację pluginu względem interfejsu (testowy run).                                                                                  | ↔ IAlgorithmPlugin; ↔ Algorithm Registry (aktualizacja statusu wersji).                             |
+
+
+### 3.5. Experiment Tracking Service – komponenty
+
+| Nazwa                    | Opis                                                                                  | Interakcje                                                                                                                  |
+|--------------------------|---------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------|
+| **TrackingAPI**          | Publiczne API do logowania runów, metryk, artefaktów, tagów.                          | ← Worker Runtime/pluginy/Web UI; ↔ RunLifecycleManager, TaggingAndSearchEngine, LineageTracker, DAO-y.                      |
+| **RunLifecycleManager**  | Tworzy runy, aktualizuje statusy.                                                     | ↔ Experiment Orchestrator; ↔ Results Store (RunDAO); ↔ EventPublisher.                                                      |
+| **TaggingAndSearchEngine** | Filtrowanie i tagowanie eksperymentów/runów.                                       | ↔ Results Store (ExperimentDAO/RunDAO); ↔ Web UI (TrackingDashboardUI, ComparisonViewUI).                                   |
+| **LineageTracker**       | Zapisuje powiązania: eksperyment → run → algorytm → benchmark → publikacja.          | ↔ Results Store (LinkDAO); ↔ Publication & Reference Service; ↔ ReportGenerator.                                            |
+
+
+### 3.6. Metrics & Analysis Service (MetricsAnalysisService) – komponenty
+
+| Nazwa                      | Opis                                                                                     | Interakcje                                                                                                      |
+|----------------------------|------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------|
+| **MetricCalculator**       | Oblicza metryki z surowych wyników (np. accuracy, regret).                              | ↔ TrackingAPI/MetricDAO (dane wejściowe); ↔ AggregationEngine.                                                 |
+| **AggregationEngine**      | Agreguje wyniki po benchmarkach/algorytmach/eksperymentach.                             | ↔ MetricCalculator; ↔ StatisticalTestsEngine; ↔ VisualizationQueryAdapter.                                     |
+| **StatisticalTestsEngine** | Testy statystyczne (np. Friedman/Nemenyi).                                              | ↔ AggregationEngine; ↔ ReportGenerator; ↔ Web UI (ComparisonViewUI).                                           |
+| **VisualizationQueryAdapter** | Przygotowuje dane do wykresów dla Web UI.                                           | ← Web UI; ↔ MetricDAO, AggregationEngine.                                                                      |
+
+
+### 3.7. Publication & Reference Service (PublicationService) – komponenty
+
+| Nazwa                       | Opis                                                       | Interakcje                                                                                                   |
+|-----------------------------|------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------|
+| **ReferenceCatalog**        | Baza publikacji (metadane artykułów, DOIs itp.).          | ↔ Results Store (PublicationDAO); ↔ Web UI (PublicationManagerUI).                                           |
+| **CitationFormatter**       | Generuje cytowania i BibTeX.                               | ↔ ReferenceCatalog; ↔ Web UI; ↔ ReportGenerator.                                                             |
+| **ReferenceLinker**         | Łączy publikacje z algorytmami, benchmarkami, eksperymentami. | ↔ LineageTracker; ↔ Results Store (LinkDAO); ↔ AlgorithmCatalogUI, BenchmarkCatalogUI, PublicationManagerUI. |
+| **ExternalBibliographyClient** | Klient do CrossRef/arXiv/DOI.                           | → serwisy zewnętrzne; ↔ ReferenceCatalog (import/aktualizacja rekordów).                                     |
+
+
+### 3.8. Results Store – komponenty logiczne
+
+| Nazwa              | Opis                                      | Interakcje                                                                                   |
+|--------------------|-------------------------------------------|----------------------------------------------------------------------------------------------|
+| **ExperimentDAO**  | Dostęp do danych eksperymentów.           | ↔ Experiment Orchestrator, Tracking Service, Web UI.                                         |
+| **RunDAO**         | Dostęp do danych runów.                   | ↔ RunLifecycleManager, Metrics & Analysis, Web UI.                                           |
+| **MetricDAO**      | Dostęp do danych metryk.                  | ↔ TrackingAPI, MetricCalculator, VisualizationQueryAdapter.                                  |
+| **AlgorithmDAO**   | Dostęp do danych algorytmów.              | ↔ AlgorithmMetadataStore, AlgorithmCatalogUI.                                                |
+| **BenchmarkDAO**   | Dostęp do danych benchmarków.             | ↔ BenchmarkRepository, BenchmarkCatalogUI, CompatibilityChecker.                             |
+| **PublicationDAO** | Dostęp do danych publikacji.              | ↔ ReferenceCatalog, ReportGenerator, Web UI.                                                 |
+| **LinkDAO**        | Powiązania (eksperyment/algorytm/benchmark/publikacja). | ↔ LineageTracker, ReferenceLinker, ReportGenerator.                                         |
+
+
+### 3.9. Web UI – komponenty
+
+| Nazwa                   | Opis                                  | Interakcje                                                                                                   |
+|-------------------------|---------------------------------------|--------------------------------------------------------------------------------------------------------------|
+| **ExperimentDesignerUI**| Kreator konfiguracji eksperymentów.   | ↔ Experiment Orchestrator; ↔ Benchmark Definition Service; ↔ Algorithm Registry.                             |
+| **TrackingDashboardUI** | Panel eksperymentów/runów.           | ↔ TrackingAPI, TaggingAndSearchEngine, RunLifecycleManager, ArtifactRepository.                              |
+| **ComparisonViewUI**    | Wykresy i porównania algorytmów.     | ↔ Metrics & Analysis (VisualizationQueryAdapter, StatisticalTestsEngine); ↔ LineageTracker.                  |
+| **BenchmarkCatalogUI**  | Katalog benchmarków.                 | ↔ BenchmarkRepository, BenchmarkVersioning, DatasetRepository.                                               |
+| **AlgorithmCatalogUI**  | Katalog algorytmów.                  | ↔ AlgorithmMetadataStore, AlgorithmVersionManager, CompatibilityChecker.                                     |
+| **PublicationManagerUI**| Zarządzanie publikacjami.            | ↔ ReferenceCatalog, ReferenceLinker, ExternalBibliographyClient.                                             |
+| **AdminSettingsUI**     | Panel ustawień administracyjnych.    | ↔ API Gateway/Backend API; ↔ Auth/Identity; konfiguracja Registry, benchmarków, limitów zasobów.            |
+
+
+### 3.10. File / Object Storage – komponenty (logiczne)
+
+| Nazwa                 | Opis                                                                                      | Interakcje                                                                                                       |
+|-----------------------|-------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------|
+| **ObjectStorageClient** | Niskopoziomowy klient Object Storage (S3/MinIO/GCS/Azure Blob).                        | Używany przez Worker Runtime, Experiment Tracking Service, ReportGenerator, ArtifactRepository, DatasetRepository. |
+| **ArtifactRepository**  | Warstwa logiczna nad ObjectStorageClient; zapis/odczyt artefaktów, konwencje ścieżek.  | ← Worker Runtime; ↔ TrackingAPI (linki do artefaktów); ↔ ReportGenerator; ↔ Web UI (pobieranie artefaktów).      |
+| **DatasetRepository**   | Datasety w Object Storage, lokalizacja i wersjonowanie.                                | ↔ ProblemInstanceManager (Benchmark Definition); ↔ Worker Runtime (pobieranie danych).                           |
+
+
+### 3.11. ReportGenerator – komponenty
+
+| Nazwa                  | Opis                                                                                       | Interakcje                                                                                                       |
+|------------------------|--------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------|
+| **ReportTemplateEngine** | Szablony raportów (Markdown/HTML/LaTeX, warianty: skrót, pełny, pod publikację).        | ↔ ReportAssembler; ↔ Web UI (wybór szablonu).                                                                    |
+| **ReportAssembler**      | Składa dane z Tracking, Metrics & Analysis, Publication & Reference w strukturę raportu.| ↔ TrackingAPI/DAO; ↔ Metrics & Analysis; ↔ ReferenceCatalog, LineageTracker; ↔ ReportTemplateEngine.            |
+| **ReportExporter**       | Generuje pliki raportu (PDF/HTML), zapisuje przez ArtifactRepository, zwraca URL.       | ↔ ArtifactRepository; ↔ Web UI (URL raportu); ↔ ReportMetadataStore.                                             |
+| **ReportMetadataStore**  | Metadane raportów (powiązane eksperymenty, algorytmy, benchmarki, autor, timestamp).    | ↔ Results Store; ↔ Web UI (lista raportów); ↔ ReportExporter.                                                    |
+
+ReportGenerator funkcjonalnie działa jako moduł backendowy w warstwie API/Orchestratora, a nie jako osobny kontener na diagramie C4-2.
 
 ---
 
@@ -1355,7 +1020,7 @@ sequenceDiagram
 
 **Aktorzy poboczni:**
 - Algorithm Registry Service
-- Publication & Reference Service
+- Publication & Reference Service (PublicationService)
 
 **Cel:**
 Dodanie do systemu nowego *wbudowanego* algorytmu HPO, który będzie dostępny w katalogu algorytmów dla wszystkich użytkowników oraz – opcjonalnie – powiązany z publikacjami naukowymi.

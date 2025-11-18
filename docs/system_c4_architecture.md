@@ -152,10 +152,10 @@ flowchart TB
         APIGW["API Gateway / Backend API"]
         ORCH["Experiment Orchestrator Service"]
         TRK["Experiment Tracking Service"]
-        ANALYTICS["Metrics & Analysis Service"]
+        ANALYTICS["MetricsAnalysisService"]
         BENCH["Benchmark Definition Service"]
         ALGREG["Algorithm Registry Service"]
-        PUB["Publication & Reference Service"]
+        PUB["PublicationService"]
         ExecLayer
   end
     UI -- HTTP --> APIGW
@@ -207,14 +207,14 @@ flowchart TB
 | Algorithm Registry Service | Rejestr i wersjonowanie algorytmów HPO (wbudowane + pluginy). Przechowywanie metadanych: nazwa, typ, parametry, wymagania środowiskowe, powiązane publikacje. Walidacja kompatybilności z benchmarkami. | Sync: API dla Web UI, Orchestratora i Plugin Runtime. | Jeden kontener / usługa (PC i chmura, skalowanie wg potrzeb). | Ułatwia świadomy dobór algorytmów i ich konfiguracji; wspiera cele G1–G5 benchmarkingu. |
 | Algorithm SDK / Plugin Runtime | Ładowanie i izolowanie kodu pluginów, obsługa kontraktu API pluginu (wejścia/wyjścia, walidacja), raportowanie wyników i metryk do Worker Runtime / Experiment Tracking Service. | Używany lokalnie przez Worker Runtime (biblioteka / sidecar). Może rozmawiać z Workerem przez lokalne API lub wywołania językowe. | Ten sam kod dla PC i chmury, różnice tylko w środowisku (docker image). | Umożliwia łatwe dodawanie nowych algorytmów w ujednoliconym środowisku, co ułatwia porównywanie HPO. |
 | Experiment Tracking Service | API do rejestrowania runów, metryk, parametrów, tagów i logów. Przechowywanie powiązań: eksperyment–run–algorytm–benchmark–publikacja. | Sync: API używane przez Worker Runtime, Orchestrator, Web UI. | Usługa korzystająca z relacyjnej bazy danych (PC: 1 kontener; chmura: skalowalny microservice). | Centralny panel śledzenia, wspiera analizę wyników i reprodukowalność eksperymentów. |
-| Metrics & Analysis Service (MetricsAnalysisService) | Agregowanie wyników (średnie, wariancje, rankingi). Obliczanie złożonych metryk (np. czas do osiągnięcia poziomu błędu). Testy statystyczne, wykresy porównawcze (serie czasowe, boxplot, ranking). | Sync: API używane przez Web UI (porównania), opcjonalnie Orchestrator (walidacje). <br> Async: może słuchać zdarzeń „RunCompleted” do preagregacji. | Elastyczna usługa analityczna (PC: 1 kontener; chmura: skalowalny microservice). | Bezpośrednio implementuje **analizę i prezentację wyników** benchmarków. |
-| Publication & Reference Service (PublicationService) | Katalog publikacji (DOI, BibTeX, linki). Powiązania publikacji z algorytmami, benchmarkami, eksperymentami. Generowanie sekcji bibliografii w raportach. Integracja z zewnętrznymi usługami bibliograficznymi. | Sync: API dla Web UI, Algorithm Registry, Experiment Tracking, raportowania. <br> Sync/Async: wywołania do zewnętrznych systemów bibliograficznych. | Usługa integracyjna (PC i chmura – podobny model, różne skale). | Łączy wyniki z literaturą i teoretycznym uzasadnieniem algorytmów, wspiera interpretację benchmarków. |
+| MetricsAnalysisService | Agregowanie wyników (średnie, wariancje, rankingi). Obliczanie złożonych metryk (np. czas do osiągnięcia poziomu błędu). Testy statystyczne, wykresy porównawcze (serie czasowe, boxplot, ranking). | Sync: API używane przez Web UI (porównania), opcjonalnie Orchestrator (walidacje). <br> Async: może słuchać zdarzeń „RunCompleted” do preagregacji. | Elastyczna usługa analityczna (PC: 1 kontener; chmura: skalowalny microservice). | Bezpośrednio implementuje **analizę i prezentację wyników** benchmarków. |
+| PublicationService | Katalog publikacji (DOI, BibTeX, linki). Powiązania publikacji z algorytmami, benchmarkami, eksperymentami. Generowanie sekcji bibliografii w raportach. Integracja z zewnętrznymi usługami bibliograficznymi. | Sync: API dla Web UI, Algorithm Registry, Experiment Tracking, raportowania. <br> Sync/Async: wywołania do zewnętrznych systemów bibliograficznych. | Usługa integracyjna (PC i chmura – podobny model, różne skale). | Łączy wyniki z literaturą i teoretycznym uzasadnieniem algorytmów, wspiera interpretację benchmarków. |
 | Results Store (Relacyjna baza danych) | Przechowywanie danych domenowych: Experiments, Runs, Metrics, Algorithms, Benchmarks, Publications, linkowania, konfiguracje. | Internal: używana przez Experiment Tracking, Benchmark Definition, Algorithm Registry, Publication & Reference; Experiment Orchestrator korzysta z tych danych wyłącznie pośrednio – przez API usług domenowych (w szczególności Experiment Tracking Service). | np. PostgreSQL / inny RDBMS, z migracjami schematu; może być lokalny (PC) lub zarządzany (chmura). | Centralne repozytorium danych do analizy i zapewnienia reprodukowalności benchmarków. |
 | File / Object Storage | Przechowywanie dużych artefaktów: datasety, modele, logi w plikach, wygenerowane raporty. | Dostęp z Workerów, Web UI / backendu i innych usług (protokół zależny od wdrożenia – S3/API plikowe). | **PC:** lokalny dysk / MinIO. <br> **Chmura:** S3 / GCS / Azure Blob. | Zapewnia odtwarzalne przechowywanie datasetów i wyników (artefaktów) benchmarków. |
 | Message Broker | Kolejka zadań runów. Kanał zdarzeń systemowych (RunStarted, RunCompleted, RunFailed, ExperimentCompleted). | Async: wymiana komunikatów między Orchestrator, Worker Runtime, Metrics & Analysis itd. | **PC:** pojedyncza instancja (np. RabbitMQ/Redis/Kafka w kontenerze). <br> **Chmura:** zarządzany lub skalowany klaster brokera. | Umożliwia elastyczny plan eksperymentu i skalowanie warstwy wykonawczej → efektywny benchmarking na dużą skalę. |
 | Monitoring & Logging Stack | Zbieranie logów z kontenerów. Zbieranie metryk (czas trwania runów, obciążenie workerów, błędy). | Integracje z usługami (agenty, eksportery, log shippers). Odczyt przez dashboardy / alerting. | **PC:** uproszczony stack (np. 1–2 kontenery). <br> **Chmura:** pełny, skalowalny stack obserwowalności. | Wspiera obserwowalność i analizę wydajności algorytmów oraz systemu benchmarkującego. |
 | Auth Service / Identity Integration (AuthService) | Integracja z IdP (OIDC/SAML). Mapowanie użytkowników na role (Badacz, Twórca pluginu, Admin). | Sync: wywołania do IdP w toku uwierzytelniania / autoryzacji; przekazywanie tokenów/claimów do usług. | W PC może być prostsza (lokalne konta / lightweight IdP); w chmurze – pełna integracja z firmowym/uczelniowym IdP. | Pozwala kontrolować, kto może modyfikować benchmarki, zatwierdzać algorytmy itp., co jest ważne dla jakości i wiarygodności benchmarków. |
-| Report Generator Service | Generowanie raportów (HTML/PDF/LaTeX) na podstawie danych z Tracking, Results Store, Metrics & Analysis, Lineage. | Sync: API wywoływane z Web UI oraz Orchestratora (po zakończeniu eksperymentu). | Python / Node.js; proces może działać jako osobny serwis lub moduł w backendzie. | Generuje spójne, powtarzalne raporty z wyników benchmarków. |
+| ReportGeneratorService | Generowanie raportów (HTML/PDF/LaTeX) na podstawie danych z Tracking, Results Store, MetricsAnalysisService, Lineage. | Sync: API wywoływane z Web UI oraz Orchestratora (po zakończeniu eksperymentu). | Python / Node.js; proces może działać jako osobny serwis lub moduł w backendzie. | Generuje spójne, powtarzalne raporty z wyników benchmarków. |
 
 ---
 
@@ -263,13 +263,13 @@ flowchart LR
     Track_Search["TaggingAndSearchEngine"]
     Track_Lineage["LineageTracker"]
   end
-  subgraph MetricsAnalysisService ["Metrics & Analysis Service (kontener)"]
+  subgraph MetricsAnalysisService ["MetricsAnalysisService (kontener)"]
     Metrics_Calc["MetricCalculator"]
     Metrics_Agg["AggregationEngine"]
     Metrics_Stats["StatisticalTestsEngine"]
     Metrics_Query["VisualizationQueryAdapter"]
   end
-  subgraph PublicationService ["Publication & Reference Service (kontener)"]
+  subgraph PublicationService ["PublicationService (kontener)"]
     Pub_Catalog["ReferenceCatalog"]
     Pub_Citation["CitationFormatter"]
     Pub_Linker["ReferenceLinker"]
@@ -354,12 +354,12 @@ flowchart LR
 | 3.3    | [Algorithm Registry Service](#33-algorithm-registry-service--komponenty)               | Rejestr algorytmów i ich wersji                 |
 | 3.4    | [Algorithm SDK / Plugin Runtime](#34-algorithm-sdk--plugin-runtime--komponenty)        | Uruchamianie pluginów algorytmów                |
 | 3.5    | [Experiment Tracking Service](#35-experiment-tracking-service--komponenty)             | Śledzenie runów, metryk i powiązań              |
-| 3.6    | [Metrics & Analysis Service](#36-metrics--analysis-service--komponenty)                | Agregacja wyników i analizy statystyczne        |
-| 3.7    | [Publication & Reference Service](#37-publication--reference-service--komponenty)      | Publikacje i referencje naukowe                 |
+| 3.6    | [MetricsAnalysisService](#36-metricsanalysisservice--komponenty)                | Agregacja wyników i analizy statystyczne        |
+| 3.7    | [PublicationService](#37-publication--reference-service--komponenty)      | Publikacje i referencje naukowe                 |
 | 3.8    | [Results Store](#38-results-store--komponenty-logiczne)                                | Warstwa dostępu do danych (DAO)                 |
 | 3.9    | [Web UI](#39-web-ui--komponenty)                                                       | Interfejsy użytkownika                          |
 | 3.10   | [File / Object Storage](#310-file--object-storage--komponenty-logiczne)                | Artefakty i datasety w Object Storage           |
-| 3.11   | [ReportGenerator](#311-reportgenerator--komponenty)                                    | Generowanie raportów                            |
+| 3.11   | [ReportGeneratorService](#311-reportgeneratorservice--komponenty)                                    | Generowanie raportów                            |
 | 3.12   | [Message Broker](#312-message-broker--komponenty)                                    | Kolejkowanie zadań runów i zdarzeń systemowych  |
 | 3.13   | [Worker Runtime / Execution Engine](#313-worker-runtime--execution-engine--komponenty) | Warstwa wykonawcza pojedynczych runów           |
 | 3.14   | [API Gateway / Backend API](#314-api-gateway--backend-api--komponenty)               | Punkt wejścia HTTP/REST/GraphQL do backendu     |
@@ -377,6 +377,81 @@ flowchart LR
 | **ReproducibilityManager** | Zarządza seedami, wersjami obrazów, snapshotami konfiguracji. | ↔ Experiment Tracking Service (metadane reprodukowalności, snapshoty), ↔ Results Store **pośrednio, przez API Experiment Tracking Service**. |
 | **EventPublisher**          | Publikuje zdarzenia systemowe (ExperimentStarted/Completed/Failed).                        | → Message Broker/Event Bus; subskrybenci: Monitoring, Web UI, ReportGenerator.                                       |
 
+#### 3.1.1. Interfejsy API Experiment Orchestrator Service
+
+**ExperimentConfigManager API:**
+```
+POST /api/v1/experiments/validate
+{
+  "benchmarks": ["benchmark_id_1", "benchmark_id_2"],
+  "algorithms": ["algorithm_id_1", "algorithm_id_2"],
+  "budget_config": {
+    "max_evaluations": 100,
+    "time_limit_minutes": 60
+  },
+  "seeds": [42, 123, 456]
+}
+
+Response 200:
+{
+  "valid": true,
+  "validation_report": {
+    "benchmark_compatibility": "OK",
+    "algorithm_compatibility": "OK",
+    "resource_requirements": "OK"
+  }
+}
+
+Response 400:
+{
+  "valid": false,
+  "errors": [
+    {
+      "field": "algorithms[0]",
+      "message": "Algorithm 'algorithm_id_1' not compatible with benchmark 'benchmark_id_1'",
+      "error_code": "INCOMPATIBLE_ALGORITHM"
+    }
+  ]
+}
+```
+
+**RunScheduler API:**
+```
+POST /api/v1/experiments/{experiment_id}/start
+{
+  "priority": "NORMAL", // NORMAL, HIGH, LOW
+  "retry_policy": {
+    "max_retries": 3,
+    "retry_delay_seconds": 30
+  }
+}
+
+Response 202:
+{
+  "experiment_id": "exp_123",
+  "total_runs_scheduled": 50,
+  "estimated_completion_time": "2025-11-18T16:30:00Z"
+}
+```
+
+**ExperimentStateStore API:**
+```
+GET /api/v1/experiments/{experiment_id}/status
+Response 200:
+{
+  "experiment_id": "exp_123",
+  "status": "RUNNING",
+  "progress": {
+    "total_runs": 50,
+    "completed_runs": 15,
+    "failed_runs": 2,
+    "running_runs": 3,
+    "pending_runs": 30
+  },
+  "estimated_completion": "2025-11-18T17:45:00Z"
+}
+```
+
 ### 3.2. Benchmark Definition Service – komponenty
 
 | Nazwa                     | Opis                                                                   | Interakcje                                                                                         |
@@ -392,6 +467,110 @@ flowchart LR
 | **AlgorithmMetadataStore**  | Przechowuje opis algorytmu: nazwa, typ, parametry, powiązania.      | ↔ Results Store (AlgorithmDAO); ↔ Web UI (AlgorithmCatalogUI).                                                   |
 | **AlgorithmVersionManager** | Zarządza wersjami implementacji algorytmów, statusem (draft, approved). | ↔ PluginLoader/PluginValidator; ↔ Experiment Orchestrator (dobór wersji).                                   |
 | **CompatibilityChecker**    | Sprawdza kompatybilność algorytmu z typami benchmarków.              | ↔ Benchmark Definition Service (ProblemInstanceManager, BenchmarkRepository).                                    |
+
+#### 3.3.1. Interfejsy API Algorithm Registry Service
+
+**AlgorithmMetadataStore API:**
+```
+POST /api/v1/algorithms
+{
+  "name": "Custom Bayesian Optimizer",
+  "description": "Advanced Bayesian optimization with custom acquisition function",
+  "type": "BAYESIAN", // BAYESIAN, EVOLUTIONARY, GRID_SEARCH, RANDOM_SEARCH, GRADIENT_BASED
+  "is_builtin": false,
+  "parameter_space": {
+    "acquisition_function": {
+      "type": "categorical",
+      "values": ["EI", "UCB", "PI"]
+    },
+    "exploration_factor": {
+      "type": "float",
+      "min": 0.0,
+      "max": 1.0,
+      "default": 0.1
+    }
+  },
+  "compatible_problem_types": ["CLASSIFICATION", "REGRESSION"],
+  "resource_requirements": {
+    "min_memory_mb": 512,
+    "min_cpu_cores": 1,
+    "gpu_required": false
+  },
+  "publication_ids": ["pub_123", "pub_456"]
+}
+
+Response 201:
+{
+  "algorithm_id": "alg_789",
+  "version_id": "alg_v1.0.0",
+  "status": "DRAFT",
+  "created_at": "2025-11-18T14:30:00Z"
+}
+```
+
+**AlgorithmVersionManager API:**
+```
+POST /api/v1/algorithms/{algorithm_id}/versions
+{
+  "version": "1.1.0",
+  "plugin_location": "s3://plugins/custom-bayes-opt-v1.1.0.whl",
+  "sdk_version": "2.1.0",
+  "changelog": "Fixed memory leak, improved convergence",
+  "backward_compatible": true
+}
+
+Response 201:
+{
+  "version_id": "alg_v1.1.0",
+  "status": "DRAFT",
+  "validation_required": true
+}
+
+PUT /api/v1/algorithms/{algorithm_id}/versions/{version_id}/status
+{
+  "status": "APPROVED", // DRAFT, UNDER_REVIEW, APPROVED, DEPRECATED
+  "approval_notes": "Passed all validation tests"
+}
+
+Response 200:
+{
+  "version_id": "alg_v1.1.0",
+  "status": "APPROVED",
+  "approved_at": "2025-11-18T15:00:00Z",
+  "approved_by": "admin_user"
+}
+```
+
+**CompatibilityChecker API:**
+```
+POST /api/v1/algorithms/{algorithm_id}/compatibility-check
+{
+  "benchmark_ids": ["bench_1", "bench_2"],
+  "problem_types": ["CLASSIFICATION", "REGRESSION"]
+}
+
+Response 200:
+{
+  "compatible": true,
+  "compatibility_report": {
+    "benchmark_compatibility": {
+      "bench_1": {
+        "compatible": true,
+        "confidence": 0.95
+      },
+      "bench_2": {
+        "compatible": false,
+        "issues": ["Requires categorical parameters, but benchmark provides continuous only"]
+      }
+    },
+    "resource_compatibility": {
+      "memory_sufficient": true,
+      "cpu_sufficient": true,
+      "gpu_available": false
+    }
+  }
+}
+```
 
 ### 3.4. Algorithm SDK / Plugin Runtime – komponenty
 
@@ -411,7 +590,100 @@ flowchart LR
 | **TaggingAndSearchEngine** | Filtrowanie i tagowanie eksperymentów/runów.                                       | ↔ Results Store (ExperimentDAO/RunDAO); ↔ Web UI (TrackingDashboardUI, ComparisonViewUI).                                   |
 | **LineageTracker**       | Zapisuje powiązania: eksperyment → run → algorytm → benchmark → publikacja.          | ↔ Results Store (LinkDAO); ↔ Publication & Reference Service; ↔ ReportGenerator.                                            |
 
-### 3.6. Metrics & Analysis Service (MetricsAnalysisService) – komponenty
+#### 3.5.1. Interfejsy API Experiment Tracking Service
+
+**TrackingAPI - Logowanie runów:**
+```
+POST /api/v1/runs
+{
+  "experiment_id": "exp_123",
+  "algorithm_version_id": "alg_v1.2.3",
+  "benchmark_instance_id": "bench_inst_456",
+  "seed": 42,
+  "environment_snapshot_id": "env_789",
+  "worker_id": "worker_001"
+}
+
+Response 201:
+{
+  "run_id": "run_abc123",
+  "status": "RUNNING",
+  "start_time": "2025-11-18T14:30:00Z",
+  "tracking_url": "/api/v1/runs/run_abc123"
+}
+```
+
+**TrackingAPI - Logowanie metryk:**
+```
+POST /api/v1/runs/{run_id}/metrics
+{
+  "metrics": [
+    {
+      "name": "best_score",
+      "value": 0.9234,
+      "step": 10,
+      "timestamp": "2025-11-18T14:35:00Z"
+    },
+    {
+      "name": "training_time",
+      "value": 120.5,
+      "step": 10,
+      "timestamp": "2025-11-18T14:35:00Z"
+    }
+  ]
+}
+
+Response 200:
+{
+  "metrics_logged": 2,
+  "run_status": "RUNNING"
+}
+```
+
+**TrackingAPI - Aktualizacja statusu runu:**
+```
+PUT /api/v1/runs/{run_id}/status
+{
+  "status": "COMPLETED", // PENDING, RUNNING, COMPLETED, FAILED, CANCELLED
+  "end_time": "2025-11-18T14:45:00Z",
+  "final_metrics": {
+    "best_score": 0.9456,
+    "total_evaluations": 100,
+    "convergence_step": 78
+  },
+  "error_message": null
+}
+
+Response 200:
+{
+  "run_id": "run_abc123",
+  "status": "COMPLETED",
+  "duration_seconds": 900
+}
+```
+
+**TaggingAndSearchEngine API:**
+```
+GET /api/v1/experiments/search?tags=optimization,neural_networks&status=COMPLETED&limit=20
+Response 200:
+{
+  "experiments": [
+    {
+      "experiment_id": "exp_123",
+      "name": "Neural Network HPO Comparison",
+      "created_at": "2025-11-18T10:00:00Z",
+      "status": "COMPLETED",
+      "tags": ["optimization", "neural_networks"],
+      "run_count": 50,
+      "success_rate": 0.96
+    }
+  ],
+  "total_count": 1,
+  "has_more": false
+}
+```
+
+### 3.6. MetricsAnalysisService – komponenty
 
 | Nazwa                      | Opis                                                                                     | Interakcje                                                                                                      |
 |----------------------------|------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------|
@@ -420,7 +692,7 @@ flowchart LR
 | **StatisticalTestsEngine** | Testy statystyczne (np. Friedman/Nemenyi).                                              | ↔ AggregationEngine; ↔ ReportGenerator; ↔ Web UI (ComparisonViewUI).                                           |
 | **VisualizationQueryAdapter** | Przygotowuje dane do wykresów dla Web UI.                                           | ← Web UI; ↔ MetricDAO, AggregationEngine.                                                                      |
 
-### 3.7. Publication & Reference Service (PublicationService) – komponenty
+### 3.7. PublicationService – komponenty
 
 | Nazwa                       | Opis                                                       | Interakcje                                                                                                   |
 |-----------------------------|------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------|
@@ -463,7 +735,7 @@ Uwaga: wszystkie wywołania usług backendu z Web UI przechodzą technicznie prz
 | **ArtifactRepository**  | Warstwa logiczna nad ObjectStorageClient; zapis/odczyt artefaktów, konwencje ścieżek.  | ← Worker Runtime; ↔ TrackingAPI (linki do artefaktów); ↔ ReportGenerator; ↔ Web UI (pobieranie artefaktów).      |
 | **DatasetRepository**   | Datasety w Object Storage, lokalizacja i wersjonowanie.                                | ↔ ProblemInstanceManager (Benchmark Definition); ↔ Worker Runtime (pobieranie danych).                           |
 
-### 3.11. ReportGenerator – komponenty
+### 3.11. ReportGeneratorService – komponenty
 
 | Nazwa                  | Opis                                                                                       | Interakcje                                                                                                       |
 |------------------------|--------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------|
@@ -484,10 +756,17 @@ Uwaga: wszystkie wywołania usług backendu z Web UI przechodzą technicznie prz
 
 | Nazwa                | Opis                                 | Powiązania główne |
 |----------------------|--------------------------------------|-------------------|
-| **RunExecutor**      | Koordynuje przebieg pojedynczego ... | ← RunJobQueue; → PluginRuntime, Tracking |
-| **DatasetLoader**    | Ładuje datasety / instancje probl... | ← BenchmarkDefinitionService; → RunExecutor |
-| **MetricReporter**   | Wysyła metryki i logi z runu do T... | → Experiment Tracking, Metrics & Analysis |
-| **ArtifactUploader** | Odpowiada za upload modeli, logów... | → File / Object Storage |
+| **RunExecutor**      | Koordynuje przebieg pojedynczego runu: pobiera zadanie RunJob z kolejki, ładuje instancję benchmarku przez DatasetLoader, uruchamia algorytm HPO przez Plugin Runtime (wywołania lokalne lub sidecar), zbiera wyniki i przekazuje do MetricReporter/ArtifactUploader. | ← RunJobQueue; → PluginRuntime (lokalne API), Tracking |
+| **DatasetLoader**    | Ładuje datasety / instancje problemowe z Object Storage na podstawie definicji z Benchmark Definition Service. | ← BenchmarkDefinitionService; → RunExecutor |
+| **MetricReporter**   | Wysyła metryki i logi z runu do Tracking Service w czasie rzeczywistym lub w batch'ach. | → Experiment Tracking, Metrics & Analysis |
+| **ArtifactUploader** | Odpowiada za upload modeli, logów i innych artefaktów do Object Storage, zwraca URL-e do Tracking Service. | → File / Object Storage |
+
+**Komunikacja Worker Runtime ↔ Plugin Runtime:**
+Worker Runtime komunikuje się z Plugin Runtime poprzez:
+- **Lokalne wywołania API** - Plugin Runtime jako biblioteka wbudowana w Worker
+- **Sidecar pattern** - Plugin Runtime jako oddzielny kontener/proces obok Worker
+- **Interfejs IAlgorithmPlugin** - standaryzowany kontrakt: `init()`, `suggest()`, `observe()`, `cleanup()`
+- **Sandboxing** - Plugin Runtime izoluje pluginy w osobnych procesach/kontenerach dla bezpieczeństwa
 
 
 ### 3.14. API Gateway / Backend API – komponenty
@@ -633,6 +912,12 @@ erDiagram
         string  id
         json    environment_json
     }
+    %% environment_json zawiera:
+    %% - wersje obrazów kontenerów
+    %% - wersje bibliotek Python/R  
+    %% - parametry środowiska (env vars)
+    %% - konfigurację zasobów (CPU/RAM)
+    %% - commit hash kodu systemu
     EXPERIMENT        ||--o{ RUN                : has
     RUN               ||--o{ METRIC             : logs
     EXPERIMENT        }o--o{ BENCHMARK          : uses
@@ -715,8 +1000,41 @@ flowchart LR
     - System informuje A1 o błędach konfiguracji; eksperyment nie jest tworzony.
   - 12a. Brak dostępnych workerów
     - Runy pozostają w stanie „pending”; A1 jest informowany o opóźnieniu.
-  - 13a. Run zakończony błędem
-    - Workery raportują błąd; Orchestrator może spróbować ponownego uruchomienia (wg polityki retry).  
+  - **1A. Walidacja konfiguracji nie powiodła się (niekompatybilny algorytm → benchmark)**
+    1. W kroku 9 Orchestrator wykrywa niezgodność (np. algorytm wymaga GPU, ale benchmark nie wspiera GPU).
+    2. System zwraca szczegółowy raport błędów z kodami: `INCOMPATIBLE_ALGORITHM`, `INSUFFICIENT_RESOURCES`, `INVALID_PARAMETER_SPACE`.
+    3. Web UI wyświetla błędy z sugestiami poprawek (np. "Wybierz benchmark wspierający GPU" lub "Użyj algorytmu bez wymagań GPU").
+    4. A1 poprawia konfigurację i ponawia próbę od kroku 7.
+  - **1B. Brak dostępnych workerów**
+    1. W kroku 12 Message Broker przyjmuje zadania, ale żaden Worker nie jest dostępny.
+    2. Orchestrator wykrywa brak aktywnych konsumentów kolejki po timeout (np. 30s).
+    3. System informuje A1: "Eksperyment zaplanowany, ale brak dostępnych workerów. Szacowany czas oczekiwania: >30 min".
+    4. A1 może: anulować eksperyment, uruchomić dodatkowe workery (UC7/UC8), lub czekać.
+    5. Po pojawieniu się workerów runy automatycznie się rozpoczynają.
+  - **1C. Run zakończony błędem podczas wykonania**
+    1. W kroku 13 Worker napotyka błąd (np. brak pamięci, błąd w kodzie pluginu, timeout).
+    2. Worker loguje szczegółowy błąd do Tracking Service: typ błędu, stack trace, zużycie zasobów.
+    3. Orchestrator otrzymuje zdarzenie `RunFailed` i sprawdza politykę retry.
+    4. Jeśli `retry_count < max_retries`: Orchestrator ponownie zleca run z opóźnieniem.
+    5. Jeśli przekroczono limit prób: run oznaczany jako `FAILED`, eksperyment kontynuowany bez tego runu.
+    6. A1 otrzymuje powiadomienie o błędnych runach z linkami do logów diagnostycznych.
+  - **1D. Błąd infrastruktury (DB/Message Broker niedostępny)**
+    1. W trakcie eksperymentu Results Store lub Message Broker staje się niedostępny.
+    2. Workery nie mogą logować metryk → przechodzą w tryb buforowania lokalnego.
+    3. Orchestrator nie może aktualizować statusu → oznacza eksperyment jako `DEGRADED`.
+    4. System próbuje reconnect co 30s przez max 10 min.
+    5. Po przywróceniu połączenia: workery wysyłają zbufowane dane, eksperyment powraca do stanu `RUNNING`.
+    6. Jeśli połączenie nie zostanie przywrócone: eksperyment oznaczany jako `FAILED_INFRASTRUCTURE`.
+  - **1E. Przekroczenie budżetu zasobów**
+    1. W trakcie runu Worker wykrywa, że algorytm przekracza limity (pamięć/CPU/czas).
+    2. Worker wysyła ostrzeżenie do Tracking Service i próbuje graceful shutdown algorytmu.
+    3. Jeśli algorytm nie reaguje w timeout (30s): Worker force-kill proces i oznacza run jako `RESOURCE_EXCEEDED`.
+    4. Orchestrator może zlecić retry z większymi limitami zasobów (jeśli dostępne) lub oznaczyć run jako failed.
+  - **1F. Błąd pluginu algorytmu HPO**
+    1. Plugin zgłasza wyjątek podczas `suggest()` lub `observe()`.
+    2. Plugin Runtime izoluje błąd i loguje: typ wyjątku, parametry wywołania, stan wewnętrzny pluginu.
+    3. Worker oznacza run jako `PLUGIN_ERROR` i nie próbuje retry (błędy pluginu to błędy logiki, nie infrastruktury).
+    4. System generuje raport dla autora pluginu z diagnostyką błędu.
 - **Warunki końcowe:**  
   - Eksperyment ma status completed/failed.
   - Wszystkie runy mają metryki i logi zapisane w Tracking Service.
@@ -911,7 +1229,7 @@ sequenceDiagram
 
 **Aktorzy poboczni:**
 - Algorithm Registry Service
-- Publication & Reference Service (PublicationService)
+- PublicationService
 
 **Cel:**
 Dodanie do systemu nowego *wbudowanego* algorytmu HPO, który będzie dostępny w katalogu algorytmów dla wszystkich użytkowników oraz – opcjonalnie – powiązany z publikacjami naukowymi.
@@ -952,7 +1270,7 @@ Dodanie do systemu nowego *wbudowanego* algorytmu HPO, który będzie dostępny 
 12. Algorithm Registry zapisuje dane w Results Store.
 13. API otrzymuje informację o utworzeniu algorytmu (`algorithmId`, `versionId`).
 14. Jeżeli w żądaniu podano listę DOI / identyfikatorów publikacji:
-    - 14.1. API wywołuje **Publication & Reference Service** z żądaniem `createPublicationLinks(algorithmId, pubIds)`,
+    - 14.1. API wywołuje **PublicationService** z żądaniem `createPublicationLinks(algorithmId, pubIds)`,
     - 14.2. Publication Service tworzy brakujące rekordy `Publication` na podstawie DOI (w razie potrzeby),
     - 14.3. Publication Service tworzy rekordy `PublicationLink` łączące algorytm z publikacjami.
 15. API zwraca do Web UI informację o sukcesie oraz identyfikatory nowego algorytmu i wersji.
@@ -1123,7 +1441,7 @@ sequenceDiagram
 
 - **Aktorzy:**  
   - Główny: Twórca algorytmu HPO (A2)  
-  - Współuczestniczący: Algorithm SDK/Plugin Runtime, Algorithm Registry, Publication & Reference Service  
+  - Współuczestniczący: Algorithm SDK/Plugin Runtime, Algorithm Registry, PublicationService  
 - **Cel:**  
   - Udostępnienie nowego algorytmu HPO jako pluginu, kompatybilnego z platformą benchmarkową.  
 - **Warunki początkowe:**  
@@ -1141,10 +1459,48 @@ sequenceDiagram
   9. Algorithm Registry zapisuje Algorithm i AlgorithmVersion ze statusem „draft”.
   10. System (lub A3 – administrator) zatwierdza algorytm (status „approved”).  
 - **Scenariusze alternatywne / błędy:**
-  - 3a. Walidacja lokalna się nie powiedzie
-    - SDK raportuje błędy implementacji; algorytm nie jest rejestrowany.
-  - 9a. Rejestracja w Registry się nie powiedzie (np. brak dostępu do storage)
-    - System informuje A2; algorytm pozostaje lokalny.
+  - **3A. Walidacja lokalna się nie powiedzie**
+    1. W kroku 4 PluginValidator wykrywa błędy implementacji:
+       - Brak wymaganych metod (`suggest`, `observe`, `init`)
+       - Nieprawidłowe sygnatury metod
+       - Plugin nie implementuje interfejsu `IAlgorithmPlugin`
+       - Błędy runtime podczas testowej symulacji
+    2. SDK generuje szczegółowy raport walidacji z przykładami poprawnej implementacji.
+    3. A2 analizuje błędy i poprawia kod pluginu.
+    4. Proces powraca do kroku 2 (walidacja lokalna).
+  - **3B. Błędy testowej symulacji pluginu**
+    1. W kroku 4 plugin przechodzi walidację interfejsu, ale zawodzi w testowej symulacji HPO.
+    2. PluginValidator wykrywa: timeout w `suggest()`, nieprawidłowe wartości zwracane, wycieki pamięci.
+    3. SDK zapisuje logi symulacji i profilowanie zasobów do pliku diagnostycznego.
+    4. A2 otrzymuje raport z metrics wydajności i sugestiami optymalizacji.
+    5. A2 optymalizuje plugin i ponawia walidację.
+  - **3C. Rejestracja w Algorithm Registry się nie powiedzie**
+    1. W kroku 9 Algorithm Registry zwraca błąd:
+       - `ALGORITHM_NAME_EXISTS`: nazwa algorytmu już istnieje
+       - `INVALID_PLUGIN_LOCATION`: nie można pobrać paczki pluginu z podanej lokalizacji
+       - `STORAGE_ACCESS_ERROR`: brak dostępu do Object Storage
+       - `METADATA_VALIDATION_ERROR`: nieprawidłowe metadane (np. niewspierane typy problemów)
+    2. System zwraca szczegółowy komunikat błędu z kodem i sugestiami naprawy.
+    3. A2 poprawia metadane lub lokalizację pluginu i ponawia rejestrację.
+  - **3D. Błąd pobierania/walidacji publikacji (DOI)**
+    1. W kroku 9 Publication Service nie może pobrać metadanych z zewnętrznego systemu bibliograficznego.
+    2. System oferuje opcje:
+       - Pominąć publikacje i zarejestrować plugin bez powiązań
+       - Wprowadzić metadane publikacji ręcznie
+       - Ponowić próbę później (plugin zapisany jako draft)
+    3. A2 wybiera opcję i kontynuuje lub poprawia dane publikacji.
+  - **3E. Plugin zawiera potencjalnie niebezpieczny kod**
+    1. Podczas walidacji SandboxManager wykrywa podejrzane operacje:
+       - Próby dostępu do systemu plików poza dozwolonymi katalogami
+       - Próby połączeń sieciowych
+       - Użycie zabronionych bibliotek
+    2. System odrzuca plugin z komunikatem `SECURITY_VIOLATION`.
+    3. A2 musi usunąć niebezpieczny kod i ponownie przesłać plugin.
+  - **3F. Konflikt wersji SDK**
+    1. Plugin został zbudowany z niekompatybilną wersją SDK.
+    2. Algorithm Registry wykrywa niezgodność wersji i odrzuca rejestrację.
+    3. System informuje o wymaganej wersji SDK i linku do aktualizacji.
+    4. A2 aktualizuje SDK, przebudowuje plugin i ponawia rejestrację.
 - **Warunki końcowe:**  
   - Nowy algorytm HPO jest dostępny w Algorithm Registry i może być użyty w UC1.
 
@@ -1287,7 +1643,7 @@ sequenceDiagram
 
 - **Aktorzy:**  
   - Główny: Badacz / Inżynier ML (A1)  
-  - Współuczestniczący: Metrics & Analysis Service, Experiment Tracking Service  
+  - Współuczestniczący: MetricsAnalysisService, Experiment Tracking Service  
 - **Cel:**  
   - Wizualne i statystyczne porównanie algorytmów HPO na zestawie benchmarków.  
 - **Warunki początkowe:**  
@@ -1296,16 +1652,54 @@ sequenceDiagram
   1. A1 otwiera Web UI – sekcję „Porównaj algorytmy”.
   2. A1 wybiera eksperymenty lub zestaw runów do porównania (np. filtr po algorytmie, benchmarku, tagach).
   3. Web UI pobiera listę runów i metryk z Experiment Tracking Service.
-  4. Web UI wysyła zapytanie do Metrics & Analysis Service z wybranymi runami.
+  4. Web UI wysyła zapytanie do MetricsAnalysisService z wybranymi runami.
   5. Metrics & Analysis agreguje metryki per algorytm/benchmark, wykonuje testy statystyczne.
   6. Metrics & Analysis zwraca dane do wizualizacji (np. tablica wyników, rankingi, wartości p).
   7. Web UI prezentuje wykresy i tabele.
   8. A1 może zapisać „widok porównania” lub wygenerować raport.  
 - **Scenariusze alternatywne / błędy:**
-  - 2a. Zbyt mała liczba runów
-    - System ostrzega, że porównanie jest statystycznie słabe.
-  - 5a. Błąd obliczeń (np. brak metryk)
-    - System informuje A1 o niekompletnych danych.
+  - **4A. Zbyt mała liczba runów dla wiarygodnej analizy statystycznej**
+    1. W kroku 5 Metrics & Analysis wykrywa, że liczba runów < 10 per algorytm.
+    2. System wyświetla ostrzeżenie: "Niedostateczna liczba runów dla testów statystycznych. Zalecane minimum: 30 runów per algorytm."
+    3. A1 może:
+       - Kontynuować analizę z zastrzeżeniem o niskiej wiarygodności
+       - Uruchomić dodatkowe runy (UC1) i powrócić do porównania
+       - Zmienić kryteria porównania (np. inny zestaw algorytmów z większą liczbą runów)
+  - **4B. Niekompletne dane metryk**
+    1. W kroku 5 część runów nie ma wymaganych metryk (np. brak `accuracy` dla części eksperymentów).
+    2. Metrics & Analysis generuje raport brakujących danych:
+       - Lista runów z brakującymi metrykami
+       - % kompletności danych per algorytm
+       - Sugerowane akcje (re-run eksperymentów lub wykluczenie niepełnych runów)
+    3. A1 wybiera strategię obsługi brakujących danych:
+       - Interpolacja/imputacja brakujących wartości
+       - Wykluczenie niepełnych runów z analizy
+       - Ograniczenie porównania do dostępnych metryk
+  - **4C. Błędy obliczeniowe w testach statystycznych**
+    1. W kroku 5 StatisticalTestsEngine napotyka błąd numeryczny (np. singular matrix w teście Friedmana).
+    2. System loguje szczegóły błędu i próbuje alternatywne testy:
+       - Jeśli Friedman test fails → użyj Kruskal-Wallis
+       - Jeśli parametric tests fails → użyj non-parametric alternatives
+    3. System informuje A1 o zmianie metody testowania i wpływie na interpretację wyników.
+  - **4D. Przekroczenie limitu czasu obliczeń**
+    1. Analiza dużego zestawu danych (>10000 runów) przekracza timeout (5 min).
+    2. Metrics & Analysis przerywa obliczenia i oferuje opcje:
+       - Sampling danych (analiza na próbie reprezentatywnej)
+       - Analiza w batch'ach (częściowe wyniki)
+       - Zwiększenie timeout dla administratora
+    3. A1 wybiera strategię i ponawia analizę z zmodyfikowanymi parametrami.
+  - **4E. Niekompatybilne metryki między algorytmami**
+    1. Wybrane algorytmy używają różnych metryk (np. accuracy vs. F1-score vs. AUC).
+    2. System wykrywa niezgodność i proponuje:
+       - Mapowanie metryk na wspólną skalę (jeśli możliwe)
+       - Ograniczenie porównania do wspólnych metryk
+       - Oddzielne analizy per typ metryki
+    3. A1 wybiera metodę unifikacji lub akceptuje ograniczone porównanie.
+  - **4F. Błąd dostępu do danych eksperymentów**
+    1. Tracking Service nie może pobrać danych z Results Store (np. connection timeout).
+    2. System próbuje retry (3 próby z exponential backoff).
+    3. Jeśli nadal błąd: informuje A1 o problemie infrastruktury i sugeruje ponowienie za kilka minut.
+    4. System oferuje użycie cached data (jeśli dostępne) z ostrzeżeniem o potencjalnej nieaktualności.
 - **Warunki końcowe:**  
   - A1 uzyskuje porównanie algorytmów, może podjąć decyzję badawczą i ewentualnie opublikować wyniki.
 
@@ -1318,7 +1712,7 @@ config:
 flowchart LR
     U["Badacz / Inżynier ML"] --> UI["Web UI\n(Widok porównań)"]
     UI --> API["API Gateway"]
-    API --> TRK["Experiment Tracking Service"] & ANAL["Metrics & Analysis Service"]
+    API --> TRK["Experiment Tracking Service"] & ANAL["MetricsAnalysisService"]
     TRK --> DB[("Results Store\nExperiments/Runs/Metrics")]
     U -- wybór eksperymentów, algorytmów,\nbenchmarków, metryk --> UI
     UI -- compareRequest() --> API
@@ -1370,7 +1764,7 @@ flowchart TB
  subgraph Swim_TRK["Tracking Service"]
         T1["Pobierz runy i metryki z DB"]
   end
- subgraph Swim_ANAL["Metrics & Analysis Service"]
+ subgraph Swim_ANAL["MetricsAnalysisService"]
         M1["Oblicz agregaty (średnie, odchylenia)"]
         M2["Przeprowadź testy statystyczne\n(np. rankingi, testy parowane)"]
         M3["Przygotuj dane do wizualizacji"]
@@ -1623,7 +2017,7 @@ sequenceDiagram
 
 - **Aktorzy:**  
   - Główny: Badacz / Inżynier ML (A1), Administrator (A3)  
-  - Współuczestniczący: Publication & Reference Service, Algorithm Registry, Experiment Tracking  
+  - Współuczestniczący: PublicationService, Algorithm Registry, Experiment Tracking  
 - **Cel:**  
   - Utrzymywanie bazy publikacji oraz powiązań z obiektami systemu (algorytmy, benchmarki, eksperymenty).  
 - **Warunki początkowe:**  
@@ -1649,7 +2043,7 @@ config:
 flowchart LR
     U["Badacz / Administrator"] --> UI@{ label: "Web UI\\n(Moduł 'Publikacje')" }
     UI --> API["API Gateway"]
-    API --> PUB["Publication & Reference Service"] & REG["Algorithm Registry"] & TRK["Tracking Service"]
+    API --> PUB["PublicationService"] & REG["Algorithm Registry"] & TRK["Tracking Service"]
     PUB --> DBPUB[("Results Store\nPublication/PublicationLink")] & BIB["Zewnętrzne systemy bibliograficzne\n(CrossRef / arXiv / DOI)"]
     U -- DOI / dane publikacji --> UI
     UI -- "addPublication(doi/...)" --> API
@@ -2502,11 +2896,11 @@ flowchart TB
  subgraph TRK["Tracking Service"]
         T1["Pobierz eksperymenty, runy, metryki\n(SELECT z Results Store)"]
   end
- subgraph MNA["Metrics & Analysis Service"]
+ subgraph MNA["MetricsAnalysisService"]
         M1["Oblicz agregaty\n(średnie, odchylenia, rankingi)"]
         M2["Przygotuj dane do wykresów\n(np. przebiegi metryk vs. iteracje)"]
   end
- subgraph PUB["Publication & Reference Service"]
+ subgraph PUB["PublicationService"]
         P1["Pobierz metadane publikacji\npowiązanych z eksperymentami / algorytmami"]
         P2@{ label: "Przygotuj listę referencji\\n(do sekcji 'Bibliografia' raportu)" }
   end
@@ -2610,11 +3004,11 @@ Przypomnienie (w skrócie):
 
 | Cel benchmarku | Opis / rola w systemie                                                                                                   | Powiązane kontenery / usługi                                                                                             | Powiązane przypadki użycia        | Kluczowe komponenty / mechanizmy                                                                                           |
 |----------------|--------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------|------------------------------------|----------------------------------------------------------------------------------------------------------------------------|
-| **G1 – Ocena** | Ocena jakości pojedynczych algorytmów HPO na dobrze zdefiniowanych benchmarkach i metrykach.                           | Experiment Orchestrator, WorkerRuntime, Experiment Tracking Service, Metrics & Analysis Service                           | UC1 (Skonfiguruj i uruchom eksperyment), UC5 (Przeglądaj i filtruj eksperymenty) | MetricCalculator, RunLifecycleManager, ExperimentConfigManager, TrackingAPI                                               |
-| **G2 – Porównanie** | Porównanie wielu algorytmów HPO (w tym autorskich) na tych samych benchmarkach i metrykach.                       | Metrics & Analysis Service, Web UI (ComparisonViewUI), Experiment Tracking Service                                          | UC4 (Porównaj wyniki algorytmów), UC1 (jako źródło danych eksperymentów)        | AggregationEngine, StatisticalTestsEngine, ComparisonViewUI, queries w TrackingService                                     |
-| **G3 – Wrażliwość** | Analiza wrażliwości wyników na zmiany konfiguracji, seedów, instancji benchmarków i parametrów.                   | Experiment Orchestrator, Benchmark Definition Service, Metrics & Analysis Service                                         | UC1 (konfiguracja eksperymentu), UC4 (analiza wyników)                          | PlanBuilder (plany z różnymi seedami/parametrami), BenchmarkRepository, MetricCalculator (wariancja, robustność)          |
+| **G1 – Ocena** | Ocena jakości pojedynczych algorytmów HPO na dobrze zdefiniowanych benchmarkach i metrykach.                           | Experiment Orchestrator, WorkerRuntime, Experiment Tracking Service, MetricsAnalysisService                           | UC1 (Skonfiguruj i uruchom eksperyment), UC5 (Przeglądaj i filtruj eksperymenty) | MetricCalculator, RunLifecycleManager, ExperimentConfigManager, TrackingAPI                                               |
+| **G2 – Porównanie** | Porównanie wielu algorytmów HPO (w tym autorskich) na tych samych benchmarkach i metrykach.                       | MetricsAnalysisService, Web UI (ComparisonViewUI), Experiment Tracking Service                                          | UC4 (Porównaj wyniki algorytmów), UC1 (jako źródło danych eksperymentów)        | AggregationEngine, StatisticalTestsEngine, ComparisonViewUI, queries w TrackingService                                     |
+| **G3 – Wrażliwość** | Analiza wrażliwości wyników na zmiany konfiguracji, seedów, instancji benchmarków i parametrów.                   | Experiment Orchestrator, Benchmark Definition Service, MetricsAnalysisService                                         | UC1 (konfiguracja eksperymentu), UC4 (analiza wyników)                          | PlanBuilder (plany z różnymi seedami/parametrami), BenchmarkRepository, MetricCalculator (wariancja, robustność)          |
 | **G4 – Ekstrapolacja** | Badanie, jak algorytmy HPO zachowują się na zróżnicowanych instancjach problemu (skalowalność, trudność, rozmiar). | Benchmark Definition Service, Experiment Orchestrator, WorkerRuntime                                                      | UC1 (eksperymenty na wielu instancjach), UC4 (porównania w różnych skalach)     | ProblemInstanceManager, BenchmarkVersioning, możliwość definiowania familiów instancji, scenariusze w Orchestratorze      |
-| **G5 – Teoria i rozwój** | Wsparcie rozwoju nowych algorytmów HPO oraz powiązanie wyników z teorią i literaturą naukową.                | Publication & Reference Service, Algorithm Registry, Plugin SDK / Plugin Runtime, Web UI (moduł publikacji i algorytmów) | UC3 (Zaimplementuj i zarejestruj algorytm HPO – plugin), UC6 (Zarządzaj referencjami), UC1/UC4 (eksperymenty i analiza) | ReferenceCatalog, ReferenceLinker, CitationFormatter, IAlgorithmPlugin / SDK, AlgorithmMetadataStore, AlgorithmVersionManager |
+| **G5 – Teoria i rozwój** | Wsparcie rozwoju nowych algorytmów HPO oraz powiązanie wyników z teorią i literaturą naukową.                | PublicationService, Algorithm Registry, Plugin SDK / Plugin Runtime, Web UI (moduł publikacji i algorytmów) | UC3 (Zaimplementuj i zarejestruj algorytm HPO – plugin), UC6 (Zarządzaj referencjami), UC1/UC4 (eksperymenty i analiza) | ReferenceCatalog, ReferenceLinker, CitationFormatter, IAlgorithmPlugin / SDK, AlgorithmMetadataStore, AlgorithmVersionManager |
 
 
 ### 7.2. Checklist dobrych praktyk benchmarkingu i ich wsparcie
@@ -2630,6 +3024,6 @@ Poniżej lista praktyk i powiązania z architekturą.
 | 5  | Plan eksperymentu (design), w tym budżety i powtórzenia       | Experiment Orchestrator, **ExperimentPlanBuilder**, **RunScheduler**                                                   | UC1                                               |
 | 6  | Analiza wyników i prezentacja                                 | Metrics & Analysis, Web UI (**ComparisonViewUI**, dashboardy)                                                            | UC4, UC5                                          |
 | 7  | Pełna reprodukowalność                                         | **ReproducibilityManager**, **LineageTracker**, Results Store, Object Storage                                          | UC1 (zapisywanie konfiguracji), UC9 (eksport i raport) |
-| 8  | Możliwość powiązania wyników z literaturą naukową            | Publication & Reference Service, **ReferenceLinker**                                                                   | UC6, UC3 (przypisanie publikacji do pluginu)      |
+| 8  | Możliwość powiązania wyników z literaturą naukową            | PublicationService, **ReferenceLinker**                                                                   | UC6, UC3 (przypisanie publikacji do pluginu)      |
 | 9  | Iteracyjne projektowanie i testowanie algorytmów HPO          | Algorithm SDK / Plugin Runtime, Algorithm Registry, Experiment Orchestrator                                            | UC3 (dodanie algorytmu), UC1 (kolejne eksperymenty), UC4 (porównania), UC5 (panel śledzenia) |
 | 10 | Cloud-ready, PC-first                                         | Warstwa kontrolna: API, Orchestrator, Registry, Benchmark Definition, Publication. <br> Warstwa wykonawcza: Workery. | UC7, UC8 (procedury deploymentu i skalowania)     |

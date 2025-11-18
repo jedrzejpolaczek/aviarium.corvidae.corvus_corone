@@ -16,7 +16,7 @@
 ```mermaid
 ---
 config:
-  look: handDrawn
+  look: neo
   layout: elk
 ---
 flowchart LR

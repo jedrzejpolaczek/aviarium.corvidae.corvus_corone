@@ -9,11 +9,6 @@
 > - Autoryzacja: klasyczne role **Badacz / Twórca pluginu / Administrator**, integracja z zewnętrznym IdP w przyszłości.
 > - Benchmarki dotyczą głównie trenowania modeli ML, ale architektura nie zakłada konkretnej domeny – można ją rozszerzyć na inne typy zadań optymalizacyjnych.
 
-
-```mermaid
-  info
-```
-
 ---
 
 ## 1. Kontekst systemu (C4-1)
@@ -42,6 +37,12 @@ flowchart LR
     classDef Sky stroke-width:1px, stroke-dasharray:none, stroke:#374D7C, fill:#E2EBFF, color:#374D7C
     classDef Rose stroke-width:1px, stroke-dasharray:none, stroke:#FF5978, fill:#FFDFE5, color:#8E2236
     classDef Peach stroke-width:1px, stroke-dasharray:none, stroke:#FBB35A, fill:#FFEFDB, color:#8F632D
+    style A1 color:#000000
+    style S color:#000000
+    style A2 color:#000000
+    style A3 color:#000000
+    style A4 color:#000000
+    style A5 color:#000000
     linkStyle 0 stroke:#00C853,fill:none
     linkStyle 1 stroke:#00C853,fill:none
     linkStyle 2 stroke:#00C853,fill:none

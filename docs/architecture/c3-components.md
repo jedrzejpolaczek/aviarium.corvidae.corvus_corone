@@ -13,95 +13,130 @@ config:
   theme: redux-dark
 ---
 flowchart TB
- subgraph WebUI["Web UI (container)"]
-        WebUI_Designer["ExperimentDesignerUI"]
-        WebUI_Tracking["TrackingDashboardUI"]
-        WebUI_Comparison["ComparisonViewUI"]
-        WebUI_BenchCatalog["BenchmarkCatalogUI"]
-        WebUI_AlgoCatalog["AlgorithmCatalogUI"]
-        WebUI_Publications["PublicationManagerUI"]
-        WebUI_Admin["AdminSettingsUI"]
-  end
- subgraph APIGateway["API Gateway / Backend API (container)"]
-        APIGateway_Public["Public API"]
-        APIGateway_Auth["AuthN/AuthZ"]
-        APIGateway_Routing["Routing"]
-  end
  subgraph PresentationLayer["Presentation Layer"]
-        WebUI
-        APIGateway
-  end
- subgraph ExperimentOrchestrator["Experiment Orchestrator Service (container)"]
-        Orchestrator_Config["ExperimentConfigManager"]
-        Orchestrator_Plan["ExperimentPlanBuilder"]
-        Orchestrator_Scheduler["RunScheduler"]
-        Orchestrator_State["ExperimentStateStore"]
-        Orchestrator_Reprod["ReproducibilityManager"]
-        Orchestrator_Events["EventPublisher"]
-  end
- subgraph BenchmarkDefinitionService["Benchmark Definition Service (container)"]
-        Bench_Repo["BenchmarkRepository"]
-        Bench_Instances["ProblemInstanceManager"]
-        Bench_Versioning["BenchmarkVersioning"]
-  end
- subgraph AlgorithmRegistryService["Algorithm Registry Service (container)"]
-        Algo_Metadata["AlgorithmMetadataStore"]
-        Algo_Versions["AlgorithmVersionManager"]
-        Algo_Compat["CompatibilityChecker"]
-  end
- subgraph ExperimentTrackingService["Experiment Tracking Service (container)"]
-        Track_API["TrackingAPI"]
-        Track_Runs["RunLifecycleManager"]
-        Track_Search["TaggingAndSearchEngine"]
-        Track_Lineage["LineageTracker"]
-  end
- subgraph MetricsAnalysisService["MetricsAnalysisService (container)"]
-        Metrics_Calc["MetricCalculator"]
-        Metrics_Agg["AggregationEngine"]
-        Metrics_Stats["StatisticalTestsEngine"]
-        Metrics_Query["VisualizationQueryAdapter"]
-  end
- subgraph PublicationService["PublicationService (container)"]
-        Pub_Catalog["ReferenceCatalog"]
-        Pub_Citation["CitationFormatter"]
-        Pub_Linker["ReferenceLinker"]
-        Pub_External["ExternalBibliographyClient"]
-  end
- subgraph ReportGeneratorService["ReportGeneratorService (container)"]
-        Report_Template["ReportTemplateEngine"]
-        Report_Assembler["ReportAssembler"]
-        Report_Exporter["ReportExporter"]
-        Report_Metadata["ReportMetadataStore"]
+    subgraph WebUI["Web UI (container)"]
+        subgraph WebUI_Components["components/"]
+            WebUI_Designer["ExperimentDesignerUI"]
+            WebUI_Tracking["TrackingDashboardUI"]
+            WebUI_Comparison["ComparisonViewUI"]
+            WebUI_BenchCatalog["BenchmarkCatalogUI"]
+            WebUI_AlgoCatalog["AlgorithmCatalogUI"]
+            WebUI_Publications["PublicationManagerUI"]
+            WebUI_Admin["AdminSettingsUI"]
+        end
+        subgraph WebUI_Shared["shared/"]
+            WebUI_Utils["UI Utilities"]
+            WebUI_Config["Configuration"]
+        end
+    end
+    subgraph APIGateway["API Gateway (container)"]
+        subgraph APIGateway_Components["components/"]
+            APIGateway_Public["Public API"]
+            APIGateway_Auth["AuthN/AuthZ"]
+            APIGateway_Routing["Routing"]
+        end
+        subgraph APIGateway_Shared["shared/"]
+            APIGateway_Utils["Common Utilities"]
+            APIGateway_Middleware["Middleware"]
+        end
+    end
   end
  subgraph BusinessLogicLayer["Business Logic Layer"]
-        ExperimentOrchestrator
-        BenchmarkDefinitionService
-        AlgorithmRegistryService
-        ExperimentTrackingService
-        MetricsAnalysisService
-        PublicationService
-        ReportGeneratorService
-  end
- subgraph WorkerRuntime["Worker Runtime / Execution Engine (container)"]
-        Worker_Executor["RunExecutor"]
-        Worker_DataLoader["DatasetLoader"]
-        Worker_Reporter["MetricReporter"]
-        Worker_Uploader["ArtifactUploader"]
-  end
- subgraph PluginRuntime["Algorithm SDK / Plugin Runtime (container)"]
-        Plugin_Interface["IAlgorithmPlugin"]
-        Plugin_Loader["PluginLoader"]
-        Plugin_Sandbox["SandboxManager"]
-        Plugin_Validator["PluginValidator"]
-  end
- subgraph MessageBroker["Message Broker (container)"]
-        Broker_RunQueue["RunJobQueue"]
-        Broker_EventBus["EventBus"]
+    subgraph ExperimentOrchestrator["Experiment Orchestrator (container)"]
+        subgraph Orchestrator_Components["components/"]
+            Orchestrator_Config["ExperimentConfigManager"]
+            Orchestrator_Plan["ExperimentPlanBuilder"]
+            Orchestrator_Scheduler["RunScheduler"]
+            Orchestrator_State["ExperimentStateStore"]
+            Orchestrator_Reprod["ReproducibilityManager"]
+            Orchestrator_Events["EventPublisher"]
+        end
+        subgraph Orchestrator_Shared["shared/"]
+            Orchestrator_Utils["Orchestration Utilities"]
+        end
+    end
+    subgraph BenchmarkDefinitionService["Benchmark Definition (container)"]
+        subgraph Bench_Components["components/"]
+            Bench_Repo["BenchmarkRepository"]
+            Bench_Instances["ProblemInstanceManager"]
+            Bench_Versioning["BenchmarkVersioning"]
+        end
+        subgraph Bench_Shared["shared/"]
+            Bench_Utils["Benchmark Utilities"]
+        end
+    end
+    subgraph AlgorithmRegistryService["Algorithm Registry (container)"]
+        subgraph Algo_Components["components/"]
+            Algo_Metadata["AlgorithmMetadataStore"]
+            Algo_Versions["AlgorithmVersionManager"]
+            Algo_Compat["CompatibilityChecker"]
+        end
+        subgraph Algo_Shared["shared/"]
+            Algo_Utils["Registry Utilities"]
+        end
+    end
+    subgraph ExperimentTrackingService["Experiment Tracking (container)"]
+        subgraph Track_Components["components/"]
+            Track_API["TrackingAPI"]
+            Track_Runs["RunLifecycleManager"]
+            Track_Search["TaggingAndSearchEngine"]
+            Track_Lineage["LineageTracker"]
+        end
+        subgraph Track_Shared["shared/"]
+            Track_Utils["Tracking Utilities"]
+        end
+    end
+    subgraph MetricsAnalysisService["Metrics Analysis (container)"]
+        subgraph Metrics_Components["components/"]
+            Metrics_Calc["MetricCalculator"]
+            Metrics_Agg["AggregationEngine"]
+            Metrics_Stats["StatisticalTestsEngine"]
+            Metrics_Query["VisualizationQueryAdapter"]
+        end
+        subgraph Metrics_Shared["shared/"]
+            Metrics_Utils["Analysis Utilities"]
+        end
+    end
+    subgraph PublicationService["Publication Service (container)"]
+        subgraph Pub_Components["components/"]
+            Pub_Catalog["ReferenceCatalog"]
+            Pub_Citation["CitationFormatter"]
+            Pub_Linker["ReferenceLinker"]
+            Pub_External["ExternalBibliographyClient"]
+        end
+        subgraph Pub_Shared["shared/"]
+            Pub_Utils["Publication Utilities"]
+        end
+    end
+    subgraph ReportGeneratorService["Report Generator (container)"]
+        subgraph Report_Components["components/"]
+            Report_Template["ReportTemplateEngine"]
+            Report_Assembler["ReportAssembler"]
+            Report_Exporter["ReportExporter"]
+            Report_Metadata["ReportMetadataStore"]
+        end
+        subgraph Report_Shared["shared/"]
+            Report_Utils["Report Utilities"]
+        end
+    end
   end
  subgraph ExecutionLayer["Execution Layer"]
-        WorkerRuntime
-        PluginRuntime
-        MessageBroker
+    subgraph WorkerRuntime["Worker Runtime (container)"]
+        subgraph Worker_Components["components/"]
+            Worker_Executor["RunExecutor"]
+            Worker_DataLoader["DatasetLoader"]
+            Worker_Reporter["MetricReporter"]
+            Worker_Uploader["ArtifactUploader"]
+        end
+        subgraph Worker_Shared["shared/"]
+            Worker_Utils["Execution Utilities"]
+            Worker_Plugins["Plugin Interface"]
+        end
+    end
+    subgraph MessageBroker["Message Broker (container)"]
+        Broker_RunQueue["RunJobQueue"]
+        Broker_EventBus["EventBus"]
+    end
   end
  subgraph ResultsStore["Results Store (container)"]
         DAO_Experiments["ExperimentDAO"]
@@ -121,19 +156,23 @@ flowchart TB
         ResultsStore
         ObjectStorage
   end
- subgraph AuthServiceC["Auth Service (container)"]
-        Auth_TokenValidation["TokenValidation"]
-        Auth_RoleMapping["RoleMapping"]
-  end
- subgraph MonitoringStack["Monitoring & Logging Stack (container)"]
+ subgraph SupportLayer["Support Layer"]
+    subgraph AuthServiceC["Auth Service (container)"]
+        subgraph Auth_Components["components/"]
+            Auth_TokenValidation["TokenValidation"]
+            Auth_RoleMapping["RoleMapping"]
+        end
+        subgraph Auth_Shared["shared/"]
+            Auth_Utils["Auth Utilities"]
+            Auth_Config["Auth Configuration"]
+        end
+    end
+    subgraph MonitoringStack["Monitoring & Logging Stack (container)"]
         Monitoring_LogCollector["LogCollector"]
         Monitoring_MetricsCollector["MetricsCollector"]
         Monitoring_Dashboard["MonitoringDashboard"]
         Monitoring_Alerting["AlertingEngine"]
-  end
- subgraph SupportLayer["Support Layer"]
-        AuthServiceC
-        MonitoringStack
+    end
   end
     WebUI_Designer --> APIGateway_Public
     WebUI_Tracking --> APIGateway_Public

@@ -1,0 +1,35 @@
+{
+  "name": "corvus-corone",
+  "version": "1.0.0",
+  "description": "HPO (Hyperparameter Optimization) Algorithm Benchmarking Platform",
+  "main": "index.js",
+  "scripts": {
+    "start": "docker-compose up -d",
+    "stop": "docker-compose down",
+    "build": "docker-compose build",
+    "logs": "docker-compose logs -f",
+    "test": "npm run test:services",
+    "test:services": "cd src && npm run test",
+    "setup:dev": "./src/support-layer/infrastructure/scripts/setup-dev.sh",
+    "migrate": "cd src/database && npm run migrate",
+    "seed": "cd src/database && npm run seed"
+  },
+  "keywords": [
+    "hpo",
+    "hyperparameter-optimization",
+    "benchmarking",
+    "machine-learning",
+    "optimization",
+    "microservices"
+  ],
+  "author": "Aviarium Software",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jedrzejpolaczek/aviarium.corvidae.corvus_corone.git"
+  },
+  "devDependencies": {
+    "concurrently": "^7.6.0",
+    "wait-on": "^7.0.1"
+  }
+}

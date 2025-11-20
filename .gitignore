@@ -1,0 +1,123 @@
+# Environment files
+.env
+.env.local
+.env.production
+
+# Data directories
+data/
+logs/
+*.log
+
+# Docker
+.docker/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+venv/
+ENV/
+env/
+.venv/
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Database files
+*.db
+*.sqlite3
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.temp
+
+# Certificates
+*.pem
+*.key
+*.crt
+
+# Backup files
+*.bak
+*.backup
+
+# Cache
+.cache/
+*.cache
+
+# Coverage reports
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Local configuration overrides
+config.local.yml
+settings.local.json
+
+# Performance monitoring data
+*.perf
+*.prof
+
+# Large files that shouldn't be in git
+*.zip
+*.tar.gz
+*.7z
+*.rar
+
+# Artifacts and exports
+artifacts/
+exports/
+reports/
+
+# Generated documentation
+docs/_build/
+docs/.doctrees/
+
+# Security
+secrets/
+*.secrets
+
+# Local development overrides
+docker-compose.override.yml
+docker-compose.local.yml

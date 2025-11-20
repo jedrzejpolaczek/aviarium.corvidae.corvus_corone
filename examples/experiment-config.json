@@ -1,0 +1,49 @@
+{
+  "config": {
+    "name": "Random Search vs Bayesian Optimization Comparison",
+    "description": "Comparing baseline random search with Bayesian optimization on UCI Wine dataset for hyperparameter optimization of SVM classifier",
+    "goals": [
+      "g2_comparison",
+      "g1_evaluation"
+    ],
+    "algorithms": [
+      {
+        "algorithm_id": "random_search",
+        "version": "1.0.0",
+        "parameters": {
+          "seed": 42
+        },
+        "budget_limit": 50,
+        "time_limit": 300
+      },
+      {
+        "algorithm_id": "bayesian_optimization",
+        "version": "1.0.0",
+        "parameters": {
+          "n_startup_trials": 10,
+          "n_ei_candidates": 24
+        },
+        "budget_limit": 50,
+        "time_limit": 300
+      }
+    ],
+    "benchmarks": [
+      {
+        "benchmark_id": "uci_wine",
+        "instance_ids": ["uci_wine_svm"],
+        "include_all_instances": false
+      }
+    ],
+    "seeds": [42, 123, 456, 789, 999],
+    "priority": 5,
+    "max_parallel_runs": 2,
+    "retry_failed_runs": true,
+    "tags": ["comparison", "baseline", "svm", "uci"],
+    "metadata": {
+      "author": "researcher",
+      "experiment_type": "algorithm_comparison",
+      "expected_duration_minutes": 30
+    }
+  },
+  "start_immediately": true
+}

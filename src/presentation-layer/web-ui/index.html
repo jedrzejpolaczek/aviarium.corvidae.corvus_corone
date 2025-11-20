@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Corvus Corone - HPO Benchmarking Platform</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .navbar-brand {
+            font-weight: bold;
+        }
+        .experiment-card {
+            border: 1px solid #dee2e6;
+            border-radius: 0.375rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        .status-badge {
+            font-size: 0.75em;
+        }
+        .metric-value {
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+        }
+        footer {
+            margin-top: 3rem;
+            padding: 2rem 0;
+            border-top: 1px solid #dee2e6;
+            background-color: #f8f9fa;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                🐦 Corvus Corone
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#experiments">Experiments</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#algorithms">Algorithms</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#benchmarks">Benchmarks</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#reports">Reports</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#profile">👤 Profile</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mt-4">
+        <!-- Welcome Section -->
+        <div class="row">
+            <div class="col-12">
+                <div class="jumbotron bg-light p-4 rounded">
+                    <h1 class="display-4">Welcome to Corvus Corone</h1>
+                    <p class="lead">HPO (Hyperparameter Optimization) Algorithm Benchmarking Platform</p>
+                    <hr class="my-4">
+                    <p>Design rigorous experiments, compare HPO algorithms, and generate scientific reports with statistical analysis.</p>
+                    <a class="btn btn-primary btn-lg" href="#" onclick="showNewExperimentModal()">🧪 New Experiment</a>
+                    <a class="btn btn-outline-secondary btn-lg ms-2" href="#" onclick="showAlgorithms()">📊 View Algorithms</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="row mt-4">
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h5 class="card-title">Active Experiments</h5>
+                        <h2 class="text-primary" id="active-experiments">-</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h5 class="card-title">Completed Runs</h5>
+                        <h2 class="text-success" id="completed-runs">-</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h5 class="card-title">Available Algorithms</h5>
+                        <h2 class="text-info" id="available-algorithms">-</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h5 class="card-title">Benchmark Datasets</h5>
+                        <h2 class="text-warning" id="benchmark-datasets">-</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Experiments -->
+        <div class="row mt-5">
+            <div class="col-12">
+                <h3>Recent Experiments</h3>
+                <div id="experiments-list">
+                    <div class="text-center">
+                        <div class="spinner-border" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-2">Loading experiments...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- New Experiment Modal -->
+    <div class="modal fade" id="newExperimentModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Create New Experiment</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="newExperimentForm">
+                        <div class="mb-3">
+                            <label for="experimentName" class="form-label">Experiment Name</label>
+                            <input type="text" class="form-control" id="experimentName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="experimentDescription" class="form-label">Description</label>
+                            <textarea class="form-control" id="experimentDescription" rows="3"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Experiment Goals</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="goal-evaluation" value="g1_evaluation">
+                                <label class="form-check-label" for="goal-evaluation">
+                                    G1 - Algorithm Performance Evaluation
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="goal-comparison" value="g2_comparison" checked>
+                                <label class="form-check-label" for="goal-comparison">
+                                    G2 - Algorithm Comparison
+                                </label>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Select Algorithms</label>
+                            <div id="algorithm-selection">
+                                <div class="text-muted">Loading algorithms...</div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Select Benchmarks</label>
+                            <div id="benchmark-selection">
+                                <div class="text-muted">Loading benchmarks...</div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label for="evaluationBudget" class="form-label">Evaluation Budget</label>
+                                <input type="number" class="form-control" id="evaluationBudget" value="50" min="10" max="1000">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="randomSeeds" class="form-label">Random Seeds (comma-separated)</label>
+                                <input type="text" class="form-control" id="randomSeeds" value="42,123,456">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="createExperiment()">Create Experiment</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>Corvus Corone</h5>
+                    <p class="text-muted">HPO Algorithm Benchmarking Platform</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p class="text-muted">
+                        Built with ❤️ by Aviarium Software<br>
+                        <small>API Status: <span id="api-status" class="badge bg-secondary">Checking...</span></small>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // API Configuration
+        const API_BASE_URL = window.location.hostname === 'localhost' 
+            ? 'http://localhost:8080' 
+            : window.location.origin;
+        
+        // Global state
+        let currentUser = null;
+        let authToken = localStorage.getItem('auth_token');
+        
+        // Utility functions
+        function formatDate(dateString) {
+            return new Date(dateString).toLocaleString();
+        }
+        
+        function getStatusBadgeClass(status) {
+            const statusClasses = {
+                'pending': 'bg-warning',
+                'running': 'bg-primary',
+                'completed': 'bg-success',
+                'failed': 'bg-danger',
+                'cancelled': 'bg-secondary'
+            };
+            return statusClasses[status] || 'bg-secondary';
+        }
+        
+        // API calls
+        async function apiCall(endpoint, options = {}) {
+            const url = `${API_BASE_URL}${endpoint}`;
+            const headers = {
+                'Content-Type': 'application/json',
+                ...options.headers
+            };
+            
+            if (authToken) {
+                headers['Authorization'] = `Bearer ${authToken}`;
+            }
+            
+            try {
+                const response = await fetch(url, {
+                    ...options,
+                    headers
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                return await response.json();
+            } catch (error) {
+                console.error(`API call failed: ${endpoint}`, error);
+                throw error;
+            }
+        }
+        
+        // Load dashboard data
+        async function loadDashboard() {
+            try {
+                // Check API status
+                await apiCall('/health');
+                document.getElementById('api-status').className = 'badge bg-success';
+                document.getElementById('api-status').textContent = 'Online';
+                
+                // Load experiments
+                const experiments = await apiCall('/api/experiments?limit=10');
+                displayExperiments(experiments);
+                
+                // Load algorithms count
+                const algorithms = await apiCall('/api/algorithms?limit=1');
+                document.getElementById('available-algorithms').textContent = '3+';
+                
+                // Load benchmarks count
+                const benchmarks = await apiCall('/api/benchmarks?limit=1');
+                document.getElementById('benchmark-datasets').textContent = '2+';
+                
+                // Calculate stats
+                const activeExperiments = experiments.filter(exp => exp.status === 'running').length;
+                document.getElementById('active-experiments').textContent = activeExperiments;
+                
+                const completedRuns = experiments.reduce((sum, exp) => sum + (exp.completed_runs || 0), 0);
+                document.getElementById('completed-runs').textContent = completedRuns;
+                
+            } catch (error) {
+                console.error('Failed to load dashboard:', error);
+                document.getElementById('api-status').className = 'badge bg-danger';
+                document.getElementById('api-status').textContent = 'Offline';
+                
+                // Show demo data
+                showDemoData();
+            }
+        }
+        
+        function displayExperiments(experiments) {
+            const container = document.getElementById('experiments-list');
+            
+            if (experiments.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center text-muted">
+                        <p>No experiments yet. Create your first experiment to get started!</p>
+                        <button class="btn btn-primary" onclick="showNewExperimentModal()">Create First Experiment</button>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = experiments.map(exp => `
+                <div class="experiment-card">
+                    <div class="row align-items-center">
+                        <div class="col-md-6">
+                            <h5 class="mb-1">${exp.name}</h5>
+                            <p class="mb-1 text-muted">${exp.description || 'No description'}</p>
+                            <small class="text-muted">Created: ${formatDate(exp.created_at)}</small>
+                        </div>
+                        <div class="col-md-3">
+                            <span class="badge status-badge ${getStatusBadgeClass(exp.status)}">${exp.status.toUpperCase()}</span>
+                            <div class="mt-1">
+                                <small class="text-muted">
+                                    ${exp.completed_runs || 0}/${exp.total_runs || 0} runs completed
+                                </small>
+                            </div>
+                        </div>
+                        <div class="col-md-3 text-end">
+                            <button class="btn btn-sm btn-outline-primary" onclick="viewExperiment('${exp.id}')">View</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function showDemoData() {
+            // Show demo data when API is not available
+            const demoExperiments = [
+                {
+                    id: 'demo-1',
+                    name: 'Random Search vs Bayesian Optimization',
+                    description: 'Comparing baseline algorithms on UCI Wine dataset',
+                    status: 'completed',
+                    created_at: new Date().toISOString(),
+                    total_runs: 100,
+                    completed_runs: 100
+                },
+                {
+                    id: 'demo-2',
+                    name: 'Grid Search Evaluation',
+                    description: 'Exhaustive search on synthetic 2D function',
+                    status: 'running',
+                    created_at: new Date(Date.now() - 3600000).toISOString(),
+                    total_runs: 200,
+                    completed_runs: 45
+                }
+            ];
+            
+            displayExperiments(demoExperiments);
+            document.getElementById('active-experiments').textContent = '1';
+            document.getElementById('completed-runs').textContent = '100';
+            document.getElementById('available-algorithms').textContent = '3';
+            document.getElementById('benchmark-datasets').textContent = '2';
+        }
+        
+        // Modal functions
+        function showNewExperimentModal() {
+            const modal = new bootstrap.Modal(document.getElementById('newExperimentModal'));
+            loadAlgorithmsForSelection();
+            loadBenchmarksForSelection();
+            modal.show();
+        }
+        
+        async function loadAlgorithmsForSelection() {
+            try {
+                const algorithms = await apiCall('/api/algorithms');
+                const container = document.getElementById('algorithm-selection');
+                
+                container.innerHTML = algorithms.map(algo => `
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="algo-${algo.id}" value="${algo.id}">
+                        <label class="form-check-label" for="algo-${algo.id}">
+                            ${algo.name} <span class="text-muted">(${algo.algorithm_type})</span>
+                        </label>
+                    </div>
+                `).join('');
+                
+                // Pre-select first two algorithms
+                if (algorithms.length >= 2) {
+                    document.getElementById(`algo-${algorithms[0].id}`).checked = true;
+                    document.getElementById(`algo-${algorithms[1].id}`).checked = true;
+                }
+                
+            } catch (error) {
+                document.getElementById('algorithm-selection').innerHTML = `
+                    <div class="text-danger">Failed to load algorithms. Using demo data.</div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="algo-random" value="random_search" checked>
+                        <label class="form-check-label" for="algo-random">Random Search</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="algo-bayes" value="bayesian_optimization" checked>
+                        <label class="form-check-label" for="algo-bayes">Bayesian Optimization</label>
+                    </div>
+                `;
+            }
+        }
+        
+        async function loadBenchmarksForSelection() {
+            try {
+                const benchmarks = await apiCall('/api/benchmarks');
+                const container = document.getElementById('benchmark-selection');
+                
+                container.innerHTML = benchmarks.map(bench => `
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="bench-${bench.id}" value="${bench.id}">
+                        <label class="form-check-label" for="bench-${bench.id}">
+                            ${bench.name} <span class="text-muted">(${bench.problem_type})</span>
+                        </label>
+                    </div>
+                `).join('');
+                
+                // Pre-select first benchmark
+                if (benchmarks.length > 0) {
+                    document.getElementById(`bench-${benchmarks[0].id}`).checked = true;
+                }
+                
+            } catch (error) {
+                document.getElementById('benchmark-selection').innerHTML = `
+                    <div class="text-danger">Failed to load benchmarks. Using demo data.</div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="bench-wine" value="uci_wine" checked>
+                        <label class="form-check-label" for="bench-wine">UCI Wine Classification</label>
+                    </div>
+                `;
+            }
+        }
+        
+        async function createExperiment() {
+            try {
+                // Collect form data
+                const name = document.getElementById('experimentName').value;
+                const description = document.getElementById('experimentDescription').value;
+                const budget = parseInt(document.getElementById('evaluationBudget').value);
+                const seeds = document.getElementById('randomSeeds').value.split(',').map(s => parseInt(s.trim()));
+                
+                // Collect selected goals
+                const goals = [];
+                document.querySelectorAll('input[type="checkbox"][id^="goal-"]:checked').forEach(cb => {
+                    goals.push(cb.value);
+                });
+                
+                // Collect selected algorithms
+                const algorithms = [];
+                document.querySelectorAll('input[type="checkbox"][id^="algo-"]:checked').forEach(cb => {
+                    algorithms.push({
+                        algorithm_id: cb.value,
+                        version: "1.0.0",
+                        parameters: {},
+                        budget_limit: budget
+                    });
+                });
+                
+                // Collect selected benchmarks
+                const benchmarks = [];
+                document.querySelectorAll('input[type="checkbox"][id^="bench-"]:checked').forEach(cb => {
+                    benchmarks.push({
+                        benchmark_id: cb.value,
+                        include_all_instances: true
+                    });
+                });
+                
+                if (algorithms.length === 0) {
+                    alert('Please select at least one algorithm.');
+                    return;
+                }
+                
+                if (benchmarks.length === 0) {
+                    alert('Please select at least one benchmark.');
+                    return;
+                }
+                
+                const experimentConfig = {
+                    config: {
+                        name,
+                        description,
+                        goals,
+                        algorithms,
+                        benchmarks,
+                        seeds,
+                        max_parallel_runs: 2
+                    },
+                    start_immediately: true
+                };
+                
+                // Create experiment
+                const result = await apiCall('/api/experiments', {
+                    method: 'POST',
+                    body: JSON.stringify(experimentConfig)
+                });
+                
+                alert(`Experiment "${name}" created successfully! ID: ${result.id}`);
+                
+                // Close modal and refresh
+                bootstrap.Modal.getInstance(document.getElementById('newExperimentModal')).hide();
+                loadDashboard();
+                
+            } catch (error) {
+                alert(`Failed to create experiment: ${error.message}`);
+            }
+        }
+        
+        function viewExperiment(experimentId) {
+            alert(`Viewing experiment ${experimentId}\n\nIn a full implementation, this would navigate to a detailed experiment view with:\n- Real-time progress tracking\n- Convergence plots\n- Statistical analysis\n- Run details and logs`);
+        }
+        
+        function showAlgorithms() {
+            alert('Algorithm catalog would show:\n\n• Built-in Algorithms:\n  - Random Search\n  - Bayesian Optimization (TPE)\n  - Grid Search\n\n• Plugin System:\n  - Custom algorithm support\n  - Container-based isolation\n  - Version management');
+        }
+        
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDashboard();
+        });
+    </script>
+</body>
+</html>

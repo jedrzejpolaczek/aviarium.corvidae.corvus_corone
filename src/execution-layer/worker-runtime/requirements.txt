@@ -1,0 +1,12 @@
+httpx==0.25.2
+numpy==1.24.3
+scipy==1.11.4
+scikit-learn==1.3.2
+pika==1.3.2
+minio==7.2.0
+prometheus-client==0.19.0
+structlog==23.2.0
+# HPO libraries
+optuna==3.4.0
+hyperopt==0.2.7
+scikit-optimize==0.10.2

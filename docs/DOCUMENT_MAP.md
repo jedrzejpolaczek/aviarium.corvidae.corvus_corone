@@ -1,4 +1,4 @@
-# Document Map - Corvus Corone
+# Document Map
 
 > **Map of dependencies between documents in the project**
 

@@ -1,0 +1,239 @@
+services:
+  # Presentation Layer
+  web-ui:
+    build: ./src/presentation-layer/web-ui
+    ports:
+      - "3000:3000"
+    environment:
+      - REACT_APP_API_URL=http://localhost:8080
+    depends_on:
+      - api-gateway
+    networks:
+      - corvus-network
+
+  api-gateway:
+    build: ./src/presentation-layer/api-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      - RABBITMQ_URL=amqp://rabbitmq:5672
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/corvus_corone
+      - AUTH_SERVICE_URL=http://auth-service:8001
+    depends_on:
+      - postgres
+      - rabbitmq
+      - auth-service
+    networks:
+      - corvus-network
+
+  # Business Logic Layer
+  experiment-orchestrator:
+    build: ./src/business-logic-layer/experiment-orchestrator
+    environment:
+      - RABBITMQ_URL=amqp://rabbitmq:5672
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/corvus_corone
+      - TRACKING_SERVICE_URL=http://experiment-tracking:8002
+      - BENCHMARK_SERVICE_URL=http://benchmark-definition:8003
+      - ALGORITHM_REGISTRY_URL=http://algorithm-registry:8004
+    depends_on:
+      - postgres
+      - rabbitmq
+      - experiment-tracking
+      - benchmark-definition
+      - algorithm-registry
+    networks:
+      - corvus-network
+
+  experiment-tracking:
+    build: ./src/business-logic-layer/experiment-tracking
+    ports:
+      - "8002:8002"
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/corvus_corone
+      - OBJECT_STORAGE_URL=http://minio:9000
+      - MINIO_ACCESS_KEY=minioadmin
+      - MINIO_SECRET_KEY=minioadmin
+    depends_on:
+      - postgres
+      - minio
+    networks:
+      - corvus-network
+
+  metrics-analysis:
+    build: ./src/business-logic-layer/metrics-analysis
+    ports:
+      - "8005:8005"
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/corvus_corone
+      - RABBITMQ_URL=amqp://rabbitmq:5672
+    depends_on:
+      - postgres
+      - rabbitmq
+    networks:
+      - corvus-network
+
+  benchmark-definition:
+    build: ./src/business-logic-layer/benchmark-definition
+    ports:
+      - "8003:8003"
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/corvus_corone
+      - OBJECT_STORAGE_URL=http://minio:9000
+      - MINIO_ACCESS_KEY=minioadmin
+      - MINIO_SECRET_KEY=minioadmin
+    depends_on:
+      - postgres
+      - minio
+    networks:
+      - corvus-network
+
+  algorithm-registry:
+    build: ./src/business-logic-layer/algorithm-registry
+    ports:
+      - "8004:8004"
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/corvus_corone
+    depends_on:
+      - postgres
+    networks:
+      - corvus-network
+
+  publication-service:
+    build: ./src/business-logic-layer/publication-service
+    ports:
+      - "8006:8006"
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/corvus_corone
+    depends_on:
+      - postgres
+    networks:
+      - corvus-network
+
+  report-generator:
+    build: ./src/business-logic-layer/report-generator
+    ports:
+      - "8007:8007"
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/corvus_corone
+      - OBJECT_STORAGE_URL=http://minio:9000
+      - MINIO_ACCESS_KEY=minioadmin
+      - MINIO_SECRET_KEY=minioadmin
+      - TRACKING_SERVICE_URL=http://experiment-tracking:8002
+      - METRICS_SERVICE_URL=http://metrics-analysis:8005
+      - PUBLICATION_SERVICE_URL=http://publication-service:8006
+    depends_on:
+      - postgres
+      - minio
+      - experiment-tracking
+      - metrics-analysis
+      - publication-service
+    networks:
+      - corvus-network
+
+  # Execution Layer
+  worker:
+    build: ./src/execution-layer/worker-runtime
+    environment:
+      - RABBITMQ_URL=amqp://rabbitmq:5672
+      - TRACKING_SERVICE_URL=http://experiment-tracking:8002
+      - BENCHMARK_SERVICE_URL=http://benchmark-definition:8003
+      - ALGORITHM_REGISTRY_URL=http://algorithm-registry:8004
+      - OBJECT_STORAGE_URL=http://minio:9000
+      - MINIO_ACCESS_KEY=minioadmin
+      - MINIO_SECRET_KEY=minioadmin
+    depends_on:
+      - rabbitmq
+      - experiment-tracking
+      - benchmark-definition
+      - algorithm-registry
+      - minio
+    deploy:
+      replicas: 2
+    networks:
+      - corvus-network
+
+  # Support Layer
+  auth-service:
+    build: ./src/support-layer/auth-service
+    ports:
+      - "8001:8001"
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/corvus_corone
+      - JWT_SECRET=your-super-secret-jwt-key-change-in-production
+    depends_on:
+      - postgres
+    networks:
+      - corvus-network
+
+  # Data Layer
+  postgres:
+    image: postgres:14
+    environment:
+      - POSTGRES_DB=corvus_corone
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./src/support-layer/infrastructure/scripts/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    ports:
+      - "5432:5432"
+    networks:
+      - corvus-network
+
+  minio:
+    image: minio/minio:latest
+    environment:
+      - MINIO_ROOT_USER=minioadmin
+      - MINIO_ROOT_PASSWORD=minioadmin
+    volumes:
+      - minio_data:/data
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    command: server /data --console-address ":9001"
+    networks:
+      - corvus-network
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    environment:
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=admin
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - corvus-network
+
+  # Monitoring
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ./src/support-layer/infrastructure/monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    networks:
+      - corvus-network
+
+  grafana:
+    image: grafana/grafana:latest
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+    ports:
+      - "3001:3000"
+    networks:
+      - corvus-network
+
+volumes:
+  postgres_data:
+  minio_data:
+  rabbitmq_data:
+  grafana_data:
+
+networks:
+  corvus-network:
+    driver: bridge

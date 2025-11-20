@@ -32,7 +32,7 @@ flowchart LR
 
 ## UC1: Configure and run benchmark experiment
 
-### 📋 Basic information
+### Basic information
 
 | Property | Value |
 |----------|-------|
@@ -42,12 +42,12 @@ flowchart LR
 | **Level** | User goal |
 | **Complexity** | Medium |
 
-### 🎯 Preconditions
+### Preconditions
 - Registered benchmarks and HPO algorithms exist (built-in or plugins)
 - User is logged in and has permissions to create experiments
 - System is available and operational
 
-### 📝 Main scenario
+### Main scenario
 
 1. **Experiment initiation**
    - A1 opens Web UI – "New experiment" section
@@ -89,7 +89,7 @@ flowchart LR
     - Orchestrator updates experiment status
     - A1 receives completion notification
 
-### ⚠️ Alternative scenarios
+### Alternative scenarios
 
 #### 1A. Configuration validation failed
 1. In step 6 Orchestrator detects incompatibility (e.g. algorithm requires GPU, but benchmark doesn't support GPU)
@@ -109,14 +109,14 @@ flowchart LR
 3. Orchestrator receives `RunFailed` event and checks retry policy
 4. System automatically retries or marks run as failed
 
-### ✅ Postconditions
+### Postconditions
 - Experiment has status `COMPLETED` or `FAILED`
 - All runs have metrics and logs saved in Tracking Service
 - Data is ready for analysis (UC4)
 
-### 📊 Diagramy
+### Diagrams
 
-#### Diagram aktywności
+#### Activity Diagram
 ```mermaid
 ---
 config:
@@ -145,7 +145,7 @@ flowchart TB
     MonitorRuns -- No --> HandleErrors{"Errors in runs?"}
     HandleErrors -- Yes --> RetryRuns["Retry runs within policy"]
     RetryRuns --> MonitorRuns
-    HandleErrors -- Nie --> MonitorRuns
+    HandleErrors -- No --> MonitorRuns
     MonitorRuns -- Yes --> UpdateStatus["Update experiment status"]
     UpdateStatus --> End(["End"])
 ```
@@ -232,7 +232,7 @@ sequenceDiagram
 
 ## UC2: Add Built-in HPO Algorithm
 
-### 📋 Basic Information
+### Basic Information
 
 | Property | Value |
 |----------|-------|
@@ -240,7 +240,7 @@ sequenceDiagram
 | **Goal** | Adding a new built-in HPO algorithm to the system |
 | **Level** | User goal |
 
-### 📝 Main Scenario
+### Main Scenario
 
 1. **Algorithm preparation**
    - Administrator implements algorithm according to IAlgorithmPlugin interface
@@ -254,9 +254,9 @@ sequenceDiagram
    - Algorithm receives `APPROVED` status
    - Becomes available to users in the catalog
 
-### 📊 Diagramy
+### Diagrams
 
-#### Diagram aktywności
+#### Activity Diagram
 ```mermaid
 ---
 config:
@@ -332,7 +332,7 @@ sequenceDiagram
     AR-->>UI: List with new algorithm
 ```
 
-#### Diagram sekwencji - Scenariusz alternatywny - Błąd walidacji
+#### Sequence Diagram - Alternative Scenario - Validation Error
 ```mermaid
 ---
 config:
@@ -358,7 +358,7 @@ sequenceDiagram
 
 ## UC3: Implement and Register HPO Algorithm Plugin
 
-### 📋 Basic Information
+### Basic Information
 
 | Property | Value |
 |----------|-------|
@@ -366,7 +366,7 @@ sequenceDiagram
 | **Goal** | Implementation and registration of custom algorithm as plugin |
 | **Level** | User goal |
 
-### 📝 Main Scenario
+### Main Scenario
 
 1. **Plugin implementation**
    - Creator uses Algorithm SDK to implement algorithm
@@ -383,9 +383,9 @@ sequenceDiagram
    - Administrator reviews and approves plugin
    - Plugin becomes available to community
 
-### 📊 Diagramy
+### Diagrams
 
-#### Diagram aktywności
+#### Activity Diagram
 ```mermaid
 ---
 config:
@@ -421,22 +421,22 @@ flowchart TB
     PubsOK -- Error --> HandlePubError["Handle publication error"]
     HandlePubError --> ApprovalPending["Awaiting approval"]
     PubsOK -- OK --> ApprovalPending
-    CheckDOI -- Nie --> ApprovalPending
+    CheckDOI -- No --> ApprovalPending
     ApprovalPending --> AdminApproval{"Administrator approves?"}
     AdminApproval -- Yes --> ChangeStatus["Change status to /approved/"]
-    AdminApproval -- Nie --> End(["Koniec - sukces"])
+    AdminApproval -- No --> End(["End - success"])
     ChangeStatus --> Available["Plugin available in experiments"]
     Available --> End
 ```
 
-#### Diagram sekwencji - Główny scenariusz
+#### Sequence Diagram - Main Scenario
 ```mermaid
 ---
 config:
   theme: redux-dark-color
 ---
 sequenceDiagram
-    participant A2 as Twórca algorytmu HPO
+    participant A2 as HPO Algorithm Creator
     participant SDK as SDK/PluginValidator
     participant UI as Web UI
     participant API as API Gateway
@@ -478,7 +478,7 @@ config:
   theme: redux-dark-color
 ---
 sequenceDiagram
-    participant A2 as Twórca algorytmu HPO
+    participant A2 as HPO Algorithm Creator
     participant SDK as SDK/PluginValidator
     A2->>SDK: hpo-sdk validate (incorrect implementation)
     SDK->>SDK: Check IAlgorithmPlugin interface
@@ -494,14 +494,14 @@ sequenceDiagram
     SDK-->>A2: SUCCESS - plugin ready
 ```
 
-#### Diagram sekwencji - Scenariusz alternatywny - Naruszenie bezpieczeństwa
+#### Sequence Diagram - Alternative Scenario - Security Violation
 ```mermaid
 ---
 config:
   theme: redux-dark-color
 ---
 sequenceDiagram
-    participant A2 as Twórca algorytmu HPO
+    participant A2 as HPO Algorithm Creator
     participant API as API Gateway
     participant AR as Algorithm Registry
     participant SM as SandboxManager
@@ -519,7 +519,7 @@ sequenceDiagram
 
 ## UC4: Compare Algorithm Results
 
-### 📋 Basic Information
+### Basic Information
 
 | Property | Value |
 |----------|-------|
@@ -527,7 +527,7 @@ sequenceDiagram
 | **Goal** | Comparison of performance of different HPO algorithms |
 | **Level** | User goal |
 
-### 📝 Main Scenario
+### Main Scenario
 
 1. **Experiment selection**
    - Researcher selects experiments for comparison
@@ -549,7 +549,7 @@ sequenceDiagram
 
 ## UC5: Browse and Filter Experiments
 
-### 📋 Basic Information
+### Basic Information
 
 | Property | Value |
 |----------|-------|
@@ -557,7 +557,7 @@ sequenceDiagram
 | **Goal** | Browsing experiment history and searching |
 | **Level** | User goal |
 
-### 📝 Main Scenario
+### Main Scenario
 
 1. **Dashboard access**
    - Researcher opens Tracking Dashboard UI
@@ -571,9 +571,9 @@ sequenceDiagram
    - Selection of experiment from list
    - Display of details: runs, metrics, logs
 
-### 📊 Diagramy
+### Diagrams
 
-#### Diagram aktywności
+#### Activity Diagram
 ```mermaid
 ---
 config:
@@ -599,11 +599,11 @@ flowchart TB
     ApplyFilters -- No --> SelectExperiment{"Select experiment?"}
     UpdateView --> SelectExperiment
     SelectExperiment -- Yes --> ShowDetails["Display experiment details"]
-    SelectExperiment -- Nie --> End(["Koniec"])
+    SelectExperiment -- No --> End(["End"])
     ShowDetails --> ExpandRuns["Expand runs list"]
     ExpandRuns --> SelectRun{"Select run?"}
     SelectRun -- Yes --> ShowRunDetails["Display run details"]
-    SelectRun -- Nie --> End
+    SelectRun -- No --> End
     ShowRunDetails --> ViewMetrics["Browse metrics"]
     ViewMetrics --> ViewLogs["Browse logs"]
     ViewLogs --> ViewConfig["Browse configuration"]
@@ -611,7 +611,7 @@ flowchart TB
     ViewArtifacts --> End
 ```
 
-#### Diagram sekwencji - Główny scenariusz
+#### Sequence Diagram - Main Scenario
 ```mermaid
 ---
 config:
@@ -622,7 +622,7 @@ sequenceDiagram
     participant UI as Web UI
     participant ETS as Experiment Tracking Service
     participant Cache as Cache Layer
-    User->>UI: Otwórz panel śledzenia
+    User->>UI: Open tracking panel
     UI->>Cache: Check experiments cache
     Cache-->>UI: Cache miss/expired
     UI->>ETS: getExperimentsList()
@@ -633,7 +633,7 @@ sequenceDiagram
     UI->>ETS: getFilteredExperiments(filters)
     ETS-->>UI: Filtered experiments + aggregates
     UI-->>User: Updated view
-    User->>UI: Wybierz eksperyment X
+    User->>UI: Select experiment X
     UI->>ETS: getExperimentDetails(experiment_id)
     ETS-->>UI: Experiment details
     UI-->>User: Experiment details
@@ -647,17 +647,17 @@ sequenceDiagram
     UI-->>User: Complete run details
 ```
 
-#### Diagram sekwencji - Scenariusz z paginacją (duża liczba eksperymentów)
+#### Sequence Diagram - Scenario with Pagination (Large Number of Experiments)
 ```mermaid
 ---
 config:
   theme: redux-dark-color
 ---
 sequenceDiagram
-    participant User as Użytkownik
+    participant User as User
     participant UI as Web UI
     participant ETS as Experiment Tracking Service
-    User->>UI: Otwórz panel śledzenia
+    User->>UI: Open tracking panel
     UI->>ETS: getExperimentsCount()
     ETS-->>UI: count = 5000 experiments
     UI->>UI: Enable pagination (page_size=50)
@@ -668,9 +668,9 @@ sequenceDiagram
     UI->>ETS: getExperimentsList(page=3, size=50)
     ETS-->>UI: Experiments 101-150
     UI-->>User: Page 3/100 experiments
-    User->>UI: Zastosuj filtry
+    User->>UI: Apply filters
     UI->>ETS: getFilteredExperiments(filters, page=1, size=50)
-    ETS-->>UI: Przefiltrowane eksperymenty (strona 1)
+    ETS-->>UI: Filtered experiments (page 1)
     UI-->>User: Filtering results with pagination
 ```
 
@@ -694,7 +694,7 @@ flowchart TB
     LazyLoadLogs --> ShowLogs["Display logs"]
     LazyLoadArtifacts --> ShowArtifacts["Display artifacts"]
     LazyLoadConfig --> ShowConfig["Display configuration"]
-    ShowMetrics --> End(["Koniec"])
+    ShowMetrics --> End(["End"])
     ShowLogs --> End
     ShowArtifacts --> End
     ShowConfig --> End
@@ -759,15 +759,15 @@ flowchart TB
 
 ## UC6: Manage paper references
 
-### 📋 Podstawowe informacje
+### Basic Information
 
-| Właściwość | Wartość |
-|------------|---------|
+| Property | Value |
+|----------|-------|
 | **Primary actors** | Researcher / Administrator |
 | **Goal** | Adding and linking scientific publications with algorithms/benchmarks |
-| **Poziom** | User goal |
+| **Level** | User goal |
 
-### 📝 Główny scenariusz
+### Main Scenario
 
 1. **Publication addition**
    - User enters publication metadata (DOI, BibTeX)
@@ -781,9 +781,9 @@ flowchart TB
    - Editing and updating existing entries
    - Citation generation in various formats
 
-### 📊 Diagramy
+### Diagrams
 
-#### Diagram aktywności
+#### Activity Diagram
 ```mermaid
 ---
 config:
@@ -795,91 +795,91 @@ flowchart TB
     OpenPublications --> ChooseAction{"Choose action"}
     ChooseAction --> AddPublication["Add new publication"] & LinkExisting["Link existing publication"] & ManageLinks["Manage links"]
     AddPublication --> EnterData["Provide DOI or manual data"]
-    EnterData --> CheckDOI{"DOI podane?"}
-    CheckDOI -- Tak --> FetchMetadata["Pobierz metadane z zewnętrznego systemu"]
-    CheckDOI -- Nie --> ManualEntry["Wprowadź dane ręcznie"]
-    FetchMetadata --> MetadataFound{"Metadane znalezione?"}
-    MetadataFound -- Nie --> ManualEntry
-    MetadataFound -- Tak --> PreviewPublication["Podgląd publikacji"]
+    EnterData --> CheckDOI{"DOI provided?"}
+    CheckDOI -- Yes --> FetchMetadata["Fetch metadata from external system"]
+    CheckDOI -- No --> ManualEntry["Enter data manually"]
+    FetchMetadata --> MetadataFound{"Metadata found?"}
+    MetadataFound -- No --> ManualEntry
+    MetadataFound -- Yes --> PreviewPublication["Preview publication"]
     ManualEntry --> PreviewPublication
-    PreviewPublication --> SavePublication["Zapisz publikację"]
-    LinkExisting --> SelectTarget["Wybierz algorytm/benchmark/eksperyment"]
-    SelectTarget --> SelectPublication["Wybierz publikację do powiązania"]
-    SelectPublication --> CreateLink["Utwórz PublicationLink"]
-    ManageLinks --> ViewLinks["Wyświetl istniejące powiązania"]
-    ViewLinks --> ModifyLinks{"Modyfikuj powiązania?"}
-    ModifyLinks -- Tak --> EditLink["Edytuj/usuń powiązanie"]
-    ModifyLinks -- Nie --> End(["Koniec"])
-    SavePublication --> UpdateViews["Zaktualizuj widoki"]
+    PreviewPublication --> SavePublication["Save publication"]
+    LinkExisting --> SelectTarget["Select algorithm/benchmark/experiment"]
+    SelectTarget --> SelectPublication["Select publication to link"]
+    SelectPublication --> CreateLink["Create PublicationLink"]
+    ManageLinks --> ViewLinks["Display existing links"]
+    ViewLinks --> ModifyLinks{"Modify links?"}
+    ModifyLinks -- Yes --> EditLink["Edit/delete link"]
+    ModifyLinks -- No --> End(["End"])
+    SavePublication --> UpdateViews["Update views"]
     CreateLink --> UpdateViews
     EditLink --> UpdateViews
     UpdateViews --> End
 ```
 
-#### Diagram sekwencji - Główny scenariusz
+#### Sequence Diagram - Main Scenario
 ```mermaid
 ---
 config:
   theme: redux-dark-color
 ---
 sequenceDiagram
-    participant User as Użytkownik (A1/A3)
+    participant User as User (A1/A3)
     participant UI as Web UI
     participant PS as Publication Service
-    participant EXT as Zewnętrzny system bibliograficzny
+    participant EXT as External Bibliography System
     participant AR as Algorithm Registry
     participant RS as Results Store
-    User->>UI: Otwórz moduł "Publikacje"
-    UI->>PS: Pobierz listę publikacji
-    PS-->>UI: Lista istniejących publikacji
-    User->>UI: "Dodaj nową publikację"
-    UI-->>User: Formularz z polem DOI/dane ręczne
-    User->>UI: Podaj DOI publikacji
+    User->>UI: Open "Publications" module
+    UI->>PS: Get publications list
+    PS-->>UI: List of existing publications
+    User->>UI: "Add new publication"
+    UI-->>User: Form with DOI field/manual data
+    User->>UI: Provide publication DOI
     UI->>PS: createPublication(doi)
-    PS->>EXT: Pobierz metadane (CrossRef/arXiv)
-    EXT-->>PS: Metadane publikacji (tytuł, autorzy, rok, etc.)
-    PS->>RS: Zapisz Publication
+    PS->>EXT: Fetch metadata (CrossRef/arXiv)
+    EXT-->>PS: Publication metadata (title, authors, year, etc.)
+    PS->>RS: Save Publication
     RS-->>PS: publication_id
-    PS-->>UI: Publikacja utworzona
-    UI-->>User: "Publikacja zapisana"
-    User->>UI: Wybierz algorytm X do powiązania
-    UI->>AR: Pobierz algorytm X
-    AR-->>UI: Szczegóły algorytmu
-    User->>UI: Powiąż publikację z algorytmem
+    PS-->>UI: Publication created
+    UI-->>User: "Publication saved"
+    User->>UI: Select algorithm X to link
+    UI->>AR: Get algorithm X
+    AR-->>UI: Algorithm details
+    User->>UI: Link publication with algorithm
     UI->>PS: createPublicationLink(publication_id, algorithm_id)
-    PS->>RS: Zapisz PublicationLink
-    PS-->>UI: Powiązanie utworzone
-    UI-->>User: "Publikacja powiązana z algorytmem"
-    UI->>AR: Odśwież widok algorytmu
-    AR-->>UI: Algorytm z powiązanymi publikacjami
+    PS->>RS: Save PublicationLink
+    PS-->>UI: Link created
+    UI-->>User: "Publication linked with algorithm"
+    UI->>AR: Refresh algorithm view
+    AR-->>UI: Algorithm with linked publications
 ```
 
-#### Diagram sekwencji - Scenariusz alternatywny - DOI nieznalezione
+#### Sequence Diagram - Alternative Scenario - DOI Not Found
 ```mermaid
 ---
 config:
   theme: redux-dark-color
 ---
 sequenceDiagram
-    participant User as Użytkownik
+    participant User as User
     participant UI as Web UI
     participant PS as Publication Service
-    participant EXT as Zewnętrzny system bibliograficzny
-    User->>UI: Podaj nieistniejący DOI
+    participant EXT as External Bibliography System
+    User->>UI: Provide non-existent DOI
     UI->>PS: createPublication(invalid_doi)
-    PS->>EXT: Pobierz metadane
+    PS->>EXT: Fetch metadata
     EXT-->>PS: 404 Not Found
-    PS-->>UI: DOI nie znalezione
-    UI-->>User: "DOI nie znalezione. Wprowadź dane ręcznie"
-    User->>UI: Wypełnij formularz ręcznie
-    User->>UI: Podaj tytuł, autorów, rok, czasopismo
+    PS-->>UI: DOI not found
+    UI-->>User: "DOI not found. Enter data manually"
+    User->>UI: Fill form manually
+    User->>UI: Provide title, authors, year, journal
     UI->>PS: createPublication(manual_data)
-    PS->>PS: Waliduj dane ręczne
-    PS-->>UI: Publikacja utworzona (dane ręczne)
-    UI-->>User: "Publikacja zapisana z danymi ręcznymi"
+    PS->>PS: Validate manual data
+    PS-->>UI: Publication created (manual data)
+    UI-->>User: "Publication saved with manual data"
 ```
 
-#### Diagram aktywności - Zarządzanie powiązaniami
+#### Activity Diagram - Link Management
 ```mermaid
 ---
 config:
@@ -887,58 +887,58 @@ config:
   layout: elk
 ---
 flowchart TB
-    ViewLinks["Wyświetl powiązania"] --> FilterLinks{"Filtruj powiązania?"}
-    FilterLinks -- Tak --> ApplyFilter["Zastosuj filtry"]
-    FilterLinks -- Nie --> ShowAllLinks["Pokaż wszystkie powiązania"]
-    ApplyFilter --> ShowFilteredLinks["Pokaż przefiltrowane"]
-    ShowAllLinks --> SelectLink{"Wybierz powiązanie?"}
+    ViewLinks["Display links"] --> FilterLinks{"Filter links?"}
+    FilterLinks -- Yes --> ApplyFilter["Apply filters"]
+    FilterLinks -- No --> ShowAllLinks["Show all links"]
+    ApplyFilter --> ShowFilteredLinks["Show filtered"]
+    ShowAllLinks --> SelectLink{"Select link?"}
     ShowFilteredLinks --> SelectLink
-    SelectLink -- Nie --> End(["Koniec"])
-    SelectLink -- Tak --> ChooseLinkAction{"Wybierz akcję"}
-    ChooseLinkAction --> EditLink["Edytuj powiązanie"] & DeleteLink["Usuń powiązanie"] & ViewDetails["Wyświetl szczegóły"]
-    EditLink --> UpdateLink["Zaktualizuj powiązanie"]
-    DeleteLink --> ConfirmDelete{"Potwierdź usunięcie?"}
-    ConfirmDelete -- Tak --> RemoveLink["Usuń powiązanie"]
-    ConfirmDelete -- Nie --> SelectLink
+    SelectLink -- No --> End(["End"])
+    SelectLink -- Yes --> ChooseLinkAction{"Choose action"}
+    ChooseLinkAction --> EditLink["Edit link"] & DeleteLink["Delete link"] & ViewDetails["View details"]
+    EditLink --> UpdateLink["Update link"]
+    DeleteLink --> ConfirmDelete{"Confirm deletion?"}
+    ConfirmDelete -- Yes --> RemoveLink["Remove link"]
+    ConfirmDelete -- No --> SelectLink
     ViewDetails --> SelectLink
-    UpdateLink --> RefreshView["Odśwież widok"]
+    UpdateLink --> RefreshView["Refresh view"]
     RemoveLink --> RefreshView
     RefreshView --> End
 ```
 
 ---
 
-## UC7: Uruchom system lokalnie na PC
+## UC7: Run system locally on PC
 
-### 📋 Podstawowe informacje
+### Basic Information
 
-| Właściwość | Wartość |
+| Property | Value |
 |------------|---------|
-| **Aktorzy główni** | Administrator |
-| **Cel** | Deployment systemu w środowisku PC/laboratoryjnym |
-| **Poziom** | System goal |
+| **Primary actors** | Administrator |
+| **Goal** | System deployment in PC/laboratory environment |
+| **Level** | System goal |
 
-### 📝 Główny scenariusz
+### Main Scenario
 
-1. **Przygotowanie środowiska**
-   - Instalacja Docker i docker-compose
-   - Klonowanie repozytorium z konfiguracją
+1. **Environment preparation**
+   - Docker and docker-compose installation
+   - Clone repository with configuration
 
-2. **Konfiguracja**
-   - Edycja plików konfiguracyjnych
-   - Ustawienie zmiennych środowiskowych
+2. **Configuration**
+   - Configuration files editing
+   - Environment variables setup
 
-3. **Uruchomienie**
-   - Wykonanie `docker-compose up`
-   - Weryfikacja działania wszystkich serwisów
+3. **Startup**
+   - Execute `docker-compose up`
+   - Verify all services operation
 
-4. **Inicjalizacja danych**
-   - Import przykładowych benchmarków
-   - Konfiguracja wbudowanych algorytmów
+4. **Data initialization**
+   - Import sample benchmarks
+   - Configure built-in algorithms
 
-### 📊 Diagramy
+### Diagrams
 
-#### Diagram aktywności
+#### Activity Diagram
 ```mermaid
 ---
 config:
@@ -946,42 +946,42 @@ config:
   theme: redux-dark
 ---
 flowchart TB
-    Start(["Start"]) --> CheckDocker{"Docker zainstalowany?"}
-    CheckDocker -- Nie --> InstallDocker["Zainstaluj Docker"]
-    CheckDocker -- Tak --> CloneRepo["Sklonuj repozytorium konfiguracji"]
+    Start(["Start"]) --> CheckDocker{"Docker installed?"}
+    CheckDocker -- No --> InstallDocker["Install Docker"]
+    CheckDocker -- Yes --> CloneRepo["Clone configuration repository"]
     InstallDocker --> CloneRepo
-    CloneRepo --> ConfigureEnv["Skonfiguruj plik .env"]
-    ConfigureEnv --> CheckPorts{"Porty dostępne?"}
-    CheckPorts -- Nie --> ModifyPorts["Zmodyfikuj porty w docker-compose.yml"]
-    CheckPorts -- Tak --> StartContainers["docker-compose up -d"]
+    CloneRepo --> ConfigureEnv["Configure .env file"]
+    ConfigureEnv --> CheckPorts{"Ports available?"}
+    CheckPorts -- No --> ModifyPorts["Modify ports in docker-compose.yml"]
+    CheckPorts -- Yes --> StartContainers["docker-compose up -d"]
     ModifyPorts --> StartContainers
-    StartContainers --> WaitInit["Czekaj na inicjalizację kontenerów"]
-    WaitInit --> CheckDB{"DB gotowa?"}
-    CheckDB -- Nie --> FixDBIssues["Napraw problemy z DB"]
-    CheckDB -- Tak --> CheckBroker{"Message Broker gotowy?"}
+    StartContainers --> WaitInit["Wait for container initialization"]
+    WaitInit --> CheckDB{"DB ready?"}
+    CheckDB -- No --> FixDBIssues["Fix DB issues"]
+    CheckDB -- Yes --> CheckBroker{"Message Broker ready?"}
     FixDBIssues --> CheckDB
-    CheckBroker -- Nie --> FixBrokerIssues["Napraw problemy z Brokerem"]
-    CheckBroker -- Tak --> CheckAPI{"API Gateway gotowy?"}
+    CheckBroker -- No --> FixBrokerIssues["Fix Broker issues"]
+    CheckBroker -- Yes --> CheckAPI{"API Gateway ready?"}
     FixBrokerIssues --> CheckBroker
-    CheckAPI -- Nie --> FixAPIIssues["Napraw problemy z API"]
-    CheckAPI -- Tak --> CheckWorkers{"Workery gotowe?"}
+    CheckAPI -- No --> FixAPIIssues["Fix API issues"]
+    CheckAPI -- Yes --> CheckWorkers{"Workers ready?"}
     FixAPIIssues --> CheckAPI
-    CheckWorkers -- Nie --> FixWorkerIssues["Napraw problemy z Workerami"]
-    CheckWorkers -- Tak --> CheckUI{"Web UI dostępny?"}
+    CheckWorkers -- No --> FixWorkerIssues["Fix Worker issues"]
+    CheckWorkers -- Yes --> CheckUI{"Web UI available?"}
     FixWorkerIssues --> CheckWorkers
-    CheckUI -- Nie --> FixUIIssues["Napraw problemy z UI"]
-    CheckUI -- Tak --> VerifyHealth["Sprawdź health-check endpoints"]
+    CheckUI -- No --> FixUIIssues["Fix UI issues"]
+    CheckUI -- Yes --> VerifyHealth["Check health-check endpoints"]
     FixUIIssues --> CheckUI
-    VerifyHealth --> HealthOK{"Wszystkie serwisy OK?"}
-    HealthOK -- Nie --> DiagnoseIssues["Diagnozuj problemy z logów"]
-    HealthOK -- Tak --> OpenBrowser["Otwórz Web UI w przeglądarce"]
-    DiagnoseIssues --> FixIssues["Napraw zidentyfikowane problemy"]
+    VerifyHealth --> HealthOK{"All services OK?"}
+    HealthOK -- No --> DiagnoseIssues["Diagnose issues from logs"]
+    HealthOK -- Yes --> OpenBrowser["Open Web UI in browser"]
+    DiagnoseIssues --> FixIssues["Fix identified issues"]
     FixIssues --> VerifyHealth
-    OpenBrowser --> SystemReady["System gotowy do użycia"]
-    SystemReady --> End(["Koniec - sukces"])
+    OpenBrowser --> SystemReady["System ready for use"]
+    SystemReady --> End(["End - success"])
 ```
 
-#### Diagram sekwencji - Główny scenariusz
+#### Sequence Diagram - Main Scenario
 ```mermaid
 ---
 config:
@@ -997,31 +997,31 @@ sequenceDiagram
     participant WR as Worker Runtime
     participant UI as Web UI
     participant MON as Monitoring
-    A3->>A3: Sklonuj repo, skonfiguruj .env
+    A3->>A3: Clone repo, configure .env
     A3->>Docker: docker-compose up -d
-    Docker->>DB: Uruchom kontener PostgreSQL
-    Docker->>MB: Uruchom kontener RabbitMQ
-    Docker->>API: Uruchom kontener API Gateway
-    Docker->>ETS: Uruchom kontener Tracking Service
-    Docker->>WR: Uruchom kontener(y) Worker Runtime
-    Docker->>UI: Uruchom kontener Web UI
-    Docker->>MON: Uruchom kontener Monitoring (opcjonalnie)
-    DB->>DB: Inicjalizuj bazę danych
-    MB->>MB: Utwórz kolejki (RunJob, etc.)
-    API->>DB: Połącz z bazą danych
-    API->>MB: Połącz z Message Brokerem
-    ETS->>DB: Wykonaj migracje schematu
-    WR->>MB: Subskrybuj kolejkę RunJob
-    UI->>API: Sprawdź połączenie z API
-    A3->>Docker: docker ps (sprawdź statusy)
-    Docker-->>A3: Wszystkie kontenery uruchomione
+    Docker->>DB: Start PostgreSQL container
+    Docker->>MB: Start RabbitMQ container
+    Docker->>API: Start API Gateway container
+    Docker->>ETS: Start Tracking Service container
+    Docker->>WR: Start Worker Runtime container(s)
+    Docker->>UI: Start Web UI container
+    Docker->>MON: Start Monitoring container (optional)
+    DB->>DB: Initialize database
+    MB->>MB: Create queues (RunJob, etc.)
+    API->>DB: Connect to database
+    API->>MB: Connect to Message Broker
+    ETS->>DB: Execute schema migrations
+    WR->>MB: Subscribe to RunJob queue
+    UI->>API: Check API connection
+    A3->>Docker: docker ps (check statuses)
+    Docker-->>A3: All containers running
     A3->>API: curl http://localhost:8080/healthz
     API-->>A3: HTTP 200 OK
-    A3->>UI: Otwórz http://localhost:3000
-    UI-->>A3: Strona logowania/główna wyświetlona
+    A3->>UI: Open http://localhost:3000
+    UI-->>A3: Login/main page displayed
 ```
 
-#### Diagram sekwencji - Scenariusz alternatywny - Konflikt portów
+#### Sequence Diagram - Alternative Scenario - Port Conflict
 ```mermaid
 ---
 config:
@@ -1032,18 +1032,18 @@ sequenceDiagram
     participant Docker as Docker Engine
     participant System as System (port already in use)
     A3->>Docker: docker-compose up -d
-    Docker->>System: Próba bindowania portu 8080
+    Docker->>System: Attempt to bind port 8080
     System-->>Docker: Error: Port 8080 already in use
     Docker-->>A3: Startup error - port conflict
-    A3->>A3: Edytuj docker-compose.yml (8080 → 8081)
-    A3->>A3: Aktualizuj .env (UI_PORT=8081)
+    A3->>A3: Edit docker-compose.yml (8080 → 8081)
+    A3->>A3: Update .env (UI_PORT=8081)
     A3->>Docker: docker-compose up -d
-    Docker->>System: Próba bindowania portu 8081
+    Docker->>System: Attempt to bind port 8081
     System-->>Docker: Port 8081 available
-    Docker-->>A3: Kontenery uruchomione poprawnie
+    Docker-->>A3: Containers started correctly
 ```
 
-#### Diagram aktywności - Diagnoza problemów
+#### Activity Diagram - Troubleshooting
 ```mermaid
 ---
 config:
@@ -1051,57 +1051,57 @@ config:
   layout: elk
 ---
 flowchart TB
-    ContainerFail["Kontener się nie uruchamia"] --> CheckLogs["Sprawdź logi kontenera"]
-    CheckLogs --> LogType{"Typ błędu"}
+    ContainerFail["Container fails to start"] --> CheckLogs["Check container logs"]
+    CheckLogs --> LogType{"Error type"}
     LogType --> PermissionError["Volume permission error"] & ConfigError["Configuration error"] & ResourceError["Resource shortage"] & NetworkError["Network/connection error"]
-    PermissionError --> FixPermissions["Popraw uprawnienia do katalogów"]
-    ConfigError --> FixConfig["Popraw konfigurację w .env"]
-    ResourceError --> FreeResources["Zwolnij zasoby lub zwiększ limity"]
-    NetworkError --> CheckNetwork["Sprawdź sieci Docker"]
-    FixPermissions --> RestartContainer["Restartuj kontener"]
+    PermissionError --> FixPermissions["Fix directory permissions"]
+    ConfigError --> FixConfig["Fix configuration in .env"]
+    ResourceError --> FreeResources["Free resources or increase limits"]
+    NetworkError --> CheckNetwork["Check Docker networks"]
+    FixPermissions --> RestartContainer["Restart container"]
     FixConfig --> RestartContainer
     FreeResources --> RestartContainer
-    CheckNetwork --> FixNetworkIssue["Napraw problemy sieci"]
+    CheckNetwork --> FixNetworkIssue["Fix network issues"]
     FixNetworkIssue --> RestartContainer
-    RestartContainer --> TestAgain["Przetestuj ponownie"]
-    TestAgain --> Success{"Sukces?"}
-    Success -- Tak --> End(["Problem rozwiązany"])
-    Success -- Nie --> CheckLogs
+    RestartContainer --> TestAgain["Test again"]
+    TestAgain --> Success{"Success?"}
+    Success -- Yes --> End(["Problem resolved"])
+    Success -- No --> CheckLogs
 ```
 
 ---
 
-## UC8: Uruchom system w chmurze / skaluj workerów
+## UC8: Run system in cloud / scale workers
 
-### 📋 Podstawowe informacje
+### Basic Information
 
-| Właściwość | Wartość |
+| Property | Value |
 |------------|---------|
-| **Aktorzy główni** | Administrator DevOps/SRE |
-| **Cel** | Deployment i skalowanie systemu w środowisku chmurowym |
-| **Poziom** | System goal |
+| **Primary actors** | DevOps/SRE Administrator |
+| **Goal** | System deployment and scaling in cloud environment |
+| **Level** | System goal |
 
-### 📝 Główny scenariusz
+### Main Scenario
 
-1. **Przygotowanie infrastruktury**
-   - Konfiguracja klastra Kubernetes
-   - Ustawienie zarządzanych usług (DB, Storage, Message Broker)
+1. **Infrastructure preparation**
+   - Kubernetes cluster configuration
+   - Managed services setup (DB, Storage, Message Broker)
 
-2. **Deployment aplikacji**
-   - Zastosowanie manifestów Kubernetes
-   - Konfiguracja load balancerów i ingress
+2. **Application deployment**
+   - Apply Kubernetes manifests
+   - Load balancers and ingress configuration
 
-3. **Skalowanie**
-   - Konfiguracja HPA (Horizontal Pod Autoscaler)
-   - Monitoring obciążenia i automatyczne skalowanie workerów
+3. **Scaling**
+   - HPA (Horizontal Pod Autoscaler) configuration
+   - Load monitoring and automatic worker scaling
 
-4. **Monitoring i alerting**
-   - Deployment stacku monitorującego
-   - Konfiguracja alertów i dashboardów
+4. **Monitoring and alerting**
+   - Monitoring stack deployment
+   - Alerts and dashboards configuration
 
-### 📊 Diagramy
+### Diagrams
 
-#### Diagram aktywności
+#### Activity Diagram
 ```mermaid
 ---
 config:
@@ -1109,40 +1109,40 @@ config:
   theme: redux-dark
 ---
 flowchart TB
-    Start(["Start"]) --> PrepareConfig["Przygotuj konfigurację chmurową"]
-    PrepareConfig --> CommitChanges["Commit zmiany do repozytorium"]
-    CommitChanges --> TriggerPipeline["CI/CD wykrywa zmiany"]
-    TriggerPipeline --> RunPipeline["Uruchom pipeline wdrożeniowy"]
+    Start(["Start"]) --> PrepareConfig["Prepare cloud configuration"]
+    PrepareConfig --> CommitChanges["Commit changes to repository"]
+    CommitChanges --> TriggerPipeline["CI/CD detects changes"]
+    TriggerPipeline --> RunPipeline["Run deployment pipeline"]
     RunPipeline --> ValidateManifests{"Manifesty poprawne?"}
-    ValidateManifests -- Nie --> FixManifests["Popraw manifesty/konfigurację"]
+    ValidateManifests -- No --> FixManifests["Fix manifests/configuration"]
     FixManifests --> CommitChanges
-    ValidateManifests -- Tak --> DeployToK8s["Wdróż do Kubernetes"]
-    DeployToK8s --> CheckResources{"Wystarczające zasoby?"}
-    CheckResources -- Nie --> ScaleCluster["Zwiększ zasoby klastra"]
-    CheckResources -- Tak --> CreatePods["Utwórz/zaktualizuj pody"]
+    ValidateManifests -- Yes --> DeployToK8s["Deploy to Kubernetes"]
+    DeployToK8s --> CheckResources{"Sufficient resources?"}
+    CheckResources -- No --> ScaleCluster["Increase cluster resources"]
+    CheckResources -- Yes --> CreatePods["Create/update pods"]
     ScaleCluster --> CreatePods
-    CreatePods --> WaitForPods["Czekaj na uruchomienie podów"]
+    CreatePods --> WaitForPods["Wait for pod startup"]
     WaitForPods --> CheckHealth{"Health checks OK?"}
-    CheckHealth -- Nie --> DiagnosePods["Diagnozuj problemy podów"]
-    CheckHealth -- Tak --> SetupMonitoring["Skonfiguruj monitoring"]
-    DiagnosePods --> FixPodIssues["Napraw problemy podów"]
+    CheckHealth -- No --> DiagnosePods["Diagnose pod issues"]
+    CheckHealth -- Yes --> SetupMonitoring["Configure monitoring"]
+    DiagnosePods --> FixPodIssues["Fix pod issues"]
     FixPodIssues --> CheckHealth
-    SetupMonitoring --> ConfigureHPA["Skonfiguruj HPA dla workerów"]
-    ConfigureHPA --> TestHPA["Przetestuj skalowanie HPA"]
-    TestHPA --> HPAWorks{"HPA działa poprawnie?"}
-    HPAWorks -- Nie --> FixHPA["Napraw konfigurację HPA"]
+    SetupMonitoring --> ConfigureHPA["Configure HPA for workers"]
+    ConfigureHPA --> TestHPA["Test HPA scaling"]
+    TestHPA --> HPAWorks{"HPA works correctly?"}
+    HPAWorks -- No --> FixHPA["Fix HPA configuration"]
     FixHPA --> TestHPA
-    HPAWorks -- Tak --> ExposeServices["Skonfiguruj Ingress/LoadBalancer"]
-    ExposeServices --> TestAccess["Przetestuj dostęp do Web UI"]
-    TestAccess --> AccessOK{"Dostęp OK?"}
-    AccessOK -- Nie --> FixIngress["Napraw konfigurację Ingress"]
+    HPAWorks -- Yes --> ExposeServices["Configure Ingress/LoadBalancer"]
+    ExposeServices --> TestAccess["Test Web UI access"]
+    TestAccess --> AccessOK{"Access OK?"}
+    AccessOK -- No --> FixIngress["Fix Ingress configuration"]
     FixIngress --> TestAccess
-    AccessOK -- Tak --> SystemReady["System gotowy w chmurze"]
-    SystemReady --> MonitorSystem["Monitoruj system i skalowanie"]
-    MonitorSystem --> End(["Koniec - sukces"])
+    AccessOK -- Yes --> SystemReady["System ready in cloud"]
+    SystemReady --> MonitorSystem["Monitor system and scaling"]
+    MonitorSystem --> End(["End - success"])
 ```
 
-#### Diagram sekwencji - Główny scenariusz
+#### Sequence Diagram - Main Scenario
 ```mermaid
 ---
 config:
@@ -1153,34 +1153,34 @@ sequenceDiagram
     participant Git as Git Repository
     participant CICD as CI/CD Pipeline
     participant K8s as Kubernetes API
-    participant Pods as Pody aplikacji
+    participant Pods as Application Pods
     participant HPA as HPA Controller
     participant Prom as Prometheus
     participant LB as LoadBalancer
-    A3->>A3: Przygotuj values-cloud.yaml
-    A3->>Git: Commit konfiguracji chmurowej
+    A3->>A3: Prepare values-cloud.yaml
+    A3->>Git: Commit cloud configuration
     Git->>CICD: Trigger webhook
-    CICD->>CICD: Uruchom pipeline (helm upgrade)
-    CICD->>K8s: Aplikuj manifesty/chart
-    K8s->>K8s: Utwórz Deployments, Services, ConfigMaps
-    K8s->>Pods: Uruchom pody (API, Tracking, Workers, UI)
-    loop Pody startują
-        Pods->>Pods: API Gateway łączy się z DB/Broker
-        Pods->>Pods: Tracking Service wykonuje migracje
-        Pods->>Pods: Workers subskrybują kolejki
-        Pods->>Pods: Web UI startuje serwer HTTP
+    CICD->>CICD: Run pipeline (helm upgrade)
+    CICD->>K8s: Apply manifests/chart
+    K8s->>K8s: Create Deployments, Services, ConfigMaps
+    K8s->>Pods: Start pods (API, Tracking, Workers, UI)
+    loop Pods starting
+        Pods->>Pods: API Gateway connects to DB/Broker
+        Pods->>Pods: Tracking Service executes migrations
+        Pods->>Pods: Workers subscribe to queues
+        Pods->>Pods: Web UI starts HTTP server
     end
     Pods-->>K8s: Health checks OK
-    K8s->>Prom: Rozpocznij zbieranie metryk
-    Prom->>HPA: Udostępnij metryki (CPU, queue length)
-    K8s->>HPA: Aktywuj HPA dla Worker Deployment
-    K8s->>LB: Skonfiguruj Ingress/LoadBalancer
-    LB-->>A3: Web UI dostępny publicznie
-    Note over HPA,Prom: Continuous monitoring i skalowanie
-    HPA->>Prom: Sprawdź metryki co 30s
+    K8s->>Prom: Start collecting metrics
+    Prom->>HPA: Provide metrics (CPU, queue length)
+    K8s->>HPA: Activate HPA for Worker Deployment
+    K8s->>LB: Configure Ingress/LoadBalancer
+    LB-->>A3: Web UI publicly available
+    Note over HPA,Prom: Continuous monitoring and scaling
+    HPA->>Prom: Check metrics every 30s
     Prom-->>HPA: CPU 80%, queue_length=100
-    HPA->>K8s: Zwiększ repliki Workers (2→5)
-    K8s->>Pods: Uruchom 3 dodatkowe Worker pody
+    HPA->>K8s: Increase Worker replicas (2→5)
+    K8s->>Pods: Start 3 additional Worker pods
 ```
 
 #### Sequence diagram - Alternative scenario - Cluster resource error
@@ -1192,30 +1192,30 @@ config:
 sequenceDiagram
     participant CICD as CI/CD Pipeline
     participant K8s as Kubernetes API
-    participant Nodes as Węzły klastra
-    participant A3 as Administrator DevOps
-    CICD->>K8s: Aplikuj Deployment z dużymi request'ami
-    K8s->>Nodes: Próba schedulowania podów
+    participant Nodes as Cluster Nodes
+    participant A3 as DevOps Administrator
+    CICD->>K8s: Apply Deployment with large requests
+    K8s->>Nodes: Attempt pod scheduling
     Nodes-->>K8s: Insufficient CPU/Memory
-    K8s-->>CICD: Pody w stanie Pending
+    K8s-->>CICD: Pods in Pending state
     CICD-->>A3: Alert: Deployment failed - resource constraints
-    A3->>A3: Sprawdź kubectl describe pods
-    A3->>A3: Analiza: need more CPU/RAM
-    alt Zwiększ zasoby klastra
-        A3->>Nodes: Add nody lub scale up
-        Nodes-->>K8s: Nowe zasoby dostępne
+    A3->>A3: Check kubectl describe pods
+    A3->>A3: Analysis: need more CPU/RAM
+    alt Increase cluster resources
+        A3->>Nodes: Add nodes or scale up
+        Nodes-->>K8s: New resources available
         K8s->>Nodes: Schedule pending pods
-    else Zmniejsz requirements
-        A3->>A3: Zmniejsz requests w values-cloud.yaml
-        A3->>CICD: Commit nowej konfiguracji
+    else Reduce requirements
+        A3->>A3: Reduce requests in values-cloud.yaml
+        A3->>CICD: Commit new configuration
         CICD->>K8s: Update Deployment
-        K8s->>Nodes: Schedule z mniejszymi wymaganiami
+        K8s->>Nodes: Schedule with lower requirements
     end
-    Nodes-->>K8s: Pody uruchomione
-    K8s-->>A3: Deployment sukces
+    Nodes-->>K8s: Pods running
+    K8s-->>A3: Deployment success
 ```
 
-#### Diagram aktywności - Automatyczne skalowanie HPA
+#### Activity Diagram - HPA Automatic Scaling
 ```mermaid
 ---
 config:
@@ -1223,18 +1223,18 @@ config:
   theme: redux-dark
 ---
 flowchart TB
-    MonitorLoad["Monitor obciążenia"] --> CheckMetrics{"Sprawdź metryki"}
-    CheckMetrics --> HighLoad{"Wysokie obciążenie?"}
-    HighLoad -- Tak --> CalculateReplicas["Oblicz potrzebną liczbę replik"]
-    HighLoad -- Nie --> LowLoad{"Niskie obciążenie?"}
-    LowLoad -- Tak --> ScaleDown["Zmniejsz liczbę replik"]
-    LowLoad -- Nie --> Wait["Czekaj 30s"]
-    CalculateReplicas --> CheckMax{"Poniżej max replik?"}
-    CheckMax -- Tak --> ScaleUp["Zwiększ liczbę replik"]
-    CheckMax -- Nie --> MaxReached["Osiągnięto maksimum"]
-    ScaleUp --> UpdateDeployment["Zaktualizuj Deployment"]
+    MonitorLoad["Monitor load"] --> CheckMetrics{"Check metrics"}
+    CheckMetrics --> HighLoad{"High load?"}
+    HighLoad -- Yes --> CalculateReplicas["Calculate required replicas"]
+    HighLoad -- No --> LowLoad{"Low load?"}
+    LowLoad -- Yes --> ScaleDown["Reduce replicas count"]
+    LowLoad -- No --> Wait["Wait 30s"]
+    CalculateReplicas --> CheckMax{"Below max replicas?"}
+    CheckMax -- Yes --> ScaleUp["Increase replicas count"]
+    CheckMax -- No --> MaxReached["Maximum reached"]
+    ScaleUp --> UpdateDeployment["Update Deployment"]
     ScaleDown --> UpdateDeployment
-    UpdateDeployment --> WaitStabilize["Czekaj na stabilizację"]
+    UpdateDeployment --> WaitStabilize["Wait for stabilization"]
     WaitStabilize --> MonitorLoad
     MaxReached --> Wait
     Wait --> MonitorLoad
@@ -1242,37 +1242,37 @@ flowchart TB
 
 ---
 
-## UC9: Wygeneruj raport z eksperymentu
+## UC9: Generate experiment report
 
-### 📋 Podstawowe informacje
+### Basic Information
 
-| Właściwość | Wartość |
+| Property | Value |
 |------------|---------|
-| **Aktorzy główni** | Badacz / Inżynier ML |
-| **Cel** | Generowanie raportu z wyników eksperymentu do publikacji |
-| **Poziom** | User goal |
+| **Primary actors** | Researcher / ML Engineer |
+| **Goal** | Generate experiment results report for publication |
+| **Level** | User goal |
 
-### 📝 Główny scenariusz
+### Main Scenario
 
-1. **Wybór eksperymentu**
-   - Badacz wybiera zakończony eksperyment
-   - System ładuje pełne dane eksperymentu
+1. **Experiment selection**
+   - Researcher selects completed experiment
+   - System loads complete experiment data
 
-2. **Konfiguracja raportu**
-   - Wybór szablonu raportu (HTML, PDF, LaTeX)
-   - Selekcja sekcji do uwzględnienia
+2. **Report configuration**
+   - Report template selection (HTML, PDF, LaTeX)
+   - Section selection to include
 
-3. **Generowanie**
-   - System agreguje dane z wielu źródeł
-   - Tworzenie wizualizacji i tabel wyników
+3. **Generation**
+   - System aggregates data from multiple sources
+   - Create visualizations and results tables
 
-4. **Finalny raport**
-   - Wygenerowanie pliku raportu
-   - Udostępnienie linku do pobrania
+4. **Final report**
+   - Generate report file
+   - Provide download link
 
-### 📊 Diagramy
+### Diagrams
 
-#### Diagram aktywności
+#### Activity Diagram
 ```mermaid
 ---
 config:
@@ -1280,39 +1280,39 @@ config:
   theme: redux-dark
 ---
 flowchart TB
-    Start(["Start"]) --> OpenReports["Otwórz widok raportów"]
-    OpenReports --> SelectExperiments["Wybierz eksperyment/y/"]
-    SelectExperiments --> SelectScope["Wybierz zakres raportu"]
-    SelectScope --> SelectFormat["Wybierz format raportu"]
-    SelectFormat --> SelectTemplate["Wybierz szablon raportu"]
-    SelectTemplate --> ValidateSelection{"Walidacja wyboru"}
+    Start(["Start"]) --> OpenReports["Open reports view"]
+    OpenReports --> SelectExperiments["Select experiment(s)"]
+    SelectExperiments --> SelectScope["Select report scope"]
+    SelectScope --> SelectFormat["Select report format"]
+    SelectFormat --> SelectTemplate["Select report template"]
+    SelectTemplate --> ValidateSelection{"Selection validation"}
     ValidateSelection -- Error --> ShowValidationError["Display validation errors"]
     ShowValidationError --> SelectExperiments
-    ValidateSelection -- OK --> GenerateReport["Kliknij: Generuj raport"]
-    GenerateReport --> CheckDataAvailable{"Dane dostępne?"}
+    ValidateSelection -- OK --> GenerateReport["Click: Generate report"]
+    GenerateReport --> CheckDataAvailable{"Data available?"}
     CheckDataAvailable -- No --> ShowDataError["Display data unavailable error"]
-    ShowDataError --> End(["Koniec"])
-    CheckDataAvailable -- Tak --> ProcessReport["Przetwórz raport"]
-    ProcessReport --> CheckTimeout{"Timeout generowania?"}
+    ShowDataError --> End(["End"])
+    CheckDataAvailable -- Yes --> ProcessReport["Process report"]
+    ProcessReport --> CheckTimeout{"Generation timeout?"}
     CheckTimeout -- Yes --> ShowTimeoutError["Display timeout error"]
     ShowTimeoutError --> End
-    CheckTimeout -- Nie --> SaveToStorage["Zapisz raport do Object Storage"]
+    CheckTimeout -- No --> SaveToStorage["Save report to Object Storage"]
     SaveToStorage --> ReturnURL["Return report URL"]
-    ReturnURL --> ShowDownloadLink["Wyświetl link do pobrania"]
-    ShowDownloadLink --> UserChoice{"Wybór użytkownika"}
-    UserChoice --> DownloadReport["Pobierz raport"] & ViewInBrowser["Otwórz w przeglądarce"] & End
+    ReturnURL --> ShowDownloadLink["Display download link"]
+    ShowDownloadLink --> UserChoice{"User choice"}
+    UserChoice --> DownloadReport["Download report"] & ViewInBrowser["Open in browser"] & End
     DownloadReport --> End
     ViewInBrowser --> End
 ```
 
-#### Diagram sekwencji - Główny scenariusz
+#### Sequence Diagram - Main Scenario
 ```mermaid
 ---
 config:
   theme: redux-dark-color
 ---
 sequenceDiagram
-    participant User as Użytkownik
+    participant User as User
     participant UI as Web UI
     participant RG as Report Generator Service
     participant ETS as Experiment Tracking Service
@@ -1320,59 +1320,59 @@ sequenceDiagram
     participant PS as Publication Service
     participant OS as Object Storage
     participant RS as Results Store
-    User->>UI: Otwórz widok raportów
-    UI->>ETS: Pobierz listę eksperymentów
-    ETS-->>UI: Lista eksperymentów
-    User->>UI: Wybierz eksperyment X + parametry raportu
-    User->>UI: Kliknij "Generuj raport"
+    User->>UI: Open reports view
+    UI->>ETS: Get experiments list
+    ETS-->>UI: Experiments list
+    User->>UI: Select experiment X + report parameters
+    User->>UI: Click "Generate report"
     UI->>RG: generateReport(experiment_id, format, template)
-    RG->>ETS: Pobierz metadane eksperymentu
-    ETS-->>RG: Szczegóły eksperymentu
-    RG->>RS: Pobierz wyniki i metryki runów
-    RS-->>RG: Dane runów
-    RG->>MAS: Pobierz agregaty i analizy
-    MAS-->>RG: Dane analityczne
-    RG->>PS: Pobierz powiązane publikacje
-    PS-->>RG: Metadane publikacji
-    RG->>RG: Składanie danych w model raportu
-    RG->>RG: Renderowanie do formatu (HTML/PDF)
-    RG->>OS: Zapisz raport
-    OS-->>RG: URL raportu
-    RG-->>UI: Raport gotowy (URL)
-    UI-->>User: Link/przycisk "Pobierz raport"
-    alt Użytkownik pobiera raport
-        User->>OS: Pobierz raport z URL
-        OS-->>User: Plik raportu
-    else Użytkownik otwiera w przeglądarce
-        User->>OS: Otwórz raport w przeglądarce
-        OS-->>User: Raport wyświetlony
+    RG->>ETS: Get experiment metadata
+    ETS-->>RG: Experiment details
+    RG->>RS: Get results and run metrics
+    RS-->>RG: Run data
+    RG->>MAS: Get aggregates and analyses
+    MAS-->>RG: Analytical data
+    RG->>PS: Get related publications
+    PS-->>RG: Publication metadata
+    RG->>RG: Compose data into report model
+    RG->>RG: Render to format (HTML/PDF)
+    RG->>OS: Save report
+    OS-->>RG: Report URL
+    RG-->>UI: Report ready (URL)
+    UI-->>User: Link/button "Download report"
+    alt User downloads report
+        User->>OS: Download report from URL
+        OS-->>User: Report file
+    else User opens in browser
+        User->>OS: Open report in browser
+        OS-->>User: Report displayed
     end
 ```
 
-#### Diagram sekwencji - Scenariusz alternatywny - Błąd generowania
+#### Sequence Diagram - Alternative Scenario - Generation Error
 ```mermaid
 ---
 config:
   theme: redux-dark-color
 ---
 sequenceDiagram
-    participant User as Użytkownik
+    participant User as User
     participant UI as Web UI
     participant RG as Report Generator Service
     participant ETS as Experiment Tracking Service
     participant RS as Results Store
-    User->>UI: Generuj raport dla eksperymentu Z
+    User->>UI: Generate report for experiment Z
     UI->>RG: generateReport(experiment_id_Z, PDF, detailed)
-    RG->>ETS: Pobierz metadane eksperymentu Z
-    ETS-->>RG: Eksperyment istnieje
-    RG->>RS: Pobierz wyniki runów
+    RG->>ETS: Get experiment Z metadata
+    ETS-->>RG: Experiment exists
+    RG->>RS: Get run results
     RS-->>RG: ERROR: No data found for experiment Z
-    RG->>RG: Loguj błąd: Missing experiment data
-    RG-->>UI: ReportGenerationError: Brak danych eksperymentu
+    RG->>RG: Log error: Missing experiment data
+    RG-->>UI: ReportGenerationError: Missing experiment data
     UI-->>User: "Cannot generate report - no data. Check if experiment has completed."
 ```
 
-#### Diagram aktywności - Renderowanie różnych formatów
+#### Activity Diagram - Different Format Rendering
 ```mermaid
 ---
 config:
@@ -1380,49 +1380,49 @@ config:
   theme: redux-dark
 ---
 flowchart TB
-    StartRender["Rozpocznij renderowanie"] --> CheckFormat{"Format raportu"}
+    StartRender["Start rendering"] --> CheckFormat{"Report format"}
     CheckFormat --> HTML["HTML"] & PDF["PDF"] & LaTeX["LaTeX"] & JSON["JSON/CSV"]
-    HTML --> LoadHTMLTemplate["Załaduj szablon HTML"]
-    PDF --> LoadPDFTemplate["Załaduj szablon PDF"]
-    LaTeX --> LoadLaTeXTemplate["Załaduj szablon LaTeX"]
-    JSON --> PrepareDataExport["Przygotuj eksport danych"]
-    LoadHTMLTemplate --> RenderHTML["Renderuj HTML z danymi"]
-    LoadPDFTemplate --> RenderPDF["Renderuj PDF przez LaTeX/WeasyPrint"]
-    LoadLaTeXTemplate --> RenderLaTeX["Generuj kod LaTeX"]
-    PrepareDataExport --> ExportJSON["Eksportuj JSON/CSV"]
-    RenderHTML --> ValidateOutput{"Walidacja"}
+    HTML --> LoadHTMLTemplate["Load HTML template"]
+    PDF --> LoadPDFTemplate["Load PDF template"]
+    LaTeX --> LoadLaTeXTemplate["Load LaTeX template"]
+    JSON --> PrepareDataExport["Prepare data export"]
+    LoadHTMLTemplate --> RenderHTML["Render HTML with data"]
+    LoadPDFTemplate --> RenderPDF["Render PDF via LaTeX/WeasyPrint"]
+    LoadLaTeXTemplate --> RenderLaTeX["Generate LaTeX code"]
+    PrepareDataExport --> ExportJSON["Export JSON/CSV"]
+    RenderHTML --> ValidateOutput{"Validation"}
     RenderPDF --> ValidateOutput
     RenderLaTeX --> ValidateOutput
     ExportJSON --> ValidateOutput
-    ValidateOutput -- OK --> SaveFile["Zapisz plik"]
-    ValidateOutput -- Błąd --> RenderError["Zgłoś błąd renderowania"]
+    ValidateOutput -- OK --> SaveFile["Save file"]
+    ValidateOutput -- Error --> RenderError["Report rendering error"]
     SaveFile --> ReturnURL["Return URL"]
-    RenderError --> End(["Koniec - sukces"])
+    RenderError --> End(["End - success"])
     ReturnURL --> End
 ```
 
 ---
 
-## Podsumowanie przypadków użycia
+## Use Cases Summary
 
 | UC | Name | Primary Actor | Frequency | Criticality |
 |----|-------|--------------|---------------|-------------|
-| UC1 | Skonfiguruj i uruchom eksperyment | Badacz | Wysoka | Krytyczna |
-| UC2 | Dodaj wbudowany algorytm HPO | Administrator | Niska | Średnia |
-| UC3 | Zaimplementuj algorytm plugin | Twórca algorytmu | Średnia | Wysoka |
-| UC4 | Porównaj wyniki algorytmów | Badacz | Wysoka | Krytyczna |
-| UC5 | Przeglądaj eksperymenty | Badacz | Wysoka | Średnia |
-| UC6 | Zarządzaj referencjami | Badacz/Admin | Średnia | Niska |
-| UC7 | Uruchom system lokalnie | Administrator | Niska | Wysoka |
-| UC8 | Uruchom system w chmurze | DevOps/SRE | Niska | Krytyczna |
-| UC9 | Wygeneruj raport | Badacz | Średnia | Średnia |
+| UC1 | Configure and run experiment | Researcher | High | Critical |
+| UC2 | Add built-in HPO algorithm | Administrator | Low | Medium |
+| UC3 | Implement algorithm plugin | Algorithm Creator | Medium | High |
+| UC4 | Compare algorithm results | Researcher | High | Critical |
+| UC5 | Browse experiments | Researcher | High | Medium |
+| UC6 | Manage references | Researcher/Admin | Medium | Low |
+| UC7 | Run system locally | Administrator | Low | High |
+| UC8 | Run system in cloud | DevOps/SRE | Low | Critical |
+| UC9 | Generate report | Researcher | Medium | Medium |
 
 ---
 
-## Powiązane dokumenty
+## Related Documents
 
-- **Architektura**: [Kontekst (C4-1)](../architecture/c1-context.md)
-- **Implementacja**: [Kontenery (C4-2)](../architecture/c2-containers.md), [Komponenty (C4-3)](../architecture/c3-components.md)
-- **Przepływ pracy**: [Workflows](workflows.md)
-- **Wdrożenie**: [Deployment Guide](../operations/deployment-guide.md)
+- **Architecture**: [Context (C4-1)](../architecture/c1-context.md)
+- **Implementation**: [Containers (C4-2)](../architecture/c2-containers.md), [Components (C4-3)](../architecture/c3-components.md)
+- **Workflow**: [Workflows](workflows.md)
+- **Deployment**: [Deployment Guide](../operations/deployment-guide.md)
 - **Methodology**: [Benchmarking Practices](../methodology/benchmarking-practices.md)

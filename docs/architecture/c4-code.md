@@ -1656,7 +1656,7 @@ class RunExecutor:
 
 ## Architectural Patterns
 
-### 🏗️ Architektura
+### 🏗️ Architecture
 - **Style:** Microservices with ability to package as modular monolith (PC)
 - **Communication:** REST/GraphQL + gRPC between services
 - **Messaging:** Message Broker (RabbitMQ/Kafka) for asynchronous operations
@@ -1667,7 +1667,7 @@ class RunExecutor:
 - **Containerization:** Docker + docker-compose (PC) / Kubernetes (Cloud)
 - **Plugins:** Python SDK with IAlgorithmPlugin interface
 
-### 🔄 Reprodukowalność
+### 🔄 Reproducibility
 - **Configuration snapshots:** Complete experiment configuration (JSON)
 - **Version tracking:** Datasets, algorithms, plugins, container images
 - **Seed management:** Random seeds for each run

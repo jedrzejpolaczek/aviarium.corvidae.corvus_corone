@@ -98,16 +98,16 @@ System runs in Docker containers with support for:
 │   │   ├── c2-containers.md    <- C4-2: Containers and services
 │   │   └── c3-components.md    <- C4-3: Components and APIs
 │   ├── methodology/             <- Research methodologies
-│   │   └── benchmarking-practices.md <- Praktyki benchmarkingu
-│   ├── user-guides/             <- Przewodniki użytkownika
-│   │   └── workflows.md        <- Procesy i workflow
-│   ├── operations/              <- Dokumentacja operacyjna
-│   │   ├── deployment-guide.md <- Przewodnik wdrożenia
-│   │   └── monitoring-guide.md <- Monitoring i alerting
-│   └── design/                  <- Decyzje projektowe
+│   │   └── benchmarking-practices.md <- Benchmarking practices
+│   ├── user-guides/             <- User guides
+│   │   └── workflows.md        <- Processes and workflows
+│   ├── operations/              <- Operational documentation
+│   │   ├── deployment-guide.md <- Deployment guide
+│   │   └── monitoring-guide.md <- Monitoring and alerting
+│   └── design/                  <- Design decisions
 │       └── design-decisions.md  <- Architectural Decision Records
 │
-├── src/                         <- Kod źródłowy aplikacji
+├── src/                         <- Application source code
 │   ├── api-gateway/            <- API Gateway service
 │   ├── orchestrator/           <- Experiment Orchestrator
 │   ├── worker/                 <- Worker Pool

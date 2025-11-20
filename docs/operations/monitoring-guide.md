@@ -8,19 +8,19 @@
 
 Corvus Corone monitoring system provides full observability at three levels:
 
-### 📊 **Infrastructure Monitoring**
+### **Infrastructure Monitoring**
 - System metrics (CPU, RAM, I/O, Network)
 - Kubernetes cluster health (if applicable)
 - Database performance and connection pools
 - Message broker queue lengths
 
-### 🏃 **Application Monitoring**  
+### **Application Monitoring**  
 - API response times and error rates
 - Worker throughput and success rates
 - Experiment execution metrics
 - Business KPIs (experiments/day, algorithm usage)
 
-### 👤 **User Experience Monitoring**
+### **User Experience Monitoring**
 - Web UI performance
 - User journey analytics
 - Feature usage statistics
@@ -30,7 +30,7 @@ Corvus Corone monitoring system provides full observability at three levels:
 
 ## Monitoring Stack
 
-### 🔧 Core Components
+### Core Components
 
 ```mermaid
 ---
@@ -85,17 +85,17 @@ flowchart LR
 - **Use case:** Debugging slow API calls, worker issues
 
 #### ELK Stack (Logging)
-- **Elasticsearch:** Log storage i indexing (3-node cluster dla HA)
-- **Logstash:** Log processing i transformation (JSON normalization, field extraction)
-- **Kibana:** Log analysis i search UI (port 5601)
-- **Fluentd:** Log shipping z kontenerów (structured JSON output)
-- **Index Strategy:** Daily indices z 30-day retention policy
+- **Elasticsearch:** Log storage and indexing (3-node cluster for HA)
+- **Logstash:** Log processing and transformation (JSON normalization, field extraction)
+- **Kibana:** Log analysis and search UI (port 5601)
+- **Fluentd:** Log shipping from containers (structured JSON output)
+- **Index Strategy:** Daily indices with 30-day retention policy
 
 ---
 
 ## Metrics Collection
 
-### 🏗️ Infrastructure Metrics
+### Infrastructure Metrics
 
 #### System-level metrics
 ```yaml
@@ -128,7 +128,7 @@ Labels:
   - namespace: namespace_name (K8s only)
 ```
 
-### 🚀 Application Metrics
+### Application Metrics
 
 #### API Gateway metrics
 ```python
@@ -207,7 +207,7 @@ Metrics:
   - pg_pool_max_connections
 ```
 
-### 📈 Business Metrics
+### Business Metrics
 
 #### Research productivity metrics
 ```python
@@ -248,7 +248,7 @@ feature_usage_total = Counter(
 
 ## Dashboards
 
-### 🖥️ System Overview Dashboard
+### System Overview Dashboard
 
 #### Infrastructure panel
 ```json
@@ -287,12 +287,12 @@ feature_usage_total = Counter(
 
 #### Key panels
 - **Service Health:** Up/down status of all services
-- **Request Volume:** HTTP requests per second z breakdown na endpoint
+- **Request Volume:** HTTP requests per second with breakdown by endpoint
 - **Response Times:** P50, P95, P99 latency
-- **Error Rates:** 4xx, 5xx errors jako % total requests
+- **Error Rates:** 4xx, 5xx errors as % of total requests
 - **Resource Usage:** CPU, Memory, Disk usage per service
 
-### 🧪 Experiment Monitoring Dashboard
+### Experiment Monitoring Dashboard
 
 #### Experiment execution metrics
 ```yaml
@@ -314,7 +314,7 @@ Panels:
   - Throughput: Completed runs per hour/day
 ```
 
-### 📊 Business Intelligence Dashboard
+### Business Intelligence Dashboard
 
 #### Research productivity
 ```yaml
@@ -339,7 +339,7 @@ Panels:
 
 ## Alerting
 
-### 🚨 Alert Rules
+### Alert Rules
 
 #### Critical alerts (immediate response)
 ```yaml
@@ -429,7 +429,7 @@ Panels:
     description: \"{{ $value }} new algorithms registered in last hour\"
 ```
 
-### 📱 Notification Channels
+### Notification Channels
 
 #### Slack integration
 ```yaml
@@ -485,7 +485,7 @@ receivers:
 
 ## Distributed Tracing
 
-### 🔍 Jaeger Configuration
+### Jaeger Configuration
 
 #### Trace collection
 ```python
@@ -542,7 +542,7 @@ Key Metrics from Traces:
 
 ## Log Management
 
-### 📝 Logging Strategy
+### Logging Strategy
 
 #### Log levels and structure
 ```python
@@ -626,7 +626,7 @@ output {
 }
 ```
 
-### 🔍 Log Analysis Patterns
+### Log Analysis Patterns
 
 #### Common search queries (Kibana)
 ```javascript
@@ -680,7 +680,7 @@ output {
 
 ## Performance Monitoring
 
-### ⚡ Key Performance Indicators
+### Key Performance Indicators
 
 #### Response time SLIs/SLOs
 ```yaml
@@ -727,7 +727,7 @@ resource_efficiency = Gauge(
 )
 ```
 
-### 📊 Performance Dashboards
+### Performance Dashboards
 
 #### Real-time performance panel
 ```yaml
@@ -754,7 +754,7 @@ Panels:
 
 ## Troubleshooting Workflows
 
-### 🔧 Common Issue Patterns
+### Common Issue Patterns
 
 #### High response times
 ```bash
@@ -799,7 +799,7 @@ Panels:
    kubectl exec postgres-0 -- psql -c \"SELECT schemaname, tablename, attname, n_distinct, correlation FROM pg_stats WHERE tablename IN ('experiments', 'runs', 'metrics');\"
 ```
 
-### 🆘 Emergency Procedures
+### Emergency Procedures
 
 #### Service degradation response
 ```yaml
@@ -834,7 +834,7 @@ Steps:
 
 ## Health Checks
 
-### 🏥 Application Health Endpoints
+### Application Health Endpoints
 
 #### API Gateway health check
 ```python
@@ -900,7 +900,7 @@ class WorkerHealthMonitor:
                 logger.warning('Worker heartbeat missing', worker_id=worker_id)
 ```
 
-### 🔍 Deep Health Checks
+### Deep Health Checks
 
 #### End-to-end system health
 ```python
@@ -951,7 +951,7 @@ def deep_health_check():
 ## Related Documents
 
 - **Deployment**: [Deployment Guide](deployment-guide.md)
-- **Architektura**: [Kontenery (C4-2)](../architecture/c2-containers.md), [Komponenty (C4-3)](../architecture/c3-components.md)
+- **Architecture**: [Containers (C4-2)](../architecture/c2-containers.md), [Components (C4-3)](../architecture/c3-components.md)
 - **Workflows**: [Workflows](../user-guides/workflows.md)
 - **Methodology**: [Benchmarking Practices](../methodology/benchmarking-practices.md)
 - **Design**: [Design Decisions](../design/design-decisions.md)

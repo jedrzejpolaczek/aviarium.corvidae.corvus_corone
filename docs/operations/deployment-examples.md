@@ -117,7 +117,7 @@ services:
       - minio_dev_data:/data
     command: server /data --console-address ":9001"
 
-  # Basic monitoring dla development
+  # Basic monitoring for development
   prometheus:
     image: prom/prometheus:latest
     ports:
@@ -282,7 +282,7 @@ services:
           cpus: '2.0'
           memory: 4G
 
-  # Redis Cluster dla staging
+  # Redis Cluster for staging
   redis:
     image: redis:7
     command: redis-server --appendonly yes --replica-read-only no

@@ -6,7 +6,7 @@ Welcome to the Corvus Corone platform documentation! This guide will help you fi
 
 ---
 
-## 🚀 Quick start - where to begin?
+## Quick start - where to begin?
 
 ### I'm new to the project
 1. **Learn the requirements**: [Use Cases](requirements/use-cases.md)
@@ -30,9 +30,9 @@ Welcome to the Corvus Corone platform documentation! This guide will help you fi
 
 ---
 
-## 📋 Complete Documentation Map
+## Complete Documentation Map
 
-### 📋 Requirements & Analysis
+### Requirements & Analysis
 | Document | Description | For whom |
 |----------|-------------|----------|
 | [Use Cases](requirements/use-cases.md) | Usage scenarios, actors, functional requirements | Product Owners, Analysts, Everyone |
@@ -41,19 +41,19 @@ Welcome to the Corvus Corone platform documentation! This guide will help you fi
 | [Non-functional Requirements](requirements/non-functional-requirements.md) | Non-functional requirements (RNF1-RNF10) | Architects, DevOps, QA |
 | [Requirements Traceability](requirements/requirements-traceability.md) | Requirements traceability matrix | Architects, PM, QA |
 
-### 🏢 Architecture (C4 Model)
+### Architecture (C4 Model)
 | Document | C4 Level | Description | For whom |
 |----------|----------|-------------|----------|
 | [Context](architecture/c1-context.md) | C4-1 | Users, external systems, requirements | Everyone |
 | [Containers](architecture/c2-containers.md) | C4-2 | Applications, databases, communication | Developers, Architects |
 | [Components](architecture/c3-components.md) | C4-3 | Modules, interfaces, technical details | Developers |
 
-### 🔬 Methodology & Research
+### Methodology & Research
 | Document | Description | For whom |
 |----------|-------------|----------|
 | [Benchmarking Practices](methodology/benchmarking-practices.md) | Research methodologies, comparison standards | Researchers, Data Scientists |
 
-### 🛠️ Operations & Deployment
+### Operations & Deployment
 | Document | Description | For whom |
 |----------|-------------|----------|
 | [Deployment Guide](operations/deployment-guide.md) | PC vs Cloud, Docker, K8s, scaling | DevOps, Administrators |
@@ -61,12 +61,12 @@ Welcome to the Corvus Corone platform documentation! This guide will help you fi
 | [Monitoring Guide](operations/monitoring-guide.md) | Logs, metrics, alerting, troubleshooting | DevOps, SRE |
 | [Performance & SLA](operations/performance-sla.md) | Benchmarks, SLA definitions, KPIs | SRE, Management |
 
-### 👥 User Guides
+### User Guides
 | Document | Description | For whom |
 |----------|-------------|----------|
 | [Workflows](user-guides/workflows.md) | Key activities, best practices | Researchers, Users |
 
-### 🎨 Design & Decisions
+### Design & Decisions
 | Document | Description | For whom |
 |----------|-------------|----------|
 | [Design Decisions](design/design-decisions.md) | **12 complete ADRs** - architectural justifications, trade-offs | Architects, Tech Leads |
@@ -74,7 +74,7 @@ Welcome to the Corvus Corone platform documentation! This guide will help you fi
 
 ---
 
-## ⭐ Key Documents (Production-Ready)
+## Key Documents (Production-Ready)
 
 ### For Decision Makers
 - **[12 Architecture Decision Records](design/design-decisions.md)** - Complete justifications for all key technical decisions
@@ -88,7 +88,7 @@ Welcome to the Corvus Corone platform documentation! This guide will help you fi
 
 ---
 
-## 🔍 Find what you need
+## Find what you need
 
 ### Looking for information about...
 
@@ -101,23 +101,23 @@ Welcome to the Corvus Corone platform documentation! This guide will help you fi
 **HPO algorithm implementation?**
 → [Components - Algorithm SDK](architecture/c3-components.md#34-algorithm-sdk--plugin-runtime--komponenty)
 
-**Jak uruchomić system?**
+**How to run the system?**
 → [Deployment Guide](operations/deployment-guide.md)
 
-**Jak dodać nowy algorytm?**
+**How to add a new algorithm?**
 → [Use Cases UC3](requirements/use-cases.md) + [Algorithm SDK](architecture/c3-components.md#34-algorithm-sdk--plugin-runtime--komponenty)
 
-**Jak porównać algorytmy?**
+**How to compare algorithms?**
 → [Use Cases UC4](requirements/use-cases.md) + [Metrics Analysis](architecture/c3-components.md#36-metricsanalysisservice--komponenty)
 
-**Dlaczego takie decyzje projektowe?**
+**Why these design decisions?**
 → [Design Decisions](design/design-decisions.md)
 
 ---
 
 ## 📋 Status dokumentacji
 
-| Dokument | Status | Ostatnia aktualizacja |
+| Document | Status | Last updated |
 |----------|--------|----------------------|
 | Use Cases | ✅ Kompletny | 2025-11-19 |
 | Functional Requirements | ✅ Kompletny | 2025-11-19 |
@@ -135,17 +135,17 @@ Welcome to the Corvus Corone platform documentation! This guide will help you fi
 
 ---
 
-## 🤝 Jak przyczynić się do dokumentacji
+## 🤝 How to contribute to documentation
 
-1. **Zgłoś błąd/propozycję**: Utwórz issue w repozytorium
-2. **Zaproponuj zmianę**: Pull request z opisem
-3. **Zadaj pytanie**: Skorzystaj z sekcji Discussions
+1. **Report bug/suggestion**: Create issue in repository
+2. **Propose change**: Pull request with description
+3. **Ask a question**: Use the Discussions section
 
-**Zasady kontrybuowania**:
-- Zachowaj struktur modelu C4 dla dokumentów architektury
-- Używaj diagramów Mermaid dla wizualizacji
-- Dodaj cross-reference do powiązanych dokumentów
-- Aktualizuj tabelę statusu po zmianach
+**Contributing guidelines**:
+- Maintain C4 model structure for architecture documents
+- Use Mermaid diagrams for visualization
+- Add cross-reference to related documents
+- Update status table after changes
 
 ---
 
@@ -174,4 +174,4 @@ Welcome to the Corvus Corone platform documentation! This guide will help you fi
 
 ---
 
-*Ostatnia aktualizacja: 2025-11-20*
+*Last updated: 2025-11-20*

@@ -8,17 +8,17 @@
 
 Corvus Corone was designed with **PC-first, Cloud-ready** philosophy, offering flexible deployment options:
 
-### 🖥️ PC/Lab Deployment
+### PC/Lab Deployment
 - **Docker Compose** - Single-node deployment
 - **Ideal for:** Development, small research teams, proof-of-concept
 - **Capacity:** Up to 10 concurrent users, 1-4 workers
 
-### ☁️ Cloud Deployment  
+### Cloud Deployment  
 - **Kubernetes** - Scalable, production-ready
 - **Ideal for:** Production, large teams, enterprise
 - **Capacity:** Elastic scaling, auto-scaling
 
-### 🔄 Hybrid Deployment
+### Hybrid Deployment
 - **Core services** in cloud, **Workers** locally
 - **Ideal for:** Compliance, data locality, custom hardware
 
@@ -26,9 +26,9 @@ Corvus Corone was designed with **PC-first, Cloud-ready** philosophy, offering f
 
 ## PC/Lab Deployment (Docker Compose)
 
-### 📋 System Requirements
+### System Requirements
 
-#### Minimalne wymagania
+#### Minimum requirements
 ```yaml
 CPU: 4 cores (8 threads)
 RAM: 16GB  
@@ -38,7 +38,7 @@ Docker: 20.10+
 Docker Compose: 2.0+
 ```
 
-#### Zalecane wymagania
+#### Recommended requirements
 ```yaml
 CPU: 8 cores (16 threads)
 RAM: 32GB
@@ -47,7 +47,7 @@ Network: 1Gbps
 GPU: Optional (for algorithms requiring GPU)
 ```
 
-### 🚀 Quick Start
+### Quick Start
 
 #### 1. Clone repository
 ```bash
@@ -94,7 +94,7 @@ Admin: http://localhost:8000/admin/
 Monitoring: http://localhost:3001 (Grafana)
 ```
 
-### 📁 Directory structure
+### Directory structure
 ```
 corvus-corone/
 ├── docker-compose.yml          # Main orchestration
@@ -114,7 +114,7 @@ corvus-corone/
     └── scale-workers.sh    # Worker scaling
 ```
 
-### ⚙️ Service configuration
+### Service configuration
 
 #### Core services
 ```yaml
@@ -179,7 +179,7 @@ services:
       - \"9001:9001\"
 ```
 
-### 🔧 Customization
+### Customization
 
 #### Worker scaling
 ```bash
@@ -193,7 +193,7 @@ docker-compose up -d --scale worker=1
 docker-compose ps worker
 ```
 
-### 📊 Monitoring Stack
+### Monitoring Stack
 
 #### PC Deployment - Basic Monitoring
 ```yaml
@@ -271,7 +271,7 @@ spec:
       node.store.allow_mmap: false
 ```
 
-### ⚡ Resource limits
+### Resource limits
 ```yaml
 # docker-compose.override.yml
 services:
@@ -309,7 +309,7 @@ volumes:
   - ./custom-algorithms:/app/algorithms:ro
 ```
 
-### 📊 Monitoring
+### Monitoring
 
 #### Built-in monitoring stack
 ```yaml
@@ -344,7 +344,7 @@ volumes:
 
 ## Cloud Deployment (Kubernetes)
 
-### 🏗️ Architecture overview
+### Architecture overview
 
 ```yaml
 # Kubernetes namespace structure
@@ -355,7 +355,7 @@ Namespaces:
   - corvus-monitoring # Observability stack
 ```
 
-### 📋 Prerequisites
+### Prerequisites
 
 #### Infrastructure requirements
 ```yaml
@@ -380,7 +380,7 @@ Load Balancer:
   - AWS ALB / Google Cloud Load Balancer / Azure Application Gateway
 ```
 
-### 🚀 Deployment process
+### Deployment process
 
 #### 1. Prepare cluster
 ```bash
@@ -429,7 +429,7 @@ helm install corvus-corone corvus-corone/corvus-corone \\
   --create-namespace
 ```
 
-### 📄 Production values.yaml
+### Production values.yaml
 
 ```yaml
 # production-values.yaml
@@ -502,7 +502,7 @@ security:
     standard: \"restricted\"
 ```
 
-### 🔄 Auto-scaling configuration
+### Auto-scaling configuration
 
 #### Horizontal Pod Autoscaler (HPA)
 ```yaml
@@ -567,7 +567,7 @@ spec:
         memory: \"256Mi\"
 ```
 
-### 🔐 Security hardening
+### Security hardening
 
 #### Network policies
 ```yaml
@@ -621,7 +621,7 @@ metadata:
 
 ## Hybrid Deployment
 
-### 🔄 Architecture pattern
+### Architecture pattern
 
 ```mermaid
 ---
@@ -655,19 +655,19 @@ flowchart TB
     WORKER3 -.-> DATA
 ```
 
-### 📝 Use cases dla hybrid deployment
+### Use cases for hybrid deployment
 
-#### Compliance i data locality
+#### Compliance and data locality
 - Data cannot leave the organization
 - Regulatory requirements (GDPR, HIPAA)
 - Custom hardware requirements (specjalne GPU, TPU)
 
 #### Cost optimization  
 - Utilization of existing on-premises resources
-- Burst to cloud podczas peak load
+- Burst to cloud during peak load
 - Data transfer cost optimization
 
-### ⚙️ Configuration
+### Configuration
 
 #### Cloud-side configuration
 ```yaml
@@ -705,7 +705,7 @@ data:
 
 ## Backup and Recovery
 
-### 💾 Backup strategy
+### Backup strategy
 
 #### Automated backups
 ```bash
@@ -751,7 +751,7 @@ spec:
           restartPolicy: OnFailure
 ```
 
-### 🔄 Disaster recovery
+### Disaster recovery
 
 #### Recovery Time Objectives (RTO)
 - **PC Deployment:** < 2 hours
@@ -786,7 +786,7 @@ curl -f https://api.corvus.your-domain.com/health
 
 ## Troubleshooting
 
-### 🔍 Common issues
+### Common issues
 
 #### Worker connection problems
 ```bash
@@ -829,7 +829,7 @@ kubectl exec -n corvus-data postgres-0 -- psql -U corvus_user -d corvus -c \"SEL
 curl -s http://localhost:15672/api/queues | jq '.[].messages'
 ```
 
-### 📞 Support contacts
+### Support contacts
 
 - **Issues:** https://github.com/AviariumSoftware/corvus-corone/issues
 - **Discussions:** https://github.com/AviariumSoftware/corvus-corone/discussions
@@ -839,7 +839,7 @@ curl -s http://localhost:15672/api/queues | jq '.[].messages'
 
 ## Related Documents
 
-- **Architektura**: [Kontenery (C4-2)](../architecture/c2-containers.md)
+- **Architecture**: [Containers (C4-2)](../architecture/c2-containers.md)
 - **Monitoring**: [Monitoring Guide](monitoring-guide.md)
 - **Requirements**: [Functional Requirements](../requirements/functional-requirements.md), [Use Cases](../requirements/use-cases.md)
 - **User Guides**: [Workflows](../user-guides/workflows.md)

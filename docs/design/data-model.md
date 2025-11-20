@@ -380,6 +380,6 @@ ORDER BY created_at DESC;
 ## 6. Cross-reference
 
 - **Component Architecture**: [C4 Components](../architecture/c3-components.md)
-- **API Reference**: [C4 Components - API Details](../architecture/c3-components.md#6-interfejsy-api---szczegóły-techniczne)
+- **API Reference**: [C4 Components - API Details](../architecture/c3-components.md#6-api-interfaces---technical-details)
 - **Deployment**: [Deployment Guide](../operations/deployment-guide.md)
 - **Requirements**: [Functional Requirements](../requirements/functional-requirements.md), [Use Cases](../requirements/use-cases.md)

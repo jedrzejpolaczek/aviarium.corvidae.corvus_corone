@@ -6,7 +6,7 @@
 
 ## Performance Framework Overview
 
-### 🎯 Performance Pillars
+### Performance Pillars
 
 | Pillar | Description | Key Metrics | Target SLA |
 |--------|-------------|-------------|------------|
@@ -20,7 +20,7 @@
 
 ## 1. API Performance Benchmarks
 
-### 🔗 REST API Response Times
+### REST API Response Times
 
 #### Read Operations (GET)
 ```yaml
@@ -87,7 +87,7 @@ GET /api/v1/benchmarks:
 #### Write Operations (POST/PUT)
 ```yaml
 POST /api/v1/experiments:
-  Description: Utworzenie nowego eksperymentu
+  Description: Create new experiment
   Payload Size: 1KB - 100KB (configuration JSON)
   
   Performance Targets:
@@ -96,11 +96,11 @@ POST /api/v1/experiments:
     Complex Configuration (>50KB):
       p50: <500ms, p95: <1000ms, p99: <1500ms
   
-  Validation Time: <100ms dla complex configurations
+  Validation Time: <100ms for complex configurations
   Database Write Time: <50ms
   
 POST /api/v1/experiments/{id}/start:
-  Description: Uruchomienie eksperymentu
+  Description: Start experiment
   Performance Targets:
     p50: <300ms, p95: <600ms, p99: <1000ms
   
@@ -110,12 +110,12 @@ POST /api/v1/experiments/{id}/start:
     - Queue Submission: <50ms
 
 PUT /api/v1/experiments/{id}:
-  Description: Aktualizacja eksperymentu
+  Description: Update experiment
   Performance Targets:
     p50: <150ms, p95: <300ms, p99: <500ms
 
 POST /api/v1/runs/{id}/metrics:
-  Description: Logowanie metryk z runu (high-frequency)
+  Description: Log metrics from run (high-frequency)
   Batch Size: 1-100 metrics per request
   
   Performance Targets:
@@ -146,7 +146,7 @@ GET /api/v1/experiments/{id}/analysis:
     Large Dataset:
       p50: <10000ms, p95: <20000ms, p99: <30000ms
   
-  Cache Strategy: 15min TTL dla completed experiments
+  Cache Strategy: 15min TTL for completed experiments
 
 GET /api/v1/comparison:
   Description: Algorithm comparison between experiments
@@ -162,7 +162,7 @@ GET /api/v1/comparison:
 
 ## 2. Worker Performance Benchmarks  
 
-### ⚡ Algorithm Execution Performance
+### Algorithm Execution Performance
 
 #### Startup Performance
 ```yaml
@@ -261,7 +261,7 @@ Network I/O:
 
 ## 3. Database Performance Benchmarks
 
-### 💾 PostgreSQL Performance
+### PostgreSQL Performance
 
 #### Query Performance
 ```yaml
@@ -354,7 +354,7 @@ Backup Performance:
 
 ## 4. End-to-End Performance Benchmarks
 
-### 🔄 Complete Experiment Workflow
+### Complete Experiment Workflow
 
 #### Experiment Lifecycle Performance
 ```yaml
@@ -425,7 +425,7 @@ API Client Experience:
 
 ## 5. Service Level Agreements (SLAs)
 
-### 📋 Availability SLAs
+### Availability SLAs
 
 #### Service Availability Targets
 ```yaml
@@ -480,7 +480,7 @@ Emergency Maintenance:
     - Major system failures requiring immediate action
 ```
 
-### 📊 Performance SLAs
+### Performance SLAs
 
 #### Response Time SLAs
 ```yaml
@@ -547,7 +547,7 @@ Data Integrity:
   Backup Integrity: 99.99% verification success rate
 ```
 
-### 🔧 Support SLAs
+### Support SLAs
 
 #### Issue Response Times
 ```yaml
@@ -594,7 +594,7 @@ Backup & Restore:
 
 ## 6. Monitoring & Alerting
 
-### 📈 SLA Monitoring
+### SLA Monitoring
 
 #### Key Performance Indicators (KPIs)
 ```yaml
@@ -634,7 +634,7 @@ Informational Alerts:
   - Certificate expiry warnings (30 days)
 ```
 
-### 📊 SLA Reporting
+### SLA Reporting
 
 #### Monthly SLA Reports
 ```yaml
@@ -659,14 +659,14 @@ Business Impact Report:
 
 ---
 
-## Podsumowanie
+## Summary
 
 These detailed performance benchmarks and SLA definitions provide:
 
-1. **Measurable Targets** - Konkretne, mierzalne cele performance
-2. **Service Level Commitments** - Jasne expectations dla stakeholders  
-3. **Monitoring Framework** - KPIs i alerting dla proactive management
+1. **Measurable Targets** - Concrete, measurable performance goals
+2. **Service Level Commitments** - Clear expectations for stakeholders  
+3. **Monitoring Framework** - KPIs and alerting for proactive management
 4. **Business Alignment** - Business metrics alongside technical ones
-5. **Continuous Improvement** - Baseline dla optimization i capacity planning
+5. **Continuous Improvement** - Baseline for optimization and capacity planning
 
-Framework ten implementuje ADR-011 (Performance Testing Strategy) i zapewnia foundation dla production-ready systemu z clear operational expectations.
+This framework implements ADR-011 (Performance Testing Strategy) and provides foundation for production-ready system with clear operational expectations.

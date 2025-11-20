@@ -658,7 +658,7 @@ Plugin Lifecycle:
     
   Execution:
     9. Container instantiation
-    10. Initialization z config
+    10. Initialization with config
     11. Suggest/observe loop
     12. Results collection
     13. Container cleanup
@@ -849,22 +849,22 @@ Research data and experiment results are critical business assets:
 We implement comprehensive DR strategy with different protection tiers:
 
 1. **Tier 1 - Critical Data (RPO: 15min, RTO: 1h):**
-   - Experiment metadata i configurations
-   - User accounts i permissions
+   - Experiment metadata and configurations
+   - User accounts and permissions
    - System configuration
    - Synchronous cross-region replication
 
 2. **Tier 2 - Important Data (RPO: 1h, RTO: 4h):**
-   - Experiment results i metrics
+   - Experiment results and metrics
    - Algorithm implementations
    - Benchmark definitions
-   - Asynchronous replication z frequent snapshots
+   - Asynchronous replication with frequent snapshots
 
 3. **Tier 3 - Bulk Data (RPO: 24h, RTO: 24h):**
    - Large artifacts (models, datasets)
    - Historical logs
    - Archive data
-   - Weekly backups z cross-region copy
+   - Weekly backups with cross-region copy
 
 ### Implementation Architecture
 
@@ -1035,7 +1035,7 @@ CI/CD Integration:
   - Performance regression testing per PR
   - Automated performance benchmarks
   - Performance budgets enforcement
-  - Trend analysis i alerting
+  - Trend analysis and alerting
 
 Production Monitoring:
   - Real-time performance dashboards
@@ -1088,7 +1088,7 @@ We implement docs-as-code strategy with automated tooling:
    - Layered documentation (overview → details → implementation)
    - Task-oriented user guides
    - API documentation auto-generation
-   - Interactive tutorials i examples
+   - Interactive tutorials and examples
 
 3. **Maintenance Strategy:**
    - Documentation in same repo as code
@@ -1168,7 +1168,7 @@ Review Process:
   - Regular content audits
 
 Metrics & Analytics:
-  - Page views i user paths
+  - Page views and user paths
   - Search queries analysis
   - User feedback collection
   - Documentation effectiveness metrics
@@ -1311,9 +1311,9 @@ class ResearchInsightsProjection:
 
 **Positive:**
 - Scalable data ingestion
-- Real-time updates dla UI
+- Real-time updates for UI
 - Complete audit trail
-- Loose coupling między komponentami
+- Loose coupling between components
 - Easy to add new data consumers
 - Better analytics capabilities
 
@@ -1346,11 +1346,11 @@ System has different data access patterns:
 Adoptujemy polyglot persistence approach:
 
 1. **PostgreSQL** - Primary transactional data
-2. **ClickHouse** - Analytical workloads i historical data
-3. **Redis** - Caching i real-time dashboard data
-4. **InfluxDB** - Monitoring metrics i time-series data
-5. **S3/MinIO** - Object storage dla artifacts
-6. **Elasticsearch** - Full-text search i discovery
+2. **ClickHouse** - Analytical workloads and historical data
+3. **Redis** - Caching and real-time dashboard data
+4. **InfluxDB** - Monitoring metrics and time-series data
+5. **S3/MinIO** - Object storage for artifacts
+6. **Elasticsearch** - Full-text search and discovery
 
 ### Database Allocation
 
@@ -1477,24 +1477,24 @@ class ExperimentService:
 ### Context
 
 System needs:
-- Dynamic scaling dla worker nodes
-- Service discovery i load balancing
-- Rolling deployments dla continuous delivery
-- Resource management i quotas
-- Health checking i auto-recovery
+- Dynamic scaling for worker nodes
+- Service discovery and load balancing
+- Rolling deployments for continuous delivery
+- Resource management and quotas
+- Health checking and auto-recovery
 - Multi-environment support (dev/staging/prod)
 - Hybrid cloud capability
 
 ### Decision
 
-Kubernetes jako primary container orchestration platform:
+Kubernetes as primary container orchestration platform:
 
 1. **Workload Management:** Deployments, StatefulSets, Jobs
-2. **Service Mesh:** Istio dla advanced networking
-3. **Auto-scaling:** HPA i VPA dla dynamic resource allocation
-4. **Storage:** Persistent volumes dla stateful services
+2. **Service Mesh:** Istio for advanced networking
+3. **Auto-scaling:** HPA and VPA for dynamic resource allocation
+4. **Storage:** Persistent volumes for stateful services
 5. **Monitoring:** Prometheus + Grafana stack
-6. **GitOps:** ArgoCD dla deployment automation
+6. **GitOps:** ArgoCD for deployment automation
 
 ### Kubernetes Resource Architecture
 
@@ -1653,9 +1653,9 @@ spec:
 
 **Positive:**
 - Auto-scaling capabilities
-- Service discovery i load balancing
+- Service discovery and load balancing
 - Rolling deployments zero-downtime
-- Resource efficiency i isolation
+- Resource efficiency and isolation
 - Declarative infrastructure
 - Multi-cloud portability
 - Strong ecosystem
@@ -1663,7 +1663,7 @@ spec:
 **Negative:**
 - Steep learning curve
 - Increased operational complexity
-- Resource overhead dla small workloads
+- Resource overhead for small workloads
 - YAML configuration complexity
 - Debugging challenges w distributed environment
 
@@ -1677,18 +1677,18 @@ spec:
 
 ### Context
 
-HPO experiments charakteryzują się:
+HPO experiments are characterized by:
 - Long-running tasks (minutes to hours)
 - Variable execution times
 - High throughput requirements
-- Need dla load balancing
+- Need for load balancing
 - Reliability requirements (retry logic)
 - Priority-based scheduling
 - Resource allocation coordination
 
 ### Decision
 
-RabbitMQ jako message broker z następującymi patterns:
+RabbitMQ as message broker with the following patterns:
 
 1. **Work Queues:** Task distribution do worker pool
 2. **Priority Queues:** Urgent experiments prioritization
@@ -1838,12 +1838,12 @@ flowchart TD
 - Load balancing across workers
 - Reliability through message persistence
 - Priority-based processing
-- Retry logic dla failed tasks
-- Decoupling między producers i consumers
+- Retry logic for failed tasks
+- Decoupling between producers and consumers
 
 **Negative:**
 - Message broker dependency
-- Added latency dla async operations
+- Added latency for async operations
 - Message ordering challenges
 - Monitoring complexity
 - Potential message loss scenarios
@@ -1858,9 +1858,9 @@ flowchart TD
 
 ### Context
 
-API musi wspierać:
-- Backward compatibility dla existing clients
-- Gradual migration path dla breaking changes
+API must support:
+- Backward compatibility for existing clients
+- Gradual migration path for breaking changes
 - Multiple client types (Web UI, CLI, SDK)
 - Third-party integrations
 - Research reproducibility (stable API contracts)
@@ -1868,13 +1868,13 @@ API musi wspierać:
 
 ### Decision
 
-URI-based versioning z semantic versioning:
+URI-based versioning with semantic versioning:
 
 1. **Version in URL:** `/api/v1/`, `/api/v2/`
 2. **Semantic Versioning:** Major.Minor.Patch
 3. **Deprecation Policy:** 12-month support window
-4. **Beta Endpoints:** `/api/beta/` dla experimental features
-5. **Content Negotiation:** Accept headers dla response format
+4. **Beta Endpoints:** `/api/beta/` for experimental features
+5. **Content Negotiation:** Accept headers for response format
 
 ### API Versioning Implementation
 
@@ -2059,15 +2059,15 @@ class APIMigrationService:
 ### Consequences
 
 **Positive:**
-- Clear versioning dla clients
+- Clear versioning for clients
 - Backward compatibility support
 - Graceful deprecation path
-- Flexibility dla new features
+- Flexibility for new features
 - Research reproducibility
 
 **Negative:**
-- Maintenance overhead dla multiple versions
-- Code complexity z version handling  
+- Maintenance overhead for multiple versions
+- Code complexity with version handling  
 - Testing burden across versions
 - Documentation complexity
 
@@ -2085,17 +2085,17 @@ System requires:
 - Multi-tenant organization support
 - Role-based access control (RBAC)
 - API key management for programmatic access
-- Integration z external identity providers
-- Audit logging dla compliance
-- Data privacy i isolation
+- Integration with external identity providers
+- Audit logging for compliance
+- Data privacy and isolation
 - Algorithm IP protection
 
 ### Decision
 
 OAuth 2.0 + JWT dengan RBAC:
 
-1. **Authentication:** OAuth 2.0 z OIDC
-2. **Authorization:** JWT tokens z role claims
+1. **Authentication:** OAuth 2.0 with OIDC
+2. **Authorization:** JWT tokens with role claims
 3. **Multi-tenancy:** Organization-based isolation
 4. **API Access:** API keys for automated clients
 5. **Audit:** Comprehensive security logging
@@ -2384,15 +2384,15 @@ def authenticate_request():
 ### Consequences
 
 **Positive:**
-- Strong authentication i authorization
+- Strong authentication and authorization
 - Multi-tenant data isolation
 - Flexible permission system
-- API key support dla automation
+- API key support for automation
 - Audit trail capabilities
 
 **Negative:**
 - Implementation complexity
-- Performance overhead dla permission checks
+- Performance overhead for permission checks
 - Token management challenges
 - Key rotation complexity
 
@@ -2409,10 +2409,10 @@ def authenticate_request():
 System requires comprehensive observability:
 - Performance monitoring across microservices
 - Business metrics for research productivity
-- Real-time alerting dla critical issues
-- Distributed tracing dla debugging
-- Log aggregation i analysis
-- Cost monitoring dla cloud resources
+- Real-time alerting for critical issues
+- Distributed tracing for debugging
+- Log aggregation and analysis
+- Cost monitoring for cloud resources
 - User experience monitoring
 
 ### Decision
@@ -2421,7 +2421,7 @@ Three pillars of observability:
 
 1. **Metrics:** Prometheus + Grafana
 2. **Logging:** ELK Stack (Elasticsearch, Logstash, Kibana)
-3. **Tracing:** Jaeger dla distributed tracing
+3. **Tracing:** Jaeger for distributed tracing
 4. **APM:** Custom application performance monitoring
 5. **Alerting:** AlertManager + PagerDuty integration
 

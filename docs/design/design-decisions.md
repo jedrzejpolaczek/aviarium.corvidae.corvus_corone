@@ -1,73 +1,73 @@
-# Design Decisions - Corvus Corone
+# Design Decisions
 
-> **Architectural Decision Records (ADR) dla systemu HPO Benchmarking Platform**
+> **Architectural Decision Records (ADR) for HPO Benchmarking Platform system**
 
 ---
 
-## Format ADR
+## ADR Format
 
-Każda decyzja architekturalna jest dokumentowana w standardowym formacie:
+Each architectural decision is documented in standard format:
 
 - **Status:** Proposed | Accepted | Deprecated | Superseded
-- **Context:** Sytuacja wymagająca decyzji
-- **Decision:** Co zostało zdecydowane
-- **Consequences:** Pozytywne i negatywne skutki decyzji
+- **Context:** Situation requiring decision
+- **Decision:** What was decided
+- **Consequences:** Positive and negative effects of decision
 
 ---
 
 ## ADR-001: Microservices Architecture
 
 **Status:** Accepted  
-**Data:** 2024-01-15  
-**Autorzy:** System Architecture Team
+**Date:** 2024-01-15  
+**Authors:** System Architecture Team
 
 ### Context
 
-System HPO benchmarking wymaga:
-- Elastycznego skalowania różnych komponentów (API, Workers, Tracking)
-- Niezależnego deployment'u dla różnych zespołów
-- Obsługi różnych języków programowania (Python algorithms, Web UI)
-- Izolacji błędów między komponentami
-- Możliwości A/B testing nowych algorytmów
+HPO benchmarking system requires:
+- Flexible scaling of different components (API, Workers, Tracking)
+- Independent deployment for different teams
+- Support for different programming languages (Python algorithms, Web UI)
+- Error isolation between components
+- A/B testing capabilities for new algorithms
 
 ### Decision
 
-Adoptujemy architekturę mikrousług z następującymi serwisami:
-1. **API Gateway** - routing i authentication
-2. **Experiment Orchestrator** - zarządzanie eksperymantami
-3. **Worker Pool** - wykonywanie algorytmów HPO
-4. **Experiment Tracking** - przechowywanie rezultatów
-5. **Plugin Manager** - zarządzanie algorytmami
-6. **Report Generator** - tworzenie raportów
-7. **Web UI** - interfejs użytkownika
+We adopt microservices architecture with the following services:
+1. **API Gateway** - routing and authentication
+2. **Experiment Orchestrator** - experiment management
+3. **Worker Pool** - HPO algorithm execution
+4. **Experiment Tracking** - storing results
+5. **Plugin Manager** - algorithm management
+6. **Report Generator** - report creation
+7. **Web UI** - user interface
 
 ### Consequences
 
-**Pozytywne:**
-- Niezależne skalowanie każdego serwisu
-- Technologiczna różnorodność (Python dla algorytmów, JavaScript dla UI)
-- Fault isolation - awaria jednego serwisu nie zatrzymuje całości
-- Łatwiejsze testing i deployment
-- Team autonomy - zespoły mogą pracować niezależnie
+**Positive:**
+- Independent scaling of each service
+- Technology diversity (Python for algorithms, JavaScript for UI)
+- Fault isolation - failure of one service doesn't stop the entire system
+- Easier testing and deployment
+- Team autonomy - teams can work independently
 
-**Negatywne:**
-- Zwiększona kompleksność operacyjna
-- Network latency między serwisami
+**Negative:**
+- Increased operational complexity
+- Network latency between services
 - Distributed system challenges (consistency, monitoring)
-- Więcej moving parts do zarządzania
+- More moving parts to manage
 
 ### Implementation Notes
 
 ```yaml
 Service Communication:
-  - Synchronous: REST APIs dla user-facing operations
-  - Asynchronous: Message broker (RabbitMQ primary, Redis fallback) dla long-running tasks
-  - Event-driven: Pub/sub dla system events
+  - Synchronous: REST APIs for user-facing operations
+  - Asynchronous: Message broker (RabbitMQ primary, Redis fallback) for long-running tasks
+  - Event-driven: Pub/sub for system events
 
 Data Management:
   - Database per service pattern
   - Shared read-only reference data via API
-  - Event sourcing dla audit trail
+  - Event sourcing for audit trail
 
 Message Broker Decision:
   - PC deployment: RabbitMQ (single node)
@@ -80,28 +80,28 @@ Message Broker Decision:
 ## ADR-002: Plugin-based Algorithm Architecture
 
 **Status:** Accepted  
-**Data:** 2024-01-20  
-**Autorzy:** Algorithm Integration Team
+**Date:** 2024-01-20  
+**Authors:** Algorithm Integration Team
 
 ### Context
 
-System musi wspierać:
-- Szybkie dodawanie nowych algorytmów HPO
-- Różne języki programowania (Python, R, Julia, Java)
-- Różne dependencies i environment requirements
-- Izolację między algorytmami (security, resource)
-- Wersjonowanie algorytmów
+System must support:
+- Rapid addition of new HPO algorithms
+- Different programming languages (Python, R, Julia, Java)
+- Different dependencies and environment requirements
+- Isolation between algorithms (security, resource)
+- Algorithm versioning
 - Community contributions
 
 ### Decision
 
-Implementujemy plugin-based architecture z następującymi elementami:
+We implement plugin-based architecture with the following elements:
 
-1. **Plugin Interface:** Standardowy contract dla wszystkich algorytmów
-2. **Container Isolation:** Każdy algorithm w oddzielnym Docker container
-3. **Plugin Registry:** Service discovery dla dostępnych algorytmów
-4. **Resource Sandbox:** Ograniczenia CPU/memory/time per plugin
-5. **Version Management:** Semantic versioning dla algorytmów
+1. **Plugin Interface:** Standard contract for all algorithms
+2. **Container Isolation:** Each algorithm in separate Docker container
+3. **Plugin Registry:** Service discovery for available algorithms
+4. **Resource Sandbox:** CPU/memory/time limits per plugin
+5. **Version Management:** Semantic versioning for algorithms
 
 ### Plugin Interface Specification
 
@@ -158,17 +158,17 @@ LABEL algorithm.requires_gpu=\"false\"
 
 ### Consequences
 
-**Pozytywne:**
-- Łatwe dodawanie nowych algorytmów
-- Strong isolation między algorytmami
-- Support dla różnych języków programowania
-- Versioning i rollback capabilities
+**Positive:**
+- Easy addition of new algorithms
+- Strong isolation between algorithms
+- Support for different programming languages
+- Versioning and rollback capabilities
 - Community ecosystem potential
-- Security przez container isolation
+- Security through container isolation
 
-**Negatywne:**
+**Negative:**
 - Container overhead (startup time, resource usage)
-- Kompleksniejszy deployment pipeline
+- More complex deployment pipeline
 - Network communication overhead
 - Container registry management
 - Potential performance impact
@@ -178,26 +178,26 @@ LABEL algorithm.requires_gpu=\"false\"
 ## ADR-003: Event-Driven Architecture for Experiment Tracking
 
 **Status:** Accepted  
-**Data:** 2024-02-01  
-**Autorzy:** Data Architecture Team
+**Date:** 2024-02-01  
+**Authors:** Data Architecture Team
 
 ### Context
 
-Experiment tracking wymaga:
-- Real-time updates o statusie eksperymantów
-- Scalable data ingestion (tysiące runs simultaneously)
-- Integration z różnymi komponentami (UI, monitoring, reporting)
-- Audit trail wszystkich operacji
-- Support dla batch i streaming analytics
-- Data consistency między serwisami
+Experiment tracking requires:
+- Real-time updates on experiment status
+- Scalable data ingestion (thousands of runs simultaneously)
+- Integration with different components (UI, monitoring, reporting)
+- Audit trail of all operations
+- Support for batch and streaming analytics
+- Data consistency between services
 
 ### Decision
 
-Implementujemy event-driven architecture z:
+We implement event-driven architecture with:
 
-1. **Event Store:** Centralne repozytorium wszystkich system events
-2. **Event Bus:** Message broker dla event distribution
-3. **Event Projections:** Materialized views dla różnych use cases
+1. **Event Store:** Central repository of all system events
+2. **Event Bus:** Message broker for event distribution
+3. **Event Projections:** Materialized views for different use cases
 4. **CQRS Pattern:** Separated read/write models
 
 ### Event Schema
@@ -220,18 +220,18 @@ Implementujemy event-driven architecture z:
 
 ### Consequences
 
-**Pozytywne:**
+**Positive:**
 - Real-time experiment tracking
-- Audit trail wszystkich operacji
+- Audit trail of all operations
 - Scalable data ingestion
-- Loose coupling między komponentami
-- Support dla analytics i reporting
+- Loose coupling between components
+- Support for analytics and reporting
 
-**Negatywne:**
+**Negative:**
 - Eventual consistency challenges
-- Complex error handling w distributed events
-- Storage overhead dla event history
-- Learning curve dla event-driven patterns
+- Complex error handling in distributed events
+- Storage overhead for event history
+- Learning curve for event-driven patterns
 
 ---
 
@@ -239,11 +239,11 @@ Implementujemy event-driven architecture z:
 
 **Status:** Accepted  
 **Data:** 2024-02-10  
-**Autorzy:** Data Architecture Team
+**Authors:** Data Architecture Team
 
 ### Context
 
-System HPO benchmarking ma różnorodne wymagania dotyczące danych:
+HPO benchmarking system has diverse data requirements:
 - OLTP operations: user management, experiment configuration, system metadata
 - OLAP analytics: time-series metrics, aggregated statistics, reporting
 - Real-time ingestion: thousands of metrics per second during experiments
@@ -252,16 +252,16 @@ System HPO benchmarking ma różnorodne wymagania dotyczące danych:
 
 ### Decision
 
-Adoptujemy dual-database strategy:
+Adapt dual-database strategy:
 
 1. **PostgreSQL (Primary OLTP):**
    - Experiments, algorithms, benchmarks, users
-   - Transactional consistency dla critical operations
+   - Transactional consistency for critical operations
    - Rich ecosystem (backup, monitoring, extensions)
 
 2. **ClickHouse (Analytics OLAP):**
    - Time-series metrics, logs, events
-   - Column-oriented storage dla analytics
+   - Column-oriented storage for analytics
    - High-performance aggregations
 
 3. **Data Pipeline:**
@@ -284,21 +284,21 @@ Data Flow:
 
 Synchronization:
   - CDC: PostgreSQL → Kafka → ClickHouse
-  - Event sourcing dla audit trail
+  - Event sourcing for audit trail
   - Eventual consistency model
 ```
 
 ### Consequences
 
-**Pozytywne:**
-- Optimal performance dla różnych workloads
-- Scalable analytics bez wpływu na OLTP
-- Rich SQL ecosystem dla obu systemów
-- Mature backup i disaster recovery
+**Positive:**
+- Optimal performance for different workloads
+- Scalable analytics without impact on OLTP
+- Rich SQL ecosystem for both systems
+- Mature backup and disaster recovery
 
-**Negatywne:**
+**Negative:**
 - Operational complexity (2 databases)
-- Eventual consistency między systemami
+- Eventual consistency between systems
 - Data synchronization challenges
 - Increased infrastructure costs
 
@@ -308,12 +308,12 @@ Synchronization:
 
 **Status:** Accepted  
 **Data:** 2024-02-15  
-**Autorzy:** Security Architecture Team
+**Authors:** Security Architecture Team
 
 ### Context
 
-Plugin-based architecture wymaga silnej izolacji security:
-- User-submitted code w pluginach HPO
+Plugin-based architecture requires strong security isolation:
+- User-submitted code in HPO plugins
 - Potential malicious algorithms
 - Resource exhaustion attacks
 - Data exfiltration risks
@@ -321,10 +321,10 @@ Plugin-based architecture wymaga silnej izolacji security:
 
 ### Decision
 
-Implementujemy multi-layered container security:
+We implement multi-layered container security:
 
 1. **Container Sandboxing:**
-   - gVisor/Kata Containers dla strong isolation
+   - gVisor/Kata Containers for strong isolation
    - Non-root containers (USER directive)
    - Read-only root filesystem
    - Minimal base images (distroless)
@@ -342,8 +342,8 @@ Implementujemy multi-layered container security:
    - Process monitoring
 
 4. **Image Security:**
-   - Vulnerability scanning w CI/CD
-   - Image signing i verification
+   - Vulnerability scanning in CI/CD
+   - Image signing and verification
    - Base image hardening
    - Regular security updates
 
@@ -370,16 +370,16 @@ Syscalls Blocked:
 
 ### Consequences
 
-**Pozytywne:**
-- Strong isolation między pluginami
+**Positive:**
+- Strong isolation between plugins
 - Defense in depth security model
-- Compliance z security standards
-- Audit trail działań
+- Compliance with security standards
+- Audit trail of actions
 
-**Negatywne:**
+**Negative:**
 - Performance overhead (gVisor ~5-10%)
-- Complexity w debugging
-- Ograniczenia dla niektórych algorytmów
+- Complexity in debugging
+- Limitations for some algorithms
 - Operational overhead
 
 ---
@@ -388,11 +388,11 @@ Syscalls Blocked:
 
 **Status:** Accepted  
 **Data:** 2024-02-20  
-**Autorzy:** SRE Team
+**Authors:** SRE Team
 
 ### Context
 
-HPO benchmarking platform wymaga comprehensive observability:
+HPO benchmarking platform requires comprehensive observability:
 - Distributed system monitoring (microservices)
 - Long-running experiment tracking (hours/days)
 - Performance debugging (slow algorithms)
@@ -402,29 +402,29 @@ HPO benchmarking platform wymaga comprehensive observability:
 
 ### Decision
 
-Adoptujemy standardowy observability stack z 3 pillars:
+We adopt standard observability stack with 3 pillars:
 
 1. **Metrics (Prometheus Ecosystem):**
-   - Prometheus server dla metrics collection
-   - Node exporter dla infrastructure metrics
+   - Prometheus server for metrics collection
+   - Node exporter for infrastructure metrics
    - Custom application metrics (business KPIs)
-   - Long-term storage w Thanos/Cortex
+   - Long-term storage in Thanos/Cortex
 
 2. **Logging (ELK Stack):**
-   - Elasticsearch dla log storage i indexing
-   - Logstash dla log processing i enrichment
-   - Kibana dla log analysis i visualization
-   - Fluentd dla log shipping
+   - Elasticsearch for log storage and indexing
+   - Logstash for log processing and enrichment
+   - Kibana for log analysis and visualization
+   - Fluentd for log shipping
 
 3. **Tracing (Jaeger):**
-   - Distributed tracing dla request flow
+   - Distributed tracing for request flow
    - Performance bottleneck identification
    - Error correlation across services
    - OpenTelemetry instrumentation
 
 4. **Visualization (Grafana):**
-   - Unified dashboards dla all data sources
-   - Alerting i notification management
+   - Unified dashboards for all data sources
+   - Alerting and notification management
    - Custom business dashboards
    - SLA monitoring
 
@@ -443,8 +443,8 @@ Storage:
   
 Visualization:
   - Grafana dashboards
-  - Kibana dla log analysis
-  - Jaeger UI dla tracing
+  - Kibana for log analysis
+  - Jaeger UI for tracing
   
 Alerting:
   - Prometheus AlertManager
@@ -474,18 +474,18 @@ Business:
 
 ### Consequences
 
-**Pozytywne:**
-- Full visibility w distributed system
+**Positive:**
+- Full visibility in distributed system
 - Proactive issue detection
 - Performance optimization data
 - Business intelligence metrics
 - Mature, proven technologies
 
-**Negatywne:**
+**Negative:**
 - High resource consumption (10-15% overhead)
-- Complex setup i maintenance
+- Complex setup and maintenance
 - Data retention costs
-- Learning curve dla zespołu
+- Learning curve for team
 
 ---
 
@@ -493,37 +493,37 @@ Business:
 
 **Status:** Accepted  
 **Data:** 2024-02-25  
-**Autorzy:** Security Team
+**Authors:** Security Team
 
 ### Context
 
-System HPO benchmarking potrzebuje robust auth system:
-- Multi-tenant access (różne organizacje badawcze)
+HPO benchmarking system needs robust auth system:
+- Multi-tenant access (different research organizations)
 - Role-based permissions (researcher, admin, plugin-author)
-- API access dla external systems
+- API access for external systems
 - Plugin security (sandbox user algorithms)
 - Compliance requirements (audit trail, MFA)
-- Integration z existing identity providers
+- Integration with existing identity providers
 
 ### Decision
 
-Implementujemy OAuth2/OIDC-based authentication z RBAC:
+We implement OAuth2/OIDC-based authentication with RBAC:
 
 1. **Authentication:**
-   - OAuth2/OIDC dla Web UI (Authorization Code flow)
-   - JWT tokens dla API access
-   - API keys dla programmatic access
-   - MFA dla privileged operations
+   - OAuth2/OIDC for Web UI (Authorization Code flow)
+   - JWT tokens for API access
+   - API keys for programmatic access
+   - MFA for privileged operations
 
 2. **Authorization (RBAC):**
-   - Role-based access control z fine-grained permissions
+   - Role-based access control with fine-grained permissions
    - Hierarchical roles: `admin` > `plugin-author` > `researcher` > `viewer`
    - Resource-level permissions (own experiments vs all experiments)
    - Plugin approval workflow
 
 3. **Identity Providers:**
-   - Built-in IdP dla PC deployment (local accounts)
-   - External IdP integration dla enterprise (SAML, OIDC)
+   - Built-in IdP for PC deployment (local accounts)
+   - External IdP integration for enterprise (SAML, OIDC)
    - Service-to-service authentication (mTLS)
 
 ### Role Definitions
@@ -581,15 +581,15 @@ JWT Tokens:
 
 ### Consequences
 
-**Pozytywne:**
+**Positive:**
 - Standards-based authentication (OAuth2/OIDC)
 - Fine-grained authorization control
-- Scalable dla multi-tenant usage
+- Scalable for multi-tenant usage
 - External IdP integration capability
-- Audit trail dla compliance
+- Audit trail for compliance
 
-**Negatywne:**
-- Additional complexity w development
+**Negative:**
+- Additional complexity in development
 - Token management overhead
 - Potential single point of failure
 - Learning curve for developers
@@ -600,38 +600,38 @@ JWT Tokens:
 
 **Status:** Accepted  
 **Data:** 2024-03-01  
-**Autorzy:** Algorithm Integration Team
+**Authors:** Algorithm Integration Team
 
 ### Context
 
-Plugin system musi być:
-- Easy to use dla algorithm developers
+Plugin system must be:
+- Easy to use for algorithm developers
 - Language agnostic (Python, R, Julia, Java)
-- Secure i isolated
-- Performant dla compute-intensive algorithms
-- Extensible dla future algorithm types
-- Well documented z examples
+- Secure and isolated
+- Performant for compute-intensive algorithms
+- Extensible for future algorithm types
+- Well documented with examples
 
 ### Decision
 
-Implementujemy container-based plugin SDK z standardized interface:
+We implement container-based plugin SDK with standardized interface:
 
 1. **Plugin Interface:**
-   - Abstract base classes dla każdego języka
+   - Abstract base classes for each language
    - Standardized lifecycle: init → suggest → observe → finalize
    - Type-safe parameter definitions
    - Metadata specification (requirements, capabilities)
 
 2. **Container Runtime:**
-   - Docker containers dla isolation
+   - Docker containers for isolation
    - Standard base images per language
-   - Resource limits i monitoring
-   - Health checks i crash recovery
+   - Resource limits and monitoring
+   - Health checks and crash recovery
 
 3. **Communication Protocol:**
-   - gRPC dla high-performance communication
-   - JSON-RPC jako fallback
-   - Streaming dla real-time metrics
+   - gRPC for high-performance communication
+   - JSON-RPC as fallback
+   - Streaming for real-time metrics
    - Async message patterns
 
 4. **SDK Components:**
@@ -654,7 +654,7 @@ Plugin Lifecycle:
     5. corvus-cli register --package algorithm.tar.gz
     6. Automatic security scanning
     7. Admin approval workflow
-    8. Publication w registry
+    8. Publication in registry
     
   Execution:
     9. Container instantiation
@@ -702,14 +702,14 @@ class HPOAlgorithm(ABC):
 
 ### Consequences
 
-**Pozytywne:**
-- Easy algorithm development i integration
+**Positive:**
+- Easy algorithm development and integration
 - Strong security isolation
 - Language flexibility
-- Standardized testing i validation
+- Standardized testing and validation
 - Community ecosystem potential
 
-**Negatywne:**
+**Negative:**
 - Container overhead (startup latency)
 - Complex debugging across container boundary
 - Network serialization costs
@@ -719,9 +719,9 @@ class HPOAlgorithm(ABC):
 
 ## Summary ADR Status
 
-| ADR | Tytuł | Status | Kluczowe dla |
+| ADR | Title | Status | Key For |
 |-----|-------|---------|--------------|
-| ADR-001 | Microservices Architecture | ✅ Accepted | Ogólna architektura |
+| ADR-001 | Microservices Architecture | ✅ Accepted | General Architecture |
 | ADR-002 | Plugin-based Algorithm Architecture | ✅ Accepted | Extensibility |
 | ADR-003 | Event-Driven Architecture | ✅ Accepted | Experiment Tracking |
 | ADR-004 | Database Strategy | ✅ Accepted | Data Management |
@@ -738,37 +738,37 @@ class HPOAlgorithm(ABC):
 
 **Status:** Accepted  
 **Data:** 2024-03-05  
-**Autorzy:** FinOps Team
+**Authors:** FinOps Team
 
 ### Context
 
-HPO benchmarking może być kosztowny, szczególnie w chmurze:
-- Long-running experiments (godziny/dni)
+HPO benchmarking can be expensive, especially in cloud:
+- Long-running experiments (hours/days)
 - Compute-intensive algorithms (CPU/GPU)
-- Large dataset storage i transfer
-- Multi-region replication dla DR
+- Large dataset storage and transfer
+- Multi-region replication for DR
 - Operational overhead (monitoring, backup)
 
 ### Decision
 
-Implementujemy multi-layer cost optimization:
+We implement multi-layer cost optimization:
 
 1. **Intelligent Auto-scaling:**
-   - Predictive scaling bazujący na queue length i historical patterns
-   - Spot instances dla non-critical workloads
-   - Reserved instances dla baseline capacity
-   - Right-sizing recommendations na podstawie utilization metrics
+   - Predictive scaling based on queue length and historical patterns
+   - Spot instances for non-critical workloads
+   - Reserved instances for baseline capacity
+   - Right-sizing recommendations based on utilization metrics
 
 2. **Data Lifecycle Management:**
    - Automated tiering: Hot → Warm → Cold → Archive
-   - Compression i deduplication for artifacts
+   - Compression and deduplication for artifacts
    - Intelligent caching strategies
    - Cost-aware data retention policies
 
 3. **Resource Optimization:**
    - Algorithm-specific resource profiles
    - Container resource right-sizing
-   - Shared GPU pools dla compatible algorithms
+   - Shared GPU pools for compatible algorithms
    - Network optimization (data locality)
 
 ### Implementation Strategy
@@ -816,16 +816,16 @@ Budgets:
 
 ### Consequences
 
-**Pozytywne:**
-- 30-50% cost reduction w cloud deployments
+**Positive:**
+- 30-50% cost reduction in cloud deployments
 - Predictable cost structure
 - Resource waste elimination
 - Better ROI visibility
 
-**Negatywne:**
-- Complexity w resource management
+**Negative:**
+- Complexity in resource management
 - Potential performance impact (spot interruptions)
-- Learning curve dla cost optimization
+- Learning curve for cost optimization
 
 ---
 
@@ -833,20 +833,20 @@ Budgets:
 
 **Status:** Accepted  
 **Data:** 2024-03-10  
-**Autorzy:** Infrastructure Team
+**Authors:** Infrastructure Team
 
 ### Context
 
-Research data i experiment results są critical business assets:
+Research data and experiment results are critical business assets:
 - Years of research work
 - Irreproducible experimental conditions
 - Compliance requirements (audit trails)
-- Business continuity dla research teams
-- Reputation risk przy data loss
+- Business continuity for research teams
+- Reputation risk with data loss
 
 ### Decision
 
-Implementujemy comprehensive DR strategy z różnymi tier-ami protection:
+We implement comprehensive DR strategy with different protection tiers:
 
 1. **Tier 1 - Critical Data (RPO: 15min, RTO: 1h):**
    - Experiment metadata i configurations
@@ -886,7 +886,7 @@ Backup Strategy:
     - GitOps approach (infrastructure as code)
     - Configuration management in version control
     - Container image registry replication
-    - Secrets backup w encrypted vault
+    - Secrets backup in encrypted vault
 
 Failover Procedures:
   Automatic:
@@ -923,14 +923,14 @@ Success Criteria:
 
 ### Consequences
 
-**Pozytywne:**
+**Positive:**
 - Research data protection
 - Business continuity assurance
 - Compliance readiness
-- Confidence w system reliability
+- Confidence in system reliability
 
-**Negatywne:**
-- 20-30% increase w infrastructure costs
+**Negative:**
+- 20-30% increase in infrastructure costs
 - Operational complexity
 - Regular testing overhead
 
@@ -940,32 +940,32 @@ Success Criteria:
 
 **Status:** Accepted  
 **Data:** 2024-03-15  
-**Autorzy:** QA Performance Team
+**Authors:** QA Performance Team
 
 ### Context
 
-HPO benchmarking system ma unique performance characteristics:
-- Highly variable workloads (różne algorytmy, różne budżety)
-- Long-running operations (eksperymenty trwają godziny/dni)
+HPO benchmarking system has unique performance characteristics:
+- Highly variable workloads (different algorithms, different budgets)
+- Long-running operations (experiments run for hours/days)
 - Resource-intensive algorithms
 - Multi-tenant usage patterns
-- Critical dla research productivity
+- Critical for research productivity
 
 ### Decision
 
-Implementujemy comprehensive performance testing strategy:
+We implement comprehensive performance testing strategy:
 
 1. **Baseline Performance Testing:**
-   - Load testing dla API endpoints
-   - Stress testing dla database operations
-   - Volume testing dla metrics ingestion
-   - Endurance testing dla długotrwałych eksperymentów
+   - Load testing for API endpoints
+   - Stress testing for database operations
+   - Volume testing for metrics ingestion
+   - Endurance testing for long-running experiments
 
 2. **Algorithm-Specific Testing:**
    - Performance profiling per algorithm type
    - Resource utilization benchmarks
    - Scalability testing (1-100 concurrent algorithms)
-   - Memory leak detection dla long-running processes
+   - Memory leak detection for long-running processes
 
 3. **End-to-End Testing:**
    - Realistic experiment simulation
@@ -1046,13 +1046,13 @@ Production Monitoring:
 
 ### Consequences
 
-**Pozytywne:**
+**Positive:**
 - Predictable system performance
 - Early regression detection
 - Capacity planning data
 - User experience optimization
 
-**Negatywne:**
+**Negative:**
 - Significant testing infrastructure cost
 - Maintenance overhead
 - Expertise requirements
@@ -1063,20 +1063,20 @@ Production Monitoring:
 
 **Status:** Accepted  
 **Data:** 2024-03-20  
-**Autorzy:** Documentation Team
+**Authors:** Documentation Team
 
 ### Context
 
-Dokumentacja jest krytyczna dla adoption i maintenance:
+Documentation is critical for adoption and maintenance:
 - Multiple audiences (developers, researchers, admins)
 - Rapidly evolving system
 - Complex domain knowledge (HPO, benchmarking)
 - Open source community contributions
-- Compliance i audit requirements
+- Compliance and audit requirements
 
 ### Decision
 
-Implementujemy docs-as-code strategy z automated tooling:
+We implement docs-as-code strategy with automated tooling:
 
 1. **Documentation Architecture:**
    - Structured documentation (C4 model approach)
@@ -1091,23 +1091,23 @@ Implementujemy docs-as-code strategy z automated tooling:
    - Interactive tutorials i examples
 
 3. **Maintenance Strategy:**
-   - Documentation w same repo jako kod
+   - Documentation in same repo as code
    - Automated testing documentation examples
-   - Review process dla dokumentacji changes
-   - Analytics i user feedback integration
+   - Review process for documentation changes
+   - Analytics and user feedback integration
 
 ### Implementation Framework
 
 ```yaml
 Documentation Stack:
-  Primary: Markdown w Git (source of truth)
+  Primary: Markdown in Git (source of truth)
   Generation: MkDocs/GitBook/Sphinx
   API Docs: OpenAPI/Swagger auto-generation
   Diagrams: Mermaid, PlantUML (as code)
   
 Publishing:
   Web: Static site generation
-  PDF: Automated generation dla offline use
+  PDF: Automated generation for offline use
   Mobile: Progressive web app
   
 Quality Assurance:
@@ -1147,7 +1147,7 @@ Developer Documentation:
     
   Development:
     - Setup development environment
-    - Coding standards i guidelines
+    - Coding standards and guidelines
     - Testing procedures
     - Deployment procedures
     
@@ -1182,13 +1182,13 @@ Update Triggers:
 
 ### Consequences
 
-**Pozytywne:**
+**Positive:**
 - Reduced support burden
 - Faster developer onboarding
 - Better user adoption
 - Compliance readiness
 
-**Negatywne:**
+**Negative:**
 - Documentation maintenance overhead
 - Tooling complexity
 - Content quality management challenges
@@ -1197,9 +1197,9 @@ Update Triggers:
 
 ## Summary ADR Status (Updated)
 
-| ADR | Tytuł | Status | Implementacja | Kluczowe dla |
+| ADR | Title | Status | Implementation | Key For |
 |-----|-------|---------|---------------|--------------|
-| ADR-001 | Microservices Architecture | ✅ Accepted | Core | Ogólna architektura |
+| ADR-001 | Microservices Architecture | ✅ Accepted | Core | General Architecture |
 | ADR-002 | Plugin-based Algorithm Architecture | ✅ Accepted | Core | Extensibility |
 | ADR-003 | Event-Driven Architecture | ✅ Accepted | Core | Experiment Tracking |
 | ADR-004 | Database Strategy | ✅ Accepted | Core | Data Management |
@@ -1214,16 +1214,16 @@ Update Triggers:
 
 ---
 
-## Powiązane dokumenty
+## Related Documents
 
-- **Wymagania**: [Non-functional Requirements](../requirements/non-functional-requirements.md) - implementacja RNF3, RNF4
-- **Architektura**: [Containers (C4-2)](../architecture/c2-containers.md) - mapowanie ADR na komponenty
-- **Architektura**: [Components (C4-3)](../architecture/c3-components.md) - szczegóły implementacyjne
-- **Operations**: [Deployment Guide](../operations/deployment-guide.md) - podstawowe konfiguracje
-- **Operations**: [Deployment Examples](../operations/deployment-examples.md) - szczegółowe przykłady dla wszystkich scenariuszy
+- **Requirements**: [Non-functional Requirements](../requirements/non-functional-requirements.md) - implementation RNF3, RNF4
+- **Architecture**: [Containers (C4-2)](../architecture/c2-containers.md) - ADR mapping to components
+- **Architecture**: [Components (C4-3)](../architecture/c3-components.md) - implementation details
+- **Operations**: [Deployment Guide](../operations/deployment-guide.md) - basic configurations
+- **Operations**: [Deployment Examples](../operations/deployment-examples.md) - detailed examples for all scenarios
 - **Operations**: [Monitoring Guide](../operations/monitoring-guide.md) - observability stack
-- **Operations**: [Performance & SLA](../operations/performance-sla.md) - benchmarks i service level agreements
-- **User Guides**: [Workflows](../user-guides/workflows.md) - security w plugin development
+- **Operations**: [Performance & SLA](../operations/performance-sla.md) - benchmarks and service level agreements
+- **User Guides**: [Workflows](../user-guides/workflows.md) - security in plugin development
 {
   \"eventType\": \"ExperimentRunCompleted\",
   \"eventId\": \"uuid-here\",
@@ -1309,7 +1309,7 @@ class ResearchInsightsProjection:
 
 ### Consequences
 
-**Pozytywne:**
+**Positive:**
 - Scalable data ingestion
 - Real-time updates dla UI
 - Complete audit trail
@@ -1317,7 +1317,7 @@ class ResearchInsightsProjection:
 - Easy to add new data consumers
 - Better analytics capabilities
 
-**Negatywne:**
+**Negative:**
 - Eventual consistency challenges
 - Increased system complexity
 - Event schema evolution challenges
@@ -1329,11 +1329,11 @@ class ResearchInsightsProjection:
 
 **Status:** Accepted  
 **Data:** 2024-02-10  
-**Autorzy:** Data Architecture Team
+**Authors:** Data Architecture Team
 
 ### Context
 
-System ma różne data access patterns:
+System has different data access patterns:
 - **Transactional:** User management, experiment configuration
 - **Analytical:** Performance analysis, research insights
 - **Cache:** Real-time dashboard, session data
@@ -1453,13 +1453,13 @@ class ExperimentService:
 
 ### Consequences
 
-**Pozytywne:**
+**Positive:**
 - Optimized performance per use case
 - Scalability per data type
-- Technology best-fit dla każdego pattern
+- Technology best-fit for each pattern
 - Better resource utilization
 
-**Negatywne:**
+**Negative:**
 - Increased operational complexity
 - Data consistency challenges
 - Multiple backup/recovery procedures
@@ -1472,11 +1472,11 @@ class ExperimentService:
 
 **Status:** Accepted  
 **Data:** 2024-02-15  
-**Autorzy:** DevOps Team
+**Authors:** DevOps Team
 
 ### Context
 
-System potrzebuje:
+System needs:
 - Dynamic scaling dla worker nodes
 - Service discovery i load balancing
 - Rolling deployments dla continuous delivery
@@ -1651,7 +1651,7 @@ spec:
 
 ### Consequences
 
-**Pozytywne:**
+**Positive:**
 - Auto-scaling capabilities
 - Service discovery i load balancing
 - Rolling deployments zero-downtime
@@ -1660,7 +1660,7 @@ spec:
 - Multi-cloud portability
 - Strong ecosystem
 
-**Negatywne:**
+**Negative:**
 - Steep learning curve
 - Increased operational complexity
 - Resource overhead dla small workloads
@@ -1673,7 +1673,7 @@ spec:
 
 **Status:** Accepted  
 **Data:** 2024-02-20  
-**Autorzy:** System Integration Team
+**Authors:** System Integration Team
 
 ### Context
 
@@ -1833,7 +1833,7 @@ flowchart TD
 
 ### Consequences
 
-**Pozytywne:**
+**Positive:**
 - Scalable task processing
 - Load balancing across workers
 - Reliability through message persistence
@@ -1841,7 +1841,7 @@ flowchart TD
 - Retry logic dla failed tasks
 - Decoupling między producers i consumers
 
-**Negatywne:**
+**Negative:**
 - Message broker dependency
 - Added latency dla async operations
 - Message ordering challenges
@@ -1854,7 +1854,7 @@ flowchart TD
 
 **Status:** Accepted  
 **Data:** 2024-03-01  
-**Autorzy:** API Design Team
+**Authors:** API Design Team
 
 ### Context
 
@@ -2058,14 +2058,14 @@ class APIMigrationService:
 
 ### Consequences
 
-**Pozytywne:**
+**Positive:**
 - Clear versioning dla clients
 - Backward compatibility support
 - Graceful deprecation path
 - Flexibility dla new features
 - Research reproducibility
 
-**Negatywne:**
+**Negative:**
 - Maintenance overhead dla multiple versions
 - Code complexity z version handling  
 - Testing burden across versions
@@ -2077,14 +2077,14 @@ class APIMigrationService:
 
 **Status:** Accepted  
 **Data:** 2024-03-10  
-**Autorzy:** Security Team
+**Authors:** Security Team
 
 ### Context
 
-System wymaga:
+System requires:
 - Multi-tenant organization support
 - Role-based access control (RBAC)
-- API key management dla programmatic access
+- API key management for programmatic access
 - Integration z external identity providers
 - Audit logging dla compliance
 - Data privacy i isolation
@@ -2097,7 +2097,7 @@ OAuth 2.0 + JWT dengan RBAC:
 1. **Authentication:** OAuth 2.0 z OIDC
 2. **Authorization:** JWT tokens z role claims
 3. **Multi-tenancy:** Organization-based isolation
-4. **API Access:** API keys dla automated clients
+4. **API Access:** API keys for automated clients
 5. **Audit:** Comprehensive security logging
 
 ### Authentication Flow
@@ -2383,14 +2383,14 @@ def authenticate_request():
 
 ### Consequences
 
-**Pozytywne:**
+**Positive:**
 - Strong authentication i authorization
 - Multi-tenant data isolation
 - Flexible permission system
 - API key support dla automation
 - Audit trail capabilities
 
-**Negatywne:**
+**Negative:**
 - Implementation complexity
 - Performance overhead dla permission checks
 - Token management challenges
@@ -2402,13 +2402,13 @@ def authenticate_request():
 
 **Status:** Accepted  
 **Data:** 2024-03-15  
-**Autorzy:** DevOps Team
+**Authors:** DevOps Team
 
 ### Context
 
-System wymaga comprehensive observability:
+System requires comprehensive observability:
 - Performance monitoring across microservices
-- Business metrics dla research productivity
+- Business metrics for research productivity
 - Real-time alerting dla critical issues
 - Distributed tracing dla debugging
 - Log aggregation i analysis
@@ -2718,51 +2718,25 @@ def create_experiment(experiment_config):
 
 ### Consequences
 
-**Pozytywne:**
+**Positive:**
 - Comprehensive system visibility
 - Proactive issue detection
 - Performance optimization insights  
-- Debugging capabilities przez tracing
-- Business intelligence z metrics
+- Debugging capabilities through tracing
+- Business intelligence from metrics
 
-**Negatywne:**
+**Negative:**
 - Infrastructure overhead
 - Data storage costs
 - Monitoring complexity
-- Performance impact z instrumentation
+- Performance impact from instrumentation
 
 ---
 
-## Implementacja i status
+## Related Documents
 
-### 🎯 **Decision Tracking**
-
-| ADR | Status | Implementation | Priority | Owner |
-|-----|--------|----------------|----------|-------|
-| ADR-001 | ✅ Docummented | Microservices deployed | High | DevOps |
-| ADR-002 | ✅ Docummented | Plugin system active | High | Algorithm Team |
-| ADR-003 | ✅ Docummented | Event-driven tracking | High | Data Team |
-| ADR-004 | ✅ Docummented | Multi-DB operational | Medium | Data Team |
-| ADR-005 | ✅ Docummented | K8s production ready | High | DevOps |
-| ADR-006 | ✅ Docummented | RabbitMQ messaging | High | Backend Team |
-| ADR-007 | ✅ Docummented | API versioning active | Medium | API Team |
-| ADR-008 | ✅ Docummented | Security in production | Critical | Security Team |
-| ADR-009 | ✅ Docummented | Full observability | High | DevOps |
-
-### 📋 **Pending Decisions**
-
-- **ADR-010:** Data retention i archival strategy
-- **ADR-011:** Machine learning model serving architecture
-- **ADR-012:** Real-time collaboration features implementation
-- **ADR-013:** Mobile application architecture
-- **ADR-014:** Disaster recovery i business continuity
-
----
-
-## Powiązane dokumenty
-
-- **Architektura**: [Kontext (C4-1)](../architecture/c1-context.md), [Kontenery (C4-2)](../architecture/c2-containers.md), [Komponenty (C4-3)](../architecture/c3-components.md)
-- **Operacje**: [Deployment Guide](../operations/deployment-guide.md), [Monitoring Guide](../operations/monitoring-guide.md)
+- **Architecture**: [Context (C4-1)](../architecture/c1-context.md), [Containers (C4-2)](../architecture/c2-containers.md), [Components (C4-3)](../architecture/c3-components.md)
+- **Operations**: [Deployment Guide](../operations/deployment-guide.md), [Monitoring Guide](../operations/monitoring-guide.md)
 - **Methodology**: [Benchmarking Practices](../methodology/benchmarking-practices.md)
 - **Requirements**: [Functional Requirements](../requirements/functional-requirements.md), [Use Cases](../requirements/use-cases.md)
 - **User Guides**: [Workflows](../user-guides/workflows.md)

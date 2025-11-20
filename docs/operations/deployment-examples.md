@@ -1,24 +1,24 @@
-# Deployment Examples - Corvus Corone
+# Deployment Examples
 
-> **Szczegółowe przykłady konfiguracji dla różnych scenariuszy deployment**
+> **Detailed configuration examples for different deployment scenarios**
 
 ---
 
-## Przegląd scenariuszy deployment
+## Deployment Scenarios Overview
 
-| Scenariusz | Use Case | Skala | Kompleksowość | SLA |
+| Scenario | Use Case | Scale | Complexity | SLA |
 |------------|----------|-------|---------------|-----|
-| **Development** | Local development, testing | 1 developer | Niska | Dev-friendly |
-| **Staging** | Pre-production testing | 5-10 użytkowników | Średnia | Production-like |
-| **Production PC** | Small research lab | 10-20 użytkowników | Średnia | 99.0% uptime |
-| **Production Cloud** | Enterprise deployment | 100+ użytkowników | Wysoka | 99.9% uptime |
-| **High Availability** | Mission-critical research | 500+ użytkowników | Bardzo wysoka | 99.95% uptime |
+| **Development** | Local development, testing | 1 developer | Low | Dev-friendly |
+| **Staging** | Pre-production testing | 5-10 users | Medium | Production-like |
+| **Production PC** | Small research lab | 10-20 users | Medium | 99.0% uptime |
+| **Production Cloud** | Enterprise deployment | 100+ users | High | 99.9% uptime |
+| **High Availability** | Mission-critical research | 500+ users | Very high | 99.95% uptime |
 
 ---
 
 ## 1. Development Environment
 
-### 🛠️ docker-compose.dev.yml
+### docker-compose.dev.yml
 
 ```yaml
 version: '3.8'
@@ -188,7 +188,7 @@ echo "💾 MinIO Console: http://localhost:9001"
 
 ## 2. Staging Environment
 
-### 🧪 docker-compose.staging.yml
+### docker-compose.staging.yml
 
 ```yaml
 version: '3.8'
@@ -351,7 +351,7 @@ networks:
 
 ## 3. Production Cloud (Kubernetes)
 
-### ☁️ k8s-production.yml
+### k8s-production.yml
 
 ```yaml
 # Namespace
@@ -789,7 +789,7 @@ spec:
 
 ## 4. High Availability Multi-Region Setup
 
-### 🌍 Multi-Region Architecture
+### Multi-Region Architecture
 
 ```yaml
 # Primary Region (us-east-1)
@@ -938,9 +938,9 @@ spec:
 
 ---
 
-## 5. Deployment Scripts i Automation
+## 5. Deployment Scripts and Automation
 
-### 🚀 Deployment Automation
+### Deployment Automation
 
 ```bash
 #!/bin/bash
@@ -1058,14 +1058,14 @@ echo "✅ All health checks passed!"
 
 ---
 
-## Podsumowanie
+## Summary
 
-Te szczegółowe przykłady deployment zapewniają:
+These detailed deployment examples provide:
 
-1. **Development Environment** - Szybki setup dla developerów z hot reload i debugging
-2. **Staging Environment** - Production-like testing environment z monitoring
-3. **Production Cloud** - Scalable, secure Kubernetes deployment z HA
-4. **Multi-Region HA** - Disaster recovery i business continuity
-5. **Automation Scripts** - Automated deployment z health checks i rollback
+1. **Development Environment** - Quick setup for developers with hot reload and debugging
+2. **Staging Environment** - Production-like testing environment with monitoring
+3. **Production Cloud** - Scalable, secure Kubernetes deployment with HA
+4. **Multi-Region HA** - Disaster recovery and business continuity
+5. **Automation Scripts** - Automated deployment with health checks and rollback
 
-Każdy scenariusz jest dostosowany do konkretnych potrzeb i implementuje ADR z design-decisions.md.
+Each scenario is tailored to specific needs and implements ADRs from design-decisions.md.

@@ -1,181 +1,189 @@
-# Kluczowe aktywności - Corvus Corone
+# Key Activities
 
-> **Workflow i procesy wspierające benchmarking algorytmów HPO**
+> **Workflows and processes supporting HPO algorithm benchmarking**
 
 ---
 
-## Przegląd aktywności
+## Activities Overview
 
-System Corvus Corone wspiera zespoły badawcze poprzez zdefiniowane procesy i workflow które zapewniają efektywny benchmarking algorytmów HPO.
+Corvus Corone system supports research teams through defined processes and workflows that ensure effective HPO algorithm benchmarking.
 
-### 🔬 Aktywności badawcze
-- **Projektowanie eksperymentów** - Systematic approach do planowania benchmarków
-- **Analiza wyników** - Statystyczne porównanie algorytmów  
-- **Reprodukcja eksperymentów** - Zapewnienie odtwarzalności wyników
-- **Publikowanie wyników** - Generowanie raportów i dokumentacji
+### 🔬 Research Activities
+- **Experiment Design** - Systematic approach to benchmark planning
+- **Results Analysis** - Statistical algorithm comparison  
+- **Experiment Reproduction** - Ensuring result reproducibility
+- **Results Publishing** - Report and documentation generation
 
-### 🔧 Aktywności techniczne  
-- **Rozwój algorytmów** - Plugin development workflow
-- **Zarządzanie danymi** - Dataset management i wersjonowanie
-- **Monitoring eksperymentów** - Real-time tracking i alerting
-- **Capacity planning** - Skalowanie i optymalizacja zasobów
+### 🔧 Technical Activities  
+- **Algorithm Development** - Plugin development workflow
+- **Data Management** - Dataset management and versioning
+- **Experiment Monitoring** - Real-time tracking and alerting
+- **Capacity Planning** - Resource scaling and optimization
 
-### 🏛️ Aktywności administracyjne
-- **Governance** - Zatwierdzanie algorytmów i benchmarków
+### 🏛️ Administrative Activities
+- **Governance** - Algorithm and benchmark approval
 - **Backup & Recovery** - Disaster recovery procedures  
-- **Security management** - Bezpieczeństwo i audit
-- **User management** - Role i uprawnienia
+- **Security Management** - Security and audit
+- **User Management** - Roles and permissions
 
 ---
 
-## Workflow: Projektowanie eksperymentu benchmarkowego
+## Workflow: Benchmark Experiment Design
 
-### 📋 Faza planowania
+| Benchmark Goal | Description / role in system |
+|----------------|------------------------------|
+| **G1 – Evaluation** | Quality assessment of individual HPO algorithms on well-defined benchmarks and metrics |
+| **G2 – Comparison** | Comparison of multiple HPO algorithms (including custom ones) on the same benchmarks and metrics |
+| **G3 – Sensitivity** | Sensitivity analysis of results to changes in configuration, seeds, benchmark instances and parameters | 
+| **G4 – Extrapolation** | Study of HPO algorithm behavior on diverse problem instances (scalability, difficulty, size) |
+| **G5 – Theory and development** | Support for developing new HPO algorithms and linking results to theory and scientific literature |
 
-#### 1. Definicja celów badawczych
+### 📋 Planning Phase
+
+#### 1. Research Objectives Definition
 ```
 Inputs: Research question, hypothesis
 Process: 
-- Zdefiniuj konkretne pytania badawcze
-- Wybierz odpowiednie cele G1-G5 z framework'u benchmarkingu
-- Określ kryteria sukcesu eksperymentu
+- Define specific research questions
+- Choose appropriate goals G1-G5 from benchmarking framework
+- Define experiment success criteria
 Outputs: Research objectives document
 ```
 
-#### 2. Dobór benchmarków i algorytmów
+#### 2. Benchmark and Algorithm Selection
 ```
 Inputs: Research objectives  
 Process:
-- Przeanalizuj katalog dostępnych benchmarków
-- Sprawdź reprezentatywność problemów
-- Wybierz algorytmy do porównania
-- Sprawdź kompatybilność algorytm-benchmark
+- Analyze catalog of available benchmarks
+- Check problem representativeness
+- Select algorithms for comparison
+- Check algorithm-benchmark compatibility
 Outputs: Experiment configuration draft
 ```
 
-#### 3. Planowanie zasobów
+#### 3. Resource Planning
 ```
 Inputs: Configuration draft
 Process:
-- Oszacuj wymagania obliczeniowe
-- Zaplanuj budżet czasowy eksperymentu  
-- Sprawdź dostępność workerów
-- Skonfiguruj polityki retry i timeoutów
+- Estimate computational requirements
+- Plan experiment time budget  
+- Check worker availability
+- Configure retry and timeout policies
 Outputs: Resource allocation plan
 ```
 
-### ⚡ Faza wykonania
+### ⚡ Execution Phase
 
-#### 4. Konfiguracja i walidacja
+#### 4. Configuration and Validation
 ```
 Process Flow:
-1. Użyj Experiment Designer UI do konfiguracji
-2. System waliduje konfigurację automatycznie
-3. Przejrzyj plan runów (algorytm × benchmark × seed)
-4. Zatwierdź i zapisz konfigurację eksperymentu
+1. Use Experiment Designer UI for configuration
+2. System validates configuration automatically
+3. Review run plan (algorithm × benchmark × seed)
+4. Approve and save experiment configuration
 ```
 
-#### 5. Uruchomienie eksperymentu
+#### 5. Experiment Launch
 ```
 Process Flow:
-1. Uruchom eksperyment przez Web UI
-2. Orchestrator tworzy zadania RunJob
-3. Workers pobierają i wykonują zadania
-4. Monitor postępu w Tracking Dashboard
-5. Reaguj na błędy i anomalie
+1. Launch experiment through Web UI
+2. Orchestrator creates RunJob tasks
+3. Workers fetch and execute tasks
+4. Monitor progress in Tracking Dashboard
+5. React to errors and anomalies
 ```
 
-#### 6. Monitoring i interwencje
+#### 6. Monitoring and Interventions
 ```
 Monitoring checklist:
-□ Sprawdź status runów co godzinę
-□ Monitor wykorzystania zasobów  
-□ Reaguj na alerty o failed runs
-□ Sprawdź quality gates (>95% success rate)
-□ Dokumentuj anomalie i interwencje
+□ Check run status every hour
+□ Monitor resource utilization  
+□ React to failed run alerts
+□ Check quality gates (>95% success rate)
+□ Document anomalies and interventions
 ```
 
-### 📊 Faza analizy
+### 📊 Analysis Phase
 
-#### 7. Analiza wyników
+#### 7. Results Analysis
 ```
 Process Flow:
-1. Użyj Comparison View UI do wizualizacji
-2. Przeprowadź testy statystyczne
-3. Wygeneruj rankingi algorytmów
-4. Identyfikuj patterns i insights
-5. Waliduj wyniki pod kątem research objectives
+1. Use Comparison View UI for visualization
+2. Perform statistical tests
+3. Generate algorithm rankings
+4. Identify patterns and insights
+5. Validate results against research objectives
 ```
 
-#### 8. Reprodukcja i walidacja
+#### 8. Reproduction and Validation
 ```
 Validation checklist:
-□ Sprawdź completeness eksperymentu (wszystkie runy)
-□ Porównaj z baseline results (jeśli dostępne)
-□ Wykonaj sanity checks na wynikach
-□ Testuj reprodukowalność na sample runów
-□ Dokumentuj discovered issues
+□ Check experiment completeness (all runs)
+□ Compare with baseline results (if available)
+□ Perform sanity checks on results
+□ Test reproducibility on sample runs
+□ Document discovered issues
 ```
 
 ---
 
-## Workflow: Rozwój i rejestracja algorytmu HPO
+## Workflow: HPO Algorithm Development and Registration
 
-### 🧩 Faza developmentu
+### 🧩 Development Phase
 
-#### 1. Setup środowiska
+#### 1. Environment Setup
 ```bash
-# Pobierz Corvus Corone SDK
+# Download Corvus Corone SDK
 pip install corvus-corone-sdk
 
-# Utwórz nowy projekt algorytmu
+# Create new algorithm project
 corvus-cli init algorithm --name MyBayesianOpt --type BAYESIAN
 
 # Setup local development environment  
 corvus-cli dev setup
 ```
 
-#### 2. Implementacja algorytmu
+#### 2. Algorithm Implementation
 ```python
-# Implementuj interfejs IAlgorithmPlugin
+# Implement IAlgorithmPlugin interface
 class MyBayesianOptimizer(IAlgorithmPlugin):
     def init(self, config_space, seed, resources):
-        # Inicjalizacja algorytmu
+        # Algorithm initialization
         pass
         
     def suggest(self, history):
-        # Zaproponuj nowe konfiguracje
+        # Suggest new configurations
         pass
         
     def observe(self, config, result):
-        # Zaktualizuj model na podstawie wyniku
+        # Update model based on result
         pass
 ```
 
-#### 3. Testowanie lokalne
+#### 3. Local Testing
 ```bash
-# Uruchom lokalne testy
+# Run local tests
 corvus-cli test local --algorithm MyBayesianOpt --benchmark iris_classification
 
-# Debug algorytmu
+# Debug algorithm
 corvus-cli debug --run-id local_run_123
 
 # Profile performance
 corvus-cli profile --algorithm MyBayesianOpt
 ```
 
-### 📦 Faza rejestracji
+### 📦 Registration Phase
 
-#### 4. Package i upload
+#### 4. Package and Upload
 ```bash
-# Stwórz package algorytmu
+# Create algorithm package
 corvus-cli package --algorithm MyBayesianOpt --version 1.0.0
 
-# Upload do systemu
+# Upload to system
 corvus-cli upload --package MyBayesianOpt-1.0.0.wheel --registry production
 ```
 
-#### 5. Review i approval
+#### 5. Review and Approval
 ```
 Process Flow:
 1. **Automated Security Scanning** (ADR-005):
@@ -185,72 +193,72 @@ Process Flow:
    - Seccomp/AppArmor policy validation
    
 2. **Functional Validation:**
-   - Algorithm przechodzi automated tests
-   - Performance benchmarks na standard suite
+   - Algorithm passes automated tests
+   - Performance benchmarks on standard suite
    - Resource utilization validation
    
 3. **Manual Review:**
-   - Administrator otrzymuje notification
-   - Code review dla security concerns
+   - Administrator receives notification
+   - Code review for security concerns
    - Documentation completeness check
    
 4. **Approval Workflow (ADR-007):**
-   - plugin-author role może submit
-   - admin role musi approve
-   - RBAC enforcement na każdym kroku
+   - plugin-author role can submit
+   - admin role must approve
+   - RBAC enforcement at each step
    
 5. **Publication:**
-   - Approved plugin w Algorithm Registry
-   - Container image w secure registry
-   - Metadata update w catalogue
+   - Approved plugin in Algorithm Registry
+   - Container image in secure registry
+   - Metadata update in catalogue
 ```
 
 ---
 
-## Workflow: Analiza porównawcza algorytmów
+## Workflow: Comparative Algorithm Analysis
 
 ### 📈 Statistical Analysis Pipeline
 
-#### 1. Data preparation
+#### 1. Data Preparation
 ```
 Process:
-- Agreguj wyniki z wielu eksperymentów
-- Sprawdź completeness danych
-- Identyfikuj outliers i anomalie
-- Prepare datasets dla testów statystycznych
+- Aggregate results from multiple experiments
+- Check data completeness
+- Identify outliers and anomalies
+- Prepare datasets for statistical tests
 ```
 
-#### 2. Comparative analysis
+#### 2. Comparative Analysis
 ```
 Statistical Tests Pipeline:
 1. Friedman test (overall significance)
 2. Nemenyi post-hoc test (pairwise comparisons)  
 3. Effect size calculations (Cohen's d, Cliff's delta)
-4. Confidence intervals dla rankings
+4. Confidence intervals for rankings
 5. Multiple testing corrections (Bonferroni, FDR)
 ```
 
-#### 3. Visualization i raportowanie
+#### 3. Visualization and Reporting
 ```
 Visualization Types:
-- Box plots dla distribution comparisons
-- Line plots dla convergence analysis  
-- Critical difference diagrams dla rankings
-- Heatmaps dla pairwise comparisons
-- Radar charts dla multi-metric analysis
+- Box plots for distribution comparisons
+- Line plots for convergence analysis  
+- Critical difference diagrams for rankings
+- Heatmaps for pairwise comparisons
+- Radar charts for multi-metric analysis
 ```
 
 ---
 
-## Monitorowanie i SLA
+## Monitoring and SLA
 
 ### 🎯 Service Level Objectives
 
-| Metryka | Target | Measurement | Alert Threshold |
+| Metric | Target | Measurement | Alert Threshold |
 |---------|--------|-------------|-----------------|
 | **API Response Time** | 95% < 200ms, 99% < 500ms | P95, P99 latency | P95 > 300ms |
 | **System Availability** | 99.9% uptime | Health check success rate | < 99.5% |
-| **Experiment Success Rate** | >95% runów successful | Failed runs / Total runs | < 90% |
+| **Experiment Success Rate** | >95% runs successful | Failed runs / Total runs | < 90% |
 | **Data Durability** | 99.999999999% | Backup validation | Backup failure |
 
 ### 📊 Key Performance Indicators
@@ -334,7 +342,7 @@ Target: Response time < 200ms
 
 ---
 
-## Backup i Disaster Recovery
+## Backup and Disaster Recovery
 
 ### 💾 Backup Strategy
 
@@ -383,10 +391,10 @@ Compliance: SOC 2, GDPR compliance procedures
 
 ---
 
-## Powiązane dokumenty
+## Related Documents
 
-- **Architektura**: [Kontekst (C4-1)](../architecture/c1-context.md), [Kontenery (C4-2)](../architecture/c2-containers.md)
-- **Wymagania**: [Functional Requirements](../requirements/functional-requirements.md), [Use Cases](../requirements/use-cases.md)
+- **Architecture**: [Context (C4-1)](../architecture/c1-context.md), [Containers (C4-2)](../architecture/c2-containers.md)
+- **Requirements**: [Functional Requirements](../requirements/functional-requirements.md), [Use Cases](../requirements/use-cases.md)
 - **Operations**: [Deployment Guide](../operations/deployment-guide.md), [Monitoring Guide](../operations/monitoring-guide.md)
 - **Methodology**: [Benchmarking Practices](../methodology/benchmarking-practices.md)
 - **Design**: [Design Decisions](../design/design-decisions.md)

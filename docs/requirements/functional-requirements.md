@@ -1,198 +1,198 @@
-# Wymagania funkcjonalne - Corvus Corone
+# Functional Requirements
 
-> **Functional requirements dla systemu HPO Benchmarking Platform**
+> **Functional requirements for the HPO Benchmarking Platform system**
 
 ---
 
-## 📚 R1 – Katalog algorytmów HPO (wbudowanych)
+## 📚 R1 – Built-in HPO Algorithm Catalog
 
-**Wymaganie:** System musi zawierać katalog wbudowanych algorytmów HPO gotowych do użycia.
+**Requirement:** System must contain a catalog of built-in HPO algorithms ready for use.
 
-**Kryteria akceptacji:**
-- Podstawowe algorytmy: Random Search, Grid Search, Bayesian Optimization (TPE)
-- Algorytmy ewolucyjne: Genetic Algorithm, Differential Evolution
+**Acceptance criteria:**
+- Basic algorithms: Random Search, Grid Search, Bayesian Optimization (TPE)
+- Evolutionary algorithms: Genetic Algorithm, Differential Evolution
 - Gradient-based: CMA-ES, SMAC
-- Metadane algorytmów: typ, parametry, kompatybilność z problemami
-- Wersjonowanie algorytmów wbudowanych
-- API do listowania i filtrowania algorytmów
+- Algorithm metadata: type, parameters, problem compatibility
+- Built-in algorithm versioning
+- API for listing and filtering algorithms
 
 ---
 
-## 🔌 R2 – Wsparcie dla algorytmów HPO jako pluginów
+## 🔌 R2 – Support for HPO Algorithms as Plugins
 
-**Wymaganie:** System musi umożliwiać dodawanie własnych algorytmów HPO jako pluginów.
+**Requirement:** System must enable adding custom HPO algorithms as plugins.
 
-**Kryteria akceptacji:**
-- Plugin SDK dla Python (minimum), docelowo R, Julia
-- Standardowy interfejs IAlgorithmPlugin
-- Container-based isolation pluginów
-- Plugin registry z metadanymi
+**Acceptance criteria:**
+- Plugin SDK for Python (minimum), targeting R, Julia
+- Standard IAlgorithmPlugin interface
+- Container-based plugin isolation
+- Plugin registry with metadata
 - Lifecycle management (install, activate, deactivate, uninstall)
-- Security scanning pluginów przed rejestracją
+- Security scanning of plugins before registration
 
 ---
 
-## 🏷️ R3 – Wersjonowanie algorytmów HPO
+## 🏷️ R3 – HPO Algorithm Versioning
 
-**Wymaganie:** System musi obsługiwać wersjonowanie algorytmów (wbudowanych i pluginów).
+**Requirement:** System must support versioning of algorithms (built-in and plugins).
 
-**Kryteria akceptacji:**
+**Acceptance criteria:**
 - Semantic versioning (major.minor.patch)
 - Backwards compatibility tracking
-- Możliwość rollback do poprzedniej wersji
-- Version pinning w eksperymentach
-- Deprecation warnings dla starych wersji
-- Migration paths między wersjami
+- Ability to rollback to previous version
+- Version pinning in experiments
+- Deprecation warnings for old versions
+- Migration paths between versions
 
 ---
 
-## 📊 R4 – Katalog benchmarków
+## 📊 R4 – Benchmark Catalog
 
-**Wymaganie:** System musi zawierać katalog benchmarków z definicjami problemów.
+**Requirement:** System must contain a catalog of benchmarks with problem definitions.
 
-**Kryteria akceptacji:**
+**Acceptance criteria:**
 - Standard benchmarks: UCI datasets, synthetic problems
 - Problem types: classification, regression, clustering
-- Benchmark instances z metadanymi
-- Best-known values gdzie dostępne
-- Dataset versioning i checksums
+- Benchmark instances with metadata
+- Best-known values where available
+- Dataset versioning and checksums
 - Custom benchmark definition support
 
 ---
 
-## ⚙️ R5 – Konfiguracja eksperymentów benchmarkowych
+## ⚙️ R5 – Benchmark Experiment Configuration
 
-**Wymaganie:** System musi umożliwiać łatwą konfigurację eksperymentów.
+**Requirement:** System must enable easy configuration of experiments.
 
-**Kryteria akceptacji:**
-- Web UI do konfiguracji eksperymentów
-- Dobór algorytmów i benchmarków
+**Acceptance criteria:**
+- Web UI for experiment configuration
+- Algorithm and benchmark selection
 - Budget configuration (evaluations, time, resources)
-- Seed management dla reprodukowalności
+- Seed management for reproducibility
 - Parameter space definition
-- Validation przed uruchomieniem
+- Validation before execution
 
 ---
 
-## 🎯 R6 – Orkiestracja eksperymentów
+## 🎯 R6 – Experiment Orchestration
 
-**Wymaganie:** System musi zarządzać planowaniem i uruchamianiem eksperymentów.
+**Requirement:** System must manage planning and execution of experiments.
 
-**Kryteria akceptacji:**
-- Queue management dla runów
+**Acceptance criteria:**
+- Queue management for runs
 - Priority scheduling (normal, high, low)
-- Resource allocation i limits
-- Retry policies dla failed runs
-- Progress tracking w czasie rzeczywistym
-- Graceful shutdown i resume
+- Resource allocation and limits
+- Retry policies for failed runs
+- Real-time progress tracking
+- Graceful shutdown and resume
 
 ---
 
-## 📱 R7 – Panel śledzenia eksperymentów
+## 📱 R7 – Experiment Tracking Panel
 
-**Wymaganie:** System musi zapewniać dashboard do monitorowania eksperymentów.
+**Requirement:** System must provide a dashboard for monitoring experiments.
 
-**Kryteria akceptacji:**
-- Lista eksperymentów z statusami
-- Real-time metrics i progress bars
-- Filtering i sorting eksperymentów
-- Detailed view pojedynczych runów
-- Log viewing i download
+**Acceptance criteria:**
+- List of experiments with statuses
+- Real-time metrics and progress bars
+- Filtering and sorting of experiments
+- Detailed view of individual runs
+- Log viewing and download
 - Export experiment metadata
 
 ---
 
-## 📈 R8 – Porównywanie wyników algorytmów
+## 📈 R8 – Algorithm Results Comparison
 
-**Wymaganie:** System musi umożliwiać porównywanie wyników różnych algorytmów.
+**Requirement:** System must enable comparison of results from different algorithms.
 
-**Kryteria akceptacji:**
+**Acceptance criteria:**
 - Side-by-side comparison view
 - Statistical significance tests
 - Visualization: box plots, convergence curves, rankings
-- Performance profiles i win/loss matrices
+- Performance profiles and win/loss matrices
 - Export comparison results
 - Custom metrics definition
 
 ---
 
-## 📋 R9 – Rejestrowanie i przegląd logów oraz artefaktów
+## 📋 R9 – Logging and Artifact Review
 
-**Wymaganie:** System musi zapisywać kompletne logi i artefakty z eksperymentów.
+**Requirement:** System must record complete logs and artifacts from experiments.
 
-**Kryteria akceptacji:**
+**Acceptance criteria:**
 - Structured logging (JSON format)
 - Artifact storage (models, plots, configs)
-- Log search i filtering
+- Log search and filtering
 - Artifact versioning
 - Automatic cleanup policies
-- Download i sharing capabilities
+- Download and sharing capabilities
 
 ---
 
-## 📚 R10 – Zarządzanie referencjami do publikacji
+## 📚 R10 – Publication Reference Management
 
-**Wymaganie:** System musi obsługiwać bibliografię i publikacje naukowe.
+**Requirement:** System must support bibliography and scientific publications.
 
-**Kryteria akceptacji:**
-- Publication database z metadanymi
-- DOI integration i automatic fetching
+**Acceptance criteria:**
+- Publication database with metadata
+- DOI integration and automatic fetching
 - BibTeX import/export
 - Linking publications to algorithms/benchmarks
-- Citation generation dla raportów
+- Citation generation for reports
 - CrossRef/arXiv integration
 
 ---
 
-## 📄 R11 – Generowanie raportów
+## 📄 R11 – Report Generation
 
-**Wymaganie:** System musi generować profesjonalne raporty z eksperymentów.
+**Requirement:** System must generate professional reports from experiments.
 
-**Kryteria akceptacji:**
+**Acceptance criteria:**
 - HTML/PDF report generation
 - Template-based reporting
-- Bibliography i citations
+- Bibliography and citations
 - Experiment configuration documentation
 - Statistical analysis inclusion
 - Custom report templates
 
 ---
 
-## 🔗 R12 – API do integracji ze światem zewnętrznym
+## 🔗 R12 – External Integration API
 
-**Wymaganie:** System musi zapewniać REST API dla integracji.
+**Requirement:** System must provide REST API for integrations.
 
-**Kryteria akceptacji:**
-- RESTful API z OpenAPI specification
-- Authentication i authorization
-- Rate limiting i throttling
-- Webhook support dla notifications
+**Acceptance criteria:**
+- RESTful API with OpenAPI specification
+- Authentication and authorization
+- Rate limiting and throttling
+- Webhook support for notifications
 - Batch operations support
-- API versioning i backwards compatibility
+- API versioning and backwards compatibility
 
 ---
 
-## 🛠️ R13 – API/SDK do tworzenia własnych algorytmów HPO
+## 🛠️ R13 – API/SDK for Custom HPO Algorithm Development
 
-**Wymaganie:** System musi zapewniać SDK dla developerów algorytmów.
+**Requirement:** System must provide SDK for algorithm developers.
 
-**Kryteria akceptacji:**
-- Python SDK z clear interface
-- Documentation i tutorials
+**Acceptance criteria:**
+- Python SDK with clear interface
+- Documentation and tutorials
 - Example implementations
-- Testing framework dla pluginów
-- Packaging i distribution support
+- Testing framework for plugins
+- Packaging and distribution support
 - Version compatibility matrix
 
 ---
 
-## 📤 R14 – Eksport danych
+## 📤 R14 – Data Export
 
-**Wymaganie:** System musi umożliwiać eksport wyników do zewnętrznych formatów.
+**Requirement:** System must enable export of results to external formats.
 
-**Kryteria akceptacji:**
+**Acceptance criteria:**
 - Multiple formats: CSV, JSON, Parquet, HDF5
-- Structured export z metadata
+- Structured export with metadata
 - Batch export capabilities
 - Cloud storage integration (S3, GCS)
 - Export job scheduling
@@ -202,21 +202,21 @@
 
 ## 🖥️ R15 – Multi-environment deployment (PC-first, cloud-ready)
 
-**Wymaganie:** System musi działać zarówno lokalnie (PC-first) jak i w chmurze (cloud-ready).
+**Requirement:** System must work both locally (PC-first) and in cloud (cloud-ready).
 
-**Kryteria akceptacji:**
-- Docker Compose dla local deployment
-- Kubernetes manifests dla cloud
-- Auto-scaling workkerów
+**Acceptance criteria:**
+- Docker Compose for local deployment
+- Kubernetes manifests for cloud
+- Auto-scaling workers
 - Environment-specific configuration
 - Migration path PC → cloud
-- Resource monitoring i optimization
+- Resource monitoring and optimization
 
 ---
 
-## 🎯 Macierz wymagań vs komponenty
+## 🎯 Requirements vs Components Matrix
 
-| Komponent | R1 | R2 | R3 | R4 | R5 | R6 | R7 | R8 | R9 | R10 | R11 | R12 | R13 | R14 | R15 |
+| Component | R1 | R2 | R3 | R4 | R5 | R6 | R7 | R8 | R9 | R10 | R11 | R12 | R13 | R14 | R15 |
 |-----------|----|----|----|----|----|----|----|----|----|----|----|----|----|----|-----|
 | **Web UI** | ✅ | ✅ | ✅ | ✅ | ⭐ | - | ⭐ | ⭐ | ✅ | ⭐ | ✅ | ✅ | - | ✅ | ✅ |
 | **API Gateway** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ⭐ | ✅ | ✅ | ⭐ |
@@ -229,16 +229,16 @@
 | **Publication Service** | ✅ | ✅ | ✅ | ✅ | - | - | - | - | ✅ | ⭐ | ⭐ | ✅ | - | ✅ | ✅ |
 | **Plugin Runtime** | - | ⭐ | ⭐ | - | - | ✅ | ✅ | - | ✅ | - | - | ✅ | ⭐ | - | ✅ |
 
-**Legenda:**
-- ⭐ = Krytyczne wymaganie dla komponentu
-- ✅ = Ważne wymaganie 
-- - = Nie dotyczy
+**Legend:**
+- ⭐ = Critical requirement for component
+- ✅ = Important requirement 
+- - = Not applicable
 
 ---
 
-## Powiązane dokumenty
+## Related Documents
 
 - **Requirements**: [Use Cases](use-cases.md), [Non-functional Requirements](non-functional-requirements.md)
-- **Architektura**: [Kontekst (C4-1)](../architecture/c1-context.md), [Kontenery (C4-2)](../architecture/c2-containers.md)
+- **Architecture**: [Context (C4-1)](../architecture/c1-context.md), [Containers (C4-2)](../architecture/c2-containers.md)
 - **Traceability**: [Requirements Traceability](requirements-traceability.md)
 - **Design**: [Design Decisions](../design/design-decisions.md), [Data Model](../design/data-model.md)

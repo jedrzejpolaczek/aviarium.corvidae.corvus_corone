@@ -1,22 +1,22 @@
-# Monitoring Guide - Corvus Corone
+# Monitoring Guide
 
-> **Kompleksowy monitoring systemu HPO Benchmarking Platform**
+> **Comprehensive monitoring for HPO Benchmarking Platform system**
 
 ---
 
-## Przegląd monitoringu
+## Monitoring Overview
 
-System monitoringu Corvus Corone zapewnia pełną obserwowalność na trzech poziomach:
+Corvus Corone monitoring system provides full observability at three levels:
 
 ### 📊 **Infrastructure Monitoring**
-- Metryki systemowe (CPU, RAM, I/O, Network)
-- Kubernetes cluster health (jeśli applicable)
-- Database performance i connection pools
+- System metrics (CPU, RAM, I/O, Network)
+- Kubernetes cluster health (if applicable)
+- Database performance and connection pools
 - Message broker queue lengths
 
 ### 🏃 **Application Monitoring**  
-- API response times i error rates
-- Worker throughput i success rates
+- API response times and error rates
+- Worker throughput and success rates
 - Experiment execution metrics
 - Business KPIs (experiments/day, algorithm usage)
 
@@ -72,7 +72,7 @@ flowchart LR
 #### Prometheus (Metrics Collection)
 - **Rol:** Time-series metryki, alerting rules
 - **Port:** 9090
-- **Retention:** 30 dni (lokalnie), długoterminowe w Thanos/Cortex
+- **Retention:** 30 days (locally), long-term in Thanos/Cortex
 
 #### Grafana (Visualization)  
 - **Rol:** Dashboardy, wykresy, alerting UI
@@ -286,7 +286,7 @@ feature_usage_total = Counter(
 ```
 
 #### Key panels
-- **Service Health:** Up/down status wszystkich serwisów
+- **Service Health:** Up/down status of all services
 - **Request Volume:** HTTP requests per second z breakdown na endpoint
 - **Response Times:** P50, P95, P99 latency
 - **Error Rates:** 4xx, 5xx errors jako % total requests
@@ -948,7 +948,7 @@ def deep_health_check():
 
 ---
 
-## Powiązane dokumenty
+## Related Documents
 
 - **Deployment**: [Deployment Guide](deployment-guide.md)
 - **Architektura**: [Kontenery (C4-2)](../architecture/c2-containers.md), [Komponenty (C4-3)](../architecture/c3-components.md)

@@ -1,10 +1,10 @@
-# Przypadki użycia - Corvus Corone
+# Use Cases
 
-> **Scenariusze użytkowania systemu HPO Benchmarking Platform**
+> **Usage scenarios for the HPO Benchmarking Platform system**
 
 ---
 
-## Przegląd przypadków użycia
+## Use Cases Overview
 
 ```mermaid
 ---
@@ -13,10 +13,10 @@ config:
   theme: redux-dark
 ---
 flowchart LR
-    A1(("Badacz / Inżynier ML")) --> UC1[["UC1: Skonfiguruj i uruchom eksperyment"]] & UC4[["UC4: Porównaj wyniki algorytmów"]] & UC5[["UC5: Przeglądaj i filtruj eksperymenty"]] & UC6[["UC6: Zarządzaj referencjami do artykułów"]] & UC9[["UC9: Wygeneruj raport z eksperymentu"]]
-    A2(("Twórca algorytmu HPO")) --> UC3[["UC3: Zaimplementuj i zarejestruj algorytm HPO plugin"]] & UC4 & UC5
-    A3(("Administrator")) --> UC2[["UC2: Dodaj wbudowany algorytm HPO"]] & UC6 & UC7[["UC7: Uruchom system lokalnie na PC"]] & UC8[["UC8: Uruchom system w chmurze / skaluj workerów"]]
-    A4(("Zewnętrzny system AutoML")) --> UC1 & UC4 & UC5 & UC9
+    A1(("Researcher / ML Engineer")) --> UC1[["UC1: Configure and run experiment"]] & UC4[["UC4: Compare algorithm results"]] & UC5[["UC5: Browse and filter experiments"]] & UC6[["UC6: Manage paper references"]] & UC9[["UC9: Generate experiment report"]]
+    A2(("HPO Algorithm Creator")) --> UC3[["UC3: Implement and register HPO algorithm plugin"]] & UC4 & UC5
+    A3(("Administrator")) --> UC2[["UC2: Add built-in HPO algorithm"]] & UC6 & UC7[["UC7: Run system locally on PC"]] & UC8[["UC8: Run system in cloud / scale workers"]]
+    A4(("External AutoML system")) --> UC1 & UC4 & UC5 & UC9
      A1:::Peach
      A2:::Peach
      A3:::Peach
@@ -30,89 +30,89 @@ flowchart LR
 
 ---
 
-## UC1: Skonfiguruj i uruchom eksperyment benchmarkowy
+## UC1: Configure and run benchmark experiment
 
-### 📋 Podstawowe informacje
+### 📋 Basic information
 
-| Właściwość | Wartość |
-|------------|---------|
-| **Aktorzy główni** | Badacz / Inżynier ML |
-| **Aktorzy współuczestniczący** | System (Orchestrator, Benchmark Definition, Algorithm Registry, Tracking) |
-| **Cel** | Utworzenie eksperymentu benchmarkowego, zdefiniowanie planu runów, uruchomienie i zapis wyników |
-| **Poziom** | User goal |
-| **Kompleksowość** | Średnia |
+| Property | Value |
+|----------|-------|
+| **Primary actors** | Researcher / ML Engineer |
+| **Supporting actors** | System (Orchestrator, Benchmark Definition, Algorithm Registry, Tracking) |
+| **Goal** | Create benchmark experiment, define run plan, execute and save results |
+| **Level** | User goal |
+| **Complexity** | Medium |
 
-### 🎯 Warunki początkowe
-- Istnieją zarejestrowane benchmarki i algorytmy HPO (wbudowane lub pluginy)
-- Użytkownik jest zalogowany i posiada uprawnienia do tworzenia eksperymentów
-- System jest dostępny i operacyjny
+### 🎯 Preconditions
+- Registered benchmarks and HPO algorithms exist (built-in or plugins)
+- User is logged in and has permissions to create experiments
+- System is available and operational
 
-### 📝 Główny scenariusz
+### 📝 Main scenario
 
-1. **Inicjacja eksperymentu**
-   - A1 otwiera Web UI – sekcję „Nowy eksperyment"
-   - System pobiera listę benchmarków z Benchmark Definition Service
+1. **Experiment initiation**
+   - A1 opens Web UI – "New experiment" section
+   - System retrieves benchmark list from Benchmark Definition Service
 
-2. **Konfiguracja benchmarków**
-   - A1 wybiera jeden lub więcej benchmarków oraz instancje problemów
-   - System wyświetla szczegóły wybranych benchmarków (datasety, metryki)
+2. **Benchmark configuration**
+   - A1 selects one or more benchmarks and problem instances
+   - System displays details of selected benchmarks (datasets, metrics)
 
-3. **Wybór algorytmów**
-   - System pobiera listę dostępnych algorytmów z Algorithm Registry
-   - A1 wybiera algorytmy i konfiguruje ich parametry/limity budżetu HPO
+3. **Algorithm selection**
+   - System retrieves list of available algorithms from Algorithm Registry
+   - A1 selects algorithms and configures their parameters/HPO budget limits
 
-4. **Definicja celów**
-   - A1 definiuje cele eksperymentu (G1–G5) i metryki
-   - A1 ustawia polityki retry, timeouty, priorytety
+4. **Goal definition**
+   - A1 defines experiment goals (G1–G5) and metrics
+   - A1 sets retry policies, timeouts, priorities
 
-5. **Zapis konfiguracji**
-   - A1 zapisuje konfigurację eksperymentu
-   - API Gateway przekazuje konfigurację do Experiment Orchestrator
+5. **Configuration save**
+   - A1 saves experiment configuration
+   - API Gateway passes configuration to Experiment Orchestrator
 
-6. **Walidacja**
-   - Orchestrator waliduje konfigurację (Benchmark Definition, Algorithm Registry)
-   - System sprawdza kompatybilność algorytmów z benchmarkami
+6. **Validation**
+   - Orchestrator validates configuration (Benchmark Definition, Algorithm Registry)
+   - System checks algorithm compatibility with benchmarks
 
-7. **Utworzenie eksperymentu**
-   - Orchestrator tworzy plan runów i zapisuje eksperyment w Experiment Tracking Service
-   - Generowany jest unikalny experiment_id
+7. **Experiment creation**
+   - Orchestrator creates run plan and saves experiment in Experiment Tracking Service
+   - Unique experiment_id is generated
 
-8. **Uruchomienie**
-   - A1 uruchamia eksperyment (przycisk „Run")
-   - Orchestrator wysyła zadania runów do Message Broker
+8. **Execution**
+   - A1 starts experiment ("Run" button)
+   - Orchestrator sends run tasks to Message Broker
 
-9. **Wykonanie**
-   - Workery pobierają zadania, wykonują runy
-   - Workery raportują metryki i logi do Tracking Service w czasie rzeczywistym
+9. **Processing**
+   - Workers retrieve tasks, execute runs
+   - Workers report metrics and logs to Tracking Service in real-time
 
-10. **Zakończenie**
-    - Orchestrator aktualizuje status eksperymentu
-    - A1 otrzymuje powiadomienie o zakończeniu
+10. **Completion**
+    - Orchestrator updates experiment status
+    - A1 receives completion notification
 
-### ⚠️ Scenariusze alternatywne
+### ⚠️ Alternative scenarios
 
-#### 1A. Walidacja konfiguracji nie powiodła się
-1. W kroku 6 Orchestrator wykrywa niezgodność (np. algorytm wymaga GPU, ale benchmark nie wspiera GPU)
-2. System zwraca szczegółowy raport błędów z kodami: `INCOMPATIBLE_ALGORITHM`, `INSUFFICIENT_RESOURCES`, `INVALID_PARAMETER_SPACE`
-3. Web UI wyświetla błędy z sugestiami poprawek
-4. A1 poprawia konfigurację i ponawia próbę od kroku 5
+#### 1A. Configuration validation failed
+1. In step 6 Orchestrator detects incompatibility (e.g. algorithm requires GPU, but benchmark doesn't support GPU)
+2. System returns detailed error report with codes: `INCOMPATIBLE_ALGORITHM`, `INSUFFICIENT_RESOURCES`, `INVALID_PARAMETER_SPACE`
+3. Web UI displays errors with suggested fixes
+4. A1 corrects configuration and retries from step 5
 
-#### 1B. Brak dostępnych workerów
-1. W kroku 8 Message Broker przyjmuje zadania, ale żaden Worker nie jest dostępny
-2. Orchestrator wykrywa brak aktywnych konsumentów kolejki po timeout (30s)
-3. System informuje A1: "Eksperyment zaplanowany, ale brak dostępnych workerów"
-4. A1 może: anulować eksperyment, uruchomić dodatkowe workery, lub czekać
+#### 1B. No available workers
+1. In step 8 Message Broker accepts tasks, but no Workers are available
+2. Orchestrator detects lack of active queue consumers after timeout (30s)
+3. System informs A1: "Experiment scheduled, but no available workers"
+4. A1 can: cancel experiment, start additional workers, or wait
 
-#### 1C. Run zakończony błędem podczas wykonania
-1. W kroku 9 Worker napotyka błąd (brak pamięci, błąd pluginu, timeout)
-2. Worker loguje szczegółowy błąd do Tracking Service
-3. Orchestrator otrzymuje zdarzenie `RunFailed` i sprawdza politykę retry
-4. System automatycznie ponawia lub oznacza run jako failed
+#### 1C. Run failed during execution
+1. In step 9 Worker encounters error (out of memory, plugin error, timeout)
+2. Worker logs detailed error to Tracking Service
+3. Orchestrator receives `RunFailed` event and checks retry policy
+4. System automatically retries or marks run as failed
 
-### ✅ Warunki końcowe
-- Eksperyment ma status `COMPLETED` lub `FAILED`
-- Wszystkie runy mają metryki i logi zapisane w Tracking Service
-- Dane są gotowe do analizy (UC4)
+### ✅ Postconditions
+- Experiment has status `COMPLETED` or `FAILED`
+- All runs have metrics and logs saved in Tracking Service
+- Data is ready for analysis (UC4)
 
 ### 📊 Diagramy
 
@@ -124,40 +124,40 @@ config:
   theme: redux-dark
 ---
 flowchart TB
-    Start(["Start"]) --> OpenUI["Otwórz Web UI - Nowy eksperyment"]
-    OpenUI --> GetBenchmarks["Pobierz listę benchmarków"]
-    GetBenchmarks --> SelectBenchmarks["Wybierz benchmarki i instancje"]
-    SelectBenchmarks --> GetAlgorithms["Pobierz listę algorytmów HPO"]
-    GetAlgorithms --> SelectAlgorithms["Wybierz algorytmy i skonfiguruj parametry"]
-    SelectAlgorithms --> DefineGoals["Zdefiniuj cele i metryki eksperymentu"]
-    DefineGoals --> SaveConfig["Zapisz konfigurację eksperymentu"]
-    SaveConfig --> ValidateConfig{"Walidacja konfiguracji"}
-    ValidateConfig -- Błąd --> ShowErrors["Wyświetl błędy walidacji"]
+    Start(["Start"]) --> OpenUI["Open Web UI - New experiment"]
+    OpenUI --> GetBenchmarks["Get benchmarks list"]
+    GetBenchmarks --> SelectBenchmarks["Select benchmarks and instances"]
+    SelectBenchmarks --> GetAlgorithms["Get HPO algorithms list"]
+    GetAlgorithms --> SelectAlgorithms["Select algorithms and configure parameters"]
+    SelectAlgorithms --> DefineGoals["Define experiment goals and metrics"]
+    DefineGoals --> SaveConfig["Save experiment configuration"]
+    SaveConfig --> ValidateConfig{"Configuration validation"}
+    ValidateConfig -- Error --> ShowErrors["Display validation errors"]
     ShowErrors --> SelectAlgorithms
-    ValidateConfig -- OK --> CreatePlan["Utwórz plan runów"]
-    CreatePlan --> StartExperiment["Uruchom eksperyment"]
-    StartExperiment --> CheckWorkers{"Dostępne workery?"}
-    CheckWorkers -- Nie --> WaitWorkers["Czekaj na workery"]
+    ValidateConfig -- OK --> CreatePlan["Create run plan"]
+    CreatePlan --> StartExperiment["Start experiment"]
+    StartExperiment --> CheckWorkers{"Available workers?"}
+    CheckWorkers -- No --> WaitWorkers["Wait for workers"]
     WaitWorkers --> CheckWorkers
-    CheckWorkers -- Tak --> SendJobs["Wyślij zadania do kolejki"]
-    SendJobs --> ExecuteRuns["Workery wykonują runy"]
-    ExecuteRuns --> MonitorRuns{"Wszystkie runy zakończone?"}
-    MonitorRuns -- Nie --> HandleErrors{"Błędy w runach?"}
-    HandleErrors -- Tak --> RetryRuns["Retry runów w ramach polityki"]
+    CheckWorkers -- Yes --> SendJobs["Send jobs to queue"]
+    SendJobs --> ExecuteRuns["Workers execute runs"]
+    ExecuteRuns --> MonitorRuns{"All runs completed?"}
+    MonitorRuns -- No --> HandleErrors{"Errors in runs?"}
+    HandleErrors -- Yes --> RetryRuns["Retry runs within policy"]
     RetryRuns --> MonitorRuns
     HandleErrors -- Nie --> MonitorRuns
-    MonitorRuns -- Tak --> UpdateStatus["Aktualizuj status eksperymentu"]
-    UpdateStatus --> End(["Koniec"])
+    MonitorRuns -- Yes --> UpdateStatus["Update experiment status"]
+    UpdateStatus --> End(["End"])
 ```
 
-#### Diagram sekwencji - Główny scenariusz
+#### Sequence Diagram - Main Scenario
 ```mermaid
 ---
 config:
   theme: redux-dark-color
 ---
 sequenceDiagram
-    participant A1 as Badacz/Inżynier ML
+    participant A1 as Researcher/ML Engineer
     participant UI as Web UI
     participant API as API Gateway
     participant ORC as Orchestrator
@@ -167,92 +167,92 @@ sequenceDiagram
     participant MB as Message Broker
     participant WR as Worker Runtime
     
-    A1->>UI: Otwórz "Nowy eksperyment"
-    UI->>BDS: Pobierz listę benchmarków
-    BDS-->>UI: Lista benchmarków
-    A1->>UI: Wybierz benchmarki
-    UI->>AR: Pobierz dostępne algorytmy
-    AR-->>UI: Lista algorytmów HPO
-    A1->>UI: Wybierz algorytmy i parametry
-    A1->>UI: Zdefiniuj cele eksperymentu
-    A1->>UI: Zapisz konfigurację
+    A1->>UI: Open "New Experiment"
+    UI->>BDS: Fetch benchmark list
+    BDS-->>UI: Benchmark list
+    A1->>UI: Select benchmarks
+    UI->>AR: Fetch available algorithms
+    AR-->>UI: HPO algorithm list
+    A1->>UI: Select algorithms and parameters
+    A1->>UI: Define experiment goals
+    A1->>UI: Save configuration
     UI->>API: createExperiment(config)
-    API->>ORC: Przekaż konfigurację
-    ORC->>BDS: Waliduj benchmarki
-    ORC->>AR: Waliduj algorytmy
+    API->>ORC: Pass configuration
+    ORC->>BDS: Validate benchmarks
+    ORC->>AR: Validate algorithms
     BDS-->>ORC: OK
     AR-->>ORC: OK
-    ORC->>ETS: Zapisz eksperyment
+    ORC->>ETS: Save experiment
     ETS-->>ORC: experiment_id
-    ORC-->>API: Konfiguracja zatwierdzona
-    API-->>UI: Eksperyment utworzony
-    A1->>UI: Uruchom eksperyment
+    ORC-->>API: Configuration approved
+    API-->>UI: Experiment created
+    A1->>UI: Start experiment
     UI->>API: startExperiment(experiment_id)
-    API->>ORC: Rozpocznij eksperyment
-    ORC->>ETS: Utwórz plan runów
-    ORC->>MB: Wyślij zadania RunJob
-    MB-->>WR: Dostarcz zadania
-    loop Dla każdego runu
-        WR->>WR: Wykonaj run algorytmu HPO
-        WR->>ETS: Loguj metryki i wyniki
+    API->>ORC: Begin experiment
+    ORC->>ETS: Create run plan
+    ORC->>MB: Send RunJob tasks
+    MB-->>WR: Deliver tasks
+    loop For each run
+        WR->>WR: Execute HPO algorithm run
+        WR->>ETS: Log metrics and results
     end
-    WR-->>ORC: Status runów
-    ORC->>ETS: Aktualizuj status eksperymentu
-    ORC-->>A1: Powiadomienie o zakończeniu
+    WR-->>ORC: Run status
+    ORC->>ETS: Update experiment status
+    ORC-->>A1: Completion notification
 ```
 
-#### Diagram sekwencji - Scenariusz alternatywny - Błąd walidacji
+#### Sequence Diagram - Alternative Scenario - Validation Error
 ```mermaid
 ---
 config:
   theme: redux-dark-color
 ---
 sequenceDiagram
-    participant A1 as Badacz/Inżynier ML
+    participant A1 as Researcher/ML Engineer
     participant UI as Web UI
     participant API as API Gateway
     participant ORC as Orchestrator
     participant AR as Algorithm Registry
     participant BDS as Benchmark Definition
-    A1->>UI: Zapisz konfigurację z niekompatybilnym algorytmem
+    A1->>UI: Save configuration with incompatible algorithm
     UI->>API: createExperiment(invalid_config)
-    API->>ORC: Waliduj konfigurację
-    ORC->>AR: Sprawdź algorytm X vs benchmark Y
-    AR-->>ORC: INCOMPATIBLE_ALGORITHM (GPU wymagane)
-    ORC->>BDS: Sprawdź benchmark Y
+    API->>ORC: Validate configuration
+    ORC->>AR: Check algorithm X vs benchmark Y
+    AR-->>ORC: INCOMPATIBLE_ALGORITHM (GPU required)
+    ORC->>BDS: Check benchmark Y
     BDS-->>ORC: No GPU support
     ORC-->>API: ValidationError: [INCOMPATIBLE_ALGORITHM]
-    API-->>UI: Błędy walidacji z sugestiami
-    UI-->>A1: "Wybierz benchmark wspierający GPU"
-    A1->>UI: Popraw konfigurację
-    Note over A1,UI: Powrót do głównego scenariusza
+    API-->>UI: Validation errors with suggestions
+    UI-->>A1: "Select GPU-supporting benchmark"
+    A1->>UI: Fix configuration
+    Note over A1,UI: Return to main scenario
 ```
 
 ---
 
-## UC2: Dodaj wbudowany algorytm HPO
+## UC2: Add Built-in HPO Algorithm
 
-### 📋 Podstawowe informacje
+### 📋 Basic Information
 
-| Właściwość | Wartość |
-|------------|---------|
-| **Aktorzy główni** | Administrator |
-| **Cel** | Dodanie nowego wbudowanego algorytmu HPO do systemu |
-| **Poziom** | User goal |
+| Property | Value |
+|----------|-------|
+| **Primary actors** | Administrator |
+| **Goal** | Adding a new built-in HPO algorithm to the system |
+| **Level** | User goal |
 
-### 📝 Główny scenariusz
+### 📝 Main Scenario
 
-1. **Przygotowanie algorytmu**
-   - Administrator implementuje algorytm zgodnie z interfejsem IAlgorithmPlugin
-   - Przygotowuje metadane: nazwa, typ, parametry, wymagania
+1. **Algorithm preparation**
+   - Administrator implements algorithm according to IAlgorithmPlugin interface
+   - Prepares metadata: name, type, parameters, requirements
 
-2. **Rejestracja w systemie**
-   - Administrator dodaje algorytm przez Admin Panel
-   - System waliduje implementację i kompatybilność
+2. **System registration**
+   - Administrator adds algorithm through Admin Panel
+   - System validates implementation and compatibility
 
-4. **Publikacja**
-   - Algorytm otrzymuje status `APPROVED`
-   - Staje się dostępny dla użytkowników w katalogu
+4. **Publication**
+   - Algorithm receives `APPROVED` status
+   - Becomes available to users in the catalog
 
 ### 📊 Diagramy
 
@@ -264,34 +264,34 @@ config:
   theme: redux-dark
 ---
 flowchart TB
-    Start(["Start"]) --> OpenPanel["Otwórz panel: Algorytmy HPO"]
-    OpenPanel --> ViewList["Wyświetl listę algorytmów"]
-    ViewList --> SelectAdd["Wybierz: Dodaj algorytm wbudowany"]
-    SelectAdd --> ShowForm["Wyświetl formularz algorytmu"]
-    ShowForm --> FillForm["Wypełnij dane algorytmu"]
-    FillForm --> ValidateUI{"Walidacja UI"}
-    ValidateUI -- Błąd --> ShowUIErrors["Podświetl błędne pola"]
+    Start(["Start"]) --> OpenPanel["Open panel: HPO Algorithms"]
+    OpenPanel --> ViewList["Display algorithms list"]
+    ViewList --> SelectAdd["Select: Add built-in algorithm"]
+    SelectAdd --> ShowForm["Display algorithm form"]
+    ShowForm --> FillForm["Fill algorithm data"]
+    FillForm --> ValidateUI{"UI Validation"}
+    ValidateUI -- Error --> ShowUIErrors["Highlight error fields"]
     ShowUIErrors --> FillForm
-    ValidateUI -- OK --> ConfirmSave["Potwierdź zapis"]
-    ConfirmSave --> CheckPerms{"Sprawdź uprawnienia"}
-    CheckPerms -- Brak --> ShowAuthError["Wyświetl błąd autoryzacji"]
-    ShowAuthError --> End(["Koniec"])
-    CheckPerms -- OK --> ValidateMetadata{"Walidacja metadanych"}
-    ValidateMetadata -- Błąd --> ShowServerErrors["Wyświetl błędy serwera"]
+    ValidateUI -- OK --> ConfirmSave["Confirm save"]
+    ConfirmSave --> CheckPerms{"Check permissions"}
+    CheckPerms -- None --> ShowAuthError["Display authorization error"]
+    ShowAuthError --> End(["End"])
+    CheckPerms -- OK --> ValidateMetadata{"Metadata validation"}
+    ValidateMetadata -- Error --> ShowServerErrors["Display server errors"]
     ShowServerErrors --> FillForm
-    ValidateMetadata -- OK --> CreateAlgorithm["Utwórz Algorithm + AlgorithmVersion"]
-    CreateAlgorithm --> CheckDOI{"Podano publikacje?"}
-    CheckDOI -- Nie --> SaveSuccess["Wyświetl sukces"]
-    CheckDOI -- Tak --> LinkPublications["Powiąż publikacje"]
-    LinkPublications --> PubSuccess{"Publikacje OK?"}
-    PubSuccess -- Błąd --> PartialSuccess["Wyświetl częściowy sukces"]
+    ValidateMetadata -- OK --> CreateAlgorithm["Create Algorithm + AlgorithmVersion"]
+    CreateAlgorithm --> CheckDOI{"Publications provided?"}
+    CheckDOI -- No --> SaveSuccess["Display success"]
+    CheckDOI -- Yes --> LinkPublications["Link publications"]
+    LinkPublications --> PubSuccess{"Publications OK?"}
+    PubSuccess -- Error --> PartialSuccess["Display partial success"]
     PubSuccess -- OK --> SaveSuccess
-    SaveSuccess --> RefreshList["Odśwież listę algorytmów"]
+    SaveSuccess --> RefreshList["Refresh algorithm list"]
     RefreshList --> End
     PartialSuccess --> End
 ```
 
-#### Diagram sekwencji - Główny scenariusz
+#### Sequence Diagram - Main Scenario
 ```mermaid
 ---
 config:
@@ -304,32 +304,32 @@ sequenceDiagram
     participant AR as Algorithm Registry
     participant PS as Publication Service
     participant RS as Results Store
-    A3->>UI: Otwórz panel "Algorytmy HPO"
-    UI->>AR: Pobierz listę algorytmów
-    AR-->>UI: Lista algorytmów (wbudowane + pluginy)
-    A3->>UI: "Dodaj algorytm wbudowany"
-    UI-->>A3: Formularz z polami algorytmu
-    A3->>UI: Wypełnij metadane + DOI publikacji
-    UI->>UI: Walidacja lokalna (pola wymagane, format DOI)
-    A3->>UI: Potwierdź zapis
+    A3->>UI: Open panel "HPO Algorithms"
+    UI->>AR: Fetch algorithm list
+    AR-->>UI: Algorithm list (built-in + plugins)
+    A3->>UI: "Add built-in algorithm"
+    UI-->>A3: Form with algorithm fields
+    A3->>UI: Fill metadata + publication DOI
+    UI->>UI: Local validation (required fields, DOI format)
+    A3->>UI: Confirm save
     UI->>API: createBuiltinAlgorithm(metadata, pubIds)
-    API->>API: Sprawdź uprawnienia (rola Administrator)
-    API->>AR: Przekaż metadane algorytmu
-    AR->>AR: Waliduj metadane (unikalność nazwy, schemat)
-    AR->>RS: Zapisz Algorithm (is_builtin=true)
-    AR->>RS: Zapisz AlgorithmVersion (v1.0, status=approved)
+    API->>API: Check permissions (Administrator role)
+    API->>AR: Pass algorithm metadata
+    AR->>AR: Validate metadata (name uniqueness, schema)
+    AR->>RS: Save Algorithm (is_builtin=true)
+    AR->>RS: Save AlgorithmVersion (v1.0, status=approved)
     RS-->>AR: algorithmId, versionId
-    AR-->>API: Algorytm utworzony
-    alt Podano publikacje
+    AR-->>API: Algorithm created
+    alt Publications provided
         API->>PS: createPublicationLinks(algorithmId, pubIds)
-        PS->>PS: Utwórz rekordy Publication (jeśli brak)
-        PS->>RS: Zapisz PublicationLink
-        PS-->>API: Publikacje powiązane
+        PS->>PS: Create Publication records (if missing)
+        PS->>RS: Save PublicationLink
+        PS-->>API: Related publications
     end
-    API-->>UI: Sukces + identyfikatory
-    UI-->>A3: Komunikat sukcesu
-    UI->>AR: Pobierz zaktualizowaną listę
-    AR-->>UI: Lista z nowym algorytmem
+    API-->>UI: Success + identifiers
+    UI-->>A3: Success message
+    UI->>AR: Get updated list
+    AR-->>UI: List with new algorithm
 ```
 
 #### Diagram sekwencji - Scenariusz alternatywny - Błąd walidacji
@@ -343,45 +343,45 @@ sequenceDiagram
     participant UI as Web UI
     participant API as API Gateway
     participant AR as Algorithm Registry
-    A3->>UI: Potwierdź zapis z istniejącą nazwą algorytmu
+    A3->>UI: Confirm save with existing algorithm name
     UI->>API: createBuiltinAlgorithm(duplicate_name, ...)
-    API->>AR: Waliduj metadane
-    AR->>AR: Sprawdź unikalność nazwy
+    API->>AR: Validate metadata
+    AR->>AR: Check name uniqueness
     AR-->>API: ValidationError: ALGORITHM_NAME_EXISTS
-    API-->>UI: Błędy walidacji
-    UI-->>A3: "Nazwa algorytmu już istnieje"
-    A3->>UI: Popraw nazwę algorytmu
-    Note over A3,UI: Powrót do głównego scenariusza
+    API-->>UI: Validation errors
+    UI-->>A3: "Algorithm name already exists"
+    A3->>UI: Fix algorithm name
+    Note over A3,UI: Return to main scenario
 ```
 
 ---
 
-## UC3: Zaimplementuj i zarejestruj algorytm HPO plugin
+## UC3: Implement and Register HPO Algorithm Plugin
 
-### 📋 Podstawowe informacje
+### 📋 Basic Information
 
-| Właściwość | Wartość |
-|------------|---------|
-| **Aktorzy główni** | Twórca algorytmu HPO |
-| **Cel** | Implementacja i rejestracja własnego algorytmu jako pluginu |
-| **Poziom** | User goal |
+| Property | Value |
+|----------|-------|
+| **Primary actors** | HPO Algorithm Creator |
+| **Goal** | Implementation and registration of custom algorithm as plugin |
+| **Level** | User goal |
 
-### 📝 Główny scenariusz
+### 📝 Main Scenario
 
-1. **Implementacja pluginu**
-   - Twórca używa Algorithm SDK do implementacji algorytmu
-   - Implementuje interfejs IAlgorithmPlugin
+1. **Plugin implementation**
+   - Creator uses Algorithm SDK to implement algorithm
+   - Implements IAlgorithmPlugin interface
 
-2. **Testowanie lokalne**
-   - Twórca testuje plugin lokalnie używając SDK
+2. **Local testing**
+   - Creator tests plugin locally using SDK
 
-3. **Rejestracja**
-   - Twórca wysyła plugin do systemu przez Web UI
-   - System przeprowadza walidację i testy
+3. **Registration**
+   - Creator submits plugin to system through Web UI
+   - System performs validation and tests
 
-4. **Zatwierdzenie**
-   - Administrator sprawdza i zatwierdza plugin
-   - Plugin staje się dostępny dla społeczności
+4. **Approval**
+   - Administrator reviews and approves plugin
+   - Plugin becomes available to community
 
 ### 📊 Diagramy
 
@@ -393,39 +393,39 @@ config:
   theme: redux-dark
 ---
 flowchart TB
-    Start(["Start"]) --> InstallSDK["Pobierz i zainstaluj SDK"]
-    InstallSDK --> ImplementPlugin["Implementuj IAlgorithmPlugin"]
-    ImplementPlugin --> RunValidation["Uruchom walidację lokalną"]
-    RunValidation --> ValidateInterface{"Walidacja interfejsu"}
-    ValidateInterface -- Błąd --> ShowValidationErrors["Wyświetl błędy implementacji"]
+    Start(["Start"]) --> InstallSDK["Download and install SDK"]
+    InstallSDK --> ImplementPlugin["Implement IAlgorithmPlugin"]
+    ImplementPlugin --> RunValidation["Run local validation"]
+    RunValidation --> ValidateInterface{"Interface validation"}
+    ValidateInterface -- Error --> ShowValidationErrors["Display implementation errors"]
     ShowValidationErrors --> ImplementPlugin
-    ValidateInterface -- OK --> RunSimulation["Uruchom testową symulację HPO"]
-    RunSimulation --> SimulationOK{"Symulacja OK?"}
-    SimulationOK -- Błąd --> ShowSimErrors["Wyświetl błędy symulacji"]
-    ShowSimErrors --> OptimizePlugin["Optymalizuj plugin"]
+    ValidateInterface -- OK --> RunSimulation["Run test HPO simulation"]
+    RunSimulation --> SimulationOK{"Simulation OK?"}
+    SimulationOK -- Error --> ShowSimErrors["Display simulation errors"]
+    ShowSimErrors --> OptimizePlugin["Optimize plugin"]
     OptimizePlugin --> RunValidation
-    SimulationOK -- OK --> PackagePlugin["Zapakuj plugin"]
-    PackagePlugin --> OpenRegistry["Otwórz: Rejestruj algorytm HPO"]
-    OpenRegistry --> FillMetadata["Podaj metadane i lokalizację"]
-    FillMetadata --> SubmitPlugin["Prześlij plugin"]
-    SubmitPlugin --> CheckSecurity{"Sprawdzenie bezpieczeństwa"}
-    CheckSecurity -- Naruszenie --> ShowSecurityError["Wyświetl błąd bezpieczeństwa"]
+    SimulationOK -- OK --> PackagePlugin["Package plugin"]
+    PackagePlugin --> OpenRegistry["Open: Register HPO algorithm"]
+    OpenRegistry --> FillMetadata["Provide metadata and location"]
+    FillMetadata --> SubmitPlugin["Submit plugin"]
+    SubmitPlugin --> CheckSecurity{"Security check"}
+    CheckSecurity -- Violation --> ShowSecurityError["Display security error"]
     ShowSecurityError --> ImplementPlugin
-    CheckSecurity -- OK --> ValidateRegistry{"Walidacja Registry"}
-    ValidateRegistry -- Błąd --> ShowRegistryErrors["Wyświetl błędy Registry"]
+    CheckSecurity -- OK --> ValidateRegistry{"Registry validation"}
+    ValidateRegistry -- Error --> ShowRegistryErrors["Display Registry errors"]
     ShowRegistryErrors --> FillMetadata
-    ValidateRegistry -- OK --> CreateDraft["Utwórz algorytm /status: draft/"]
-    CreateDraft --> CheckDOI{"Publikacje podane?"}
-    CheckDOI -- Tak --> LinkPubs["Powiąż publikacje"]
-    LinkPubs --> PubsOK{"Publikacje OK?"}
-    PubsOK -- Błąd --> HandlePubError["Obsłuż błąd publikacji"]
-    HandlePubError --> ApprovalPending["Oczekiwanie na zatwierdzenie"]
+    ValidateRegistry -- OK --> CreateDraft["Create algorithm /status: draft/"]
+    CreateDraft --> CheckDOI{"Publications provided?"}
+    CheckDOI -- Yes --> LinkPubs["Link publications"]
+    LinkPubs --> PubsOK{"Publications OK?"}
+    PubsOK -- Error --> HandlePubError["Handle publication error"]
+    HandlePubError --> ApprovalPending["Awaiting approval"]
     PubsOK -- OK --> ApprovalPending
     CheckDOI -- Nie --> ApprovalPending
-    ApprovalPending --> AdminApproval{"Administrator zatwierdza?"}
-    AdminApproval -- Tak --> ChangeStatus["Zmień status na /approved/"]
+    ApprovalPending --> AdminApproval{"Administrator approves?"}
+    AdminApproval -- Yes --> ChangeStatus["Change status to /approved/"]
     AdminApproval -- Nie --> End(["Koniec - sukces"])
-    ChangeStatus --> Available["Plugin dostępny w eksperymentach"]
+    ChangeStatus --> Available["Plugin available in experiments"]
     Available --> End
 ```
 
@@ -444,34 +444,34 @@ sequenceDiagram
     participant PS as Publication Service
     participant A3 as Administrator
     A2->>SDK: pip install hpo-sdk
-    A2->>A2: Implementuj IAlgorithmPlugin
+    A2->>A2: Implement IAlgorithmPlugin
     A2->>SDK: hpo-sdk validate
-    SDK->>SDK: Sprawdź zgodność interfejsu
-    SDK->>SDK: Uruchom testową symulację
-    SDK-->>A2: Raport walidacji (SUCCESS)
-    A2->>A2: Zapakuj plugin (wheel/docker)
-    A2->>UI: Otwórz "Rejestruj algorytm HPO"
-    UI-->>A2: Formularz rejestracji
-    A2->>UI: Podaj metadane + lokalizację pluginu
-    A2->>UI: Prześlij plugin
+    SDK->>SDK: Check interface compatibility
+    SDK->>SDK: Run test simulation
+    SDK-->>A2: Validation report (SUCCESS)
+    A2->>A2: Package plugin (wheel/docker)
+    A2->>UI: Open "Register HPO algorithm"
+    UI-->>A2: Registration form
+    A2->>UI: Provide metadata + plugin location
+    A2->>UI: Submit plugin
     UI->>API: registerPlugin(metadata, location, pubIds)
-    API->>AR: Waliduj i zapisz plugin
-    AR->>AR: Sprawdź metadane, pobierz paczkę
-    AR->>AR: Utwórz Algorithm + AlgorithmVersion (draft)
-    opt Publikacje podane
-    AR->>PS: Powiąż publikacje
-    PS-->>AR: Publikacje powiązane
+    API->>AR: Validate and save plugin
+    AR->>AR: Check metadata, download package
+    AR->>AR: Create Algorithm + AlgorithmVersion (draft)
+    opt Publications provided
+    AR->>PS: Link publications
+    PS-->>AR: Related publications
     end
-    AR-->>API: Plugin zarejestrowany (draft)
-    API-->>UI: Sukces rejestracji
-    UI-->>A2: "Plugin zarejestrowany, oczekuje zatwierdzenia"
-    Note over A3: Administrator przegląda plugin
-    A3->>AR: Zatwierdź plugin
-    AR->>AR: Zmień status na "approved"
-    AR-->>A2: Powiadomienie o zatwierdzeniu
+    AR-->>API: Plugin registered (draft)
+    API-->>UI: Registration success
+    UI-->>A2: "Plugin registered, awaiting approval"
+    Note over A3: Administrator reviews plugin
+    A3->>AR: Approve plugin
+    AR->>AR: Change status to "approved"
+    AR-->>A2: Approval notification
 ```
 
-#### Diagram sekwencji - Scenariusz alternatywny - Błąd walidacji lokalnej
+#### Sequence diagram - Alternative scenario - Local validation error
 ```mermaid
 ---
 config:
@@ -480,18 +480,18 @@ config:
 sequenceDiagram
     participant A2 as Twórca algorytmu HPO
     participant SDK as SDK/PluginValidator
-    A2->>SDK: hpo-sdk validate (błędna implementacja)
-    SDK->>SDK: Sprawdź interfejs IAlgorithmPlugin
-    SDK-->>A2: BŁĄD: Brak metody suggest()
-    A2->>A2: Dodaj brakującą metodę suggest()
-    A2->>SDK: hpo-sdk validate (ponownie)
-    SDK->>SDK: Sprawdź interfejs (OK)
-    SDK->>SDK: Testowa symulacja HPO
-    SDK-->>A2: BŁĄD: Timeout w suggest(), wyciek pamięci
-    SDK-->>A2: Raport diagnostyczny + profil zasobów
-    A2->>A2: Optymalizuj algorytm
-    A2->>SDK: hpo-sdk validate (kolejna próba)
-    SDK-->>A2: SUCCESS - plugin gotowy
+    A2->>SDK: hpo-sdk validate (incorrect implementation)
+    SDK->>SDK: Check IAlgorithmPlugin interface
+    SDK-->>A2: ERROR: Missing suggest() method
+    A2->>A2: Add missing suggest() method
+    A2->>SDK: hpo-sdk validate (again)
+    SDK->>SDK: Check interface (OK)
+    SDK->>SDK: Test HPO simulation
+    SDK-->>A2: ERROR: Timeout in suggest(), memory leak
+    SDK-->>A2: Diagnostic report + resource profile
+    A2->>A2: Optimize algorithm
+    A2->>SDK: hpo-sdk validate (next attempt)
+    SDK-->>A2: SUCCESS - plugin ready
 ```
 
 #### Diagram sekwencji - Scenariusz alternatywny - Naruszenie bezpieczeństwa
@@ -506,70 +506,70 @@ sequenceDiagram
     participant AR as Algorithm Registry
     participant SM as SandboxManager
     A2->>API: registerPlugin(metadata, suspicious_plugin)
-    API->>AR: Waliduj plugin
-    AR->>SM: Sprawdź bezpieczeństwo kodu
-    SM->>SM: Wykryj próbę dostępu do systemu plików
+    API->>AR: Validate plugin
+    AR->>SM: Check code security
+    SM->>SM: Detect filesystem access attempt
     SM-->>AR: SECURITY_VIOLATION: filesystem access
-    AR-->>API: Odrzucenie pluginu
-    API-->>A2: "Plugin odrzucony - naruszenie bezpieczeństwa"
-    Note over A2: Musi usunąć niebezpieczny kod
+    AR-->>API: Plugin rejected
+    API-->>A2: "Plugin rejected - security violation"
+    Note over A2: Must remove dangerous code
 ```
 
 ---
 
-## UC4: Porównaj wyniki algorytmów
+## UC4: Compare Algorithm Results
 
-### 📋 Podstawowe informacje
+### 📋 Basic Information
 
-| Właściwość | Wartość |
-|------------|---------|
-| **Aktorzy główni** | Badacz / Inżynier ML |
-| **Cel** | Porównanie wydajności różnych algorytmów HPO |
-| **Poziom** | User goal |
+| Property | Value |
+|----------|-------|
+| **Primary actors** | Researcher / ML Engineer |
+| **Goal** | Comparison of performance of different HPO algorithms |
+| **Level** | User goal |
 
-### 📝 Główny scenariusz
+### 📝 Main Scenario
 
-1. **Wybór eksperymentów**
-   - Badacz wybiera eksperymenty do porównania
-   - System ładuje dane z Experiment Tracking Service
+1. **Experiment selection**
+   - Researcher selects experiments for comparison
+   - System loads data from Experiment Tracking Service
 
-2. **Konfiguracja porównania**
-   - Wybór metryk do porównania
-   - Ustawienia wizualizacji (wykresy, tabele)
+2. **Comparison configuration**
+   - Selection of metrics for comparison
+   - Visualization settings (charts, tables)
 
-3. **Analiza statystyczna**
-   - System przeprowadza testy statystyczne
-   - Generuje rankingi i poziomy istotności
+3. **Statistical analysis**
+   - System performs statistical tests
+   - Generates rankings and significance levels
 
-4. **Wizualizacja**
-   - Wyświetlenie wykresów porównawczych
-   - Tabele z wynikami i statystykami
+4. **Visualization**
+   - Display of comparative charts
+   - Tables with results and statistics
 
 ---
 
-## UC5: Przeglądaj i filtruj eksperymenty
+## UC5: Browse and Filter Experiments
 
-### 📋 Podstawowe informacje
+### 📋 Basic Information
 
-| Właściwość | Wartość |
-|------------|---------|
-| **Aktorzy główni** | Badacz / Inżynier ML |
-| **Cel** | Przeglądanie historii eksperymentów i wyszukiwanie |
-| **Poziom** | User goal |
+| Property | Value |
+|----------|-------|
+| **Primary actors** | Researcher / ML Engineer |
+| **Goal** | Browsing experiment history and searching |
+| **Level** | User goal |
 
-### 📝 Główny scenariusz
+### 📝 Main Scenario
 
-1. **Dostęp do dashboardu**
-   - Badacz otwiera Tracking Dashboard UI
-   - System wyświetla listę eksperymentów
+1. **Dashboard access**
+   - Researcher opens Tracking Dashboard UI
+   - System displays list of experiments
 
-2. **Filtrowanie**
-   - Zastosowanie filtrów: status, tagi, daty, algorytmy
-   - System aktualizuje listę wyników
+2. **Filtering**
+   - Application of filters: status, tags, dates, algorithms
+   - System updates result list
 
-3. **Szczegóły eksperymentu**
-   - Wybór eksperymentu z listy
-   - Wyświetlenie szczegółów: runów, metryk, logów
+3. **Experiment details**
+   - Selection of experiment from list
+   - Display of details: runs, metrics, logs
 
 ### 📊 Diagramy
 
@@ -581,33 +581,33 @@ config:
   theme: redux-dark
 ---
 flowchart TB
-    Start(["Start"]) --> OpenPanel["Otwórz panel śledzenia"]
-    OpenPanel --> LoadExperiments["Załaduj listę eksperymentów"]
-    LoadExperiments --> CheckCount{"Dużo eksperymentów?"}
-    CheckCount -- Tak --> EnablePagination["Włącz paginację i lazy loading"]
-    CheckCount -- Nie --> ShowAll["Wyświetl wszystkie"]
-    EnablePagination --> ShowFiltered["Wyświetl listę eksperymentów"]
+    Start(["Start"]) --> OpenPanel["Open tracking panel"]
+    OpenPanel --> LoadExperiments["Load experiment list"]
+    LoadExperiments --> CheckCount{"Many experiments?"}
+    CheckCount -- Yes --> EnablePagination["Enable pagination and lazy loading"]
+    CheckCount -- No --> ShowAll["Display all"]
+    EnablePagination --> ShowFiltered["Display experiment list"]
     ShowAll --> ShowFiltered
-    ShowFiltered --> ApplyFilters{"Zastosować filtry?"}
-    ApplyFilters -- Tak --> SelectFilters["Wybierz filtry"]
-    SelectFilters --> FilterByTags["Filtruj po tagach"]
-    FilterByTags --> FilterByTime["Filtruj po czasie"]
-    FilterByTime --> FilterByBenchmark["Filtruj po benchmarkach"]
-    FilterByBenchmark --> FilterByAlgorithm["Filtruj po algorytmach"]
-    FilterByAlgorithm --> FilterByStatus["Filtruj po statusach"]
-    FilterByStatus --> UpdateView["Zaktualizuj widok"]
-    ApplyFilters -- Nie --> SelectExperiment{"Wybierz eksperyment?"}
+    ShowFiltered --> ApplyFilters{"Apply filters?"}
+    ApplyFilters -- Yes --> SelectFilters["Select filters"]
+    SelectFilters --> FilterByTags["Filter by tags"]
+    FilterByTags --> FilterByTime["Filter by time"]
+    FilterByTime --> FilterByBenchmark["Filter by benchmarks"]
+    FilterByBenchmark --> FilterByAlgorithm["Filter by algorithms"]
+    FilterByAlgorithm --> FilterByStatus["Filter by status"]
+    FilterByStatus --> UpdateView["Update view"]
+    ApplyFilters -- No --> SelectExperiment{"Select experiment?"}
     UpdateView --> SelectExperiment
-    SelectExperiment -- Tak --> ShowDetails["Wyświetl szczegóły eksperymentu"]
+    SelectExperiment -- Yes --> ShowDetails["Display experiment details"]
     SelectExperiment -- Nie --> End(["Koniec"])
-    ShowDetails --> ExpandRuns["Rozwiń listę runów"]
-    ExpandRuns --> SelectRun{"Wybierz run?"}
-    SelectRun -- Tak --> ShowRunDetails["Wyświetl detale runu"]
+    ShowDetails --> ExpandRuns["Expand runs list"]
+    ExpandRuns --> SelectRun{"Select run?"}
+    SelectRun -- Yes --> ShowRunDetails["Display run details"]
     SelectRun -- Nie --> End
-    ShowRunDetails --> ViewMetrics["Przeglądaj metryki"]
-    ViewMetrics --> ViewLogs["Przeglądaj logi"]
-    ViewLogs --> ViewConfig["Przeglądaj konfigurację"]
-    ViewConfig --> ViewArtifacts["Przeglądaj artefakty"]
+    ShowRunDetails --> ViewMetrics["Browse metrics"]
+    ViewMetrics --> ViewLogs["Browse logs"]
+    ViewLogs --> ViewConfig["Browse configuration"]
+    ViewConfig --> ViewArtifacts["Browse artifacts"]
     ViewArtifacts --> End
 ```
 
@@ -618,33 +618,33 @@ config:
   theme: redux-dark-color
 ---
 sequenceDiagram
-    participant User as Użytkownik (A1/A2)
+    participant User as User (A1/A2)
     participant UI as Web UI
     participant ETS as Experiment Tracking Service
     participant Cache as Cache Layer
     User->>UI: Otwórz panel śledzenia
-    UI->>Cache: Sprawdź cache eksperymentów
+    UI->>Cache: Check experiments cache
     Cache-->>UI: Cache miss/expired
     UI->>ETS: getExperimentsList()
-    ETS-->>UI: Lista eksperymentów + metadata
-    UI->>Cache: Zapisz w cache
-    UI-->>User: Lista eksperymentów z filtrami
-    User->>UI: Zastosuj filtry (tagi, czas, benchmark)
+    ETS-->>UI: Experiments list + metadata
+    UI->>Cache: Save in cache
+    UI-->>User: Experiments list with filters
+    User->>UI: Apply filters (tags, time, benchmark)
     UI->>ETS: getFilteredExperiments(filters)
-    ETS-->>UI: Przefiltrowane eksperymenty + agregaty
-    UI-->>User: Zaktualizowany widok
+    ETS-->>UI: Filtered experiments + aggregates
+    UI-->>User: Updated view
     User->>UI: Wybierz eksperyment X
     UI->>ETS: getExperimentDetails(experiment_id)
-    ETS-->>UI: Szczegóły eksperymentu
-    UI-->>User: Detale eksperymentu
-    User->>UI: Rozwiń runy eksperymentu
+    ETS-->>UI: Experiment details
+    UI-->>User: Experiment details
+    User->>UI: Expand experiment runs
     UI->>ETS: getRunsList(experiment_id)
-    ETS-->>UI: Lista runów eksperymentu
-    UI-->>User: Lista runów z statusami
-    User->>UI: Wybierz run Y
+    ETS-->>UI: Experiment runs list
+    UI-->>User: Runs list with statuses
+    User->>UI: Select run Y
     UI->>ETS: getRunDetails(run_id)
-    ETS-->>UI: Metryki, logi, konfiguracja, artefakty
-    UI-->>User: Kompletne detale runu
+    ETS-->>UI: Metrics, logs, configuration, artifacts
+    UI-->>User: Complete run details
 ```
 
 #### Diagram sekwencji - Scenariusz z paginacją (duża liczba eksperymentów)
@@ -659,22 +659,22 @@ sequenceDiagram
     participant ETS as Experiment Tracking Service
     User->>UI: Otwórz panel śledzenia
     UI->>ETS: getExperimentsCount()
-    ETS-->>UI: count = 5000 eksperymentów
-    UI->>UI: Włącz paginację (page_size=50)
+    ETS-->>UI: count = 5000 experiments
+    UI->>UI: Enable pagination (page_size=50)
     UI->>ETS: getExperimentsList(page=1, size=50)
-    ETS-->>UI: Pierwsze 50 eksperymentów
-    UI-->>User: Strona 1/100 eksperymentów
-    User->>UI: Przejdź do strony 3
+    ETS-->>UI: First 50 experiments
+    UI-->>User: Page 1/100 experiments
+    User->>UI: Go to page 3
     UI->>ETS: getExperimentsList(page=3, size=50)
-    ETS-->>UI: Eksperymenty 101-150
-    UI-->>User: Strona 3/100 eksperymentów
+    ETS-->>UI: Experiments 101-150
+    UI-->>User: Page 3/100 experiments
     User->>UI: Zastosuj filtry
     UI->>ETS: getFilteredExperiments(filters, page=1, size=50)
     ETS-->>UI: Przefiltrowane eksperymenty (strona 1)
-    UI-->>User: Wyniki filtrowania z paginacją
+    UI-->>User: Filtering results with pagination
 ```
 
-#### Diagram aktywności - Lazy loading szczegółów runu
+#### Activity diagram - Lazy loading run details
 ```mermaid
 ---
 config:
@@ -682,54 +682,54 @@ config:
   layout: elk
 ---
 flowchart TB
-    SelectRun["Wybierz run"] --> LoadBasic["Załaduj podstawowe info"]
-    LoadBasic --> ShowRunSummary["Wyświetl podsumowanie runu"]
-    ShowRunSummary --> UserAction{"Akcja użytkownika"}
-    UserAction --> ViewMetrics["Kliknij: Metryki"] & ViewLogs["Kliknij: Logi"] & ViewArtifacts["Kliknij: Artefakty"] & ViewConfig["Kliknij: Konfiguracja"]
-    ViewMetrics --> LazyLoadMetrics["Lazy load metryk"]
-    ViewLogs --> LazyLoadLogs["Lazy load logów"]
-    ViewArtifacts --> LazyLoadArtifacts["Lazy load artefaktów"]
-    ViewConfig --> LazyLoadConfig["Lazy load konfiguracji"]
-    LazyLoadMetrics --> ShowMetrics["Wyświetl metryki"]
-    LazyLoadLogs --> ShowLogs["Wyświetl logi"]
-    LazyLoadArtifacts --> ShowArtifacts["Wyświetl artefakty"]
-    LazyLoadConfig --> ShowConfig["Wyświetl konfigurację"]
+    SelectRun["Select run"] --> LoadBasic["Load basic info"]
+    LoadBasic --> ShowRunSummary["Display run summary"]
+    ShowRunSummary --> UserAction{"User action"}
+    UserAction --> ViewMetrics["Click: Metrics"] & ViewLogs["Click: Logs"] & ViewArtifacts["Click: Artifacts"] & ViewConfig["Click: Configuration"]
+    ViewMetrics --> LazyLoadMetrics["Lazy load metrics"]
+    ViewLogs --> LazyLoadLogs["Lazy load logs"]
+    ViewArtifacts --> LazyLoadArtifacts["Lazy load artifacts"]
+    ViewConfig --> LazyLoadConfig["Lazy load configuration"]
+    LazyLoadMetrics --> ShowMetrics["Display metrics"]
+    LazyLoadLogs --> ShowLogs["Display logs"]
+    LazyLoadArtifacts --> ShowArtifacts["Display artifacts"]
+    LazyLoadConfig --> ShowConfig["Display configuration"]
     ShowMetrics --> End(["Koniec"])
     ShowLogs --> End
     ShowArtifacts --> End
     ShowConfig --> End
 ```
 
----# Diagram sekwencji - Scenariusz alternatywny - Niekompletne dane
+---# Sequence diagram - Alternative scenario - Incomplete data
 ```mermaid
 ---
 config:
   theme: redux-dark-color
 ---
 sequenceDiagram
-    participant A1 as Badacz/Inżynier ML
+    participant A1 as Researcher/ML Engineer
     participant UI as Web UI
     participant MAS as MetricsAnalysisService
-    A1->>UI: Wybierz eksperymenty z brakującymi metrykami
-    UI->>MAS: Żądanie analizy
-    MAS->>MAS: Sprawdź kompletność danych
-    MAS-->>UI: Raport brakujących danych (lista runów, % kompletności)
-    UI-->>A1: "Część runów nie ma wymaganych metryk"
-    A1->>UI: Wybierz strategię: imputacja/wykluczenie/ograniczenie
-    alt Imputacja
-    UI->>MAS: Wykonaj imputację brakujących wartości
-    MAS-->>UI: Dane z imputowanymi wartościami
-    else Wykluczenie
-    UI->>MAS: Wyklucz niepełne runy
-    MAS-->>UI: Przefiltrowane dane
-    else Ograniczenie
-    UI->>MAS: Ogranicz do dostępnych metryk
-    MAS-->>UI: Dane ograniczone do wspólnych metryk
+    A1->>UI: Select experiments with missing metrics
+    UI->>MAS: Analysis request
+    MAS->>MAS: Check data completeness
+    MAS-->>UI: Missing data report (runs list, % completeness)
+    UI-->>A1: "Some runs missing required metrics"
+    A1->>UI: Select strategy: imputation/exclusion/limitation
+    alt Imputation
+    UI->>MAS: Perform imputation of missing values
+    MAS-->>UI: Data with imputed values
+    else Exclusion
+    UI->>MAS: Exclude incomplete runs
+    MAS-->>UI: Filtered data
+    else Limitation
+    UI->>MAS: Limit to available metrics
+    MAS-->>UI: Data limited to common metrics
     end
-    Note over A1,MAS: Kontynuacja głównego scenariusza
+    Note over A1,MAS: Main scenario continuation
 ```
 
-#### Diagram aktywności - Obsługa błędów obliczeniowych
+#### Activity diagram - Computational error handling
 ```mermaid
 ---
 config:
@@ -737,49 +737,49 @@ config:
   layout: elk
 ---
 flowchart TB
-    PerformTests["Wykonaj testy statystyczne"] --> TestsOK{"Testy OK?"}
-    TestsOK -- Tak --> ReturnResults["Zwróć wyniki"]
-    TestsOK -- Nie --> LogError["Zaloguj błąd numeryczny"]
-    LogError --> TryAlternative{"Alternatywny test?"}
-    TryAlternative -- Tak --> UseFriedman["Użyj Friedman test"]
+    PerformTests["Perform statistical tests"] --> TestsOK{"Tests OK?"}
+    TestsOK -- Yes --> ReturnResults["Return results"]
+    TestsOK -- No --> LogError["Log numerical error"]
+    LogError --> TryAlternative{"Alternative test?"}
+    TryAlternative -- Yes --> UseFriedman["Use Friedman test"]
     UseFriedman --> FriedmanOK{"Friedman OK?"}
-    FriedmanOK -- Nie --> UseKruskal["Użyj Kruskal-Wallis"]
+    FriedmanOK -- No --> UseKruskal["Use Kruskal-Wallis"]
     UseKruskal --> KruskalOK{"Kruskal OK?"}
-    KruskalOK -- Nie --> UseNonParametric["Użyj testy nieparametryczne"]
-    UseNonParametric --> InformUser["Poinformuj o zmianie metody"]
-    FriedmanOK -- Tak --> InformUser
-    KruskalOK -- Tak --> InformUser
-    TryAlternative -- Nie --> ReportError["Zgłoś błąd analizy"]
+    KruskalOK -- No --> UseNonParametric["Use non-parametric tests"]
+    UseNonParametric --> InformUser["Inform about method change"]
+    FriedmanOK -- Yes --> InformUser
+    KruskalOK -- Yes --> InformUser
+    TryAlternative -- No --> ReportError["Report analysis error"]
     InformUser --> ReturnResults
-    ReportError --> End(["Koniec - sukces"])
+    ReportError --> End(["End - success"])
     ReturnResults --> End
 ```
 
 ---
 
-## UC6: Zarządzaj referencjami do artykułów
+## UC6: Manage paper references
 
 ### 📋 Podstawowe informacje
 
 | Właściwość | Wartość |
 |------------|---------|
-| **Aktorzy główni** | Badacz / Administrator |
-| **Cel** | Dodawanie i łączenie publikacji naukowych z algorytmami/benchmarkami |
+| **Primary actors** | Researcher / Administrator |
+| **Goal** | Adding and linking scientific publications with algorithms/benchmarks |
 | **Poziom** | User goal |
 
 ### 📝 Główny scenariusz
 
-1. **Dodanie publikacji**
-   - Użytkownik wprowadza metadane publikacji (DOI, BibTeX)
-   - System wzbogaca dane z zewnętrznych źródeł (CrossRef, arXiv)
+1. **Publication addition**
+   - User enters publication metadata (DOI, BibTeX)
+   - System enriches data from external sources (CrossRef, arXiv)
 
-2. **Łączenie z elementami**
-   - Powiązanie publikacji z algorytmami lub benchmarkami
-   - Aktualizacja metadanych w Registry Services
+2. **Linking with elements**
+   - Linking publications with algorithms or benchmarks
+   - Metadata update in Registry Services
 
-3. **Zarządzanie bibliografią**
-   - Edycja i aktualizacja istniejących pozycji
-   - Generowanie cytowań w różnych formatach
+3. **Bibliography management**
+   - Editing and updating existing entries
+   - Citation generation in various formats
 
 ### 📊 Diagramy
 
@@ -791,10 +791,10 @@ config:
   theme: redux-dark
 ---
 flowchart TB
-    Start(["Start"]) --> OpenPublications["Otwórz moduł: Publikacje"]
-    OpenPublications --> ChooseAction{"Wybierz akcję"}
-    ChooseAction --> AddPublication["Dodaj nową publikację"] & LinkExisting["Powiąż istniejącą publikację"] & ManageLinks["Zarządzaj powiązaniami"]
-    AddPublication --> EnterData["Podaj DOI lub dane ręcznie"]
+    Start(["Start"]) --> OpenPublications["Open module: Publications"]
+    OpenPublications --> ChooseAction{"Choose action"}
+    ChooseAction --> AddPublication["Add new publication"] & LinkExisting["Link existing publication"] & ManageLinks["Manage links"]
+    AddPublication --> EnterData["Provide DOI or manual data"]
     EnterData --> CheckDOI{"DOI podane?"}
     CheckDOI -- Tak --> FetchMetadata["Pobierz metadane z zewnętrznego systemu"]
     CheckDOI -- Nie --> ManualEntry["Wprowadź dane ręcznie"]
@@ -1034,7 +1034,7 @@ sequenceDiagram
     A3->>Docker: docker-compose up -d
     Docker->>System: Próba bindowania portu 8080
     System-->>Docker: Error: Port 8080 already in use
-    Docker-->>A3: Błąd startu - konflikt portów
+    Docker-->>A3: Startup error - port conflict
     A3->>A3: Edytuj docker-compose.yml (8080 → 8081)
     A3->>A3: Aktualizuj .env (UI_PORT=8081)
     A3->>Docker: docker-compose up -d
@@ -1053,7 +1053,7 @@ config:
 flowchart TB
     ContainerFail["Kontener się nie uruchamia"] --> CheckLogs["Sprawdź logi kontenera"]
     CheckLogs --> LogType{"Typ błędu"}
-    LogType --> PermissionError["Błąd uprawnień do wolumenu"] & ConfigError["Błąd konfiguracji"] & ResourceError["Brak zasobów"] & NetworkError["Błąd sieci/połączenia"]
+    LogType --> PermissionError["Volume permission error"] & ConfigError["Configuration error"] & ResourceError["Resource shortage"] & NetworkError["Network/connection error"]
     PermissionError --> FixPermissions["Popraw uprawnienia do katalogów"]
     ConfigError --> FixConfig["Popraw konfigurację w .env"]
     ResourceError --> FreeResources["Zwolnij zasoby lub zwiększ limity"]
@@ -1183,7 +1183,7 @@ sequenceDiagram
     K8s->>Pods: Uruchom 3 dodatkowe Worker pody
 ```
 
-#### Diagram sekwencji - Scenariusz alternatywny - Błąd zasobów klastra
+#### Sequence diagram - Alternative scenario - Cluster resource error
 ```mermaid
 ---
 config:
@@ -1286,18 +1286,18 @@ flowchart TB
     SelectScope --> SelectFormat["Wybierz format raportu"]
     SelectFormat --> SelectTemplate["Wybierz szablon raportu"]
     SelectTemplate --> ValidateSelection{"Walidacja wyboru"}
-    ValidateSelection -- Błąd --> ShowValidationError["Wyświetl błędy walidacji"]
+    ValidateSelection -- Error --> ShowValidationError["Display validation errors"]
     ShowValidationError --> SelectExperiments
     ValidateSelection -- OK --> GenerateReport["Kliknij: Generuj raport"]
     GenerateReport --> CheckDataAvailable{"Dane dostępne?"}
-    CheckDataAvailable -- Nie --> ShowDataError["Wyświetl błąd braku danych"]
+    CheckDataAvailable -- No --> ShowDataError["Display data unavailable error"]
     ShowDataError --> End(["Koniec"])
     CheckDataAvailable -- Tak --> ProcessReport["Przetwórz raport"]
     ProcessReport --> CheckTimeout{"Timeout generowania?"}
-    CheckTimeout -- Tak --> ShowTimeoutError["Wyświetl błąd timeout"]
+    CheckTimeout -- Yes --> ShowTimeoutError["Display timeout error"]
     ShowTimeoutError --> End
     CheckTimeout -- Nie --> SaveToStorage["Zapisz raport do Object Storage"]
-    SaveToStorage --> ReturnURL["Zwróć URL raportu"]
+    SaveToStorage --> ReturnURL["Return report URL"]
     ReturnURL --> ShowDownloadLink["Wyświetl link do pobrania"]
     ShowDownloadLink --> UserChoice{"Wybór użytkownika"}
     UserChoice --> DownloadReport["Pobierz raport"] & ViewInBrowser["Otwórz w przeglądarce"] & End
@@ -1369,7 +1369,7 @@ sequenceDiagram
     RS-->>RG: ERROR: No data found for experiment Z
     RG->>RG: Loguj błąd: Missing experiment data
     RG-->>UI: ReportGenerationError: Brak danych eksperymentu
-    UI-->>User: "Nie można wygenerować raportu - brak danych. Sprawdź czy eksperyment został zakończony."
+    UI-->>User: "Cannot generate report - no data. Check if experiment has completed."
 ```
 
 #### Diagram aktywności - Renderowanie różnych formatów
@@ -1396,7 +1396,7 @@ flowchart TB
     ExportJSON --> ValidateOutput
     ValidateOutput -- OK --> SaveFile["Zapisz plik"]
     ValidateOutput -- Błąd --> RenderError["Zgłoś błąd renderowania"]
-    SaveFile --> ReturnURL["Zwróć URL"]
+    SaveFile --> ReturnURL["Return URL"]
     RenderError --> End(["Koniec - sukces"])
     ReturnURL --> End
 ```
@@ -1405,7 +1405,7 @@ flowchart TB
 
 ## Podsumowanie przypadków użycia
 
-| UC | Nazwa | Główny aktor | Częstotliwość | Krytyczność |
+| UC | Name | Primary Actor | Frequency | Criticality |
 |----|-------|--------------|---------------|-------------|
 | UC1 | Skonfiguruj i uruchom eksperyment | Badacz | Wysoka | Krytyczna |
 | UC2 | Dodaj wbudowany algorytm HPO | Administrator | Niska | Średnia |

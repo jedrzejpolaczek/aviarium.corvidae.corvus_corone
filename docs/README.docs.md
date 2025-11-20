@@ -1,103 +1,104 @@
-# Dokumentacja Corvus Corone - Przewodnik
+# Corvus Corone Documentation - Guide
 
-> **System benchmarkowania algorytmów HPO (Hyperparameter Optimization)**
+> **HPO (Hyperparameter Optimization) Algorithm Benchmarking System**
 
-Witaj w dokumentacji platformy Corvus Corone! Ten przewodnik pomoże Ci znaleźć właściwe informacje w zależności od Twojej roli i potrzeb.
-
----
-
-## 🚀 Szybki start - gdzie zacząć?
-
-### Jestem nowy w projekcie
-1. **Poznaj wymagania**: [Przypadki użycia](requirements/use-cases.md)
-2. **Zacznij tutaj**: [Architektura - Kontekst systemu](architecture/c1-context.md)
-3. **Zrozum strukturę**: [Architektura - Kontenery](architecture/c2-containers.md)
-
-### Jestem programistą/architektem
-1. **Architektura systemu**: [C4 - Kontekst](architecture/c1-context.md) → [Kontenery](architecture/c2-containers.md) → [Komponenty](architecture/c3-components.md)
-2. **Decyzje projektowe**: [Design Decisions](design/design-decisions.md)
-3. **Deployment**: [Przewodnik wdrożenia](operations/deployment-guide.md)
-
-### Jestem badaczem/użytkownikiem
-1. **Co system robi**: [Przypadki użycia](requirements/use-cases.md)
-2. **Metodologia**: [Benchmarking Practices](methodology/benchmarking-practices.md)
-3. **Workflow badawczy**: [Kluczowe aktywności](user-guides/workflows.md)
-
-### Jestem administratorem/DevOps
-1. **Deployment**: [Przewodnik wdrożenia](operations/deployment-guide.md)
-2. **Monitoring**: [Monitoring i Logging](operations/monitoring-guide.md)
-3. **Architektura kontenerów**: [C4 - Kontenery](architecture/c2-containers.md)
+Welcome to the Corvus Corone platform documentation! This guide will help you find the right information depending on your role and needs.
 
 ---
 
-## 📚 Kompletna mapa dokumentacji
+## 🚀 Quick start - where to begin?
+
+### I'm new to the project
+1. **Learn the requirements**: [Use Cases](requirements/use-cases.md)
+2. **Start here**: [Architecture - System Context](architecture/c1-context.md)
+3. **Understand the structure**: [Architecture - Containers](architecture/c2-containers.md)
+
+### I'm a developer/architect
+1. **System architecture**: [C4 - Context](architecture/c1-context.md) → [Containers](architecture/c2-containers.md) → [Components](architecture/c3-components.md)
+2. **Design decisions**: [Design Decisions](design/design-decisions.md)
+3. **Deployment**: [Deployment Guide](operations/deployment-guide.md)
+
+### I'm a researcher/user
+1. **What the system does**: [Use Cases](requirements/use-cases.md)
+2. **Methodology**: [Benchmarking Practices](methodology/benchmarking-practices.md)
+3. **Research workflow**: [Key Activities](user-guides/workflows.md)
+
+### I'm an administrator/DevOps
+1. **Deployment**: [Deployment Guide](operations/deployment-guide.md)
+2. **Monitoring**: [Monitoring and Logging](operations/monitoring-guide.md)
+3. **Container architecture**: [C4 - Containers](architecture/c2-containers.md)
+
+---
+
+## 📋 Complete Documentation Map
 
 ### 📋 Requirements & Analysis
-| Dokument | Opis | Dla kogo |
-|----------|------|----------|
-| [Use Cases](requirements/use-cases.md) | Scenariusze użycia, aktorzy, wymagania funkcjonalne | Product Owners, Analitycy, Wszyscy |
-| [Functional Requirements](requirements/functional-requirements.md) | Wymagania funkcjonalne (R1-R15) | Product Owners, Analitycy, Deweloperzy |
-| [Non-functional Requirements](requirements/non-functional-requirements.md) | Wymagania niefunkcjonalne (RNF1-RNF10) | Architekci, DevOps, QA |
-| [Requirements Traceability](requirements/requirements-traceability.md) | Macierz śledzenia wymagań | Architekci, PM, QA |
+| Document | Description | For whom |
+|----------|-------------|----------|
+| [Use Cases](requirements/use-cases.md) | Usage scenarios, actors, functional requirements | Product Owners, Analysts, Everyone |
+| [Business Requirements](requirements/business-requirements.md) | Strategic goals, business value, stakeholder needs | Executives, Product Owners, Stakeholders |
+| [Functional Requirements](requirements/functional-requirements.md) | Functional requirements (R1-R15) | Product Owners, Analysts, Developers |
+| [Non-functional Requirements](requirements/non-functional-requirements.md) | Non-functional requirements (RNF1-RNF10) | Architects, DevOps, QA |
+| [Requirements Traceability](requirements/requirements-traceability.md) | Requirements traceability matrix | Architects, PM, QA |
 
-### 🏗️ Architektura (Model C4)
-| Dokument | Poziom C4 | Opis | Dla kogo |
-|----------|-----------|------|----------|
-| [Context](architecture/c1-context.md) | C4-1 | Użytkownicy, systemy zewnętrzne, wymagania | Wszyscy |
-| [Containers](architecture/c2-containers.md) | C4-2 | Aplikacje, bazy danych, komunikacja | Programiści, Architekci |
-| [Components](architecture/c3-components.md) | C4-3 | Moduły, interfejsy, szczegóły techniczne | Programiści |
+### 🏢 Architecture (C4 Model)
+| Document | C4 Level | Description | For whom |
+|----------|----------|-------------|----------|
+| [Context](architecture/c1-context.md) | C4-1 | Users, external systems, requirements | Everyone |
+| [Containers](architecture/c2-containers.md) | C4-2 | Applications, databases, communication | Developers, Architects |
+| [Components](architecture/c3-components.md) | C4-3 | Modules, interfaces, technical details | Developers |
 
 ### 🔬 Methodology & Research
-| Dokument | Opis | Dla kogo |
-|----------|------|----------|
-| [Benchmarking Practices](methodology/benchmarking-practices.md) | Metodologie badawcze, standardy porównań | Badacze, Data Scientists |
+| Document | Description | For whom |
+|----------|-------------|----------|
+| [Benchmarking Practices](methodology/benchmarking-practices.md) | Research methodologies, comparison standards | Researchers, Data Scientists |
 
 ### 🛠️ Operations & Deployment
-| Dokument | Opis | Dla kogo |
-|----------|------|----------|
-| [Deployment Guide](operations/deployment-guide.md) | PC vs Cloud, Docker, K8s, skalowanie | DevOps, Administratorzy |
-| [Deployment Examples](operations/deployment-examples.md) | Szczegółowe przykłady dla każdego scenariusza | DevOps, Administratorzy |
-| [Monitoring Guide](operations/monitoring-guide.md) | Logi, metryki, alertowanie, troubleshooting | DevOps, SRE |
+| Document | Description | For whom |
+|----------|-------------|----------|
+| [Deployment Guide](operations/deployment-guide.md) | PC vs Cloud, Docker, K8s, scaling | DevOps, Administrators |
+| [Deployment Examples](operations/deployment-examples.md) | Detailed examples for each scenario | DevOps, Administrators |
+| [Monitoring Guide](operations/monitoring-guide.md) | Logs, metrics, alerting, troubleshooting | DevOps, SRE |
 | [Performance & SLA](operations/performance-sla.md) | Benchmarks, SLA definitions, KPIs | SRE, Management |
 
 ### 👥 User Guides
-| Dokument | Opis | Dla kogo |
-|----------|------|----------|
-| [Workflows](user-guides/workflows.md) | Kluczowe aktywności, best practices | Badacze, Użytkownicy |
+| Document | Description | For whom |
+|----------|-------------|----------|
+| [Workflows](user-guides/workflows.md) | Key activities, best practices | Researchers, Users |
 
 ### 🎨 Design & Decisions
-| Dokument | Opis | Dla kogo |
-|----------|------|----------|
-| [Design Decisions](design/design-decisions.md) | **12 kompletnych ADR** - uzasadnienia architekturalne, trade-offs | Architekci, Tech Leads |
-| [Data Model](design/data-model.md) | Szczegółowy model danych (ERD) | Architekci, Deweloperzy |
+| Document | Description | For whom |
+|----------|-------------|----------|
+| [Design Decisions](design/design-decisions.md) | **12 complete ADRs** - architectural justifications, trade-offs | Architects, Tech Leads |
+| [Data Model](design/data-model.md) | Detailed data model (ERD) | Architects, Developers |
 
 ---
 
-## ⭐ Kluczowe dokumenty (Production-Ready)
+## ⭐ Key Documents (Production-Ready)
 
-### Dla Decision Makers
-- **[12 Architecture Decision Records](design/design-decisions.md)** - Kompletne uzasadnienia wszystkich kluczowych decyzji technicznych
-- **[Performance & SLA Definitions](operations/performance-sla.md)** - Szczegółowe benchmarks i service level agreements
-- **[Requirements Traceability Matrix](requirements/requirements-traceability.md)** - Pełna śledzącać wymagania → architektura
+### For Decision Makers
+- **[12 Architecture Decision Records](design/design-decisions.md)** - Complete justifications for all key technical decisions
+- **[Performance & SLA Definitions](operations/performance-sla.md)** - Detailed benchmarks and service level agreements
+- **[Requirements Traceability Matrix](requirements/requirements-traceability.md)** - Complete tracing requirements → architecture
 
-### Dla Implementation Teams  
-- **[Detailed Deployment Examples](operations/deployment-examples.md)** - Gotowe konfiguracje dla dev/staging/production
-- **[Complete Architecture (C1-C2-C3-C4)](architecture/c1-context.md)** - Pełny model C4 z implementacją
-- **[Security & Monitoring Implementation](requirements/non-functional-requirements.md)** - RNF z konkretnymi rozwiązaniami
+### For Implementation Teams  
+- **[Detailed Deployment Examples](operations/deployment-examples.md)** - Ready configurations for dev/staging/production
+- **[Complete Architecture (C1-C2-C3-C4)](architecture/c1-context.md)** - Full C4 model with implementation
+- **[Security & Monitoring Implementation](requirements/non-functional-requirements.md)** - RNF with concrete solutions
 
 ---
 
-## 🔍 Znajdź co potrzebujesz
+## 🔍 Find what you need
 
-### Szukasz informacji o...
+### Looking for information about...
 
-**Systemie jako całości?**
+**The system as a whole?**
 → [Context](architecture/c1-context.md)
 
-**Konkretnych usługach/kontenerach?**
+**Specific services/containers?**
 → [Containers](architecture/c2-containers.md)
 
-**Implementacji algorytmów HPO?**
+**HPO algorithm implementation?**
 → [Components - Algorithm SDK](architecture/c3-components.md#34-algorithm-sdk--plugin-runtime--komponenty)
 
 **Jak uruchomić system?**
@@ -150,26 +151,26 @@ Witaj w dokumentacji platformy Corvus Corone! Ten przewodnik pomoże Ci znaleź�
 
 ---
 
-## 📖 Glossary kluczowych terminów
+## 📚 Glossary of Key Terms
 
-| Termin | Definicja |
-|--------|-----------|
-| **HPO** | Hyperparameter Optimization - optymalizacja hiperparametrów |
-| **Benchmark** | Zdefiniowany problem testowy do porównywania algorytmów |
-| **Run** | Pojedyncze wykonanie algorytmu HPO na instancji benchmarku |
-| **Plugin** | Zewnętrzny algorytm HPO zaimplementowany jako kontener |
-| **Worker** | Jednostka wykonawcza uruchamiająca algorytmy HPO |
-| **Orchestrator** | Komponent zarządzający planowaniem i wykonaniem eksperymentów |
-| **Message Broker** | System kolejkowania zadań (RabbitMQ/Redis) |
-| **ADR** | Architecture Decision Record - uzasadnienie decyzji projektowych |
-| **C4 Model** | Context-Containers-Components-Code - metodyka dokumentacji architektury |
-| **SDK** | Software Development Kit - narzędzia dla twórców pluginów |
+| Term | Definition |
+|------|------------|
+| **HPO** | Hyperparameter Optimization - hyperparameter optimization |
+| **Benchmark** | Defined test problem for comparing algorithms |
+| **Run** | Single execution of HPO algorithm on benchmark instance |
+| **Plugin** | External HPO algorithm implemented as container |
+| **Worker** | Execution unit running HPO algorithms |
+| **Orchestrator** | Component managing experiment planning and execution |
+| **Message Broker** | Task queuing system (RabbitMQ/Redis) |
+| **ADR** | Architecture Decision Record - design decision justification |
+| **C4 Model** | Context-Containers-Components-Code - architecture documentation methodology |
+| **SDK** | Software Development Kit - tools for plugin developers |
 
 ---
 
-**📝 Uwaga**: Ten plik został przeniesiony z `docs/README.md` na `docs/README.docs.md` aby uniknąć konfliktów z głównym README projektu.
+**📝 Note**: This file was moved from `docs/README.md` to `docs/README.docs.md` to avoid conflicts with the main project README.
 
-**↩️ Powrót do**: [Główny README projektu](../README.md)
+**↩️ Back to**: [Main Project README](../README.md)
 
 ---
 

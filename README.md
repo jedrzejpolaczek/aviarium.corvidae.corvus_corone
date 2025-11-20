@@ -1,31 +1,31 @@
 # Corvus Corone - HPO Benchmarking Platform
 
-Platforma do benchmarkingu algorytmów hyperparameter optimization (HPO) z naciskiem na reproducibility i statistical rigor.
+Platform for benchmarking hyperparameter optimization (HPO) algorithms with emphasis on reproducibility and statistical rigor.
 
-## 📖 Dokumentacja
+## 📖 Documentation
 
-**Production-ready dokumentacja** systemu została zorganizowana w strukturę łatwą w nawigacji:
+**Production-ready documentation** of the system has been organized into an easy-to-navigate structure:
 
-**▶️ [Zacznij tutaj - Przewodnik po dokumentacji](docs/README.docs.md)**
+**▶️ [Start here - Documentation Guide](docs/README.docs.md)**
 
-**🎯 Kompletna dokumentacja obejmuje:**
-- **Requirements**: Use cases, wymagania funkcjonalne i niefunkcjonalne + Requirements Traceability Matrix
-- **Architektura**: Pełny model C4 (Context, Containers, Components, Code) 
-- **Design Decisions**: **12 kompletnych ADR** pokrywających wszystkie kluczowe decyzje architekturalne
+**🎯 Complete documentation includes:**
+- **Requirements**: Use cases, functional and non-functional requirements + Requirements Traceability Matrix
+- **Architecture**: Full C4 model (Context, Containers, Components, Code) 
+- **Design Decisions**: **12 complete ADRs** covering all key architectural decisions
 - **Operations**: Deployment examples, monitoring, **performance benchmarks & SLA definitions**
-- **Methodology**: Benchmarking practices, metodologie badawcze
-- **User Guides**: Workflows, instrukcje użytkowania
+- **Methodology**: Benchmarking practices, research methodologies
+- **User Guides**: Workflows, usage instructions
 
-### 🎯 Szybkie linki:
-- [Przypadki użycia](docs/requirements/use-cases.md) - Wymagania i scenariusze
-- [Metodologie](docs/methodology/benchmarking-practices.md) - Praktyki badawcze
-- [Architektura systemu](docs/architecture/c1-context.md) - Przegląd techniczny (Model C4)
-- [Przewodnik wdrożenia](docs/operations/deployment-guide.md) - PC-first, Cloud-ready deployment
-- [Requirements Traceability](docs/requirements/requirements-traceability.md) - Macierz śledzenia wymagań
+### 🎯 Quick links:
+- [Use Cases](docs/requirements/use-cases.md) - Requirements and scenarios
+- [Methodologies](docs/methodology/benchmarking-practices.md) - Research practices
+- [System Architecture](docs/architecture/c1-context.md) - Technical overview (C4 Model)
+- [Deployment Guide](docs/operations/deployment-guide.md) - PC-first, Cloud-ready deployment
+- [Requirements Traceability](docs/requirements/requirements-traceability.md) - Requirements traceability matrix
 
 ---
 
-*Szczegółowa nawigacja i opis wszystkich dokumentów: [docs/README.docs.md](docs/README.docs.md)*
+*Detailed navigation and description of all documents: [docs/README.docs.md](docs/README.docs.md)*
 
 ## Project Data
 
@@ -34,30 +34,30 @@ Platforma do benchmarkingu algorytmów hyperparameter optimization (HPO) z nacis
 **Software version:** 1.0.0  
 **Repository Purpose:** Hyperparameter Optimization algorithms benchmarking and comparison platform
 
-## Spis treści
+## Table of Contents
 
-1. [Dokumentacja](#-dokumentacja)
+1. [Documentation](#-documentation)
 2. [Project Data](#project-data)
-3. [Architektura systemu](#-architektura-systemu)
-4. [Technologie](#-technologie)
-5. [Struktura projektu](#-struktura-projektu)
-6. [Instalacja i uruchomienie](#-instalacja-i-uruchomienie)
-7. [Wkład w rozwój](#-wkład-w-rozwój)
-8. [Licencja](#-licencja)
+3. [System Architecture](#-system-architecture)
+4. [Technologies](#-technologies)
+5. [Project Structure](#-project-structure)
+6. [Installation and Setup](#-installation-and-setup)
+7. [Contributing](#-contributing)
+8. [License](#-license)
 
-## 🏗️ Architektura systemu
+## 🏗️ System Architecture
 
-Corvus Corone to platforma mikrousługowa zaprojektowana dla benchmarkingu algorytmów HPO:
+Corvus Corone is a microservices platform designed for benchmarking HPO algorithms:
 
-- **Mikrousługi**: API Gateway, Worker Pool, Experiment Tracking, Algorithm Registry + Plugin Runtime
-- **Container orchestration**: Kubernetes dla skalowania
-- **Message broker**: RabbitMQ (primary) / Redis (fallback) dla asynchronicznej komunikacji
-- **Storage**: PostgreSQL (Results Store), Object Storage (artefakty), Redis (cache)
-- **Monitoring**: Prometheus + Grafana, distributed tracing (patrz [Monitoring Stack](docs/operations/monitoring-guide.md))
+- **Microservices**: API Gateway, Worker Pool, Experiment Tracking, Algorithm Registry + Plugin Runtime
+- **Container orchestration**: Kubernetes for scaling
+- **Message broker**: RabbitMQ (primary) / Redis (fallback) for asynchronous communication
+- **Storage**: PostgreSQL (Results Store), Object Storage (artifacts), Redis (cache)
+- **Monitoring**: Prometheus + Grafana, distributed tracing (see [Monitoring Stack](docs/operations/monitoring-guide.md))
 
-Szczegóły w [dokumentacji architektury](docs/architecture/c1-context.md).
+Details in [architecture documentation](docs/architecture/c1-context.md).
 
-## 💻 Technologie
+## 💻 Technologies
 
 ### Backend
 - **Python 3.9+** - Core application language
@@ -79,25 +79,25 @@ Szczegóły w [dokumentacji architektury](docs/architecture/c1-context.md).
 - **Jaeger** - Distributed tracing
 
 ### Environment
-System działa w kontenerach Docker z obsługą:
+System runs in Docker containers with support for:
 - **Cloud**: AWS, GCP, Azure (Kubernetes)
 - **On-premise**: Docker Compose, Kubernetes
 - **Development**: Local Docker setup
 
-## 📁 Struktura projektu
+## 📁 Project Structure
 
 ```
-├── README.md                     <- Ten plik - główny opis projektu
-├── docs/                         <- Kompletna dokumentacja systemu
-│   ├── README.docs.md           <- Przewodnik po dokumentacji
-│   ├── requirements/            <- Wymagania i analiza biznesowa
-│   │   ├── use-cases.md        <- Przypadki użycia
-│   │   └── non-functional-requirements.md <- Wymagania niefunkcjonalne
-│   ├── architecture/            <- Architektura systemu (Model C4)
-│   │   ├── c1-context.md       <- C4-1: Kontekst systemu
-│   │   ├── c2-containers.md    <- C4-2: Kontenery i usługi
-│   │   └── c3-components.md    <- C4-3: Komponenty i API
-│   ├── methodology/             <- Metodologie badawcze
+├── README.md                     <- This file - main project description
+├── docs/                         <- Complete system documentation
+│   ├── README.docs.md           <- Documentation guide
+│   ├── requirements/            <- Requirements and business analysis
+│   │   ├── use-cases.md        <- Use cases
+│   │   └── non-functional-requirements.md <- Non-functional requirements
+│   ├── architecture/            <- System architecture (C4 Model)
+│   │   ├── c1-context.md       <- C4-1: System context
+│   │   ├── c2-containers.md    <- C4-2: Containers and services
+│   │   └── c3-components.md    <- C4-3: Components and APIs
+│   ├── methodology/             <- Research methodologies
 │   │   └── benchmarking-practices.md <- Praktyki benchmarkingu
 │   ├── user-guides/             <- Przewodniki użytkownika
 │   │   └── workflows.md        <- Procesy i workflow
@@ -125,49 +125,49 @@ System działa w kontenerach Docker z obsługą:
 ├── scripts/                     <- Utility scripts
 └── examples/                    <- Example algorithms and benchmarks
 ```
-## 🚀 Instalacja i uruchomienie
+## 🚀 Installation and Run
 
-### Wymagania
+### Requirements
 - **Docker** 20.10+
 - **Docker Compose** 2.0+
 - **Python** 3.9+ (dla development)
 - **Kubernetes** 1.21+ (dla production)
 
-### Szybki start (Docker Compose)
+### Quick start (Docker Compose)
 ```bash
-# Sklonuj repozytorium
+# Clone repository
 git clone https://github.com/jedrzejpolaczek/aviarium.corvidae.corvus_corone.git
 cd aviarium.corvidae.corvus_corone
 
-# Uruchom system
+# Run system
 docker-compose up -d
 
-# Sprawdź status
+# Check status
 docker-compose ps
 ```
 
-### Dostęp do aplikacji
+### App access
 - **Web UI**: http://localhost:3000
 - **API Gateway**: http://localhost:8080
 - **Monitoring**: http://localhost:3001 (Grafana)
 
-### Szczegółowe instrukcje
-Pełny przewodnik instalacji: [Deployment Guide](docs/operations/deployment-guide.md)
+### Detailed Instructions
+Complete installation guide: [Deployment Guide](docs/operations/deployment-guide.md)
 
-## 🤝 Wkład w rozwój
+## 🤝 Contributing
 
-### Jak przyczynić się do projektu
-1. **Fork** repozytorium
-2. **Utwórz** branch dla swojej funkcjonalności (`git checkout -b feature/AmazingFeature`)
-3. **Commit** swoje zmiany (`git commit -m 'Add some AmazingFeature'`)
-4. **Push** do brancha (`git push origin feature/AmazingFeature`)
-5. **Otwórz** Pull Request
+### How to contribute to the project
+1. **Fork** the repository
+2. **Create** a branch for your feature (`git checkout -b feature/AmazingFeature`)
+3. **Commit** your changes (`git commit -m 'Add some AmazingFeature'`)
+4. **Push** to the branch (`git push origin feature/AmazingFeature`)
+5. **Open** a Pull Request
 
-### Standardy kodowania
+### Coding Standards
 - **Python**: [Google Python Style Guide](https://google.github.io/styleguide/pyguide.html)
 - **JavaScript**: ESLint + Prettier
-- **Docker**: Best practices dla multi-stage builds
-- **Dokumentacja**: Markdown z diagramami Mermaid
+- **Docker**: Best practices for multi-stage builds
+- **Documentation**: Markdown with Mermaid diagrams
 
 ### Testing
 ```bash
@@ -181,21 +181,21 @@ pytest tests/integration/
 pytest tests/e2e/
 ```
 
-### Zgłaszanie problemów
-- **Bugs**: Użyj GitHub Issues z template'em bug report
-- **Feature requests**: GitHub Issues z template'em feature request
-- **Pytania**: GitHub Discussions
+### Reporting Issues
+- **Bugs**: Use GitHub Issues with bug report template
+- **Feature requests**: GitHub Issues with feature request template
+- **Questions**: GitHub Discussions
 
-## 📄 Licencja
+## 📄 License
 
-Ten projekt jest dostępny na licencji MIT. Zobacz plik [LICENSE](LICENSE) po szczegóły.
+This project is available under the MIT license. See the [LICENSE](LICENSE) file for details.
 
-## 🏆 Podziękowania
+## 🏆 Acknowledgments
 
-Projekt powstał dzięki:
-- **Zespołowi badawczemu** za koncepcje i wymagania
-- **Community HPO** za feedback i algorytmy
-- **Open Source** za narzędzia i biblioteki
+This project was made possible thanks to:
+- **Research team** for concepts and requirements
+- **HPO Community** for feedback and algorithms
+- **Open Source** for tools and libraries
 
 ---
 

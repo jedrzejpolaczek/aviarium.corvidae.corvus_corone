@@ -1,10 +1,10 @@
-# Kontenery - Corvus Corone (C4-2)
+# Containers
 
-> **Dekompozycja systemu HPO Benchmarking Platform na kontenery (aplikacje, usługi, bazy danych)**
+> **Decomposition of HPO Benchmarking Platform system into containers (applications, services, databases)**
 
 ---
 
-## Diagram architektury kontenerów
+## Container Architecture Diagram
 
 ```mermaid
 ---
@@ -15,7 +15,7 @@ config:
 ---
 flowchart TB
  subgraph Client["Client"]
-        Ext["Zewnętrzne systemy AutoML / Analiza"]
+        Ext["External AutoML / Analysis systems"]
   end
  subgraph PresentationLayer["PresentationLayer"]
         UI["Web UI / Frontend"]
@@ -30,7 +30,7 @@ flowchart TB
         PUB["PublicationService"]
         RGS["ReportGeneratorService"]
   end
- subgraph ExecLayer["Warstwa wykonawcza"]
+ subgraph ExecLayer["Execution Layer"]
         MB["Message Broker"]
         WORKER["Worker Runtime / Execution Engine"]
         PLUGIN["Algorithm SDK / Plugin Runtime"]
@@ -98,68 +98,68 @@ flowchart TB
 
 ---
 
-## Przegląd kontenerów
+## Container Overview
 
-### 🎨 Warstwa prezentacji
-- **Web UI (Frontend)** - Interfejs użytkownika React/Vue/Angular
-- **API Gateway** - Pojedynczy punkt wejścia HTTP/REST/GraphQL
+### 🎨 Presentation Layer
+- **Web UI (Frontend)** - User interface React/Vue/Angular
+- **API Gateway** - Single HTTP/REST/GraphQL entry point
 
-### 🧠 Warstwa logiki biznesowej (Core Services)
-- **Experiment Orchestrator** - Orkiestracja i planowanie eksperymentów
-- **Experiment Tracking** - Śledzenie runów i metryk
-- **MetricsAnalysisService** - Analiza i agregacja wyników
-- **Benchmark Definition Service** - Definicje benchmarków i problemów
-- **Algorithm Registry Service** - Katalog algorytmów HPO
-- **PublicationService** - Zarządzanie publikacjami i referencjami
-- **ReportGeneratorService** - Generowanie raportów
+### 🧠 Business Logic Layer (Core Services)
+- **Experiment Orchestrator** - Experiment orchestration and planning
+- **Experiment Tracking** - Run and metrics tracking
+- **MetricsAnalysisService** - Results analysis and aggregation
+- **Benchmark Definition Service** - Benchmark and problem definitions
+- **Algorithm Registry Service** - HPO algorithm catalog
+- **PublicationService** - Publication and reference management
+- **ReportGeneratorService** - Report generation
 
-### ⚡ Warstwa wykonawcza
-- **Worker Runtime** - Wykonywanie pojedynczych runów
-- **Algorithm SDK/Plugin Runtime** - Uruchamianie pluginów algorytmów
-- **Message Broker** - Kolejkowanie zadań i zdarzeń
+### ⚡ Execution Layer
+- **Worker Runtime** - Individual run execution
+- **Algorithm SDK/Plugin Runtime** - Algorithm plugin execution
+- **Message Broker** - Task and event queuing
 
-### 💾 Warstwa danych
-- **Results Store (Database)** - Relacyjna baza danych (PostgreSQL)
-- **File/Object Storage** - Artefakty, datasety, modele
+### 💾 Data Layer
+- **Results Store (Database)** - Relational database (PostgreSQL)
+- **File/Object Storage** - Artifacts, datasets, models
 
-### 🔧 Warstwa wsparcia
-- **Auth Service** - Autoryzacja i uwierzytelnianie
-- **Monitoring & Logging** - Obserwowalność i diagnostyka
+### 🔧 Support Layer
+- **Auth Service** - Authorization and authentication
+- **Monitoring & Logging** - Observability and diagnostics
 
 ---
 
-## Szczegółowy opis kontenerów
+## Detailed Container Description
 
-| Kontener | Warstwa | Odpowiedzialności | Komunikacja | PC vs Chmura | Rola w benchmarkingu |
+| Container | Layer | Responsibilities | Communication | PC vs Cloud | Role in benchmarking |
 |----------|---------|-------------------|-------------|--------------|---------------------|
-| **Web UI (Frontend)** | **Prezentacji** | • Interfejs do definicji benchmarków i eksperymentów<br>• Podgląd katalogu algorytmów HPO<br>• Panel śledzenia eksperymentów<br>• Porównanie wyników<br>• Zarządzanie publikacjami<br>• Generowanie raportów<br>• Podstawowa administracja | • REST/GraphQL/WebSocket z **API Gateway** (sync) | **PC:** lokalny kontener lub pliki statyczne<br>**Chmura:** frontend (CDN/storage) | Prezentacja celów eksperymentu, konfiguracji, wyników i statystyk |
-| **API Gateway / Backend API** | **Prezentacji** | • Pojedynczy punkt wejścia dla Web UI i systemów zewnętrznych<br>• Routing żądań do usług domenowych<br>• Autoryzacja/uwierzytelnianie<br>• Rate limiting, CORS | • Z klientami: HTTP REST/GraphQL (sync)<br>• Z usługami: HTTP/gRPC (sync) + Message Broker (async) | **PC:** jeden kontener (monolith/gateway)<br>**Chmura:** API Gateway + microservices | Centralny punkt integracji i udostępniania funkcji |
-| **Experiment Orchestrator Service** | **Logiki biznesowej** | • Przyjmowanie definicji eksperymentów<br>• Walidacja planu (algorytmy, instancje)<br>• Tworzenie planu runów (algorytm × instancja × seed)<br>• Zlecanie runów workerom<br>• Zarządzanie stanem eksperymentu<br>• Kontrola reprodukowalności | • Sync: z API Gateway<br>• Async: do Worker Runtime (Message Broker)<br>• Events: RunCompleted/RunFailed | **PC:** jedna instancja<br>**Chmura:** skalowalny microservice, HA | Implementuje **plan eksperymentu** i kontrolę budżetu |
-| **Worker Runtime / Execution Engine** | **Wykonawczej** | • Wykonywanie pojedynczych runów<br>• Ładowanie benchmarku i instancji<br>• Uruchamianie algorytmu HPO<br>• Raportowanie metryk<br>• Obsługa błędów i retry | • Async: odbiór zadań z Message Broker<br>• Sync/Async: zapisy do Tracking Service<br>• Dostęp do Object Storage | **PC:** 1-N workerów (docker-compose)<br>**Chmura:** worker pods, autoscaling | Zapewnia reprodukowalność i porównywalność runów |
-| **Benchmark Definition Service** | **Logiki biznesowej** | • Przechowywanie definicji benchmarków<br>• Wersjonowanie benchmarków<br>• Listy datasetów, problemów<br>• Metryki, znane optimum/best-known | • Sync: API dla Orchestratora i Web UI | **PC/Chmura:** jeden kontener | Realizuje dobór instancji problemowych |
-| **Algorithm Registry Service** | **Logiki biznesowej** | • Rejestr algorytmów HPO (wbudowane + pluginy)<br>• Metadane: nazwa, typ, parametry<br>• Wersjonowanie algorytmów<br>• Walidacja kompatybilności | • Sync: API dla Web UI, Orchestratora, Plugin Runtime | **PC/Chmura:** jeden kontener/usługa | Świadomy dobór algorytmów i konfiguracji |
-| **Algorithm SDK / Plugin Runtime** | **Wykonawczej** | • Ładowanie i izolowanie pluginów<br>• Kontrakt API pluginu<br>• Walidacja wejść/wyjść<br>• Raportowanie wyników | • Lokalnie z Worker Runtime<br>• API lub wywołania językowe | **PC/Chmura:** ten sam kod, różne środowisko | Łatwe dodawanie algorytmów w ujednoliconym środowisku |
-| **Experiment Tracking Service** | **Logiki biznesowej** | • API do logowania runów, metryk, tagów<br>• Powiązania: eksperyment→run→algorytm→benchmark<br>• Historia zmian parametrów<br>• Wyszukiwanie i filtrowanie | • Sync: API dla Worker Runtime, Orchestrator, Web UI | **PC:** 1 kontener<br>**Chmura:** skalowalny microservice | Panel śledzenia, analiza wyników, reprodukowalność |
-| **MetricsAnalysisService** | **Logiki biznesowej** | • Agregowanie wyników<br>• Złożone metryki (czas do poziomu błędu)<br>• Testy statystyczne<br>• Wykresy porównawcze | • Sync: API dla Web UI<br>• Async: słuchanie zdarzeń RunCompleted | **PC:** 1 kontener<br>**Chmura:** skalowalny microservice | **Analiza i prezentacja wyników** benchmarków |
-| **PublicationService** | **Logiki biznesowej** | • Katalog publikacji (DOI, BibTeX)<br>• Powiązania z algorytmami/benchmarkami<br>• Generowanie bibliografii<br>• Integracja z CrossRef/arXiv | • Sync: API dla Web UI, innych usług<br>• Sync/Async: wywołania do systemów bibliograficznych | **PC/Chmura:** usługa integracyjna | Łączy wyniki z literaturą naukową |
-| **Results Store (Database)** | **Danych** | • Dane domenowe: Experiments, Runs, Metrics<br>• Algorithms, Benchmarks, Publications<br>• Powiązania i konfiguracje<br>• ACID transactions | • Internal: przez DAO z usług domenowych<br>• Orchestrator: tylko pośrednio przez API | **PC:** lokalny PostgreSQL<br>**Chmura:** zarządzana baza | Centralne repozytorium dla reprodukowalności |
-| **Object Storage** | **Danych** | • Duże artefakty: datasety, modele<br>• Logi w plikach<br>• Wygenerowane raporty<br>• Versioning i lifecycle | • S3/API plikowe z workerów i usług | **PC:** lokalny dysk/MinIO<br>**Chmura:** S3/GCS/Azure Blob | Odtwarzalne przechowywanie artefaktów |
-| **Message Broker (RabbitMQ/Redis)** | **Wykonawczej** | • Kolejka zadań runów<br>• Zdarzenia systemowe<br>• RunStarted/Completed/Failed<br>• ExperimentCompleted | • Async: komunikaty między usługami<br>• Pub/Sub pattern | **PC:** RabbitMQ (primary), Redis (fallback)<br>**Chmura:** Managed RabbitMQ lub Redis Streams | Elastyczny plan eksperymentu i skalowanie |
-| **Monitoring & Logging Stack** | **Wsparcia** | • **Metrics:** Prometheus + Thanos (long-term)<br>• **Logging:** ELK Stack (Elasticsearch/Logstash/Kibana)<br>• **Tracing:** Jaeger distributed tracing<br>• **Dashboards:** Grafana unified visualization<br>• Business KPIs i SLA monitoring | • OpenTelemetry instrumentation<br>• Fluentd log shipping<br>• AlertManager notifications | **PC:** Prometheus+Grafana+basic logging<br>**Chmura:** Full observability stack z clustering | Three pillars observability (metrics/logs/traces) |
-| **Auth Service** | **Wsparcia** | • OAuth2/OIDC authentication<br>• RBAC z role hierarchy (admin/plugin-author/researcher/viewer)<br>• JWT token management (15min TTL)<br>• MFA dla privileged operations<br>• API keys dla programmatic access | • Sync: OAuth2 flows, token validation<br>• Integration z external IdP | **PC:** built-in IdP z local accounts<br>**Chmura:** SAML/OIDC integration | Multi-tenant access control i compliance |
-| **ReportGeneratorService** | **Logiki biznesowej** | • Raporty HTML/PDF/LaTeX<br>• Agregacja danych z wielu źródeł<br>• Templates i styling<br>• Bibliografia i cytowania | • Sync: API z Web UI i Orchestratora<br>• Data fetch z Tracking/Results Store | **PC/Chmura:** Python/Node.js serwis | Spójne, powtarzalne raporty benchmarków |
+| **Web UI (Frontend)** | **Presentation** | • Interface for benchmark and experiment definition<br>• HPO algorithm catalog viewing<br>• Experiment tracking panel<br>• Results comparison<br>• Publication management<br>• Report generation<br>• Basic administration | • REST/GraphQL/WebSocket z **API Gateway** (sync) | **PC:** local container or static files<br>**Cloud:** frontend (CDN/storage) | Presentation of experiment goals, configuration, results and statistics |
+| **API Gateway / Backend API** | **Presentation** | • Single entry point for Web UI and external systems<br>• Request routing to domain services<br>• Authorization/authentication<br>• Rate limiting, CORS | • Z klientami: HTTP REST/GraphQL (sync)<br>• Z usługami: HTTP/gRPC (sync) + Message Broker (async) | **PC:** single container (monolith/gateway)<br>**Cloud:** API Gateway + microservices | Central integration point and function exposure |
+| **Experiment Orchestrator Service** | **Business Logic** | • Accepting experiment definitions<br>• Plan validation (algorithms, instances)<br>• Creating run plans (algorithm × instance × seed)<br>• Assigning runs to workers<br>• Experiment state management<br>• Reproducibility control | • Sync: z API Gateway<br>• Async: do Worker Runtime (Message Broker)<br>• Events: RunCompleted/RunFailed | **PC:** single instance<br>**Cloud:** scalable microservice, HA | Implements **experiment plan** and budget control |
+| **Worker Runtime / Execution Engine** | **Execution** | • Executing individual runs<br>• Loading benchmark and instances<br>• Running HPO algorithm<br>• Reporting metrics<br>• Error handling and retry | • Async: odbiór zadań z Message Broker<br>• Sync/Async: zapisy do Tracking Service<br>• Dostęp do Object Storage | **PC:** 1-N workers (docker-compose)<br>**Cloud:** worker pods, autoscaling | Ensures reproducibility and comparability of runs |
+| **Benchmark Definition Service** | **Business Logic** | • Storing benchmark definitions<br>• Benchmark versioning<br>• Dataset and problem lists<br>• Metrics, known optimum/best-known | • Sync: API for Orchestrator and Web UI | **PC/Cloud:** single container | Implements problem instance selection
+| **Algorithm Registry Service** | **Business Logic** | • HPO algorithm registry (built-in + plugins)<br>• Metadata: name, type, parameters<br>• Algorithm versioning<br>• Compatibility validation | • Sync: API for Web UI, Orchestrator, Plugin Runtime | **PC/Cloud:** single container/service | Conscious algorithm and configuration selection |
+| **Algorithm SDK / Plugin Runtime** | **Execution** | • Loading and isolating plugins<br>• Plugin API contract<br>• Input/output validation<br>• Results reporting | • Locally with Worker Runtime<br>• API or language calls | **PC/Cloud:** same code, different environment | Easy algorithm addition in unified environment |
+| **Experiment Tracking Service** | **Business Logic** | • API for logging runs, metrics, tags<br>• Relationships: experiment→run→algorithm→benchmark<br>• Parameter change history<br>• Search and filtering | • Sync: API for Worker Runtime, Orchestrator, Web UI | **PC:** 1 container<br>**Cloud:** scalable microservice | Tracking panel, results analysis, reproducibility |
+| **MetricsAnalysisService** | **Business Logic** | • Results aggregation<br>• Complex metrics (time to error level)<br>• Statistical tests<br>• Comparative charts | • Sync: API for Web UI<br>• Async: listening to RunCompleted events | **PC:** 1 container<br>**Cloud:** scalable microservice | **Analysis and presentation of benchmark results** |
+| **PublicationService** | **Business Logic** | • Publication catalog (DOI, BibTeX)<br>• Links to algorithms/benchmarks<br>• Bibliography generation<br>• CrossRef/arXiv integration | • Sync: API for Web UI, other services<br>• Sync/Async: calls to bibliographic systems | **PC/Cloud:** integration service | Links results to scientific literature |
+| **Results Store (Database)** | **Data** | • Domain data: Experiments, Runs, Metrics<br>• Algorithms, Benchmarks, Publications<br>• Relationships and configurations<br>• ACID transactions | • Internal: through DAO from domain services<br>• Orchestrator: only indirectly through API | **PC:** local PostgreSQL<br>**Cloud:** managed database | Central repository for reproducibility |
+| **Object Storage** | **Data** | • Large artifacts: datasets, models<br>• File logs<br>• Generated reports<br>• Versioning and lifecycle | • S3/File API from workers and services | **PC:** local disk/MinIO<br>**Cloud:** S3/GCS/Azure Blob | Reproducible artifact storage |
+| **Message Broker (RabbitMQ/Redis)** | **Execution** | • Run task queue<br>• System events<br>• RunStarted/Completed/Failed<br>• ExperimentCompleted | • Async: messages between services<br>• Pub/Sub pattern | **PC:** RabbitMQ (primary), Redis (fallback)<br>**Cloud:** Managed RabbitMQ or Redis Streams | Flexible experiment plan and scaling |
+| **Monitoring & Logging Stack** | **Support** | • **Metrics:** Prometheus + Thanos (long-term)<br>• **Logging:** ELK Stack (Elasticsearch/Logstash/Kibana)<br>• **Tracing:** Jaeger distributed tracing<br>• **Dashboards:** Grafana unified visualization<br>• Business KPIs and SLA monitoring | • OpenTelemetry instrumentation<br>• Fluentd log shipping<br>• AlertManager notifications | **PC:** Prometheus+Grafana+basic logging<br>**Cloud:** Full observability stack with clustering | Three pillars observability (metrics/logs/traces) |
+| **Auth Service** | **Support** | • OAuth2/OIDC authentication<br>• RBAC with role hierarchy (admin/plugin-author/researcher/viewer)<br>• JWT token management (15min TTL)<br>• MFA for privileged operations<br>• API keys for programmatic access | • Sync: OAuth2 flows, token validation<br>• Integration with external IdP | **PC:** built-in IdP with local accounts<br>**Cloud:** SAML/OIDC integration | Multi-tenant access control and compliance |
+| **ReportGeneratorService** | **Business Logic** | • HTML/PDF/LaTeX reports<br>• Data aggregation from multiple sources<br>• Templates and styling<br>• Bibliography and citations | • Sync: API from Web UI and Orchestrator<br>• Data fetch from Tracking/Results Store | **PC/Cloud:** Python/Node.js service | Consistent, repeatable benchmark reports |
 
 ---
 
-## Wzorce komunikacji
+## Communication Patterns
 
-### 🔄 Synchroniczna (Request/Response)
+### 🔄 Synchronous (Request/Response)
 - **Web UI ↔ API Gateway**: REST/GraphQL
 - **API Gateway ↔ Core Services**: HTTP/gRPC
 - **Worker ↔ Tracking Service**: REST API
 - **Services ↔ Results Store**: Database queries
 
-### ⚡ Asynchroniczna (Event-driven)
+### ⚡ Asynchronous (Event-driven)
 - **Orchestrator → Workers**: Task queue (RabbitMQ primary, Redis fallback)
 - **Workers → Analytics**: RunCompleted events
 - **System events**: ExperimentStarted/Completed/Failed (via Event Bus)
@@ -170,26 +170,24 @@ flowchart TB
 - **Report generation**: On-demand/scheduled
 - **Data export**: Bulk operations
 
-
-
 ---
 
-## Skalowanie i dostępność
+## Scaling and Availability
 
-### 📈 Strategie skalowania
+### 📈 Scaling strategies
 
-| Warstwa | PC | Cloud | Bottlenecks |
+| Layer | PC | Cloud | Bottlenecks |
 |---------|-------|-------|-------------|
-| **Frontend** | 1 instancja | CDN + multiple replicas | N/A (stateless) |
-| **API Gateway** | 1 kontener | Load balancer + replicas | Rate limiting |
-| **Core Services** | 1 każdy | Auto-scaling groups | Database connections |
-| **Workers** | 1-N kontenerów | HPA based on queue length | CPU/Memory intensive |
+| **Frontend** | 1 instance | CDN + multiple replicas | N/A (stateless) |
+| **API Gateway** | 1 container | Load balancer + replicas | Rate limiting |
+| **Core Services** | 1 each | Auto-scaling groups | Database connections |
+| **Workers** | 1-N containers | HPA based on queue length | CPU/Memory intensive |
 | **Database** | Single instance | Read replicas, sharding | Concurrent writes |
 | **Object Storage** | Local disk/MinIO | Distributed storage | Network I/O |
 
-### 🛡️ Wysokiej dostępności (HA)
+### 🛡️ High Availability (HA)
 
-**Krytyczne komponenty:**
+**Critical components:**
 - **Results Store**: Master-slave replication
 - **Message Broker**: Clustered setup
 - **API Gateway**: Load balancing
@@ -203,7 +201,7 @@ flowchart TB
 
 ---
 
-## Monitoring kontenerów
+## Container Monitoring
 
 ### 📊 Key Metrics
 - **Performance**: CPU, Memory, Network, Disk I/O
@@ -224,11 +222,11 @@ flowchart TB
 
 ---
 
-## Powiązane dokumenty
+## Related Documents
 
-- **Poprzedni poziom**: [Kontekst (C4-1)](c1-context.md)
-- **Następny poziom**: [Komponenty (C4-3)](c3-components.md)
-- **Szczegóły implementacji**: [Kod (C4-4)](c4-code.md)
-- **Wymagania**: [Functional Requirements](../requirements/functional-requirements.md), [Use Cases](../requirements/use-cases.md)
+- **Previous level**: [Context (C4-1)](c1-context.md)
+- **Next level**: [Components (C4-3)](c3-components.md)
+- **Implementation details**: [Code (C4-4)](c4-code.md)
+- **Requirements**: [Functional Requirements](../requirements/functional-requirements.md), [Use Cases](../requirements/use-cases.md)
 - **Deployment**: [Deployment Guide](../operations/deployment-guide.md)
 - **Monitoring**: [Monitoring Guide](../operations/monitoring-guide.md)

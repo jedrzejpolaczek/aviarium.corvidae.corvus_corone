@@ -1,32 +1,32 @@
-# Deployment Guide - Corvus Corone
+# Deployment Guide
 
-> **Przewodnik wdrażania systemu HPO Benchmarking Platform**
+> **Deployment guide for HPO Benchmarking Platform system**
 
 ---
 
-## Przegląd deployment options
+## Deployment Options Overview
 
-Corvus Corone został zaprojektowany z filozofią **PC-first, Cloud-ready**, oferując elastyczne opcje wdrażania:
+Corvus Corone was designed with **PC-first, Cloud-ready** philosophy, offering flexible deployment options:
 
 ### 🖥️ PC/Lab Deployment
 - **Docker Compose** - Single-node deployment
-- **Idealny dla:** Development, małe zespoły badawcze, proof-of-concept
-- **Capacity:** Do 10 równoczesnych użytkowników, 1-4 workerów
+- **Ideal for:** Development, small research teams, proof-of-concept
+- **Capacity:** Up to 10 concurrent users, 1-4 workers
 
 ### ☁️ Cloud Deployment  
 - **Kubernetes** - Scalable, production-ready
-- **Idealny dla:** Produkcja, duże zespoły, enterprise
-- **Capacity:** Elastyczne skalowanie, auto-scaling
+- **Ideal for:** Production, large teams, enterprise
+- **Capacity:** Elastic scaling, auto-scaling
 
 ### 🔄 Hybrid Deployment
-- **Core services** w chmurze, **Workers** lokalnie
-- **Idealny dla:** Compliance, data locality, custom hardware
+- **Core services** in cloud, **Workers** locally
+- **Ideal for:** Compliance, data locality, custom hardware
 
 ---
 
 ## PC/Lab Deployment (Docker Compose)
 
-### 📋 Wymagania systemowe
+### 📋 System Requirements
 
 #### Minimalne wymagania
 ```yaml
@@ -44,7 +44,7 @@ CPU: 8 cores (16 threads)
 RAM: 32GB
 Disk: 500GB SSD + 1TB HDD for data
 Network: 1Gbps
-GPU: Optional (dla algorytmów wymagających GPU)
+GPU: Optional (for algorithms requiring GPU)
 ```
 
 ### 🚀 Quick Start
@@ -658,14 +658,14 @@ flowchart TB
 ### 📝 Use cases dla hybrid deployment
 
 #### Compliance i data locality
-- Dane nie mogą opuścić organizacji
+- Data cannot leave the organization
 - Regulatory requirements (GDPR, HIPAA)
 - Custom hardware requirements (specjalne GPU, TPU)
 
 #### Cost optimization  
-- Wykorzystanie istniejących zasobów on-premises
+- Utilization of existing on-premises resources
 - Burst to cloud podczas peak load
-- Optymalizacja kosztów transferu danych
+- Data transfer cost optimization
 
 ### ⚙️ Configuration
 
@@ -837,7 +837,7 @@ curl -s http://localhost:15672/api/queues | jq '.[].messages'
 
 ---
 
-## Powiązane dokumenty
+## Related Documents
 
 - **Architektura**: [Kontenery (C4-2)](../architecture/c2-containers.md)
 - **Monitoring**: [Monitoring Guide](monitoring-guide.md)

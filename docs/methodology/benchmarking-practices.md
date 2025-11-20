@@ -1,14 +1,14 @@
-# Benchmarking Practices - Corvus Corone
+# Benchmarking Practices
 
-> **Metodyki i best practices dla platformy HPO benchmarking**
+> **Methodologies and best practices for HPO benchmarking platform**
 
 ---
 
-## Przegląd benchmarkingu HPO
+## HPO Benchmarking Overview
 
-### 🎯 **Cele benchmarking platformy**
+### **Benchmarking Platform Goals**
 
-System Corvus Corone został zaprojektowany aby umożliwiać:
+Corvus Corone system was designed to enable:
 
 ```mermaid
 ---
@@ -39,35 +39,35 @@ mindmap
       Performance Profiling
 ```
 
-### 📊 **Benchmarking Dimensions**
+### **Benchmarking Dimensions**
 
 #### Performance Metrics
-- **Solution Quality:** Najlepsze znalezione wartości funkcji celu
-- **Convergence Rate:** Szybkość zbieżności do optimum
-- **Sample Efficiency:** Jakość wyników względem liczby evaluacji
-- **Robustness:** Stabilność wyników przy różnych seed values
+- **Solution Quality:** Best found objective function values
+- **Convergence Rate:** Speed of convergence to optimum
+- **Sample Efficiency:** Quality of results relative to number of evaluations
+- **Robustness:** Stability of results across different seed values
 
 #### Resource Metrics  
 - **Time Efficiency:** Wall-clock time, CPU time, GPU time
 - **Memory Usage:** Peak memory, average memory footprint
-- **Energy Consumption:** Power usage podczas wykonania
-- **Scalability:** Performance przy różnych rozmiarach problemów
+- **Energy Consumption:** Power usage during execution
+- **Scalability:** Performance with different problem sizes
 
 #### Reliability Metrics
-- **Success Rate:** % runs które zakończyły się sukcesem
-- **Reproducibility:** Consistency wyników przy identycznych ustawieniach
-- **Fault Tolerance:** Odporność na problemy z systemem/danymi
-- **Configuration Sensitivity:** Stabilność względem hiperparametrów
+- **Success Rate:** % runs that completed successfully
+- **Reproducibility:** Consistency of results with identical settings
+- **Fault Tolerance:** Resilience to system/data problems
+- **Configuration Sensitivity:** Stability with respect to hyperparameters
 
 ---
 
-## Metodologia benchmarkingu
+## Benchmarking Methodology
 
-### 🔬 **Experimental Design Principles**
+### **Experimental Design Principles**
 
 #### Controlled Experiments
 ```python
-# Przykład konfiguracji eksperymentu kontrolowanego
+# Example configuration for controlled experiment
 experiment_config = {
     \"name\": \"bayesian_vs_random_search\",
     \"description\": \"Statistical comparison of Bayesian optimization vs random search\",
@@ -143,7 +143,7 @@ def apply_resource_blocking(runs):
     return interleave_runs(cpu_runs, gpu_runs)
 ```
 
-### 📏 **Benchmark Suite Design**
+### **Benchmark Suite Design**
 
 #### Problem Diversity Matrix
 ```yaml
@@ -229,7 +229,7 @@ class BenchmarkFunction:
 
 ## Statistical Analysis Framework
 
-### 📈 **Performance Comparison Methods**
+### **Performance Comparison Methods**
 
 #### Significance Testing
 ```python
@@ -411,7 +411,7 @@ def compute_algorithm_rankings(results_df):
     return rankings
 ```
 
-### 📊 **Visualization Standards**
+### **Visualization Standards**
 
 #### Performance comparison plots
 ```python
@@ -504,7 +504,7 @@ def create_performance_comparison_plots(results_df, output_dir):
 
 ## Algorithm Evaluation Framework
 
-### 🔍 **Algorithm Characterization**
+### **Algorithm Characterization**
 
 #### Meta-learning features
 ```python
@@ -687,7 +687,7 @@ class AlgorithmRecommender:
 
 ## Reproducibility Standards
 
-### 🔒 **Reproducibility Requirements**
+### **Reproducibility Requirements**
 
 #### Environment standardization
 ```yaml
@@ -828,7 +828,7 @@ class ReproducibilityValidator:
 
 ## Resource Management
 
-### ⚙️ **Computational Resource Optimization**
+### **Computational Resource Optimization**
 
 #### Resource allocation strategies
 ```python
@@ -1023,7 +1023,7 @@ class AutoScaler:
 
 ## Quality Assurance
 
-### ✅ **Experiment Validation Pipeline**
+### **Experiment Validation Pipeline**
 
 #### Pre-execution validation
 ```python
@@ -1252,10 +1252,10 @@ class ResultValidator:
 
 ---
 
-## Powiązane dokumenty
+## Related Documents
 
-- **Architektura**: [Kontext (C4-1)](../architecture/c1-context.md), [Kontenery (C4-2)](../architecture/c2-containers.md), [Komponenty (C4-3)](../architecture/c3-components.md)
-- **Operacje**: [Monitoring Guide](../operations/monitoring-guide.md), [Deployment Guide](../operations/deployment-guide.md)
+- **Architecture**: [Context (C4-1)](../architecture/c1-context.md), [Containers (C4-2)](../architecture/c2-containers.md), [Components (C4-3)](../architecture/c3-components.md)
+- **Operations**: [Monitoring Guide](../operations/monitoring-guide.md), [Deployment Guide](../operations/deployment-guide.md)
 - **Requirements**: [Functional Requirements](../requirements/functional-requirements.md), [Use Cases](../requirements/use-cases.md)
 - **User Guides**: [Workflows](../user-guides/workflows.md)
 - **Design**: [Design Decisions](../design/design-decisions.md)

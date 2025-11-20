@@ -1,10 +1,10 @@
 # Document Map - Corvus Corone
 
-> **Mapa zależności między dokumentami w projekcie**
+> **Map of dependencies between documents in the project**
 
 ---
 
-## 🗺️ Struktura dokumentacji
+## 🗺️ Documentation Structure
 
 ```mermaid
 ---
@@ -17,6 +17,7 @@ flowchart TB
     
     subgraph REQUIREMENTS["📋 REQUIREMENTS"]
         UC["use-cases.md"]
+        BR["business-requirements.md"]
         FR["functional-requirements.md"]
         NFR["non-functional-requirements.md"]
         RTM["requirements-traceability.md"]
@@ -57,6 +58,9 @@ flowchart TB
     DOCS_README --> METHODOLOGY
     DOCS_README --> GUIDES
     
+    UC --> BR
+    BR --> FR
+    BR --> NFR
     UC --> RTM
     FR --> RTM
     NFR --> RTM
@@ -88,16 +92,16 @@ flowchart TB
 
 ---
 
-## 📚 Zależności między dokumentami
+## 📋 Dependencies Between Documents
 
-### 🔗 Główne ścieżki dokumentacji
+### 🔗 Main Documentation Paths
 
-#### **Ścieżka 1: Wymagania → Architektura**
+#### **Path 1: Requirements → Architecture**
 ```
-use-cases.md → functional-requirements.md → requirements-traceability.md → c1-context.md → c2-containers.md → c3-components.md
+use-cases.md → business-requirements.md → functional-requirements.md → requirements-traceability.md → c1-context.md → c2-containers.md → c3-components.md
 ```
 
-#### **Ścieżka 2: Architektura → Implementacja**
+#### **Path 2: Architecture → Implementation**
 ```
 c2-containers.md → design-decisions.md → data-model.md → deployment-guide.md
 ```
@@ -113,7 +117,8 @@ deployment-guide.md → deployment-examples.md → monitoring-guide.md → perfo
 |-------------------|---------------|
 | **README.md** | README.docs.md, use-cases.md, c1-context.md, deployment-guide.md |
 | **README.docs.md** | Wszystkie inne dokumenty (hub) |
-| **use-cases.md** | functional-requirements.md, c1-context.md |
+| **use-cases.md** | business-requirements.md, functional-requirements.md, c1-context.md |
+| **business-requirements.md** | functional-requirements.md, non-functional-requirements.md |
 | **functional-requirements.md** | requirements-traceability.md |
 | **non-functional-requirements.md** | design-decisions.md (ADR-005, ADR-006) |
 | **requirements-traceability.md** | Wszystkie wymagania i UC, c1-context.md |

@@ -1,18 +1,18 @@
-# Performance Benchmarks & SLA Definitions - Corvus Corone
+# Performance Benchmarks & SLA Definitions
 
-> **Szczegółowe definicje performance benchmarks i Service Level Agreements**
+> **Detailed performance benchmarks and Service Level Agreements definitions**
 
 ---
 
-## Przegląd Performance Framework
+## Performance Framework Overview
 
 ### 🎯 Performance Pillars
 
-| Pillar | Opis | Kluczowe Metryki | Target SLA |
-|--------|------|------------------|------------|
-| **Latency** | Response time dla user operations | p50, p95, p99 response times | p95 <500ms |
-| **Throughput** | System capacity i processing rates | Requests/sec, evaluations/hour | 1000+ req/sec |
-| **Availability** | System uptime i reliability | Uptime %, error rates | 99.9% uptime |
+| Pillar | Description | Key Metrics | Target SLA |
+|--------|-------------|-------------|------------|
+| **Latency** | Response time for user operations | p50, p95, p99 response times | p95 <500ms |
+| **Throughput** | System capacity and processing rates | Requests/sec, evaluations/hour | 1000+ req/sec |
+| **Availability** | System uptime and reliability | Uptime %, error rates | 99.9% uptime |
 | **Scalability** | Performance under increasing load | Users, concurrent experiments | Linear scaling |
 | **Resource Efficiency** | Optimal resource utilization | CPU/Memory/Storage utilization | <80% average |
 
@@ -25,7 +25,7 @@
 #### Read Operations (GET)
 ```yaml
 GET /api/v1/experiments:
-  Description: Lista eksperymentów z paginacją
+  Description: Experiment list with pagination
   Load Conditions:
     - Light: 100 concurrent users, 1000 experiments
     - Medium: 500 concurrent users, 10000 experiments  
@@ -48,7 +48,7 @@ GET /api/v1/experiments:
   Error Rate: <0.1% under normal load
 
 GET /api/v1/experiments/{id}:
-  Description: Szczegóły pojedynczego eksperymentu
+  Description: Single experiment details
   Performance Targets:
     p50: <50ms
     p95: <100ms
@@ -57,7 +57,7 @@ GET /api/v1/experiments/{id}:
   Cache Strategy: 5min TTL, 95% cache hit rate
 
 GET /api/v1/experiments/{id}/runs:
-  Description: Lista runów dla eksperymentu
+  Description: List of runs for experiment
   Load Conditions:
     - Small experiment: <100 runs
     - Medium experiment: 100-1000 runs
@@ -72,13 +72,13 @@ GET /api/v1/experiments/{id}/runs:
       p50: <500ms, p95: <1000ms, p99: <2000ms
 
 GET /api/v1/algorithms:
-  Description: Katalog dostępnych algorytmów
+  Description: Available algorithms catalog
   Performance Targets:
     p50: <50ms, p95: <100ms, p99: <150ms
   Cache Strategy: 30min TTL, 99% cache hit rate
 
 GET /api/v1/benchmarks:
-  Description: Katalog benchmarków
+  Description: Benchmarks catalog
   Performance Targets:
     p50: <75ms, p95: <150ms, p99: <250ms
   Cache Strategy: 1hour TTL, 98% cache hit rate
@@ -132,7 +132,7 @@ POST /api/v1/runs/{id}/metrics:
 #### Analytics Operations
 ```yaml
 GET /api/v1/experiments/{id}/analysis:
-  Description: Analiza wyników eksperymentu
+  Description: Experiment results analysis
   Data Size Categories:
     - Small: <1000 runs, <10000 metrics
     - Medium: 1000-10000 runs, <100000 metrics
@@ -149,7 +149,7 @@ GET /api/v1/experiments/{id}/analysis:
   Cache Strategy: 15min TTL dla completed experiments
 
 GET /api/v1/comparison:
-  Description: Porównanie algorytmów między eksperymentami
+  Description: Algorithm comparison between experiments
   Performance Targets:
     2-5 algorithms: p95 <3000ms
     5-10 algorithms: p95 <8000ms
@@ -661,12 +661,12 @@ Business Impact Report:
 
 ## Podsumowanie
 
-Te szczegółowe performance benchmarks i SLA definitions zapewniają:
+These detailed performance benchmarks and SLA definitions provide:
 
 1. **Measurable Targets** - Konkretne, mierzalne cele performance
 2. **Service Level Commitments** - Jasne expectations dla stakeholders  
 3. **Monitoring Framework** - KPIs i alerting dla proactive management
-4. **Business Alignment** - Metryki biznesowe oprócz technicznych
+4. **Business Alignment** - Business metrics alongside technical ones
 5. **Continuous Improvement** - Baseline dla optimization i capacity planning
 
 Framework ten implementuje ADR-011 (Performance Testing Strategy) i zapewnia foundation dla production-ready systemu z clear operational expectations.

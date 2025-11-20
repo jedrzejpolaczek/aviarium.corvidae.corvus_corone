@@ -1,10 +1,10 @@
-# Kod - Corvus Corone (C4-4)
+# Code
 
-> **Szczegóły implementacyjne kluczowych komponentów systemu HPO Benchmarking Platform na poziomie kodu**
+> **Implementation details of key HPO Benchmarking Platform system components at code level**
 
 ---
 
-## Diagramy klas komponentów systemu
+## System Component Class Diagrams
 
 ### 4.1 Experiment Orchestrator - Class Diagram
 
@@ -1109,7 +1109,7 @@ classDiagram
 
 ---
 
-## Model danych (ERD)
+## Data Model (ERD)
 
 ```mermaid
 ---
@@ -1212,9 +1212,9 @@ erDiagram
 
 ---
 
-## Interfejsy API - implementacja
+## Interfaces API - implementation
 
-### 4.4 Python SDK dla pluginów algorytmów
+### 4.4 Python SDK for Algorithm Plugins
 
 ```python
 from abc import ABC, abstractmethod
@@ -1225,7 +1225,7 @@ import json
 
 @dataclass
 class ParameterConfiguration:
-    """Konfiguracja parametrów dla pojedynczej ewaluacji"""
+    """Parameter configuration for single evaluation"""
     parameters: Dict[str, Any]
     configuration_id: Optional[str] = None
     
@@ -1237,7 +1237,7 @@ class ParameterConfiguration:
 
 @dataclass
 class EvaluationResult:
-    """Wynik ewaluacji konfiguracji parametrów"""
+    """Result of parameter configuration evaluation"""
     objective_value: float
     additional_metrics: Dict[str, float]
     evaluation_time: float
@@ -1255,67 +1255,67 @@ class EvaluationResult:
 
 @dataclass
 class AlgorithmConfig:
-    """Konfiguracja algorytmu HPO"""
+    """HPO algorithm configuration"""
     algorithm_params: Dict[str, Any]
     parameter_space: Dict[str, Any]
     optimization_direction: str  # 'minimize' or 'maximize'
     random_seed: Optional[int] = None
     
 class IAlgorithmPlugin(ABC):
-    """Interfejs dla pluginów algorytmów HPO"""
+    """Interface for HPO algorithm plugins"""
     
     @abstractmethod
     def init(self, config: AlgorithmConfig) -> None:
         """
-        Inicjalizacja algorytmu z podaną konfiguracją
+        Initialize algorithm with given configuration
         
         Args:
-            config: Konfiguracja algorytmu i przestrzeni parametrów
+            config: Algorithm configuration and parameter space
         """
         pass
     
     @abstractmethod
     def suggest(self, budget_remaining: int) -> ParameterConfiguration:
         """
-        Zasugeruj następną konfigurację parametrów do ewaluacji
+        Suggest next parameter configuration for evaluation
         
         Args:
-            budget_remaining: Pozostały budżet ewaluacji
-            
+            budget_remaining: Remaining evaluation budget
+        
         Returns:
-            Konfiguracja parametrów do przetestowania
+            Parameter configuration to test
         """
         pass
     
     @abstractmethod
     def observe(self, config: ParameterConfiguration, result: EvaluationResult) -> None:
         """
-        Zaobserwuj wynik ewaluacji konfiguracji
+        Observe the evaluation result of a configuration
         
         Args:
-            config: Konfiguracja która została przetestowana
-            result: Wynik ewaluacji tej konfiguracji
+            config: Configuration that was tested
+            result: Result of evaluating this configuration
         """
         pass
     
     @abstractmethod
     def get_best_configuration(self) -> ParameterConfiguration:
         """
-        Zwróć najlepszą dotychczas znalezioną konfigurację
+        Return the best configuration found so far
         
         Returns:
-            Najlepsza konfiguracja parametrów
+            Best parameter configuration found
         """
         pass
     
     @abstractmethod
     def cleanup(self) -> None:
-        """Oczyść zasoby algorytmu"""
+        """Clean up algorithm resources"""
         pass
 
-# Przykład implementacji - Random Search
+# Example implementation - Random Search
 class RandomSearchPlugin(IAlgorithmPlugin):
-    """Implementacja algorytmu Random Search"""
+    """Random Search algorithm implementation"""
     
     def __init__(self):
         self.config: Optional[AlgorithmConfig] = None
@@ -1331,7 +1331,7 @@ class RandomSearchPlugin(IAlgorithmPlugin):
         self.observed_configs = []
         self.observed_results = []
         
-        # Ustaw generator losowy
+        # Set random generator
         if config.random_seed is not None:
             import random
             random.seed(config.random_seed)
@@ -1413,7 +1413,7 @@ class MetricData:
     metadata: Optional[Dict[str, Any]] = None
 
 class TrackingClient:
-    """Klient do komunikacji z Tracking Service"""
+    """Client for communication with Tracking Service"""
     
     def __init__(self, base_url: str, api_key: Optional[str] = None):
         self.base_url = base_url.rstrip('/')
@@ -1425,10 +1425,10 @@ class TrackingClient:
     
     def create_run(self, request: CreateRunRequest) -> str:
         """
-        Utwórz nowy run eksperymentu
+        Create a new experiment run
         
         Returns:
-            run_id: Identyfikator utworzonego runu
+            run_id: Identifier of the created run
         """
         response = self.session.post(
             f"{self.base_url}/api/v1/runs",
@@ -1438,7 +1438,7 @@ class TrackingClient:
         return response.json()['run_id']
     
     def log_metrics(self, run_id: str, metrics: List[MetricData]) -> None:
-        """Zaloguj metryki dla runu"""
+        """Log metrics for a run"""
         metrics_data = []
         for metric in metrics:
             metric_dict = asdict(metric)
@@ -1453,7 +1453,7 @@ class TrackingClient:
         response.raise_for_status()
     
     def update_run_status(self, run_id: str, status: str) -> None:
-        """Zaktualizuj status runu"""
+        """Update run status"""
         response = self.session.patch(
             f"{self.base_url}/api/v1/runs/{run_id}/status",
             json={'status': status}
@@ -1461,18 +1461,18 @@ class TrackingClient:
         response.raise_for_status()
     
     def complete_run(self, run_id: str, final_result: Dict[str, Any]) -> None:
-        """Oznacz run jako ukończony z finalnym wynikiem"""
+        """Mark run as completed with final result"""
         response = self.session.post(
             f"{self.base_url}/api/v1/runs/{run_id}/complete",
             json={'result': final_result}
         )
         response.raise_for_status()
 
-# Przykład użycia TrackingClient
+# TrackingClient usage example
 def example_usage():
     tracking = TrackingClient("http://localhost:8080", api_key="your-api-key")
     
-    # Utwórz run
+    # Create run
     run_request = CreateRunRequest(
         experiment_id="exp_123",
         algorithm_version_id="bayesian_opt_v1.0",
@@ -1481,7 +1481,7 @@ def example_usage():
     )
     run_id = tracking.create_run(run_request)
     
-    # Loguj metryki podczas eksperymentu
+    # Log metrics during experiment
     metrics = [
         MetricData(name="best_score", value=0.85, step=10),
         MetricData(name="current_score", value=0.82, step=10),
@@ -1489,7 +1489,7 @@ def example_usage():
     ]
     tracking.log_metrics(run_id, metrics)
     
-    # Zakończ run
+    # Finish run
     tracking.complete_run(run_id, {
         "final_best_score": 0.92,
         "total_evaluations": 100,
@@ -1497,7 +1497,7 @@ def example_usage():
     })
 ```
 
-### 4.6 Worker Runtime - implementacja runu
+### 4.6 Worker Runtime - Run Implementation
 
 ```python
 import asyncio
@@ -1516,7 +1516,7 @@ class RunExecutionConfig:
     timeout_seconds: int = 3600
 
 class RunExecutor:
-    """Executor odpowiedzialny za wykonanie pojedynczego runu"""
+    """Executor responsible for executing a single run"""
     
     def __init__(self, 
                  plugin_loader: 'PluginLoader',
@@ -1530,28 +1530,28 @@ class RunExecutor:
     
     async def execute_run(self, config: RunExecutionConfig) -> Dict[str, Any]:
         """
-        Wykonaj pojedynczy run eksperymentu
+        Execute a single experiment run
         
         Returns:
-            Wynik wykonania runu z metrykami
+            Run execution result with metrics
         """
         run_id = config.run_id
         start_time = time.time()
         
         try:
-            # 1. Załaduj plugin algorytmu
+            # 1. Load algorithm plugin
             self.logger.info(f"Loading algorithm plugin: {config.algorithm_version_id}")
             algorithm_plugin = await self.plugin_loader.load_plugin(
                 config.algorithm_version_id
             )
             
-            # 2. Załaduj benchmark
+            # 2. Load benchmark
             self.logger.info(f"Loading benchmark: {config.benchmark_instance_id}")
             benchmark = await self.benchmark_loader.load_benchmark(
                 config.benchmark_instance_id
             )
             
-            # 3. Inicjalizuj algorytm
+            # 3. Initialize algorithm
             algorithm_config = AlgorithmConfig(
                 algorithm_params=benchmark.get_default_algorithm_params(),
                 parameter_space=benchmark.get_parameter_space(),
@@ -1560,26 +1560,26 @@ class RunExecutor:
             )
             algorithm_plugin.init(algorithm_config)
             
-            # 4. Wykonaj pętlę optymalizacji
+            # 4. Execute optimization loop
             evaluation_count = 0
             max_evaluations = config.budget.get('max_evaluations', 100)
             best_score = None
             
             while evaluation_count < max_evaluations:
-                # Zasugeruj konfigurację
+                # Suggest configuration
                 suggested_config = algorithm_plugin.suggest(
                     max_evaluations - evaluation_count
                 )
                 
-                # Ewaluuj konfigurację
+                # Evaluate configuration
                 evaluation_result = await benchmark.evaluate(
                     suggested_config.parameters
                 )
                 
-                # Przekaż wynik algorytmowi
+                # Pass result to algorithm
                 algorithm_plugin.observe(suggested_config, evaluation_result)
                 
-                # Zaloguj metryki
+                # Log metrics
                 metrics = [
                     MetricData(
                         name="objective_value",
@@ -1593,7 +1593,7 @@ class RunExecutor:
                     )
                 ]
                 
-                # Dodaj dodatkowe metryki
+                # Add additional metrics
                 for metric_name, metric_value in evaluation_result.additional_metrics.items():
                     metrics.append(MetricData(
                         name=metric_name,
@@ -1603,21 +1603,21 @@ class RunExecutor:
                 
                 await self.tracking_client.log_metrics(run_id, metrics)
                 
-                # Aktualizuj najlepszy wynik
+                # Update best result
                 if best_score is None or evaluation_result.objective_value > best_score:
                     best_score = evaluation_result.objective_value
                 
                 evaluation_count += 1
                 
-                # Sprawdź timeout
+                # Check timeout
                 if time.time() - start_time > config.timeout_seconds:
                     self.logger.warning(f"Run {run_id} timed out after {config.timeout_seconds}s")
                     break
             
-            # 5. Pobierz najlepszą konfigurację
+            # 5. Get best configuration
             best_config = algorithm_plugin.get_best_configuration()
             
-            # 6. Przygotuj wynik
+            # 6. Prepare result
             execution_result = {
                 "success": True,
                 "total_evaluations": evaluation_count,
@@ -1627,7 +1627,7 @@ class RunExecutor:
                 "terminated_reason": "budget_exhausted" if evaluation_count >= max_evaluations else "timeout"
             }
             
-            # 7. Oznacz run jako ukończony
+            # 7. Mark run as completed
             await self.tracking_client.complete_run(run_id, execution_result)
             
             return execution_result
@@ -1635,7 +1635,7 @@ class RunExecutor:
         except Exception as e:
             self.logger.error(f"Run {run_id} failed: {str(e)}")
             
-            # Oznacz run jako nieudany
+            # Mark run as failed
             await self.tracking_client.update_run_status(run_id, "FAILED")
             
             return {
@@ -1645,7 +1645,7 @@ class RunExecutor:
             }
         
         finally:
-            # Oczyść zasoby
+            # Clean up resources
             if 'algorithm_plugin' in locals():
                 algorithm_plugin.cleanup()
             if 'benchmark' in locals():
@@ -1654,31 +1654,31 @@ class RunExecutor:
 
 ---
 
-## Wzorce architektoniczne
+## Architectural Patterns
 
 ### 🏗️ Architektura
-- **Styl:** Microservices z możliwością pakowania w monolit modułowy (PC)
-- **Communication:** REST/GraphQL + gRPC między usługami
-- **Messaging:** Message Broker (RabbitMQ/Kafka) dla asynchronicznych operacji
+- **Style:** Microservices with ability to package as modular monolith (PC)
+- **Communication:** REST/GraphQL + gRPC between services
+- **Messaging:** Message Broker (RabbitMQ/Kafka) for asynchronous operations
 
 ### 💾 Technologie
 - **Database:** PostgreSQL (Results Store)
-- **Object Storage:** S3/MinIO (artefakty, datasety)
+- **Object Storage:** S3/MinIO (artifacts, datasets)
 - **Containerization:** Docker + docker-compose (PC) / Kubernetes (Cloud)
-- **Plugins:** Python SDK z interfejsem IAlgorithmPlugin
+- **Plugins:** Python SDK with IAlgorithmPlugin interface
 
 ### 🔄 Reprodukowalność
-- **Configuration snapshots:** Pełna konfiguracja eksperymentu (JSON)
-- **Version tracking:** Datasety, algorytmy, pluginy, obrazy kontenerów
-- **Seed management:** Losowe seedy dla każdego runu
-- **Environment snapshots:** Opis środowiska uruchomieniowego
-- **Code references:** Commit hash/tag repozytorium lub wersja pluginu
+- **Configuration snapshots:** Complete experiment configuration (JSON)
+- **Version tracking:** Datasets, algorithms, plugins, container images
+- **Seed management:** Random seeds for each run
+- **Environment snapshots:** Runtime environment description
+- **Code references:** Repository commit hash/tag or plugin version
 
 ---
 
-## Wzorce projektowe w implementacji
+## Design Patterns in Implementation
 
-### 4.7 Strategy Pattern - Algorytmy HPO
+### 4.7 Strategy Pattern - HPO Algorithms
 
 ```python
 from abc import ABC, abstractmethod
@@ -1691,17 +1691,17 @@ class OptimizationStrategy(Enum):
     GRID_SEARCH = "grid_search"
 
 class AlgorithmFactory:
-    """Factory do tworzenia instancji algorytmów HPO"""
+    """Factory for creating HPO algorithm instances"""
     
     _algorithms = {
         OptimizationStrategy.RANDOM_SEARCH: RandomSearchPlugin,
         OptimizationStrategy.BAYESIAN_OPTIMIZATION: BayesianOptimizationPlugin,
-        # Inne algorytmy...
+        # Other algorithms...
     }
     
     @classmethod
     def create_algorithm(cls, strategy: OptimizationStrategy) -> IAlgorithmPlugin:
-        """Utwórz instancję algorytmu na podstawie strategii"""
+        """Create algorithm instance based on strategy"""
         if strategy not in cls._algorithms:
             raise ValueError(f"Unsupported optimization strategy: {strategy}")
         
@@ -1711,7 +1711,7 @@ class AlgorithmFactory:
     @classmethod
     def register_algorithm(cls, strategy: OptimizationStrategy, 
                           algorithm_class: type) -> None:
-        """Zarejestruj nowy algorytm"""
+        """Register new algorithm"""
         cls._algorithms[strategy] = algorithm_class
 ```
 
@@ -1729,7 +1729,7 @@ class EventType(Enum):
     EXPERIMENT_COMPLETED = "experiment_completed"
 
 class Event:
-    """Klasa bazowa dla zdarzeń systemowych"""
+    """Base class for system events"""
     
     def __init__(self, event_type: EventType, data: Dict[str, Any]):
         self.event_type = event_type
@@ -1737,31 +1737,31 @@ class Event:
         self.timestamp = datetime.now()
 
 class EventObserver(ABC):
-    """Interfejs dla obserwatorów zdarzeń"""
+    """Interface for event observers"""
     
     @abstractmethod
     async def handle_event(self, event: Event) -> None:
         pass
 
 class EventPublisher:
-    """Publisher zdarzeń systemowych"""
+    """System events publisher"""
     
     def __init__(self):
         self.observers: Dict[EventType, List[EventObserver]] = {}
     
     def subscribe(self, event_type: EventType, observer: EventObserver) -> None:
-        """Subskrybuj zdarzenia danego typu"""
+        """Subscribe to events of given type"""
         if event_type not in self.observers:
             self.observers[event_type] = []
         self.observers[event_type].append(observer)
     
     def unsubscribe(self, event_type: EventType, observer: EventObserver) -> None:
-        """Usuń subskrypcję"""
+        """Remove subscription"""
         if event_type in self.observers:
             self.observers[event_type].remove(observer)
     
     async def publish(self, event: Event) -> None:
-        """Opublikuj zdarzenie do wszystkich obserwatorów"""
+        """Publish event to all observers"""
         if event.event_type in self.observers:
             for observer in self.observers[event.event_type]:
                 try:
@@ -1770,16 +1770,16 @@ class EventPublisher:
                     # Log error but don't stop other observers
                     logging.error(f"Observer {observer} failed to handle event: {e}")
 
-# Przykład implementacji obserwatora
+# Example observer implementation
 class MetricsCollectorObserver(EventObserver):
-    """Obserwator zbierający metryki z zdarzeń"""
+    """Observer collecting metrics from events"""
     
     def __init__(self, metrics_service: 'MetricsService'):
         self.metrics_service = metrics_service
     
     async def handle_event(self, event: Event) -> None:
         if event.event_type == EventType.RUN_COMPLETED:
-            # Zbierz metryki z ukończonego runu
+            # Collect metrics from completed run
             run_id = event.data['run_id']
             execution_time = event.data['execution_time']
             
@@ -1790,7 +1790,7 @@ class MetricsCollectorObserver(EventObserver):
             )
 ```
 
-### 4.9 Repository Pattern - Dostęp do danych
+### 4.9 Repository Pattern - Data Access
 
 ```python
 from abc import ABC, abstractmethod
@@ -1811,7 +1811,7 @@ class RunEntity:
     resource_usage: Optional[Dict[str, Any]] = None
 
 class IRunRepository(ABC):
-    """Interfejs repozytorium dla encji Run"""
+    """Repository interface for Run entity"""
     
     @abstractmethod
     async def create(self, run: RunEntity) -> RunEntity:
@@ -1830,7 +1830,7 @@ class IRunRepository(ABC):
         pass
 
 class PostgreSQLRunRepository(IRunRepository):
-    """Implementacja repozytorium dla PostgreSQL"""
+    """Repository implementation for PostgreSQL"""
     
     def __init__(self, connection_pool: asyncpg.Pool):
         self.pool = connection_pool
@@ -1908,7 +1908,7 @@ class PostgreSQLRunRepository(IRunRepository):
 
 ### 🖥️ PC-First (Development/Small teams)
 ```yaml
-# docker-compose.yml przykład
+# docker-compose.yml example
 services:
   web-ui: # Static files / Node.js dev server
   api-gateway: # Single backend container
@@ -1932,7 +1932,7 @@ services:
 
 ---
 
-## Bezpieczeństwo na poziomie kodu
+## Code-Level Security
 
 ### 🔐 Input Validation
 
@@ -1941,7 +1941,7 @@ from pydantic import BaseModel, validator
 from typing import Dict, Any, List
 
 class ExperimentConfigValidator(BaseModel):
-    """Walidator konfiguracji eksperymentu"""
+    """Experiment configuration validator"""
     
     experiment_id: str
     name: str
@@ -1968,7 +1968,7 @@ class ExperimentConfigValidator(BaseModel):
             raise ValueError('Budget must specify positive max_evaluations')
         return v
 
-# Użycie walidatora
+# Validator usage
 def validate_experiment_config(config_data: Dict[str, Any]) -> ExperimentConfigValidator:
     try:
         return ExperimentConfigValidator(**config_data)
@@ -1986,34 +1986,34 @@ from typing import Any, Dict
 import resource
 
 class SecurePluginExecutor:
-    """Bezpieczne wykonywanie pluginów w izolowanym środowisku"""
+    """Secure plugin execution in isolated environment"""
     
     def __init__(self, max_memory_mb: int = 512, max_cpu_time_s: int = 300):
         self.max_memory = max_memory_mb * 1024 * 1024  # Convert to bytes
         self.max_cpu_time = max_cpu_time_s
     
     def set_resource_limits(self):
-        """Ustaw limity zasobów dla procesu"""
-        # Limit pamięci
+        """Set resource limits for process"""
+        # Memory limit
         resource.setrlimit(resource.RLIMIT_AS, (self.max_memory, self.max_memory))
         
-        # Limit czasu CPU
+        # CPU time limit
         resource.setrlimit(resource.RLIMIT_CPU, (self.max_cpu_time, self.max_cpu_time))
         
-        # Limit liczby plików
+        # File count limit
         resource.setrlimit(resource.RLIMIT_NOFILE, (100, 100))
     
     def execute_plugin_method(self, plugin_code: str, method_name: str, 
                             args: Dict[str, Any]) -> Any:
-        """Wykonaj metodę pluginu w bezpiecznym środowisku"""
+        """Execute plugin method in secure environment"""
         
-        # Utwórz tymczasowy plik z kodem pluginu
+        # Create temporary file with plugin code
         with tempfile.NamedTemporaryFile(mode='w', suffix='.py', delete=False) as f:
             f.write(plugin_code)
             plugin_file = f.name
         
         try:
-            # Wykonaj plugin w subprocess z ograniczeniami
+            # Execute plugin in subprocess with limitations
             cmd = ['python', plugin_file, method_name, str(args)]
             
             result = subprocess.run(
@@ -2030,16 +2030,16 @@ class SecurePluginExecutor:
             return result.stdout
             
         finally:
-            # Usuń tymczasowy plik
+            # Remove temporary file
             os.unlink(plugin_file)
 ```
 
 ---
 
-## Powiązane dokumenty
+## Related Documents
 
-- **Poprzedni poziom**: [Komponenty (C4-3)](c3-components.md)
-- **Kontekst**: [Kontekst (C4-1)](c1-context.md), [Kontenery (C4-2)](c2-containers.md)
-- **Wymagania**: [Functional Requirements](../requirements/functional-requirements.md), [Use Cases](../requirements/use-cases.md)
+- **Previous level**: [Components (C4-3)](c3-components.md)
+- **Context**: [Context (C4-1)](c1-context.md), [Containers (C4-2)](c2-containers.md)
+- **Requirements**: [Functional Requirements](../requirements/functional-requirements.md), [Use Cases](../requirements/use-cases.md)
 - **Design**: [Data Model](../design/data-model.md), [Design Decisions](../design/design-decisions.md)
 - **Deployment**: [Deployment Guide](../operations/deployment-guide.md)

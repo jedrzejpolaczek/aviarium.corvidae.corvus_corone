@@ -1,24 +1,24 @@
-# Kontekst systemu - Corvus Corone (C4-1)
+# System Context
 
-> **System benchmarkowania algorytmów HPO (Hyperparameter Optimization)**
-
----
-
-## Założenia projektowe
-
-**Docelowa skala:** Pojedynczy zespół badawczy / małe laboratorium (kilku–kilkunastu użytkowników równoległych), ale z możliwością rozrostu do większego klastra.
-
-**Stack technologiczny:** Dominujący stack ML to Python (scikit-learn, PyTorch, TensorFlow, XGBoost itd.), ale architektura nie jest do niego twardo przywiązana.
-
-**Deployment:** **PC-first (docker-compose, single-node)** z prostą ścieżką do **cloud / K8s**.
-
-**Autoryzacja:** Klasyczne role **Badacz / Twórca pluginu / Administrator**, integracja z zewnętrznym IdP w przyszłości.
-
-**Zakres:** Benchmarki dotyczą głównie trenowania modeli ML, ale architektura nie zakłada konkretnej domeny – można ją rozszerzyć na inne typy zadań optymalizacyjnych.
+> **HPO (Hyperparameter Optimization) Algorithm Benchmarking System**
 
 ---
 
-## Diagram kontekstu
+## Design Assumptions
+
+**Target Scale:** Single research team / small laboratory (several to dozen concurrent users), but with the ability to scale to a larger cluster.
+
+**Technology Stack:** Dominant ML stack is Python (scikit-learn, PyTorch, TensorFlow, XGBoost, etc.), but the architecture is not tightly coupled to it.
+
+**Deployment:** **PC-first (docker-compose, single-node)** with a simple path to **cloud / K8s**.
+
+**Authorization:** Classic roles **Researcher / Plugin Creator / Administrator**, with future integration with external IdP.
+
+**Scope:** Benchmarks primarily concern ML model training, but the architecture doesn't assume a specific domain – it can be extended to other types of optimization tasks.
+
+---
+
+## Context Diagram
 
 ```mermaid
 ---
@@ -28,12 +28,12 @@ config:
   theme: redux-dark
 ---
 flowchart LR
-    A1["Badacz / Inżynier ML"] L_A1_S_0@-- konfiguruje eksperymenty, analizuje wyniki --> S["HPO Benchmarking Platform"]
-    A2["Twórca algorytmu HPO"] L_A2_S_0@-- rejestruje pluginy HPO --> S
-    A3["Administrator"] L_A3_S_0@-- zarządza systemem i katalogami --> S
-    A4["Zewnętrzny system AutoML / narzędzie analityczne"] L_A4_S_0@-- uruchamia eksperymenty przez API --> S
-    S L_S_A4_0@-- udostępnia wyniki, metryki --> A4
-    S L_S_A5_0@-- pobiera metadane publikacji --> A5["Zewnętrzne systemy bibliograficzne<br>CrossRef / arXiv / DOI"]
+    A1["Researcher / ML Engineer"] L_A1_S_0@-- configures experiments, analyzes results --> S["HPO Benchmarking Platform"]
+    A2["HPO Algorithm Creator"] L_A2_S_0@-- registers HPO plugins --> S
+    A3["Administrator"] L_A3_S_0@-- manages system and catalogs --> S
+    A4["External AutoML system / analytical tool"] L_A4_S_0@-- runs experiments via API --> S
+    S L_S_A4_0@-- provides results, metrics --> A4
+    S L_S_A5_0@-- fetches publication metadata --> A5["External bibliographic systems<br>CrossRef / arXiv / DOI"]
      A1:::Peach
      S:::Aqua
      A2:::Peach
@@ -67,125 +67,141 @@ flowchart LR
 
 ---
 
-## Użytkownicy i systemy zewnętrzne
+## Users and External Systems
 
-### Badacz / Inżynier ML
-**Główni użytkownicy systemu**
-- Definiuje benchmarki, konfiguruje eksperymenty
-- Uruchamia eksperymenty lokalnie / w chmurze
-- Analizuje wyniki, porównuje algorytmy HPO
-- Eksportuje dane do zewnętrznych narzędzi analitycznych
+### Researcher / ML Engineer
+**Primary system users**
+- Defines benchmarks, configures experiments
+- Runs experiments locally / in the cloud
+- Analyzes results, compares HPO algorithms
+- Exports data to external analytical tools
 
-### Twórca algorytmu HPO (Plugin Author)
-**Deweloperzy algorytmów**
-- Implementuje algorytmy HPO jako pluginy w oparciu o SDK
-- Rejestruje i wersjonuje własne algorytmy
-- Testuje je na istniejących benchmarkach
+### HPO Algorithm Creator (Plugin Author)
+**Algorithm developers**
+- Implements HPO algorithms as plugins based on SDK
+- Registers and versions own algorithms
+- Tests them on existing benchmarks
 
-### Administrator systemu
-**Zarządza infrastrukturą i konfiguracją**
-- Zarządza deploymentem (PC / chmura)
-- Konfiguruje zasoby, uprawnienia, integracje (IdP, monitoring)
-- Dodaje / zatwierdza wbudowane algorytmy HPO i benchmarki „kanoniczne"
-- Obejmuje role: Administrator lokalny (PC/lab) i DevOps/SRE (chmura/K8s)
+### System Administrator
+**Manages infrastructure and configuration**
+- Manages deployment (PC / cloud)
+- Configures resources, permissions, integrations (IdP, monitoring)
+- Adds / approves built-in HPO algorithms and "canonical" benchmarks
+- Includes roles: Local Administrator (PC/lab) and DevOps/SRE (cloud/K8s)
 
-### Zewnętrzny system AutoML / narzędzie analityczne
-**Integracje systemowe**
-- Wywołuje API w celu uruchamiania eksperymentów
-- Pobiera wyniki benchmarków do dalszej analizy (BI, Jupyter, AutoML pipeline)
+### External AutoML system / analytical tool
+**System integrations**
+- Calls API to run experiments
+- Retrieves benchmark results for further analysis (BI, Jupyter, AutoML pipeline)
 
-### Źródła bibliograficzne (zewnętrzne systemy)
-**Usługi bibliograficzne**
+### Bibliographic sources (external systems)
+**Bibliographic services**
 - CrossRef, arXiv, DOI resolver
-- Umożliwiają walidację i uzupełnianie metadanych publikacji
+- Enable validation and completion of publication metadata
 
 ---
 
-## System centralny
+## Central System
 
 ### HPO Benchmarking Platform
 
-**Główny system wspierający:**
-- Projektowanie benchmarków
-- Uruchamianie eksperymentów HPO
-- Śledzenie eksperymentów i runów
-- Analizę wyników i raportowanie
-- Zarządzanie algorytmami HPO (wbudowane + pluginy)
-- Zarządzanie referencjami do publikacji
+**Main system supporting:**
+- Benchmark design
+- Running HPO experiments
+- Tracking experiments and runs
+- Results analysis and reporting
+- Managing HPO algorithms (built-in + plugins)
+- Managing publication references
 
 ---
 
-## Wymagania funkcjonalne
+## Business Requirements
 
-> **📋 Szczegółowe wymagania funkcjonalne**: [Functional Requirements](../requirements/functional-requirements.md)
+> **Detailed business requirements**: [Business Requirements](../requirements/business-requirements.md)
 
-System musi spełniać kluczowe wymagania funkcjonalne (R1-R15):
+System must fulfill key business requirements supporting strategic goals:
 
-- **R1-R4**: Katalogi algorytmów i benchmarków, wsparcie pluginów, wersjonowanie
-- **R5-R7**: Konfiguracja i orkiestracja eksperymentów, panel śledzenia
-- **R8-R11**: Analiza wyników, porównywanie, artefakty, raportowanie
-- **R12-R15**: API, SDK, eksport danych, multi-environment deployment
+- **BR1**: Version control, statistical rigor, publication support
+- **BR4-BR6**: Production readiness, decision support, enterprise features
+- **BR7**: Multi-language SDK, documentation, plugin certification
+- **BR9**: Auto-scaling, monitoring, disaster recovery
 
-Pełne kryteria akceptacji i implementacja w dedykowanym dokumencie wymagań.
-
----
-
-## Wymagania niefunkcjonalne
-
-> **📋 Szczegółowe wymagania niefunkcjonalne**: [Non-functional Requirements](../requirements/non-functional-requirements.md)
-
-System musi spełniać kluczowe wymagania niefunkcjonalne:
-
-- **RNF1-RNF3**: Skalowalność, Niezawodność, Bezpieczeństwo
-- **RNF4-RNF6**: Obserwowalność, Rozszerzalność, Cloud-ready deployment  
-- **RNF7-RNF10**: Reprodukowalność, Użyteczność, Backup/DR, Performance
-
-Pełne kryteria akceptacji i implementacja w dedykowanym dokumencie wymagań.
+Full acceptance criteria and strategic alignment detailed in the dedicated business requirements document.
 
 ---
 
-## Jak architektura wspiera dobre praktyki benchmarkingu
+## Functional Requirements
 
-### Cele benchmarkingu G1–G5 a architektura systemu
+> **Detailed functional requirements**: [Functional Requirements](../requirements/functional-requirements.md)
 
-Przypomnienie celów benchmarkingu HPO:
+System must fulfill key functional requirements (R1-R15):
 
-- **G1** – Ocena wydajności algorytmu  
-- **G2** – Porównanie algorytmów między sobą  
-- **G3** – Analiza wrażliwości / robustności  
-- **G4** – Ekstrapolacja / generalizacja wyników  
-- **G5** – Wsparcie teorii i rozwoju algorytmów  
+- **R1-R4**: Algorithm and benchmark catalogs, plugin support, versioning
+- **R5-R7**: Experiment configuration and orchestration, tracking panel
+- **R8-R11**: Results analysis, comparison, artifacts, reporting
+- **R12-R15**: API, SDK, data export, multi-environment deployment
 
-**Mapowanie celów na komponenty architektury:**
-
-| Cel benchmarku | Opis / rola w systemie | Powiązane kontenery / usługi | Kluczowe komponenty |
-|----------------|------------------------|------------------------------|---------------------|
-| **G1 – Ocena** | Ocena jakości pojedynczych algorytmów HPO na dobrze zdefiniowanych benchmarkach i metrykach | Experiment Orchestrator, Worker Runtime, Experiment Tracking Service, Metrics Analysis Service | MetricCalculator, RunLifecycleManager, ExperimentConfigManager, TrackingAPI |
-| **G2 – Porównanie** | Porównanie wielu algorytmów HPO (w tym autorskich) na tych samych benchmarkach i metrykach | Metrics Analysis Service, Web UI (ComparisonViewUI), Experiment Tracking Service | AggregationEngine, StatisticalTestsEngine, ComparisonViewUI |
-| **G3 – Wrażliwość** | Analiza wrażliwości wyników na zmiany konfiguracji, seedów, instancji benchmarków i parametrów | Experiment Orchestrator, Benchmark Definition Service, Metrics Analysis Service | ExperimentPlanBuilder, BenchmarkRepository, MetricCalculator |
-| **G4 – Ekstrapolacja** | Badanie zachowania algorytmów HPO na zróżnicowanych instancjach problemu (skalowalność, trudność, rozmiar) | Benchmark Definition Service, Experiment Orchestrator, Worker Runtime | ProblemInstanceManager, BenchmarkVersioning |
-| **G5 – Teoria i rozwój** | Wsparcie rozwoju nowych algorytmów HPO oraz powiązanie wyników z teorią i literaturą naukową | Publication Service, Algorithm Registry, Plugin SDK / Plugin Runtime | ReferenceCatalog, ReferenceLinker, IAlgorithmPlugin SDK, AlgorithmMetadataStore |
-
-### Checklist dobrych praktyk benchmarkingu
-
-| ID | Dobra praktyka | Powiązane komponenty systemu | Wsparcie architektury |
-|----|----------------|------------------------------|----------------------|
-| 1 | Jasno określone cele eksperymentu (G1–G5) | Web UI (ExperimentDesignerUI), Experiment Orchestrator | Kreator eksperymentów z jasnymi celami i metrykami |
-| 2 | Dobrze zdefiniowane problemy / instancje benchmarku | Benchmark Definition Service, BenchmarkRepository, ProblemInstanceManager | Katalog benchmarków z metadanymi i wersjowaniem |
-| 3 | Świadomy dobór algorytmów / konfiguracji | Algorithm Registry, AlgorithmMetadataStore, CompatibilityChecker | Rejestr algorytmów z opisami i sprawdzaniem kompatybilności |
-| 4 | Dobrze zdefiniowane miary wydajności | Metrics Analysis Service, MetricCalculator | Standardowe i niestandardowe metryki z walidacją |
-| 5 | Plan eksperymentu (design), w tym budżety i powtórzenia | Experiment Orchestrator, ExperimentPlanBuilder, RunScheduler | Automatyczne planowanie macierzy eksperymentów |
-| 6 | Analiza wyników i prezentacja | Metrics Analysis Service, Web UI (ComparisonViewUI, dashboardy) | Interaktywne dashboardy z testami statystycznymi |
-| 7 | Pełna reprodukowalność | ReproducibilityManager, LineageTracker, Results Store, Object Storage | Snapshoty środowiska, seedy, wersjonowanie |  
-| 8 | Powiązanie wyników z literaturą naukową | Publication Service, ReferenceLinker | Katalog publikacji z automatycznym linkowaniem |
-| 9 | Iteracyjne projektowanie i testowanie algorytmów HPO | Algorithm SDK / Plugin Runtime, Algorithm Registry | SDK dla pluginów z cyklem życia od draftu do produkcji |
-| 10 | Elastyczne wdrożenie (PC-first, cloud-ready) | Wszystkie usługi z obsługą konteneryzacji | Docker Compose (PC) + Kubernetes (cloud) |
+Full acceptance criteria and implementation detailed in the dedicated requirements document.
 
 ---
 
-## Powiązane dokumenty
+## Non-functional Requirements
 
-- **Następny poziom**: [Kontenery (C4-2)](c2-containers.md)
-- **Implementacja**: [Komponenty (C4-3)](c3-components.md)
-- **Użytkowanie**: [Przypadki użycia](../requirements/use-cases.md)
-- **Wdrożenie**: [Deployment Guide](../operations/deployment-guide.md)
+> **Detailed non-functional requirements**: [Non-functional Requirements](../requirements/non-functional-requirements.md)
+
+System must fulfill key non-functional requirements:
+
+- **RNF1-RNF3**: Scalability, Reliability, Security
+- **RNF4-RNF6**: Observability, Extensibility, Cloud-ready deployment  
+- **RNF7-RNF10**: Reproducibility, Usability, Backup/DR, Performance
+
+Full acceptance criteria and implementation in dedicated requirements document.
+
+---
+
+## How Architecture Supports Good Benchmarking Practices
+
+### Benchmarking Goals G1–G5 vs System Architecture
+
+Reminder of HPO benchmarking goals:
+
+- **G1** – Algorithm performance evaluation  
+- **G2** – Comparison of algorithms  
+- **G3** – Sensitivity / robustness analysis  
+- **G4** – Extrapolation / generalization of results  
+- **G5** – Support for theory and algorithm development  
+
+**Mapping goals to architecture components:**
+
+| Benchmark Goal | Description / role in system | Related containers / services | Key components |
+|----------------|------------------------------|------------------------------|----------------|
+| **G1 – Evaluation** | Quality assessment of individual HPO algorithms on well-defined benchmarks and metrics | Experiment Orchestrator, Worker Runtime, Experiment Tracking Service, Metrics Analysis Service | MetricCalculator, RunLifecycleManager, ExperimentConfigManager, TrackingAPI |
+| **G2 – Comparison** | Comparison of multiple HPO algorithms (including custom ones) on the same benchmarks and metrics | Metrics Analysis Service, Web UI (ComparisonViewUI), Experiment Tracking Service | AggregationEngine, StatisticalTestsEngine, ComparisonViewUI |
+| **G3 – Sensitivity** | Sensitivity analysis of results to changes in configuration, seeds, benchmark instances and parameters | Experiment Orchestrator, Benchmark Definition Service, Metrics Analysis Service | ExperimentPlanBuilder, BenchmarkRepository, MetricCalculator |
+| **G4 – Extrapolation** | Study of HPO algorithm behavior on diverse problem instances (scalability, difficulty, size) | Benchmark Definition Service, Experiment Orchestrator, Worker Runtime | ProblemInstanceManager, BenchmarkVersioning |
+| **G5 – Theory and development** | Support for developing new HPO algorithms and linking results to theory and scientific literature | Publication Service, Algorithm Registry, Plugin SDK / Plugin Runtime | ReferenceCatalog, ReferenceLinker, IAlgorithmPlugin SDK, AlgorithmMetadataStore |
+
+### Good Benchmarking Practices Checklist
+
+| ID | Good Practice | Related System Components | Architecture Support |
+|----|---------------|---------------------------|---------------------|
+| 1 | Clearly defined experiment goals (G1–G5) | Web UI (ExperimentDesignerUI), Experiment Orchestrator | Experiment wizard with clear goals and metrics |
+| 2 | Well-defined problems / benchmark instances | Benchmark Definition Service, BenchmarkRepository, ProblemInstanceManager | Benchmark catalog with metadata and versioning |
+| 3 | Conscious algorithm / configuration selection | Algorithm Registry, AlgorithmMetadataStore, CompatibilityChecker | Algorithm registry with descriptions and compatibility checking |
+| 4 | Well-defined performance measures | Metrics Analysis Service, MetricCalculator | Standard and custom metrics with validation |
+| 5 | Experiment plan (design), including budgets and repetitions | Experiment Orchestrator, ExperimentPlanBuilder, RunScheduler | Automatic experiment matrix planning |
+| 6 | Results analysis and presentation | Metrics Analysis Service, Web UI (ComparisonViewUI, dashboards) | Interactive dashboards with statistical tests |
+| 7 | Full reproducibility | ReproducibilityManager, LineageTracker, Results Store, Object Storage | Environment snapshots, seeds, versioning |  
+| 8 | Linking results to scientific literature | Publication Service, ReferenceLinker | Publication catalog with automatic linking |
+| 9 | Iterative design and testing of HPO algorithms | Algorithm SDK / Plugin Runtime, Algorithm Registry | Plugin SDK with lifecycle from draft to production |
+| 10 | Flexible deployment (PC-first, cloud-ready) | All services with containerization support | Docker Compose (PC) + Kubernetes (cloud) |
+
+---
+
+## Related Documents
+
+- **Next level**: [Containers (C4-2)](c2-containers.md)
+- **Components**: [Components (C4-3)](c3-components.md)
+- **Code**: [Code (C4-4)](c4-code.md)
+- **Usage**: [Use Cases](../requirements/use-cases.md)
+- **Deployment**: [Deployment Guide](../operations/deployment-guide.md)

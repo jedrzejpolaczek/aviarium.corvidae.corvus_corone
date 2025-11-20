@@ -1,220 +1,220 @@
-# Wymagania niefunkcjonalne - Corvus Corone
+# Non-functional Requirements
 
-> **Non-functional requirements dla systemu HPO Benchmarking Platform**
-
----
-
-## 📈 RNF1 – Skalowalność
-
-**Wymaganie:** System musi skalować się od pojedynczego PC do klastra cloudowego.
-
-**Kryteria akceptacji:**
-- PC deployment: 1-10 użytkowników, 1-4 workerów
-- Cloud deployment: 100+ użytkowników, 50+ workerów  
-- Auto-scaling workerów na podstawie queue length
-- Horizontal scaling wszystkich bezstanowych serwisów
+> **Non-functional requirements for the HPO Benchmarking Platform system**
 
 ---
 
-## 🛡️ RNF2 – Niezawodność  
+## 📈 RNF1 – Scalability
 
-**Wymaganie:** System musi być odporny na awarie i zapewniać wysoką dostępność.
+**Requirement:** System must scale from a single PC to a cloud cluster.
 
-**Kryteria akceptacji:**
+**Acceptance criteria:**
+- PC deployment: 1-10 users, 1-4 workers
+- Cloud deployment: 100+ users, 50+ workers  
+- Auto-scaling of workers based on queue length
+- Horizontal scaling of all stateless services
+
+---
+
+## 🛡️ RNF2 – Reliability  
+
+**Requirement:** System must be resilient to failures and provide high availability.
+
+**Acceptance criteria:**
 - Uptime ≥ 99.5% (43.8h downtime/year max)
-- Graceful degradation przy awarii części komponentów
-- Automatic retry dla transient failures
-- Circuit breaker patterns dla external dependencies
-- Health checks dla wszystkich serwisów
+- Graceful degradation during component failures
+- Automatic retry for transient failures
+- Circuit breaker patterns for external dependencies
+- Health checks for all services
 
 ---
 
-## 🔒 RNF3 – Bezpieczeństwo
+## 🔒 RNF3 – Security
 
-**Wymaganie:** System musi chronić dane i zapewniać bezpieczny dostęp.
+**Requirement:** System must protect data and ensure secure access.
 
-**Kryteria akceptacji podstawowe:**
+**Basic acceptance criteria:**
 - Multi-tenant isolation (organization-level)
 - Role-based access control (RBAC)
 - API authentication (JWT + API keys)
 - Algorithm sandboxing (container isolation)
-- Audit logging wszystkich operacji
+- Audit logging of all operations
 - Encryption in transit (HTTPS/TLS)
 - Secure secret management
 
-### RNF3.1 Security Patterns (szczegółowe)
+### RNF3.1 Security Patterns
 
-**Autoryzacja i uwierzytelnianie:**
-- **Zero Trust Architecture** - każde połączenie między serwisami autoryzowane
-- **RBAC (Role-Based Access Control)** z granularnymi uprawnieniami:
+**Authorization and authentication:**
+- **Zero Trust Architecture** - every connection between services authorized
+- **RBAC (Role-Based Access Control)** with granular permissions:
   - `researcher`: read experiments, create experiments, read algorithms
   - `plugin-author`: researcher + register plugins, manage own algorithms  
-  - `admin`: wszystkie uprawnienia + manage system, approve plugins
-- **JWT tokens** z krótkim TTL (15 min) + refresh tokens
-- **mTLS** dla komunikacji service-to-service w K8s
-- **MFA** dla kont administratorskich
+  - `admin`: all permissions + manage system, approve plugins
+- **JWT tokens** with short TTL (15 min) + refresh tokens
+- **mTLS** for service-to-service communication in K8s
+- **MFA** for administrative accounts
 
 **Plugin Security (Sandboxing):**
-- **Container isolation** - każdy plugin w oddzielnym kontenerze
+- **Container isolation** - each plugin in separate container
 - **Resource limits** - CPU/Memory/Network/Storage quotas per plugin
-- **Restricted filesystem** - read-only root, write tylko do /tmp
-- **Network policies** - blokada dostępu do internetu, tylko do API systemu
-- **Code scanning** - static analysis podczas rejestracji pluginu
-- **Runtime monitoring** - wykrywanie podejrzanych operacji (syscalls)
+- **Restricted filesystem** - read-only root, write only to /tmp
+- **Network policies** - block internet access, only to system API
+- **Code scanning** - static analysis during plugin registration
+- **Runtime monitoring** - detection of suspicious operations (syscalls)
 
 **Data Protection:**
-- **Encryption at rest** - wszystkie dane w DB i Object Storage
-- **Encryption in transit** - TLS 1.3 dla wszystkich połączeń HTTP
-- **PII handling** - osobne szyfrowanie danych użytkowników
-- **Audit logging** - kompletny trail wszystkich operacji CRUD
-- **Data retention policies** - automatyczne usuwanie po N latach
+- **Encryption at rest** - all data in DB and Object Storage
+- **Encryption in transit** - TLS 1.3 for all HTTP connections
+- **PII handling** - separate encryption of user data
+- **Audit logging** - complete trail of all CRUD operations
+- **Data retention policies** - automatic deletion after N years
 - **GDPR compliance** - right to be forgotten, data portability
 
 **Infrastructure Security:**
-- **Network segmentation** - oddzielne subnets dla DB, aplikacji, workerów
-- **WAF (Web Application Firewall)** przed Web UI
-- **DDoS protection** na poziomie load balancera  
-- **Vulnerability scanning** obrazów kontenerów w CI/CD
+- **Network segmentation** - separate subnets for DB, applications, workers
+- **WAF (Web Application Firewall)** in front of Web UI
+- **DDoS protection** at load balancer level  
+- **Vulnerability scanning** of container images in CI/CD
 - **Security hardening** - minimal base images, non-root users
-- **SIEM integration** - centralne logowanie zdarzeń bezpieczeństwa
+- **SIEM integration** - centralized security event logging
 
-**Implementacja (patrz [ADR-005: Container Security Strategy](../design/design-decisions.md#adr-005-container-security-strategy)):**
-- **Container Sandboxing:** gVisor/Kata Containers dla strong isolation
+**Implementation (see [ADR-005: Container Security Strategy](../design/design-decisions.md#adr-005-container-security-strategy)):**
+- **Container Sandboxing:** gVisor/Kata Containers for strong isolation
 - **Resource Limiting:** CPU/Memory/Disk quotas per plugin (1000m CPU, 2Gi RAM, 1Gi Disk max)
 - **Runtime Security:** Seccomp profiles, AppArmor/SELinux, Falco monitoring
 - **Image Security:** Vulnerability scanning, image signing, distroless base images
 - **Network Security:** Deny all egress by default, allow only API communication
 
-**Dodatkowe kryteria akceptacji:**
-- ✅ Zero privileged containers w produkcji
-- ✅ Wszystkie komunikacje szyfrowane (TLS 1.3+)
-- ✅ Regular penetration testing (co 6 miesięcy)
-- ✅ SOC2 Type II compliance dla środowisk enterprise
-- ✅ Plugin isolation verified przez security audit
+**Additional acceptance criteria:**
+- ✅ Zero privileged containers in production
+- ✅ All communications encrypted (TLS 1.3+)
+- ✅ Regular penetration testing (every 6 months)
+- ✅ SOC2 Type II compliance for enterprise environments
+- ✅ Plugin isolation verified by security audit
 - ✅ gVisor/Kata isolation performance overhead <10%
 
 ---
 
-## 👁️ RNF4 – Obserwowalność
+## 👁️ RNF4 – Observability
 
-**Wymaganie:** System musi zapewniać pełną observability dla debugging i monitoring.
+**Requirement:** System must provide full observability for debugging and monitoring.
 
-**Implementacja (patrz [ADR-006: Monitoring and Observability Stack](../design/design-decisions.md#adr-006-monitoring-and-observability-stack)):**
+**Implementation (see [ADR-006: Monitoring and Observability Stack](../design/design-decisions.md#adr-006-monitoring-and-observability-stack)):**
 - **Three Pillars Observability:** Metrics (Prometheus), Logs (ELK), Traces (Jaeger)
-- **Unified Visualization:** Grafana dashboards z multiple data sources
+- **Unified Visualization:** Grafana dashboards with multiple data sources
 - **Business Metrics:** Algorithm success rates, experiment costs, SLA monitoring
-- **Long-term Storage:** Thanos dla metrics retention, Elasticsearch dla logs
+- **Long-term Storage:** Thanos for metrics retention, Elasticsearch for logs
 
-**Kryteria akceptacji:**
-- Structured logging (JSON, centralized w ELK)
+**Acceptance criteria:**
+- Structured logging (JSON, centralized in ELK)
 - Metrics collection (Prometheus + custom business KPIs)
-- Distributed tracing (Jaeger z OpenTelemetry)
-- Real-time dashboards (Grafana z alerting)
+- Distributed tracing (Jaeger with OpenTelemetry)
+- Real-time dashboards (Grafana with alerting)
 - SLA monitoring (availability ≥99.5%, latency p95 <500ms)
 - Performance profiling (CPU/Memory per algorithm)
 - Monitoring overhead <15% total system resources
 
 ---
 
-## 🔧 RNF5 – Rozszerzalność (pluginy)
+## 🔧 RNF5 – Extensibility (plugins)
 
-**Wymaganie:** System musi umożliwiać łatwe dodawanie nowych algorytmów HPO.
+**Requirement:** System must enable easy addition of new HPO algorithms.
 
-**Kryteria akceptacji:**
-- Plugin SDK dla różnych języków (Python, R, Julia)
+**Acceptance criteria:**
+- Plugin SDK for different languages (Python, R, Julia)
 - Container-based isolation
-- Plugin versioning i rollback
-- Plugin discovery i registration
+- Plugin versioning and rollback
+- Plugin discovery and registration
 - Resource limits per plugin
-- Plugin metadata i compatibility checking
+- Plugin metadata and compatibility checking
 
 ---
 
 ## ☁️ RNF6 – Cloud-ready, PC-first
 
-**Wymaganie:** Architektura PC-first z łatwą migracją do cloud.
+**Requirement:** PC-first architecture with easy migration to cloud.
 
-**Kryteria akceptacji:**
-- Docker Compose deployment dla PC
-- Kubernetes manifests dla cloud
+**Acceptance criteria:**
+- Docker Compose deployment for PC
+- Kubernetes manifests for cloud
 - Environment-agnostic configuration
 - External service discovery
-- Stateless services (gdzie możliwe)
+- Stateless services (where possible)
 - Cloud storage integration (S3, GCS, Azure Blob)
 
 ---
 
-## 🔄 RNF7 – Reprodukowalność
+## 🔄 RNF7 – Reproducibility
 
-**Wymaganie:** Wszystkie eksperymenty muszą być w pełni reprodukowalne.
+**Requirement:** All experiments must be fully reproducible.
 
-**Kryteria akceptacji:**
+**Acceptance criteria:**
 - Deterministic random number generation
 - Environment isolation (containers)
 - Complete configuration capture
-- Data versioning i checksums
+- Data versioning and checksums
 - Algorithm versioning
 - Execution environment metadata
 
 ---
 
-## 🎨 RNF8 – Użyteczność
+## 🎨 RNF8 – Usability
 
-**Wymaganie:** System musi być intuicyjny dla użytkowników z różnym background.
+**Requirement:** System must be intuitive for users with different backgrounds.
 
-**Kryteria akceptacji:**
-- Web UI dla non-technical users
-- CLI dla power users
-- REST API dla programmatic access
-- Interactive tutorials i documentation
-- Error messages z actionable guidance
-- Progress tracking dla long-running tasks
+**Acceptance criteria:**
+- Web UI for non-technical users
+- CLI for power users
+- REST API for programmatic access
+- Interactive tutorials and documentation
+- Error messages with actionable guidance
+- Progress tracking for long-running tasks
 
 ---
 
-## 💾 RNF9 – Backup i Disaster Recovery
+## 💾 RNF9 – Backup and Disaster Recovery
 
-**Wymaganie:** System musi zapewniać ochronę przed utratą danych.
+**Requirement:** System must provide protection against data loss.
 
-**Strategia backup:**
+**Backup strategy:**
 
 **Results Store (PostgreSQL):**
-- Automatyczne daily snapshots z retention 30 dni
-- Point-in-time recovery (PITR) z WAL archiving  
-- Cross-region replication dla środowisk produkcyjnych
-- Encrypted backups z rotacją kluczy
+- Automatic daily snapshots with 30 day retention
+- Point-in-time recovery (PITR) with WAL archiving  
+- Cross-region replication for production environments
+- Encrypted backups with key rotation
 
-**Object Storage (artefakty, datasety):**
-- Versioning włączone dla wszystkich obiektów
-- Cross-region replication z 99.999999999% durability
-- Lifecycle policies (archiving po 1 roku, deletion po 7 latach)
-- Immutable backups przez Object Lock
+**Object Storage (artifacts, datasets):**
+- Versioning enabled for all objects
+- Cross-region replication with 99.999999999% durability
+- Lifecycle policies (archiving after 1 year, deletion after 7 years)
+- Immutable backups through Object Lock
 
-**Konfiguracja systemu:**
-- GitOps approach - wszystkie manifesty/charts w git
-- Encrypted backup secrets i konfiguracji w HashiCorp Vault
-- Infrastructure as Code (Terraform) w wersjonowanym repo
+**System configuration:**
+- GitOps approach - all manifests/charts in git
+- Encrypted backup of secrets and configuration in HashiCorp Vault
+- Infrastructure as Code (Terraform) in versioned repo
 
 **Disaster Recovery:**
-- **RTO (Recovery Time Objective): 4 godziny** dla pełnego przywrócenia
-- **RPO (Recovery Point Objective): 1 godzina** maksymalna utrata danych  
-- **Multi-region deployment** z automatic failover dla krytycznych usług
-- **Runbook** z procedurami odtwarzania dla każdego komponentu
-- **Quarterly DR drills** z dokumentacją wyników
+- **RTO (Recovery Time Objective): 4 hours** for full restoration
+- **RPO (Recovery Point Objective): 1 hour** maximum data loss  
+- **Multi-region deployment** with automatic failover for critical services
+- **Runbook** with recovery procedures for each component
+- **Quarterly DR drills** with documented results
 
-**Kryteria akceptacji:**
-- ✅ Automated daily backups z weryfikacją integralności
-- ✅ Successful restore test co kwartał
-- ✅ Dokumentacja procedur DR dostępna 24/7
+**Acceptance criteria:**
+- ✅ Automated daily backups with integrity verification
+- ✅ Successful restore test every quarter
+- ✅ DR procedure documentation available 24/7
 - ✅ Cross-region failover <4h RTO, <1h RPO
 
 ---
 
 ## 🚀 RNF10 – Performance
 
-**Wymaganie:** System musi zapewniać odpowiednie performance dla workloads HPO.
+**Requirement:** System must provide appropriate performance for HPO workloads.
 
-**Kryteria akceptacji:**
+**Acceptance criteria:**
 - API response time: P95 < 1s, P99 < 3s
 - Experiment queue throughput: 1000+ jobs/hour
 - Database query performance: P95 < 100ms
@@ -224,9 +224,9 @@
 
 ---
 
-## 📊 Macierz wymagań vs komponenty
+## 📊 Requirements vs Components Matrix
 
-| Komponent | RNF1 | RNF2 | RNF3 | RNF4 | RNF5 | RNF6 | RNF7 | RNF8 | RNF9 | RNF10 |
+| Component | RNF1 | RNF2 | RNF3 | RNF4 | RNF5 | RNF6 | RNF7 | RNF8 | RNF9 | RNF10 |
 |-----------|------|------|------|------|------|------|------|------|------|-------|
 | API Gateway | ✅ | ✅ | ⭐ | ✅ | - | ✅ | - | ✅ | - | ⭐ |
 | Orchestrator | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ⭐ | ✅ | ✅ | ✅ |
@@ -235,16 +235,16 @@
 | Plugin Manager | - | ✅ | ⭐ | ✅ | ⭐ | ✅ | ⭐ | ✅ | ✅ | ✅ |
 | Web UI | ✅ | ✅ | ✅ | ✅ | - | ✅ | - | ⭐ | - | ⭐ |
 
-**Legenda:**
-- ⭐ = Krytyczne wymaganie dla komponentu
-- ✅ = Ważne wymaganie 
-- - = Nie dotyczy
+**Legend:**
+- ⭐ = Critical requirement for component
+- ✅ = Important requirement 
+- - = Not applicable
 
 ---
 
-## Powiązane dokumenty
+## Related Documents
 
 - **Requirements**: [Functional Requirements](functional-requirements.md), [Use Cases](use-cases.md)
-- **Architektura**: [Kontekst (C4-1)](../architecture/c1-context.md), [Kontenery (C4-2)](../architecture/c2-containers.md)
+- **Architecture**: [Context (C4-1)](../architecture/c1-context.md), [Containers (C4-2)](../architecture/c2-containers.md)
 - **Operations**: [Deployment Guide](../operations/deployment-guide.md), [Monitoring Guide](../operations/monitoring-guide.md)
 - **Design**: [Design Decisions](../design/design-decisions.md)

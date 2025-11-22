@@ -1017,7 +1017,7 @@ sequenceDiagram
     Docker-->>A3: All containers running
     A3->>API: curl http://localhost:8080/healthz
     API-->>A3: HTTP 200 OK
-    A3->>UI: Open http://localhost:3000
+    A3->>UI: Open http://localhost:8080
     UI-->>A3: Login/main page displayed
 ```
 

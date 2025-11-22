@@ -3,6 +3,7 @@ import logging
 import os
 import time
 import traceback
+import io
 from datetime import datetime
 from typing import Dict, Any, List
 
@@ -37,15 +38,35 @@ class HPOWorker:
         self._setup_connections()
     
     def _setup_connections(self):
-        """Setup RabbitMQ and MinIO connections"""
+        """Setup RabbitMQ and MinIO connections with retry logic"""
+        # Setup RabbitMQ connection with retry
+        max_retries = 5
+        for i in range(max_retries):
+            try:
+                # RabbitMQ connection parameters with heartbeat settings
+                parameters = pika.URLParameters(RABBITMQ_URL)
+                parameters.heartbeat = 600  # 10 minutes heartbeat
+                parameters.blocked_connection_timeout = 300  # 5 minutes
+                parameters.socket_timeout = 30  # 30 seconds socket timeout
+                
+                self.connection = pika.BlockingConnection(parameters)
+                self.channel = self.connection.channel()
+                self.channel.queue_declare(queue='hpo_runs', durable=True)
+                self.channel.basic_qos(prefetch_count=1)
+                
+                logger.info(f"Worker {self.worker_id} RabbitMQ connection established with heartbeat={parameters.heartbeat}s")
+                break
+                
+            except Exception as e:
+                logger.warning(f"RabbitMQ connection attempt {i+1}/{max_retries} failed: {e}")
+                if i < max_retries - 1:
+                    time.sleep(2 ** i)  # Exponential backoff
+                else:
+                    logger.error(f"Failed to connect to RabbitMQ after {max_retries} attempts")
+                    raise
+        
+        # Setup MinIO connection
         try:
-            # RabbitMQ connection
-            self.connection = pika.BlockingConnection(pika.URLParameters(RABBITMQ_URL))
-            self.channel = self.connection.channel()
-            self.channel.queue_declare(queue='hpo_runs', durable=True)
-            self.channel.basic_qos(prefetch_count=1)
-            
-            # MinIO connection
             minio_url = OBJECT_STORAGE_URL.replace("http://", "").replace("https://", "")
             self.minio_client = Minio(
                 minio_url,
@@ -58,11 +79,13 @@ class HPOWorker:
             if not self.minio_client.bucket_exists("hpo-artifacts"):
                 self.minio_client.make_bucket("hpo-artifacts")
             
-            logger.info(f"Worker {self.worker_id} connections established")
+            logger.info(f"Worker {self.worker_id} MinIO connection established")
             
         except Exception as e:
-            logger.error(f"Failed to setup connections: {e}")
+            logger.error(f"Failed to setup MinIO connection: {e}")
             raise
+        
+        logger.info(f"Worker {self.worker_id} all connections established successfully")
     
     def start_consuming(self):
         """Start consuming run jobs from queue"""
@@ -230,7 +253,11 @@ class HPOWorker:
         parameters = algorithm_config.get("parameters", {})
         budget_limit = algorithm_config.get("budget_limit", 100)
         
-        logger.info(f"Executing built-in algorithm {algorithm_id} for run {run_id}")
+        # Ensure budget_limit is not None and is a valid integer
+        if budget_limit is None:
+            budget_limit = 100
+        
+        logger.info(f"Executing built-in algorithm {algorithm_id} for run {run_id} with budget_limit={budget_limit}")
         
         # Set random seed
         np.random.seed(seed)
@@ -440,11 +467,12 @@ class HPOWorker:
                 artifact_data = json.dumps(artifact["data"]).encode()
                 storage_path = f"runs/{run_id}/{artifact_name}"
                 
-                # Upload to MinIO
+                # Upload to MinIO - create BytesIO object for the data
+                data_stream = io.BytesIO(artifact_data)
                 self.minio_client.put_object(
                     "hpo-artifacts",
                     storage_path,
-                    data=artifact_data,
+                    data=data_stream,
                     length=len(artifact_data),
                     content_type="application/json"
                 )

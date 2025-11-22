@@ -11,59 +11,56 @@ scrape_configs:
     static_configs:
       - targets: ['localhost:9090']
 
-  - job_name: 'api-gateway'
-    static_configs:
-      - targets: ['api-gateway:8080']
-    metrics_path: '/metrics'
-    scrape_interval: 30s
+  # FastAPI services - commenting out until /metrics endpoints are implemented
+  # - job_name: 'api-gateway'
+  #   static_configs:
+  #     - targets: ['api-gateway:8080']
+  #   metrics_path: '/metrics'
+  #   scrape_interval: 30s
 
-  - job_name: 'experiment-orchestrator'
-    static_configs:
-      - targets: ['experiment-orchestrator:8000']
-    metrics_path: '/metrics'
-    scrape_interval: 30s
+  # - job_name: 'experiment-orchestrator'
+  #   static_configs:
+  #     - targets: ['experiment-orchestrator:8000']
+  #   metrics_path: '/metrics'
+  #   scrape_interval: 30s
 
-  - job_name: 'experiment-tracking'
-    static_configs:
-      - targets: ['experiment-tracking:8002']
-    metrics_path: '/metrics'
-    scrape_interval: 30s
+  # - job_name: 'experiment-tracking'
+  #   static_configs:
+  #     - targets: ['experiment-tracking:8002']
+  #   metrics_path: '/metrics'
+  #   scrape_interval: 30s
 
-  - job_name: 'worker-runtime'
-    static_configs:
-      - targets: ['worker:8080']
-    metrics_path: '/metrics'
-    scrape_interval: 15s
+  # - job_name: 'worker-runtime'
+  #   static_configs:
+  #     - targets: ['worker:8080']
+  #   metrics_path: '/metrics'
+  #   scrape_interval: 15s
 
-  - job_name: 'benchmark-definition'
-    static_configs:
-      - targets: ['benchmark-definition:8003']
-    metrics_path: '/metrics'
-    scrape_interval: 60s
+  # - job_name: 'benchmark-definition'
+  #   static_configs:
+  #     - targets: ['benchmark-definition:8003']
+  #   metrics_path: '/metrics'
+  #   scrape_interval: 60s
 
-  - job_name: 'algorithm-registry'
-    static_configs:
-      - targets: ['algorithm-registry:8004']
-    metrics_path: '/metrics'
-    scrape_interval: 60s
+  # - job_name: 'algorithm-registry'
+  #   static_configs:
+  #     - targets: ['algorithm-registry:8004']
+  #   metrics_path: '/metrics'
+  #   scrape_interval: 60s
 
-  - job_name: 'metrics-analysis'
-    static_configs:
-      - targets: ['metrics-analysis:8005']
-    metrics_path: '/metrics'
-    scrape_interval: 30s
+  # - job_name: 'metrics-analysis'
+  #   static_configs:
+  #     - targets: ['metrics-analysis:8005']
+  #   metrics_path: '/metrics'
+  #   scrape_interval: 30s
 
-  - job_name: 'auth-service'
-    static_configs:
-      - targets: ['auth-service:8001']
-    metrics_path: '/metrics'
-    scrape_interval: 60s
+  # - job_name: 'auth-service'
+  #   static_configs:
+  #     - targets: ['auth-service:8001']
+  #   metrics_path: '/metrics'
+  #   scrape_interval: 60s
 
-  - job_name: 'postgres'
-    static_configs:
-      - targets: ['postgres:5432']
-    scrape_interval: 60s
-
+  # Infrastructure services - keeping only those with actual metrics endpoints
   - job_name: 'rabbitmq'
     static_configs:
       - targets: ['rabbitmq:15692']

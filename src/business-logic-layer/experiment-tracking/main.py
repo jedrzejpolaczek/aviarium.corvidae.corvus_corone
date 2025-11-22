@@ -248,8 +248,18 @@ async def create_experiment(experiment: ExperimentCreate, db: Session = Depends(
     db.refresh(db_experiment)
     
     # Convert to response model
-    response = ExperimentResponse.from_orm(db_experiment)
-    response.tags = db_experiment.tags.split(",") if db_experiment.tags else []
+    response = ExperimentResponse(
+        id=db_experiment.id,
+        name=db_experiment.name,
+        description=db_experiment.description,
+        goal_type=db_experiment.goal_type,
+        created_by_user=db_experiment.created_by_user,
+        created_at=db_experiment.created_at,
+        updated_at=db_experiment.updated_at,
+        config_json=db_experiment.config_json,
+        status=db_experiment.status,
+        tags=db_experiment.tags.split(",") if db_experiment.tags else []
+    )
     
     return response
 
@@ -271,11 +281,21 @@ async def get_experiment(experiment_id: str, db: Session = Depends(get_db)):
         Run.status == "failed"
     ).count()
     
-    response = ExperimentResponse.from_orm(db_experiment)
-    response.tags = db_experiment.tags.split(",") if db_experiment.tags else []
-    response.total_runs = total_runs
-    response.completed_runs = completed_runs
-    response.failed_runs = failed_runs
+    response = ExperimentResponse(
+        id=db_experiment.id,
+        name=db_experiment.name,
+        description=db_experiment.description,
+        goal_type=db_experiment.goal_type,
+        created_by_user=db_experiment.created_by_user,
+        created_at=db_experiment.created_at,
+        updated_at=db_experiment.updated_at,
+        config_json=db_experiment.config_json,
+        status=db_experiment.status,
+        tags=db_experiment.tags.split(",") if db_experiment.tags else [],
+        total_runs=total_runs,
+        completed_runs=completed_runs,
+        failed_runs=failed_runs
+    )
     
     return response
 
@@ -301,8 +321,18 @@ async def list_experiments(
     
     responses = []
     for exp in experiments:
-        response = ExperimentResponse.from_orm(exp)
-        response.tags = exp.tags.split(",") if exp.tags else []
+        response = ExperimentResponse(
+            id=exp.id,
+            name=exp.name,
+            description=exp.description,
+            goal_type=exp.goal_type,
+            created_by_user=exp.created_by_user,
+            created_at=exp.created_at,
+            updated_at=exp.updated_at,
+            config_json=exp.config_json,
+            status=exp.status,
+            tags=exp.tags.split(",") if exp.tags else []
+        )
         responses.append(response)
     
     return responses

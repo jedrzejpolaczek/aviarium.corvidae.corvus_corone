@@ -1,7 +1,10 @@
 from fastapi import FastAPI, Request, Depends, HTTPException
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from datetime import datetime
 import logging
 import httpx
+import os
 
 # Import components and shared utilities
 from components import auth_component, service_router
@@ -58,10 +61,12 @@ async def proxy_experiments_base(request: Request):
     # Route to orchestrator for creation/management, tracking for queries
     if request.method in ["POST", "PUT", "DELETE"]:
         service = "orchestrator"
+        target_path = "/api/experiments"
     else:
         service = "tracking"
+        target_path = "/api/tracking/experiments"
     
-    return await service_router.proxy_request(service, "/api/experiments", request)
+    return await service_router.proxy_request(service, target_path, request)
 
 @app.api_route("/api/experiments/{path:path}", methods=["GET", "POST", "PUT", "DELETE"])
 async def proxy_experiments(path: str, request: Request):
@@ -69,10 +74,12 @@ async def proxy_experiments(path: str, request: Request):
     # Route to orchestrator for creation/management, tracking for queries
     if request.method in ["POST", "PUT", "DELETE"]:
         service = "orchestrator"
+        target_path = f"/api/experiments/{path}"
     else:
         service = "tracking"
+        target_path = f"/api/tracking/experiments/{path}"
     
-    return await service_router.proxy_request(service, f"/api/experiments/{path}", request)
+    return await service_router.proxy_request(service, target_path, request)
 
 # Tracking routes
 @app.api_route("/api/tracking/{path:path}", methods=["GET", "POST", "PUT", "DELETE"])
@@ -125,6 +132,23 @@ async def proxy_reports(path: str, request: Request, user=Depends(auth_component
 async def proxy_auth(path: str, request: Request):
     """Proxy authentication requests"""
     return await service_router.proxy_request("auth", f"/api/auth/{path}", request)
+
+# Static file serving for web UI
+@app.get("/")
+async def serve_index():
+    """Serve the main web UI"""
+    web_ui_path = "/app/web-ui"
+    index_path = os.path.join(web_ui_path, "index.html")
+    if os.path.exists(index_path):
+        return FileResponse(index_path)
+    else:
+        # Fallback to a simple response if file doesn't exist
+        return {"message": "Web UI not found", "status": "error"}
+
+# Mount static files
+web_ui_path = "/app/web-ui"
+if os.path.exists(web_ui_path):
+    app.mount("/static", StaticFiles(directory=web_ui_path), name="static")
 
 if __name__ == "__main__":
     import uvicorn

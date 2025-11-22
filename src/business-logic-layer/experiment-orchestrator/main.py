@@ -7,6 +7,10 @@ from datetime import datetime
 import httpx
 import os
 import uuid
+import pika
+import time
+import json
+import traceback
 
 # Import components and shared utilities
 from components import (
@@ -34,6 +38,8 @@ logger = logging.getLogger(__name__)
 # Service URLs
 ALGORITHM_REGISTRY_URL = os.getenv("ALGORITHM_REGISTRY_URL", "http://algorithm-registry:8004")
 BENCHMARK_SERVICE_URL = os.getenv("BENCHMARK_SERVICE_URL", "http://benchmark-definition:8003")
+TRACKING_SERVICE_URL = os.getenv("TRACKING_SERVICE_URL", "http://experiment-tracking:8002")
+RABBITMQ_URL = os.getenv("RABBITMQ_URL", "amqp://guest:guest@rabbitmq:5672/")
 
 app = FastAPI(
     title="Experiment Orchestrator Service",
@@ -120,11 +126,18 @@ class RunPlan(BaseModel):
 
 # Message broker connection
 def get_rabbitmq_connection():
-    """Get RabbitMQ connection with retry logic"""
+    """Get RabbitMQ connection with retry logic and proper heartbeat settings"""
     max_retries = 5
     for i in range(max_retries):
         try:
-            connection = pika.BlockingConnection(pika.URLParameters(RABBITMQ_URL))
+            # Connection parameters with heartbeat settings
+            parameters = pika.URLParameters(RABBITMQ_URL)
+            parameters.heartbeat = 600  # 10 minutes heartbeat
+            parameters.blocked_connection_timeout = 300  # 5 minutes
+            parameters.socket_timeout = 30  # 30 seconds socket timeout
+            
+            connection = pika.BlockingConnection(parameters)
+            logger.info(f"Successfully connected to RabbitMQ with heartbeat={parameters.heartbeat}s")
             return connection
         except Exception as e:
             logger.warning(f"RabbitMQ connection attempt {i+1}/{max_retries} failed: {e}")
@@ -249,78 +262,148 @@ class RunScheduler:
     def __init__(self):
         self.connection = None
         self.channel = None
-        self._setup_queues()
     
-    def _setup_queues(self):
-        """Setup RabbitMQ queues"""
+    def _ensure_connection(self):
+        """Ensure RabbitMQ connection is active"""
         try:
-            self.connection = get_rabbitmq_connection()
-            self.channel = self.connection.channel()
+            # Check if connection exists and is open
+            if self.connection is None or self.connection.is_closed:
+                logger.info("Establishing new RabbitMQ connection")
+                self.connection = get_rabbitmq_connection()
+                self.channel = None
             
-            # Declare queues
-            self.channel.queue_declare(queue='hpo_runs', durable=True)
-            self.channel.queue_declare(queue='run_results', durable=True)
-            
-            logger.info("RabbitMQ queues set up successfully")
+            # Check if channel exists and is open
+            if self.channel is None or self.channel.is_closed:
+                logger.info("Creating new RabbitMQ channel")
+                self.channel = self.connection.channel()
+                
+                # Declare queues
+                self.channel.queue_declare(queue='hpo_runs', durable=True)
+                self.channel.queue_declare(queue='run_results', durable=True)
+                
+                logger.info("RabbitMQ connection and queues set up successfully")
+                
         except Exception as e:
-            logger.error(f"Failed to setup RabbitMQ queues: {e}")
+            logger.error(f"Failed to setup RabbitMQ connection: {e}")
+            self.connection = None
+            self.channel = None
+            raise
     
     async def schedule_runs(self, runs: List[RunPlan]):
-        """Schedule runs for execution"""
-        if not self.channel:
-            self._setup_queues()
-        
+        """Schedule runs for execution with retry logic"""
         for run in runs:
-            try:
-                # Send run to worker queue
-                message = {
-                    "run_id": run.run_id,
-                    "experiment_id": run.experiment_id,
-                    "algorithm_config": run.algorithm_config.dict(),
-                    "benchmark_id": run.benchmark_id,
-                    "instance_id": run.instance_id,
-                    "seed": run.seed,
-                    "priority": run.priority
-                }
-                
-                self.channel.basic_publish(
-                    exchange='',
-                    routing_key='hpo_runs',
-                    body=json.dumps(message),
-                    properties=pika.BasicProperties(
-                        delivery_mode=2,  # Make message persistent
-                        priority=run.priority
+            max_retries = 3
+            for attempt in range(max_retries):
+                try:
+                    # Ensure connection is active
+                    self._ensure_connection()
+                    
+                    # Send run to worker queue
+                    message = {
+                        "run_id": run.run_id,
+                        "experiment_id": run.experiment_id,
+                        "algorithm_config": run.algorithm_config.dict(),
+                        "benchmark_id": run.benchmark_id,
+                        "instance_id": run.instance_id,
+                        "seed": run.seed,
+                        "priority": run.priority
+                    }
+                    
+                    self.channel.basic_publish(
+                        exchange='',
+                        routing_key='hpo_runs',
+                        body=json.dumps(message),
+                        properties=pika.BasicProperties(
+                            delivery_mode=2,  # Make message persistent
+                            priority=run.priority
+                        )
                     )
+                    
+                    # Register run with tracking service
+                    await self._register_run_with_tracking(run)
+                    
+                    logger.info(f"Scheduled run {run.run_id}")
+                    break  # Success, exit retry loop
+                    
+                except Exception as e:
+                    logger.error(f"Failed to schedule run {run.run_id} (attempt {attempt + 1}/{max_retries}): {e}")
+                    
+                    # Reset connection on error
+                    self.connection = None
+                    self.channel = None
+                    
+                    if attempt < max_retries - 1:
+                        time.sleep(2 ** attempt)  # Exponential backoff
+                    else:
+                        logger.error(f"Failed to schedule run {run.run_id} after {max_retries} attempts")
+    
+    async def _register_experiment_with_tracking(self, experiment_id: str, config: ExperimentConfig):
+        """Register experiment with tracking service"""
+        try:
+            # Extract first algorithm and benchmark for description
+            first_algorithm = config.algorithms[0].algorithm_id if config.algorithms else "unknown"
+            first_benchmark = config.benchmarks[0].benchmark_id if config.benchmarks else "unknown"
+            
+            experiment_data = {
+                "id": experiment_id,
+                "name": config.name or f"Experiment {experiment_id[:8]}",
+                "description": config.description or f"HPO experiment with algorithm {first_algorithm} on benchmark {first_benchmark}",
+                "goal_type": "minimize",
+                "created_by_user": "system",
+                "config_json": config.dict(),
+                "tags": [first_algorithm, first_benchmark] + config.tags
+            }
+            
+            async with httpx.AsyncClient(timeout=30.0) as client:
+                response = await client.post(
+                    f"{TRACKING_SERVICE_URL}/api/tracking/experiments",
+                    json=experiment_data
                 )
                 
-                # Register run with tracking service
-                await self._register_run_with_tracking(run)
-                
-                logger.info(f"Scheduled run {run.run_id}")
-                
-            except Exception as e:
-                logger.error(f"Failed to schedule run {run.run_id}: {e}")
-    
+                if response.status_code in [200, 201]:
+                    logger.info(f"Successfully registered experiment {experiment_id} with tracking service")
+                    return True
+                else:
+                    logger.error(f"Failed to register experiment {experiment_id} with tracking service. Status: {response.status_code}, Response: {response.text}")
+                    return False
+                    
+        except httpx.RequestError as e:
+            logger.error(f"Network error registering experiment {experiment_id} with tracking service: {e}")
+            return False
+        except Exception as e:
+            logger.error(f"Unexpected error registering experiment {experiment_id} with tracking: {e}")
+            logger.error(f"Traceback: {traceback.format_exc()}")
+            return False
+
     async def _register_run_with_tracking(self, run: RunPlan):
         """Register run with tracking service"""
         try:
-            async with httpx.AsyncClient() as client:
+            run_data = {
+                "run_id": run.run_id,
+                "experiment_id": run.experiment_id,
+                "algorithm_version_id": f"{run.algorithm_config.algorithm_id}:{run.algorithm_config.version}",
+                "benchmark_instance_id": run.instance_id,
+                "seed": run.seed,
+                "status": RunStatus.PENDING,
+                "config": run.algorithm_config.dict()
+            }
+            
+            async with httpx.AsyncClient(timeout=30.0) as client:
                 response = await client.post(
                     f"{TRACKING_SERVICE_URL}/api/tracking/runs",
-                    json={
-                        "run_id": run.run_id,
-                        "experiment_id": run.experiment_id,
-                        "algorithm_version_id": f"{run.algorithm_config.algorithm_id}:{run.algorithm_config.version}",
-                        "benchmark_instance_id": run.instance_id,
-                        "seed": run.seed,
-                        "status": RunStatus.PENDING,
-                        "config": run.algorithm_config.dict()
-                    }
+                    json=run_data
                 )
-                if response.status_code != 201:
-                    logger.error(f"Failed to register run {run.run_id} with tracking service")
+                
+                if response.status_code in [200, 201]:
+                    logger.info(f"Successfully registered run {run.run_id} with tracking service")
+                else:
+                    logger.error(f"Failed to register run {run.run_id} with tracking service. Status: {response.status_code}, Response: {response.text}")
+                    
+        except httpx.RequestError as e:
+            logger.error(f"Network error registering run {run.run_id} with tracking service: {e}")
         except Exception as e:
-            logger.error(f"Error registering run with tracking: {e}")
+            logger.error(f"Unexpected error registering run {run.run_id} with tracking: {e}")
+            logger.error(f"Traceback: {traceback.format_exc()}")
 
 # Service instances
 config_manager = ExperimentConfigManager()
@@ -426,6 +509,15 @@ async def cancel_experiment(experiment_id: str):
 async def build_and_schedule_experiment(experiment_id: str, config: ExperimentConfig, start_immediately: bool):
     """Background task to build execution plan and optionally start experiment"""
     try:
+        # Register experiment with tracking service first
+        experiment_registered = await run_scheduler._register_experiment_with_tracking(experiment_id, config)
+        if not experiment_registered:
+            logger.error(f"Failed to register experiment {experiment_id} with tracking service")
+            experiment = experiments_store[experiment_id]
+            experiment["status"] = ExperimentStatus.FAILED
+            experiment["updated_at"] = datetime.utcnow()
+            return
+        
         # Build execution plan
         runs = await plan_builder.build_plan(experiment_id, config)
         run_plans_store[experiment_id] = runs

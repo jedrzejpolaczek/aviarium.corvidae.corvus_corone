@@ -114,14 +114,14 @@ class BenchmarkInstanceResponse(BaseModel):
     benchmark_id: str
     name: str
     dataset_ref: str
-    config_json: Dict[str, Any]
+    config_json: Optional[Dict[str, Any]] = None
     best_known_value: Optional[float]
-    parameter_space_json: Dict[str, Any]
+    parameter_space_json: Optional[Dict[str, Any]] = None
     evaluation_budget: int
     time_limit_seconds: Optional[int]
     difficulty_level: str
     created_at: datetime
-    metadata_json: Dict[str, Any]
+    metadata_json: Optional[Dict[str, Any]] = None
     is_active: bool
     
     class Config:

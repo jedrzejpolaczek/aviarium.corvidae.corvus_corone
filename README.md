@@ -33,16 +33,19 @@ docker-compose ps
 python src/support-layer/infrastructure/scripts/validate-architecture.py
 
 # Access the application
-# Web UI: http://localhost:3000
-# API Gateway: http://localhost:8080
+# Web UI: http://localhost:8080 (unified access via API Gateway)
+# API Endpoints: http://localhost:8080/api/
+# API Documentation: http://localhost:8080/docs
 # RabbitMQ Management: http://localhost:15672 (admin/admin)
 # MinIO Console: http://localhost:9001 (minioadmin/minioadmin)
 # Grafana: http://localhost:3001 (admin/admin)
 ```
 
+> **Architecture Note**: The Web UI is served directly by the API Gateway at port 8080, providing a unified access point that simplifies deployment and reduces port conflicts.
+
 ### Your First Experiment
 
-1. **Open Web UI**: Navigate to http://localhost:3000
+1. **Open Web UI**: Navigate to http://localhost:8080
 2. **Create Experiment**: Click "New Experiment"
 3. **Select Benchmark**: Choose from UCI datasets or synthetic problems
 4. **Choose Algorithms**: Select algorithms to compare (e.g., Random Search vs Bayesian Optimization)
@@ -266,8 +269,8 @@ docker-compose ps
 ```
 
 ### Application Access
-- **Web UI**: http://localhost:3000 - Main user interface
-- **API Gateway**: http://localhost:8080 - REST API endpoints
+- **Web UI**: http://localhost:8080 - Main user interface (served by API Gateway)
+- **API Gateway**: http://localhost:8080 - REST API endpoints and Web UI
 - **API Documentation**: http://localhost:8080/docs - Interactive API docs
 - **Monitoring Dashboard**: http://localhost:3001 - Grafana (admin/admin)
 - **Message Queue**: http://localhost:15672 - RabbitMQ Management (admin/admin)

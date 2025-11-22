@@ -140,7 +140,12 @@
         <!-- Recent Experiments -->
         <div class="row mt-5">
             <div class="col-12">
-                <h3>Recent Experiments</h3>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h3>Recent Experiments</h3>
+                    <button class="btn btn-outline-secondary" onclick="loadExperiments()" title="Refresh experiments">
+                        <i class="bi bi-arrow-clockwise"></i> Refresh
+                    </button>
+                </div>
                 <div id="experiments-list">
                     <div class="text-center">
                         <div class="spinner-border" role="status">
@@ -360,6 +365,44 @@
         </div>
     </div>
 
+    <!-- All Experiments Modal -->
+    <div class="modal fade" id="experimentsModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-flask me-2"></i>All Experiments
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <p class="text-muted mb-0">View and manage all your hyperparameter optimization experiments</p>
+                        </div>
+                        <div>
+                            <button class="btn btn-primary" onclick="showNewExperimentModal(); bootstrap.Modal.getInstance(document.getElementById('experimentsModal')).hide();">
+                                <i class="fas fa-plus me-2"></i>New Experiment
+                            </button>
+                        </div>
+                    </div>
+                    <hr>
+                    <div id="experiments-modal-list">
+                        <div class="text-center py-4">
+                            <div class="spinner-border" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <p class="mt-2">Loading all experiments...</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- New Experiment Modal -->
     <div class="modal fade" id="newExperimentModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
@@ -530,6 +573,7 @@
         
         // Load dashboard data
         async function loadDashboard() {
+            console.log('loadDashboard() called');
             try {
                 // Try to authenticate, but continue without auth if it fails
                 if (!authToken) {
@@ -563,19 +607,31 @@
                     updateApiStatus('Offline', 'bg-danger');
                 }
                 
-                // Load experiments (allow this to fail without affecting API status)
-                let experiments = [];
-                try {
-                    experiments = await apiCall('/api/experiments?limit=10');
-                } catch (expError) {
-                    console.warn('Failed to load experiments:', expError);
-                    experiments = [];
+                // Load experiments with retry logic
+                let retryCount = 0;
+                const maxRetries = 3;
+                while (retryCount < maxRetries) {
+                    try {
+                        await loadExperiments();
+                        break; // Success, exit retry loop
+                    } catch (error) {
+                        retryCount++;
+                        console.warn(`Experiments loading attempt ${retryCount} failed:`, error);
+                        if (retryCount < maxRetries) {
+                            console.log(`Retrying in ${retryCount * 1000}ms...`);
+                            await new Promise(resolve => setTimeout(resolve, retryCount * 1000));
+                        } else {
+                            console.error('All experiments loading attempts failed');
+                            displayExperiments([]);
+                        }
+                    }
                 }
-                displayExperiments(experiments);
                 
                 // Load algorithms count
                 try {
+                    console.log('Loading algorithms...');
                     const algorithms = await apiCall('/api/algorithms');
+                    console.log('Algorithms loaded:', algorithms.length);
                     allAlgorithms = algorithms;
                     document.getElementById('available-algorithms').textContent = algorithms.length;
                     document.getElementById('available-algorithms').className = 'text-success';
@@ -587,7 +643,9 @@
                 
                 // Load benchmarks count
                 try {
+                    console.log('Loading benchmarks...');
                     const benchmarks = await apiCall('/api/benchmarks');
+                    console.log('Benchmarks loaded:', benchmarks.length);
                     allBenchmarks = benchmarks;
                     document.getElementById('benchmark-datasets').textContent = benchmarks.length;
                     document.getElementById('benchmark-datasets').className = 'text-success';
@@ -659,6 +717,76 @@
             `).join('');
         }
         
+        function displayAllExperiments(experiments) {
+            const container = document.getElementById('experiments-modal-list');
+            
+            if (experiments.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center text-muted py-5">
+                        <div class="mb-4">
+                            <i class="fas fa-flask" style="font-size: 4rem; opacity: 0.3;"></i>
+                        </div>
+                        <h4>No Experiments Created Yet</h4>
+                        <p>Get started by creating your first hyperparameter optimization experiment.</p>
+                        <button class="btn btn-primary btn-lg mt-3" onclick="showNewExperimentModal(); bootstrap.Modal.getInstance(document.getElementById('experimentsModal')).hide();">Create First Experiment</button>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = experiments.map(exp => `
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-md-8">
+                                <h5 class="card-title mb-1">${exp.name}</h5>
+                                <p class="card-text text-muted mb-2">${exp.description || 'No description provided'}</p>
+                                <div class="d-flex align-items-center gap-3">
+                                    <small class="text-muted">
+                                        <i class="fas fa-calendar-alt me-1"></i>
+                                        Created: ${formatDate(exp.created_at)}
+                                    </small>
+                                    <small class="text-muted">
+                                        <i class="fas fa-user me-1"></i>
+                                        ${exp.created_by_user || 'Unknown'}
+                                    </small>
+                                    ${exp.tags ? `<small class="text-muted"><i class="fas fa-tags me-1"></i>${exp.tags}</small>` : ''}
+                                </div>
+                            </div>
+                            <div class="col-md-4 text-end">
+                                <div class="mb-2">
+                                    <span class="badge status-badge ${getStatusBadgeClass(exp.status)} fs-6">${exp.status.toUpperCase()}</span>
+                                </div>
+                                <div class="mb-2">
+                                    <small class="text-muted d-block">
+                                        ${exp.completed_runs || 0}/${exp.total_runs || 0} runs completed
+                                    </small>
+                                </div>
+                                <div class="btn-group" role="group">
+                                    <button class="btn btn-sm btn-outline-primary" onclick="viewExperiment('${exp.id}')">
+                                        <i class="fas fa-eye me-1"></i>View
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-secondary" onclick="editExperiment('${exp.id}')">
+                                        <i class="fas fa-edit me-1"></i>Edit
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function viewExperiment(experimentId) {
+            // TODO: Implement experiment detail view
+            alert(`View experiment: ${experimentId}`);
+        }
+        
+        function editExperiment(experimentId) {
+            // TODO: Implement experiment editing
+            alert(`Edit experiment: ${experimentId}`);
+        }
+
         function showDemoData() {
             // Show empty state when API is not available
             displayExperiments([]);
@@ -818,20 +946,41 @@
                 
                 // Show success message
                 const successAlert = document.createElement('div');
-                successAlert.className = 'alert alert-success alert-dismissible fade show';
+                successAlert.className = 'alert alert-success alert-dismissible fade show position-fixed';
+                successAlert.style.cssText = 'top: 20px; right: 20px; z-index: 9999; max-width: 400px;';
                 successAlert.innerHTML = `
                     <strong>Success!</strong> Experiment "${name}" created successfully! ID: ${result.id}
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 `;
-                document.querySelector('.container').insertBefore(successAlert, document.querySelector('.row'));
+                document.body.appendChild(successAlert);
+                
+                // Auto-remove the alert after 5 seconds
+                setTimeout(() => {
+                    if (successAlert.parentNode) {
+                        successAlert.remove();
+                    }
+                }, 5000);
                 
                 // Close modal and refresh
                 bootstrap.Modal.getInstance(document.getElementById('newExperimentModal')).hide();
                 
-                // Refresh dashboard after a short delay to ensure experiment is processed
-                setTimeout(() => {
-                    loadDashboard();
-                }, 1000);
+                // Refresh all experiment data after a short delay to ensure experiment is processed
+                setTimeout(async () => {
+                    console.log('Refreshing dashboard and experiments after creation...');
+                    await loadDashboard();
+                    
+                    // Force refresh the experiments list in case it's cached
+                    await loadExperiments();
+                    
+                    // Update experiment counter manually by fetching latest count
+                    try {
+                        const allExperiments = await apiCall('/api/experiments');
+                        const activeCount = allExperiments.filter(exp => exp.status === 'running').length;
+                        document.getElementById('active-experiments').textContent = activeCount;
+                    } catch (error) {
+                        console.error('Failed to update active experiments counter:', error);
+                    }
+                }, 1500);
                 
             } catch (error) {
                 alert(`Failed to create experiment: ${error.message}`);
@@ -1243,10 +1392,49 @@
         }
         
         // Navigation functions
-        function showExperimentsView() {
-            // Scroll to experiments section or refresh the dashboard
-            document.getElementById('experiments-list').scrollIntoView({ behavior: 'smooth' });
-            setActiveNavLink('Experiments');
+        async function showExperimentsView() {
+            // Load and show all experiments in a modal
+            await loadAllExperiments();
+            const modal = new bootstrap.Modal(document.getElementById('experimentsModal'));
+            modal.show();
+        }
+        
+        async function loadExperiments() {
+            console.log('loadExperiments() called');
+            try {
+                // Add cache-busting timestamp to ensure fresh data
+                const timestamp = Date.now();
+                console.log('Fetching experiments from API...');
+                const experiments = await apiCall(`/api/experiments?limit=10&_t=${timestamp}`);
+                console.log('API returned experiments:', experiments);
+                
+                displayExperiments(experiments);
+                
+                // Update active experiments count
+                const activeCount = experiments.filter(exp => exp.status === 'running').length;
+                document.getElementById('active-experiments').textContent = activeCount;
+                
+                console.log('Experiments loaded for dashboard:', experiments.length, 'Active:', activeCount);
+            } catch (error) {
+                console.error('Failed to load experiments:', error);
+                console.error('Error details:', error.stack);
+                displayExperiments([]);
+                document.getElementById('active-experiments').textContent = '0';
+            }
+        }
+        
+        async function loadAllExperiments() {
+            try {
+                console.log('Loading all experiments...');
+                // Add cache-busting timestamp to ensure fresh data
+                const timestamp = Date.now();
+                const experiments = await apiCall(`/api/experiments?_t=${timestamp}`); // No limit - get all experiments
+                console.log('All experiments loaded:', experiments.length);
+                displayAllExperiments(experiments);
+            } catch (error) {
+                console.error('Failed to load all experiments:', error);
+                displayAllExperiments([]);
+            }
         }
 
         async function showBenchmarksView() {

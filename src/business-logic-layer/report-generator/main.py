@@ -221,6 +221,24 @@ async def generate_report(request: ReportRequest):
         logger.error(f"Failed to generate report: {e}")
         raise HTTPException(status_code=500, detail=f"Report generation failed: {str(e)}")
 
+@app.get("/api/reports/")
+async def list_reports():
+    """List all generated reports (placeholder implementation)"""
+    # For now, return a sample list. In production, this would fetch from a database
+    return {
+        "reports": [
+            {
+                "report_id": "sample_report_001",
+                "title": "Sample HPO Experiment Report",
+                "generated_at": "2024-11-22T10:30:00Z",
+                "format": "html",
+                "experiments_included": ["exp_001", "exp_002"],
+                "status": "completed"
+            }
+        ],
+        "total": 1
+    }
+
 @app.get("/api/reports/templates")
 async def list_report_templates():
     """List available report templates"""

@@ -88,11 +88,13 @@ docker-compose exec api python manage.py loaddata sample_benchmarks.json
 
 #### 5. Access system
 ```
-Web UI: http://localhost:3000
-API: http://localhost:8000/api/v1/
-Admin: http://localhost:8000/admin/
+Web UI: http://localhost:8080 (served by API Gateway)
+API: http://localhost:8080/api/
+Admin: http://localhost:8080/docs (API Documentation)
 Monitoring: http://localhost:3001 (Grafana)
 ```
+
+> **Note**: The Web UI is now served directly by the API Gateway at port 8080, providing a unified access point for both the user interface and REST API endpoints.
 
 ### Directory structure
 ```

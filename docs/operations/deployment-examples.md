@@ -178,7 +178,7 @@ docker-compose -f docker-compose.dev.yml exec api-gateway python manage.py creat
 docker-compose -f docker-compose.dev.yml exec api-gateway python manage.py loaddata sample_data.json
 
 echo "✅ Development environment ready!"
-echo "🌐 Web UI: http://localhost:3000"
+echo "🌐 Web UI: http://localhost:8080"
 echo "🔧 API: http://localhost:8000"
 echo "📊 Prometheus: http://localhost:9090"
 echo "💾 MinIO Console: http://localhost:9001"

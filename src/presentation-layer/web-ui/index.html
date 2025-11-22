@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Corvus Corone - HPO Benchmarking Platform</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css" rel="stylesheet">
     <style>
         .navbar-brand {
             font-weight: bold;
@@ -21,6 +22,35 @@
         .metric-value {
             font-family: 'Courier New', monospace;
             font-weight: bold;
+        }
+        .algorithm-card {
+            border: 1px solid #dee2e6;
+            border-radius: 0.375rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            transition: all 0.2s ease-in-out;
+            cursor: pointer;
+        }
+        .algorithm-card:hover {
+            border-color: #0d6efd;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .algorithm-card.selected {
+            border-color: #0d6efd;
+            background-color: #f8f9ff;
+        }
+        .complexity-badge {
+            font-size: 0.75em;
+        }
+        .tag-badge {
+            font-size: 0.7em;
+            margin: 0.1rem;
+        }
+        .parallelizable-icon {
+            color: #28a745;
+        }
+        .sequential-icon {
+            color: #ffc107;
         }
         footer {
             margin-top: 3rem;
@@ -41,21 +71,7 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="#experiments">Experiments</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#algorithms">Algorithms</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#benchmarks">Benchmarks</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#reports">Reports</a>
-                    </li>
-                </ul>
-                <ul class="navbar-nav">
+                <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
                         <a class="nav-link" href="#profile">👤 Profile</a>
                     </li>
@@ -74,8 +90,13 @@
                     <p class="lead">HPO (Hyperparameter Optimization) Algorithm Benchmarking Platform</p>
                     <hr class="my-4">
                     <p>Design rigorous experiments, compare HPO algorithms, and generate scientific reports with statistical analysis.</p>
-                    <a class="btn btn-primary btn-lg" href="#" onclick="showNewExperimentModal()">🧪 New Experiment</a>
-                    <a class="btn btn-outline-secondary btn-lg ms-2" href="#" onclick="showAlgorithms()">📊 View Algorithms</a>
+                    <div class="mt-4">
+                        <a class="btn btn-primary btn-lg me-2 mb-2" href="#" onclick="showNewExperimentModal()">🧪 New Experiment</a>
+                        <a class="btn btn-outline-primary btn-lg me-2 mb-2" href="#" onclick="showExperimentsView()">📋 View Experiments</a>
+                        <a class="btn btn-outline-secondary btn-lg me-2 mb-2" href="#" onclick="showAlgorithms()">📊 View Algorithms</a>
+                        <a class="btn btn-outline-info btn-lg me-2 mb-2" href="#" onclick="showBenchmarksView()">🎯 View Benchmarks</a>
+                        <a class="btn btn-outline-success btn-lg me-2 mb-2" href="#" onclick="showReportsView()">📈 View Reports</a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -127,6 +148,213 @@
                         </div>
                         <p class="mt-2">Loading experiments...</p>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Algorithm Catalog Modal -->
+    <div class="modal fade" id="algorithmCatalogModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Algorithm Catalog</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Search and Filter -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <input type="text" class="form-control" id="algorithmSearch" placeholder="Search algorithms...">
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-select" id="algorithmTypeFilter">
+                                <option value="">All Types</option>
+                                <option value="random_search">Random Search</option>
+                                <option value="bayesian_optimization">Bayesian Optimization</option>
+                                <option value="grid_search">Grid Search</option>
+                                <option value="evolutionary">Evolutionary</option>
+                                <option value="gradient_based">Gradient Based</option>
+                                <option value="multi_objective">Multi-Objective</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-select" id="algorithmStatusFilter">
+                                <option value="">All Status</option>
+                                <option value="active">Active</option>
+                                <option value="experimental">Experimental</option>
+                                <option value="deprecated">Deprecated</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <!-- Algorithm Grid -->
+                    <div id="algorithms-grid">
+                        <div class="text-center">
+                            <div class="spinner-border" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <p class="mt-2">Loading algorithms...</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="createExperimentFromCatalog()">Create Experiment with Selected</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Algorithm Details Modal -->
+    <div class="modal fade" id="algorithmDetailsModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="algorithmDetailsTitle">Algorithm Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="algorithmDetailsBody">
+                    <!-- Details will be populated dynamically -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="useAlgorithmBtn">Use in Experiment</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Benchmarks Modal -->
+    <div class="modal fade" id="benchmarksModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Available Benchmarks</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <input type="text" class="form-control" id="benchmarkSearch" placeholder="Search benchmarks...">
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-select" id="benchmarkTypeFilter">
+                                <option value="">All Types</option>
+                                <option value="synthetic">Synthetic</option>
+                                <option value="real_world">Real World</option>
+                                <option value="classification">Classification</option>
+                                <option value="regression">Regression</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-select" id="benchmarkDifficultyFilter">
+                                <option value="">All Difficulties</option>
+                                <option value="easy">Easy</option>
+                                <option value="medium">Medium</option>
+                                <option value="hard">Hard</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div id="benchmarks-grid">
+                        <div class="text-center">
+                            <div class="spinner-border" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <p class="mt-2">Loading benchmarks...</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="createExperimentFromBenchmarks()">Create Experiment with Selected</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Benchmark Details Modal -->
+    <div class="modal fade" id="benchmarkDetailsModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="benchmarkDetailsTitle">Benchmark Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="benchmarkDetailsBody">
+                    <!-- Details will be populated dynamically -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="useBenchmarkBtn">Use in Experiment</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Benchmark Details Modal -->
+    <div class="modal fade" id="benchmarkDetailsModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="benchmarkDetailsTitle">Benchmark Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="benchmarkDetailsBody">
+                    <!-- Details will be populated dynamically -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="useBenchmarkBtn">Use in Experiment</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reports Modal -->
+    <div class="modal fade" id="reportsModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Experiment Reports</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <select class="form-select" id="reportTypeFilter">
+                                <option value="">All Report Types</option>
+                                <option value="comparison">Algorithm Comparison</option>
+                                <option value="performance">Performance Analysis</option>
+                                <option value="statistical">Statistical Analysis</option>
+                                <option value="convergence">Convergence Analysis</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <select class="form-select" id="reportStatusFilter">
+                                <option value="">All Status</option>
+                                <option value="completed">Completed</option>
+                                <option value="generating">Generating</option>
+                                <option value="failed">Failed</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <button class="btn btn-primary" onclick="generateNewReport()">
+                                <i class="bi bi-plus-circle me-1"></i>Generate New Report
+                            </button>
+                        </div>
+                    </div>
+                    <div id="reports-grid">
+                        <div class="text-center">
+                            <div class="spinner-border" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <p class="mt-2">Loading reports...</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -208,7 +436,9 @@
                 <div class="col-md-6 text-md-end">
                     <p class="text-muted">
                         Built with ❤️ by Aviarium Software<br>
-                        <small>API Status: <span id="api-status" class="badge bg-secondary">Checking...</span></small>
+                        <small>API Status: <span id="api-status" class="badge bg-secondary" 
+                                                 data-bs-toggle="tooltip" 
+                                                 data-bs-placement="top">Checking...</span></small>
                     </p>
                 </div>
             </div>
@@ -240,6 +470,33 @@
                 'cancelled': 'bg-secondary'
             };
             return statusClasses[status] || 'bg-secondary';
+        }
+        
+        // API Status Management
+        function updateApiStatus(status, badgeClass) {
+            const statusElement = document.getElementById('api-status');
+            statusElement.className = `badge ${badgeClass}`;
+            statusElement.textContent = status;
+            
+            // Update tooltip content based on status
+            const tooltips = {
+                'Checking...': 'Currently checking the health status of the API Gateway. Please wait...',
+                'Online': 'API Gateway is healthy and all core services are accessible and responding properly. All features should work correctly.',
+                'Offline': 'API Gateway health check failed. Some features may not work properly. Check your connection or contact support if the issue persists.'
+            };
+            
+            statusElement.setAttribute('title', tooltips[status] || 'API status information not available');
+            
+            // Reinitialize tooltip for updated content
+            try {
+                const existingTooltip = bootstrap.Tooltip.getInstance(statusElement);
+                if (existingTooltip) {
+                    existingTooltip.dispose();
+                }
+                new bootstrap.Tooltip(statusElement);
+            } catch (error) {
+                console.warn('Failed to update tooltip:', error);
+            }
         }
         
         // API calls
@@ -274,22 +531,71 @@
         // Load dashboard data
         async function loadDashboard() {
             try {
-                // Check API status
-                await apiCall('/health');
-                document.getElementById('api-status').className = 'badge bg-success';
-                document.getElementById('api-status').textContent = 'Online';
+                // Try to authenticate, but continue without auth if it fails
+                if (!authToken) {
+                    try {
+                        const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ 
+                                username: 'researcher', 
+                                password: 'researcher123' 
+                            })
+                        });
+                        if (response.ok) {
+                            const tokenData = await response.json();
+                            authToken = tokenData.access_token;
+                            localStorage.setItem('auth_token', authToken);
+                            console.log('Auto-authenticated with demo user');
+                        }
+                    } catch (error) {
+                        console.warn('Auto-authentication failed, trying without authentication:', error);
+                        authToken = null;
+                    }
+                }
                 
-                // Load experiments
-                const experiments = await apiCall('/api/experiments?limit=10');
+                // Check API status independently
+                try {
+                    await apiCall('/health');
+                    updateApiStatus('Online', 'bg-success');
+                } catch (healthError) {
+                    console.error('API health check failed:', healthError);
+                    updateApiStatus('Offline', 'bg-danger');
+                }
+                
+                // Load experiments (allow this to fail without affecting API status)
+                let experiments = [];
+                try {
+                    experiments = await apiCall('/api/experiments?limit=10');
+                } catch (expError) {
+                    console.warn('Failed to load experiments:', expError);
+                    experiments = [];
+                }
                 displayExperiments(experiments);
                 
                 // Load algorithms count
-                const algorithms = await apiCall('/api/algorithms?limit=1');
-                document.getElementById('available-algorithms').textContent = '3+';
+                try {
+                    const algorithms = await apiCall('/api/algorithms');
+                    allAlgorithms = algorithms;
+                    document.getElementById('available-algorithms').textContent = algorithms.length;
+                    document.getElementById('available-algorithms').className = 'text-success';
+                } catch (error) {
+                    console.error('Failed to load algorithms:', error);
+                    document.getElementById('available-algorithms').textContent = 'Offline';
+                    document.getElementById('available-algorithms').className = 'text-danger';
+                }
                 
                 // Load benchmarks count
-                const benchmarks = await apiCall('/api/benchmarks?limit=1');
-                document.getElementById('benchmark-datasets').textContent = '2+';
+                try {
+                    const benchmarks = await apiCall('/api/benchmarks');
+                    allBenchmarks = benchmarks;
+                    document.getElementById('benchmark-datasets').textContent = benchmarks.length;
+                    document.getElementById('benchmark-datasets').className = 'text-success';
+                } catch (error) {
+                    console.error('Failed to load benchmarks:', error);
+                    document.getElementById('benchmark-datasets').textContent = 'Offline';
+                    document.getElementById('benchmark-datasets').className = 'text-danger';
+                }
                 
                 // Calculate stats
                 const activeExperiments = experiments.filter(exp => exp.status === 'running').length;
@@ -298,13 +604,21 @@
                 const completedRuns = experiments.reduce((sum, exp) => sum + (exp.completed_runs || 0), 0);
                 document.getElementById('completed-runs').textContent = completedRuns;
                 
+                // Initialize tooltips for all elements (including API status)
+                setTimeout(() => {
+                    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+                    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                        return new bootstrap.Tooltip(tooltipTriggerEl);
+                    });
+                }, 100);
+                
             } catch (error) {
                 console.error('Failed to load dashboard:', error);
-                document.getElementById('api-status').className = 'badge bg-danger';
-                document.getElementById('api-status').textContent = 'Offline';
                 
-                // Show demo data
-                showDemoData();
+                // Show empty experiments but don't override individual service status or API status
+                displayExperiments([]);
+                document.getElementById('active-experiments').textContent = '0';
+                document.getElementById('completed-runs').textContent = '0';
             }
         }
         
@@ -346,33 +660,16 @@
         }
         
         function showDemoData() {
-            // Show demo data when API is not available
-            const demoExperiments = [
-                {
-                    id: 'demo-1',
-                    name: 'Random Search vs Bayesian Optimization',
-                    description: 'Comparing baseline algorithms on UCI Wine dataset',
-                    status: 'completed',
-                    created_at: new Date().toISOString(),
-                    total_runs: 100,
-                    completed_runs: 100
-                },
-                {
-                    id: 'demo-2',
-                    name: 'Grid Search Evaluation',
-                    description: 'Exhaustive search on synthetic 2D function',
-                    status: 'running',
-                    created_at: new Date(Date.now() - 3600000).toISOString(),
-                    total_runs: 200,
-                    completed_runs: 45
-                }
-            ];
+            // Show empty state when API is not available
+            displayExperiments([]);
             
-            displayExperiments(demoExperiments);
-            document.getElementById('active-experiments').textContent = '1';
-            document.getElementById('completed-runs').textContent = '100';
-            document.getElementById('available-algorithms').textContent = '3';
-            document.getElementById('benchmark-datasets').textContent = '2';
+            // Show error states for unavailable resources
+            document.getElementById('active-experiments').textContent = '0';
+            document.getElementById('completed-runs').textContent = '0';
+            document.getElementById('available-algorithms').textContent = 'Offline';
+            document.getElementById('available-algorithms').className = 'text-warning';
+            document.getElementById('benchmark-datasets').textContent = 'Offline';
+            document.getElementById('benchmark-datasets').className = 'text-warning';
         }
         
         // Modal functions
@@ -390,7 +687,7 @@
                 
                 container.innerHTML = algorithms.map(algo => `
                     <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="algo-${algo.id}" value="${algo.id}">
+                        <input class="form-check-input" type="checkbox" id="algo-${algo.id}" value="${algo.id}" onchange="syncAlgorithmSelections()">
                         <label class="form-check-label" for="algo-${algo.id}">
                             ${algo.name} <span class="text-muted">(${algo.algorithm_type})</span>
                         </label>
@@ -405,14 +702,9 @@
                 
             } catch (error) {
                 document.getElementById('algorithm-selection').innerHTML = `
-                    <div class="text-danger">Failed to load algorithms. Using demo data.</div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="algo-random" value="random_search" checked>
-                        <label class="form-check-label" for="algo-random">Random Search</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="algo-bayes" value="bayesian_optimization" checked>
-                        <label class="form-check-label" for="algo-bayes">Bayesian Optimization</label>
+                    <div class="alert alert-warning">
+                        <i class="bi bi-exclamation-triangle"></i> <strong>Algorithm Service Unavailable</strong><br>
+                        Cannot load available algorithms. Please ensure the algorithm registry service is running and try again.
                     </div>
                 `;
             }
@@ -425,7 +717,7 @@
                 
                 container.innerHTML = benchmarks.map(bench => `
                     <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="bench-${bench.id}" value="${bench.id}">
+                        <input class="form-check-input" type="checkbox" id="bench-${bench.id}" value="${bench.id}" onchange="syncBenchmarkSelections()">
                         <label class="form-check-label" for="bench-${bench.id}">
                             ${bench.name} <span class="text-muted">(${bench.problem_type})</span>
                         </label>
@@ -438,11 +730,24 @@
                 }
                 
             } catch (error) {
+                // Use the same demo benchmarks as the catalog, matching actual database
+                const demoBenchmarks = [
+                    {
+                        id: 'uci_wine',
+                        name: 'UCI Wine Classification',
+                        problem_type: 'classification'
+                    },
+                    {
+                        id: 'synthetic_2d',
+                        name: 'Synthetic 2D Function',
+                        problem_type: 'synthetic'
+                    }
+                ];
+                
                 document.getElementById('benchmark-selection').innerHTML = `
-                    <div class="text-danger">Failed to load benchmarks. Using demo data.</div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="bench-wine" value="uci_wine" checked>
-                        <label class="form-check-label" for="bench-wine">UCI Wine Classification</label>
+                    <div class="alert alert-warning">
+                        <i class="bi bi-exclamation-triangle"></i> <strong>Benchmark Service Unavailable</strong><br>
+                        Cannot load available benchmarks. Please ensure the benchmark definition service is running and try again.
                     </div>
                 `;
             }
@@ -511,11 +816,22 @@
                     body: JSON.stringify(experimentConfig)
                 });
                 
-                alert(`Experiment "${name}" created successfully! ID: ${result.id}`);
+                // Show success message
+                const successAlert = document.createElement('div');
+                successAlert.className = 'alert alert-success alert-dismissible fade show';
+                successAlert.innerHTML = `
+                    <strong>Success!</strong> Experiment "${name}" created successfully! ID: ${result.id}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                `;
+                document.querySelector('.container').insertBefore(successAlert, document.querySelector('.row'));
                 
                 // Close modal and refresh
                 bootstrap.Modal.getInstance(document.getElementById('newExperimentModal')).hide();
-                loadDashboard();
+                
+                // Refresh dashboard after a short delay to ensure experiment is processed
+                setTimeout(() => {
+                    loadDashboard();
+                }, 1000);
                 
             } catch (error) {
                 alert(`Failed to create experiment: ${error.message}`);
@@ -526,12 +842,835 @@
             alert(`Viewing experiment ${experimentId}\n\nIn a full implementation, this would navigate to a detailed experiment view with:\n- Real-time progress tracking\n- Convergence plots\n- Statistical analysis\n- Run details and logs`);
         }
         
-        function showAlgorithms() {
-            alert('Algorithm catalog would show:\n\n• Built-in Algorithms:\n  - Random Search\n  - Bayesian Optimization (TPE)\n  - Grid Search\n\n• Plugin System:\n  - Custom algorithm support\n  - Container-based isolation\n  - Version management');
+        // Global algorithm data
+        let allAlgorithms = [];
+        let selectedAlgorithms = new Set();
+        
+        // Global benchmark data
+        let allBenchmarks = [];
+        let selectedBenchmarks = new Set();
+
+        async function showAlgorithms() {
+            const modal = new bootstrap.Modal(document.getElementById('algorithmCatalogModal'));
+            await loadAlgorithmCatalog();
+            // Sync selections from experiment form
+            syncAlgorithmSelections();
+            modal.show();
+        }
+
+        async function loadAlgorithmCatalog() {
+            try {
+                allAlgorithms = await apiCall('/api/algorithms');
+                displayAlgorithms(allAlgorithms);
+                
+                // Initialize tooltips
+                setTimeout(() => {
+                    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+                    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                        return new bootstrap.Tooltip(tooltipTriggerEl);
+                    });
+                }, 100);
+                
+                // Setup search and filter listeners
+                document.getElementById('algorithmSearch').addEventListener('input', filterAlgorithms);
+                document.getElementById('algorithmTypeFilter').addEventListener('change', filterAlgorithms);
+                document.getElementById('algorithmStatusFilter').addEventListener('change', filterAlgorithms);
+                
+            } catch (error) {
+                console.error('Failed to load algorithms:', error);
+                document.getElementById('algorithms-grid').innerHTML = `
+                    <div class="alert alert-danger">
+                        <h6>Failed to load algorithms</h6>
+                        <p>Unable to connect to algorithm registry. Please check your connection and try again.</p>
+                        <button class="btn btn-outline-danger btn-sm" onclick="loadAlgorithmCatalog()">Retry</button>
+                    </div>
+                `;
+            }
+        }
+
+        function displayAlgorithms(algorithms) {
+            const container = document.getElementById('algorithms-grid');
+            
+            if (algorithms.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center text-muted">
+                        <p>No algorithms found matching your criteria.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = algorithms.map(algo => {
+                const isSelected = selectedAlgorithms.has(algo.id);
+                const complexityColor = {
+                    'low': 'success',
+                    'medium': 'warning', 
+                    'high': 'danger'
+                }[algo.metadata_json?.complexity || 'medium'];
+                
+                const parallelIcon = algo.metadata_json?.parallelizable ? 
+                    '<i class="bi bi-lightning-charge parallelizable-icon" title="Parallelizable"></i>' :
+                    '<i class="bi bi-clock sequential-icon" title="Sequential"></i>';
+                
+                return `
+                    <div class="algorithm-card ${isSelected ? 'selected' : ''}" onclick="toggleAlgorithmSelection('${algo.id}')">
+                        <div class="row align-items-center">
+                            <div class="col-md-8">
+                                <div class="d-flex align-items-center mb-2">
+                                    <h6 class="mb-0 me-2">${algo.name}</h6>
+                                    <span class="badge bg-${complexityColor} complexity-badge me-2" 
+                                          data-bs-toggle="tooltip" 
+                                          data-bs-placement="top" 
+                                          title="${getComplexityTooltip(algo.metadata_json?.complexity || 'medium')}">${algo.metadata_json?.complexity || 'medium'}</span>
+                                    <span class="badge bg-secondary me-2"
+                                          data-bs-toggle="tooltip" 
+                                          data-bs-placement="top" 
+                                          title="${getAlgorithmTypeTooltip(algo.algorithm_type)}">${algo.algorithm_type.replace('_', ' ')}</span>
+                                    <span data-bs-toggle="tooltip" 
+                                          data-bs-placement="top" 
+                                          title="${getParallelizationTooltip(algo.metadata_json?.parallelizable)}">${parallelIcon}</span>
+                                </div>
+                                <p class="text-muted small mb-2">${algo.description}</p>
+                                <div class="mb-1">
+                                    ${algo.tags.map(tag => `<span class="badge bg-light text-dark tag-badge"
+                                                              data-bs-toggle="tooltip" 
+                                                              data-bs-placement="top" 
+                                                              title="${getTagTooltip(tag)}">${tag}</span>`).join('')}
+                                </div>
+                                <small class="text-muted">
+                                    Version ${algo.latest_version || '1.0.0'} • 
+                                    ${algo.metadata_json?.parameter_types?.join(', ') || 'Various parameters'} • 
+                                    Author: ${algo.author}
+                                </small>
+                            </div>
+                            <div class="col-md-4 text-end">
+                                <div class="mb-2">
+                                    <span class="badge bg-${algo.status === 'active' ? 'success' : 'warning'}" 
+                                          data-bs-toggle="tooltip" 
+                                          data-bs-placement="top" 
+                                          title="${getStatusTooltip(algo.status)}"
+                                          style="cursor: help;">${algo.status.toUpperCase()}</span>
+                                </div>
+                                <div class="btn-group btn-group-sm">
+                                    <button class="btn btn-outline-primary" onclick="event.stopPropagation(); viewAlgorithmDetails('${algo.id}')">
+                                        Details
+                                    </button>
+                                    <button class="btn btn-${isSelected ? 'danger' : 'success'}" onclick="event.stopPropagation(); toggleAlgorithmSelection('${algo.id}')">
+                                        ${isSelected ? 'Remove' : 'Select'}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function filterAlgorithms() {
+            const searchTerm = document.getElementById('algorithmSearch').value.toLowerCase();
+            const typeFilter = document.getElementById('algorithmTypeFilter').value;
+            const statusFilter = document.getElementById('algorithmStatusFilter').value;
+            
+            const filtered = allAlgorithms.filter(algo => {
+                const matchesSearch = searchTerm === '' || 
+                    algo.name.toLowerCase().includes(searchTerm) ||
+                    algo.description.toLowerCase().includes(searchTerm) ||
+                    algo.tags.some(tag => tag.toLowerCase().includes(searchTerm));
+                
+                const matchesType = typeFilter === '' || algo.algorithm_type === typeFilter;
+                const matchesStatus = statusFilter === '' || algo.status === statusFilter;
+                
+                return matchesSearch && matchesType && matchesStatus;
+            });
+            
+            displayAlgorithms(filtered);
+            
+            // Re-initialize tooltips after filtering
+            setTimeout(() => {
+                var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+                var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                    return new bootstrap.Tooltip(tooltipTriggerEl);
+                });
+            }, 100);
+        }
+
+        function toggleAlgorithmSelection(algorithmId) {
+            if (selectedAlgorithms.has(algorithmId)) {
+                selectedAlgorithms.delete(algorithmId);
+            } else {
+                selectedAlgorithms.add(algorithmId);
+            }
+            
+            // Refresh display to update selection state
+            filterAlgorithms();
+        }
+
+        async function viewAlgorithmDetails(algorithmId) {
+            try {
+                const algorithm = allAlgorithms.find(a => a.id === algorithmId);
+                if (!algorithm) return;
+                
+                // Get detailed algorithm info including versions
+                let versions = [];
+                try {
+                    versions = await apiCall(`/api/algorithms/${algorithmId}/versions`);
+                } catch (error) {
+                    console.warn('Failed to load algorithm versions:', error);
+                    versions = [];
+                }
+                
+                document.getElementById('algorithmDetailsTitle').textContent = algorithm.name;
+                document.getElementById('algorithmDetailsBody').innerHTML = `
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h6>Description</h6>
+                            <p>${algorithm.description}</p>
+                            
+                            <h6>Technical Specifications</h6>
+                            <table class="table table-sm">
+                                <tr><td><strong>Type:</strong></td><td>${algorithm.algorithm_type.replace('_', ' ')}</td></tr>
+                                <tr><td><strong>Complexity:</strong></td><td>${algorithm.metadata_json?.complexity || 'Medium'}</td></tr>
+                                <tr><td><strong>Parallelizable:</strong></td><td>${algorithm.metadata_json?.parallelizable ? 'Yes' : 'No'}</td></tr>
+                                <tr><td><strong>Parameter Types:</strong></td><td>${algorithm.metadata_json?.parameter_types?.join(', ') || 'Various'}</td></tr>
+                                <tr><td><strong>Status:</strong></td><td><span class="badge bg-${algorithm.status === 'active' ? 'success' : 'warning'}">${algorithm.status.toUpperCase()}</span></td></tr>
+                                <tr><td><strong>Author:</strong></td><td>${algorithm.author}</td></tr>
+                                <tr><td><strong>Created:</strong></td><td>${formatDate(algorithm.created_at)}</td></tr>
+                            </table>
+                            
+                            <h6>Tags</h6>
+                            <div class="mb-3">
+                                ${algorithm.tags.map(tag => `<span class="badge bg-secondary me-1">${tag}</span>`).join('')}
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <h6>Version Information</h6>
+                            <p><strong>Latest Version:</strong> ${algorithm.latest_version || '1.0.0'}</p>
+                            <p><strong>Total Versions:</strong> ${algorithm.version_count}</p>
+                            
+                            ${versions && versions.length > 0 ? `
+                                <h6>Available Versions</h6>
+                                <div class="list-group">
+                                    ${versions.slice(0, 3).map(v => `
+                                        <div class="list-group-item">
+                                            <div class="d-flex justify-content-between">
+                                                <span>v${v.version}</span>
+                                                <small class="text-muted">${formatDate(v.created_at)}</small>
+                                            </div>
+                                            ${v.release_notes ? `<small class="text-muted">${v.release_notes}</small>` : ''}
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            ` : `
+                                <h6>Version Information</h6>
+                                <p class="text-muted">No version details available.</p>
+                            `}
+                            
+                            <div class="mt-3">
+                                <h6>Performance Characteristics</h6>
+                                <small class="text-muted">
+                                    ${algorithm.metadata_json?.parallelizable ? 
+                                        '✅ Can run multiple evaluations in parallel' : 
+                                        '⚠️ Sequential evaluation only'
+                                    }
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                // Setup use button
+                document.getElementById('useAlgorithmBtn').onclick = () => {
+                    toggleAlgorithmSelection(algorithmId);
+                    bootstrap.Modal.getInstance(document.getElementById('algorithmDetailsModal')).hide();
+                };
+                
+                const detailsModal = new bootstrap.Modal(document.getElementById('algorithmDetailsModal'));
+                detailsModal.show();
+                
+            } catch (error) {
+                console.error('Failed to load algorithm details:', error);
+                alert('Failed to load algorithm details. Please try again.');
+            }
+        }
+
+        function getStatusTooltip(status) {
+            const tooltips = {
+                'active': 'Production ready and recommended for use in experiments. Fully tested and maintained.',
+                'experimental': 'Under development or testing. May have limitations or unexpected behavior.',
+                'deprecated': 'Still functional but being phased out. Not recommended for new experiments.',
+                'disabled': 'Currently unavailable due to issues or maintenance. Cannot be used in experiments.'
+            };
+            return tooltips[status] || 'Status information not available';
+        }
+
+        function getComplexityTooltip(complexity) {
+            const tooltips = {
+                'low': 'Simple algorithm with minimal configuration. Fast to run and easy to understand.',
+                'medium': 'Moderate complexity with some tunable parameters. Balanced performance and flexibility.',
+                'high': 'Advanced algorithm with many parameters. May require expertise to configure properly.'
+            };
+            return tooltips[complexity] || 'Complexity information not available';
+        }
+
+        function getParallelizationTooltip(parallelizable) {
+            if (parallelizable) {
+                return 'This algorithm can run multiple evaluations in parallel, speeding up experiments with sufficient resources.';
+            } else {
+                return 'This algorithm runs evaluations sequentially, making decisions based on previous results.';
+            }
+        }
+
+        function getAlgorithmTypeTooltip(algorithmType) {
+            const tooltips = {
+                'random_search': 'Randomly samples parameter combinations. Simple baseline method that works well for many problems.',
+                'grid_search': 'Systematically tests all parameter combinations in a predefined grid. Exhaustive but thorough.',
+                'bayesian_optimization': 'Uses probabilistic models to intelligently select promising parameter combinations based on past results.',
+                'evolutionary': 'Mimics natural evolution with populations of solutions that evolve over generations.',
+                'gradient_based': 'Uses mathematical gradients to efficiently navigate the parameter space toward optimal values.',
+                'multi_objective': 'Optimizes multiple conflicting objectives simultaneously (e.g., accuracy vs speed).',
+                'neural_architecture_search': 'Automatically designs neural network architectures for optimal performance.',
+                'custom': 'User-defined algorithm with specific implementation details.'
+            };
+            return tooltips[algorithmType] || 'Algorithm type information not available';
+        }
+
+        function getTagTooltip(tag) {
+            const tooltips = {
+                'baseline': 'Standard reference algorithm commonly used for comparison in research and benchmarking.',
+                'simple': 'Easy to understand, configure, and use. Good choice for beginners or quick experiments.',
+                'parallel': 'Can utilize multiple CPU cores or machines to run evaluations simultaneously.',
+                'efficient': 'Provides good optimization performance relative to computational resources used.',
+                'bayesian': 'Uses Bayesian statistical methods to make intelligent decisions about parameter exploration.',
+                'exhaustive': 'Systematically explores all possible parameter combinations within defined ranges.',
+                'sequential': 'Evaluates parameters one at a time, using previous results to guide future choices.',
+                'stochastic': 'Incorporates randomness in its decision-making process for exploration.',
+                'deterministic': 'Produces consistent, repeatable results given the same input parameters.',
+                'gradient_free': 'Does not require gradient information, suitable for black-box optimization problems.',
+                'multi_modal': 'Can find multiple optimal solutions in complex parameter landscapes.',
+                'robust': 'Performs consistently well across different types of optimization problems.',
+                'experimental': 'New or research-stage algorithm that may have limited validation or documentation.',
+                'popular': 'Widely used and well-established algorithm in the HPO community.',
+                'fast': 'Optimized for quick convergence and minimal computational overhead.'
+            };
+            return tooltips[tag] || `Algorithm characteristic: ${tag}. Hover for more details about this property.`;
+        }
+
+        function syncAlgorithmSelections() {
+            // Sync from experiment form to catalog
+            selectedAlgorithms.clear();
+            document.querySelectorAll('input[type="checkbox"][id^="algo-"]:checked').forEach(checkbox => {
+                const algoId = checkbox.value;
+                selectedAlgorithms.add(algoId);
+            });
+            
+            // Refresh algorithm display if catalog is open
+            if (allAlgorithms.length > 0) {
+                displayAlgorithms(allAlgorithms);
+            }
         }
         
+        function syncBenchmarkSelections() {
+            // Sync from experiment form to catalog
+            selectedBenchmarks.clear();
+            document.querySelectorAll('input[type="checkbox"][id^="bench-"]:checked').forEach(checkbox => {
+                const benchId = checkbox.value;
+                selectedBenchmarks.add(benchId);
+            });
+            
+            // Refresh benchmark display if catalog is open
+            if (allBenchmarks.length > 0) {
+                displayBenchmarks(allBenchmarks);
+            }
+        }
+
+        function syncAlgorithmSelections() {
+            // Sync from experiment form to catalog
+            selectedAlgorithms.clear();
+            document.querySelectorAll('input[type="checkbox"][id^="algo-"]:checked').forEach(checkbox => {
+                const algoId = checkbox.value;
+                selectedAlgorithms.add(algoId);
+            });
+            
+            // Refresh algorithm display if catalog is open
+            if (allAlgorithms.length > 0) {
+                displayAlgorithms(allAlgorithms);
+            }
+        }
+        
+        function syncBenchmarkSelections() {
+            // Sync from experiment form to catalog
+            selectedBenchmarks.clear();
+            document.querySelectorAll('input[type="checkbox"][id^="bench-"]:checked').forEach(checkbox => {
+                const benchId = checkbox.value;
+                selectedBenchmarks.add(benchId);
+            });
+            
+            // Refresh benchmark display if catalog is open
+            if (allBenchmarks.length > 0) {
+                displayBenchmarks(allBenchmarks);
+            }
+        }
+        
+        function updateResourceCounts() {
+            // Update counts based on actually loaded data
+            document.getElementById('available-algorithms').textContent = allAlgorithms.length || '0';
+            document.getElementById('benchmark-datasets').textContent = allBenchmarks.length || '0';
+        }
+        
+
+
+        function createExperimentFromCatalog() {
+            if (selectedAlgorithms.size === 0) {
+                alert('Please select at least one algorithm to create an experiment.');
+                return;
+            }
+            
+            // Close catalog modal
+            bootstrap.Modal.getInstance(document.getElementById('algorithmCatalogModal')).hide();
+            
+            // Open experiment modal with pre-selected algorithms
+            showNewExperimentModal();
+            
+            // Pre-select the chosen algorithms in the experiment form
+            setTimeout(() => {
+                selectedAlgorithms.forEach(algoId => {
+                    const checkbox = document.getElementById(`algo-${algoId}`);
+                    if (checkbox) {
+                        checkbox.checked = true;
+                    }
+                });
+            }, 500);
+        }
+        
+        // Navigation functions
+        function showExperimentsView() {
+            // Scroll to experiments section or refresh the dashboard
+            document.getElementById('experiments-list').scrollIntoView({ behavior: 'smooth' });
+            setActiveNavLink('Experiments');
+        }
+
+        async function showBenchmarksView() {
+            const modal = new bootstrap.Modal(document.getElementById('benchmarksModal'));
+            await loadBenchmarkCatalog();
+            // Sync selections from experiment form
+            syncBenchmarkSelections();
+            modal.show();
+            setActiveNavLink('Benchmarks');
+        }
+
+        async function showReportsView() {
+            const modal = new bootstrap.Modal(document.getElementById('reportsModal'));
+            await loadReportsCatalog();
+            modal.show();
+            setActiveNavLink('Reports');
+        }
+
+        function setActiveNavLink(activeItem) {
+            // Update active state in navigation
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+                if (link.textContent.trim() === activeItem) {
+                    link.classList.add('active');
+                }
+            });
+        }
+
+        // Benchmarks functionality
+        async function loadBenchmarkCatalog() {
+            try {
+                const benchmarks = await apiCall('/api/benchmarks');
+                allBenchmarks = benchmarks;
+                displayBenchmarks(benchmarks);
+                updateResourceCounts();
+            } catch (error) {
+                console.error('Failed to load benchmarks:', error);
+                document.getElementById('benchmarks-grid').innerHTML = `
+                    <div class="alert alert-danger">
+                        <h6><i class="bi bi-exclamation-triangle"></i> Benchmark Service Unavailable</h6>
+                        <p>Unable to connect to the benchmark definition service. Please check:</p>
+                        <ul>
+                            <li>Benchmark Definition service is running</li>
+                            <li>Database connection is available</li>
+                            <li>Network connectivity to backend services</li>
+                        </ul>
+                        <p class="mb-0"><small>Contact your system administrator if this issue persists.</small></p>
+                    </div>
+                `;
+            }
+        }
+
+        function displayBenchmarks(benchmarks) {
+            const container = document.getElementById('benchmarks-grid');
+            
+            if (benchmarks.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center text-muted">
+                        <p>No benchmarks found. Check back later for available benchmark datasets.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = benchmarks.map(benchmark => {
+                const difficultyColor = {
+                    'easy': 'success',
+                    'medium': 'warning',
+                    'hard': 'danger'
+                }[benchmark.difficulty?.toLowerCase() || 'medium'];
+                
+                const problemTypeColor = {
+                    'classification': 'primary',
+                    'regression': 'info',
+                    'synthetic': 'secondary',
+                    'real_world': 'success'
+                }[benchmark.problem_type?.toLowerCase() || 'primary'];
+
+                return `
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col-md-8">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <h6 class="card-title mb-0 me-2">${benchmark.name}</h6>
+                                        <span class="badge bg-${difficultyColor} me-2" 
+                                              data-bs-toggle="tooltip" 
+                                              data-bs-placement="top" 
+                                              title="${getBenchmarkDifficultyTooltip(benchmark.difficulty || 'medium')}">${benchmark.difficulty || 'Medium'}</span>
+                                        <span class="badge bg-${problemTypeColor} me-2"
+                                              data-bs-toggle="tooltip" 
+                                              data-bs-placement="top" 
+                                              title="${getBenchmarkTypeTooltip(benchmark.problem_type || 'unknown')}">${benchmark.problem_type || 'Unknown'}</span>
+                                        <span class="badge bg-info"
+                                              data-bs-toggle="tooltip" 
+                                              data-bs-placement="top" 
+                                              title="Number of test instances in this benchmark dataset">${benchmark.dataset_size || 'Standard'} instances</span>
+                                    </div>
+                                    <p class="card-text text-muted mb-2">${benchmark.description || 'No description available'}</p>
+                                    ${benchmark.tags ? `
+                                        <div class="mb-1">
+                                            ${benchmark.tags.map(tag => `<span class="badge bg-light text-dark tag-badge me-1"
+                                                                          data-bs-toggle="tooltip" 
+                                                                          data-bs-placement="top" 
+                                                                          title="${getBenchmarkTagTooltip(tag)}">${tag}</span>`).join('')}
+                                        </div>
+                                    ` : ''}
+                                    <small class="text-muted">
+                                        ${benchmark.metrics ? `Metrics: ${benchmark.metrics.join(', ')}` : 'Standard metrics'} • 
+                                        ${benchmark.created_at ? `Added: ${formatDate(benchmark.created_at)}` : 'Built-in benchmark'}
+                                    </small>
+                                </div>
+                                <div class="col-md-4 text-end">
+                                    <div class="btn-group btn-group-sm">
+                                        <button class="btn btn-outline-primary" onclick="event.stopPropagation(); viewBenchmarkDetails('${benchmark.id}')">
+                                            Details
+                                        </button>
+                                        <button class="btn btn-${selectedBenchmarks.has(benchmark.id) ? 'danger' : 'success'}" onclick="event.stopPropagation(); toggleBenchmarkSelection('${benchmark.id}')">
+                                            ${selectedBenchmarks.has(benchmark.id) ? 'Remove' : 'Select'}
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            // Initialize tooltips for benchmarks
+            setTimeout(() => {
+                var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+                var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                    return new bootstrap.Tooltip(tooltipTriggerEl);
+                });
+            }, 100);
+        }
+
+        async function viewBenchmarkDetails(benchmarkId) {
+            try {
+                // Try to get benchmark details from API
+                let benchmarkDetails;
+                try {
+                    benchmarkDetails = await apiCall(`/api/benchmarks/${benchmarkId}`);
+                } catch (error) {
+                    console.warn('Failed to load benchmark details from API, using demo data');
+                    // Fallback to demo data
+                    benchmarkDetails = getDemoBenchmarkDetails(benchmarkId);
+                }
+                
+                document.getElementById('benchmarkDetailsTitle').textContent = benchmarkDetails.name;
+                document.getElementById('benchmarkDetailsBody').innerHTML = `
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h6>Description</h6>
+                            <p>${benchmarkDetails.description}</p>
+                            
+                            <h6>Technical Specifications</h6>
+                            <table class="table table-sm">
+                                <tr><td><strong>Problem Type:</strong></td><td>${benchmarkDetails.problem_type}</td></tr>
+                                <tr><td><strong>Difficulty:</strong></td><td><span class="badge bg-${benchmarkDetails.difficulty === 'easy' ? 'success' : benchmarkDetails.difficulty === 'hard' ? 'danger' : 'warning'}">${benchmarkDetails.difficulty}</span></td></tr>
+                                <tr><td><strong>Dataset Size:</strong></td><td>${benchmarkDetails.dataset_size} instances</td></tr>
+                                <tr><td><strong>Dimensions:</strong></td><td>${benchmarkDetails.dimensions || 'Variable'}</td></tr>
+                                <tr><td><strong>Optimization Goal:</strong></td><td>${benchmarkDetails.optimization_goal || 'Minimize'}</td></tr>
+                                <tr><td><strong>Evaluation Budget:</strong></td><td>${benchmarkDetails.max_evaluations || '100'} evaluations</td></tr>
+                            </table>
+                            
+                            <h6>Performance Metrics</h6>
+                            <div class="mb-3">
+                                ${(benchmarkDetails.metrics || ['accuracy', 'f1_score']).map(metric => `<span class="badge bg-secondary me-1">${metric}</span>`).join('')}
+                            </div>
+                            
+                            <h6>Parameter Space</h6>
+                            <div class="mb-3">
+                                <small class="text-muted">
+                                    ${benchmarkDetails.parameter_space || 'Hyperparameter search space includes learning rate, regularization, and model architecture parameters.'}
+                                </small>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <h6>Usage Statistics</h6>
+                            <p><strong>Times Used:</strong> ${benchmarkDetails.usage_count || 'N/A'}</p>
+                            <p><strong>Average Runtime:</strong> ${benchmarkDetails.avg_runtime || '~2 minutes'}</p>
+                            
+                            <h6>Characteristics</h6>
+                            ${benchmarkDetails.tags ? benchmarkDetails.tags.map(tag => `<span class="badge bg-light text-dark me-1 mb-1">${tag}</span>`).join('') : '<span class="badge bg-light text-dark">standard</span>'}
+                            
+                            <div class="mt-3">
+                                <h6>Recommended For</h6>
+                                <small class="text-muted">
+                                    ${benchmarkDetails.recommended_for || 'General hyperparameter optimization tasks and algorithm comparison studies.'}
+                                </small>
+                            </div>
+                            
+                            <div class="mt-3">
+                                <h6>Quick Facts</h6>
+                                <ul class="list-unstyled small text-muted">
+                                    <li>📊 ${benchmarkDetails.problem_type} problem</li>
+                                    <li>⚡ ${benchmarkDetails.difficulty} difficulty</li>
+                                    <li>📈 ${(benchmarkDetails.metrics || []).length} evaluation metrics</li>
+                                    <li>🎯 ${benchmarkDetails.optimization_goal || 'Minimize'} objective</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                // Setup use button
+                document.getElementById('useBenchmarkBtn').onclick = () => {
+                    selectBenchmark(benchmarkId);
+                    bootstrap.Modal.getInstance(document.getElementById('benchmarkDetailsModal')).hide();
+                };
+                
+                const detailsModal = new bootstrap.Modal(document.getElementById('benchmarkDetailsModal'));
+                detailsModal.show();
+                
+            } catch (error) {
+                console.error('Failed to load benchmark details:', error);
+                alert('Failed to load benchmark details. Please try again.');
+            }
+        }
+        
+        function getDemoBenchmarkDetails(benchmarkId) {
+            const demoData = {
+                'synthetic_2d': {
+                    id: 'synthetic_2d',
+                    name: 'Synthetic 2D Function',
+                    description: 'A synthetic 2-dimensional optimization test function designed for algorithm benchmarking.',
+                    problem_type: 'Synthetic',
+                    difficulty: 'easy',
+                    dataset_size: '1000',
+                    dimensions: '2D',
+                    optimization_goal: 'Minimize',
+                    max_evaluations: '100',
+                    metrics: ['objective_value', 'convergence_rate'],
+                    tags: ['synthetic', 'continuous', 'smooth', 'unimodal'],
+                    parameter_space: 'Continuous parameters x1, x2 ∈ [-5, 5]',
+                    recommended_for: 'Testing optimization algorithms and comparing convergence behavior.',
+                    usage_count: 47,
+                    avg_runtime: '30 seconds'
+                },
+                'uci_wine': {
+                    id: 'uci_wine',
+                    name: 'UCI Wine Classification',
+                    description: 'Real-world wine classification dataset from UCI repository for machine learning hyperparameter optimization.',
+                    problem_type: 'Classification',
+                    difficulty: 'medium',
+                    dataset_size: '178',
+                    dimensions: '13 features',
+                    optimization_goal: 'Maximize',
+                    max_evaluations: '50',
+                    metrics: ['accuracy', 'f1_score', 'precision', 'recall'],
+                    tags: ['real_world', 'classification', 'small_dataset', 'multiclass'],
+                    parameter_space: 'ML model hyperparameters: learning rate [0.001, 1.0], regularization [1e-6, 1e-1], etc.',
+                    recommended_for: 'Real-world ML model hyperparameter tuning and classification algorithm comparison.',
+                    usage_count: 23,
+                    avg_runtime: '2 minutes'
+                }
+            };
+            return demoData[benchmarkId] || {
+                id: benchmarkId,
+                name: 'Unknown Benchmark',
+                description: 'Benchmark details not available.',
+                problem_type: 'Unknown',
+                difficulty: 'medium',
+                dataset_size: 'N/A',
+                metrics: ['performance']
+            };
+        }
+        
+        function toggleBenchmarkSelection(benchmarkId) {
+            if (selectedBenchmarks.has(benchmarkId)) {
+                selectedBenchmarks.delete(benchmarkId);
+            } else {
+                selectedBenchmarks.add(benchmarkId);
+            }
+            
+            // Refresh display to update selection state
+            displayBenchmarks(allBenchmarks);
+        }
+        
+        function selectBenchmark(benchmarkId) {
+            // This function is called from the benchmark details modal
+            toggleBenchmarkSelection(benchmarkId);
+        }
+        
+        function createExperimentFromBenchmarks() {
+            if (selectedBenchmarks.size === 0) {
+                alert('Please select at least one benchmark to create an experiment.');
+                return;
+            }
+            
+            // Close benchmarks modal
+            bootstrap.Modal.getInstance(document.getElementById('benchmarksModal')).hide();
+            
+            // Open experiment modal with pre-selected benchmarks
+            showNewExperimentModal();
+            
+            // Pre-select the chosen benchmarks in the experiment form
+            setTimeout(() => {
+                selectedBenchmarks.forEach(benchId => {
+                    const checkbox = document.getElementById(`bench-${benchId}`);
+                    if (checkbox) {
+                        checkbox.checked = true;
+                    }
+                });
+            }, 500);
+        }
+
+        // Reports functionality
+        async function loadReportsCatalog() {
+            try {
+                const reports = await apiCall('/api/reports');
+                displayReports(reports);
+            } catch (error) {
+                console.error('Failed to load reports:', error);
+                document.getElementById('reports-grid').innerHTML = `
+                    <div class="alert alert-info">
+                        <h6>Reports Coming Soon</h6>
+                        <p>The reporting system will provide:</p>
+                        <ul>
+                            <li><strong>Algorithm Comparison Reports</strong> - Side-by-side performance analysis</li>
+                            <li><strong>Convergence Analysis</strong> - Optimization progress visualization</li>
+                            <li><strong>Statistical Significance Tests</strong> - Wilcoxon, Mann-Whitney U tests</li>
+                            <li><strong>Publication-Ready Figures</strong> - LaTeX/PDF export capability</li>
+                        </ul>
+                        <button class="btn btn-primary mt-2" onclick="generateNewReport()">Generate Sample Report</button>
+                    </div>
+                `;
+            }
+        }
+
+        function displayReports(reports) {
+            const container = document.getElementById('reports-grid');
+            
+            if (reports.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center text-muted">
+                        <p>No reports generated yet. Create experiments and generate reports to see them here.</p>
+                        <button class="btn btn-outline-primary" onclick="generateNewReport()">Generate First Report</button>
+                    </div>
+                `;
+                return;
+            }
+
+            // Display actual reports if available
+            container.innerHTML = reports.map(report => `
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h6 class="card-title">${report.title}</h6>
+                        <p class="card-text">${report.description}</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <span class="badge bg-${report.status === 'completed' ? 'success' : 'warning'}">${report.status}</span>
+                                <small class="text-muted ms-2">Generated: ${formatDate(report.created_at)}</small>
+                            </div>
+                            <div>
+                                <button class="btn btn-outline-primary btn-sm me-1">View</button>
+                                <button class="btn btn-outline-secondary btn-sm">Download</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function generateNewReport() {
+            alert('Report Generation\\n\\nThis would open a report configuration dialog where you can:\\n- Select experiments to analyze\\n- Choose comparison metrics\\n- Configure statistical tests\\n- Set output format (PDF, HTML, LaTeX)');
+        }
+        
+        // Benchmark tooltip functions
+        function getBenchmarkDifficultyTooltip(difficulty) {
+            const tooltips = {
+                'easy': 'Simple benchmark with clear optimal solutions. Good for testing and learning.',
+                'medium': 'Moderate complexity with some challenging aspects. Suitable for most comparisons.',
+                'hard': 'Complex benchmark with multiple local optima or high dimensionality. For advanced testing.'
+            };
+            return tooltips[difficulty.toLowerCase()] || 'Difficulty level information not available';
+        }
+        
+        function getBenchmarkTypeTooltip(problemType) {
+            const tooltips = {
+                'classification': 'Machine learning classification task. Optimize model hyperparameters for accuracy.',
+                'regression': 'Continuous value prediction task. Optimize for minimal prediction error.',
+                'synthetic': 'Artificially created test function with known properties. Good for controlled testing.',
+                'real_world': 'Real dataset from practical applications. Tests algorithm performance on actual problems.',
+                'optimization': 'Pure mathematical optimization problem. Focus on finding global optimum.',
+                'multi_objective': 'Multiple conflicting objectives to optimize simultaneously.',
+                'constrained': 'Optimization with constraints that must be satisfied.',
+                'noisy': 'Objective function includes random noise, testing robustness.'
+            };
+            return tooltips[problemType.toLowerCase()] || 'Problem type information not available';
+        }
+        
+        function getBenchmarkTagTooltip(tag) {
+            const tooltips = {
+                'synthetic': 'Artificially created benchmark with controllable properties for testing.',
+                'real_world': 'Based on real datasets and practical optimization problems.',
+                'continuous': 'Parameters are continuous values (e.g., learning rates, regularization).',
+                'discrete': 'Parameters are discrete choices (e.g., number of layers, activation functions).',
+                'categorical': 'Parameters are categories (e.g., optimizer type, kernel type).',
+                'smooth': 'Objective function is smooth and differentiable.',
+                'noisy': 'Objective evaluations include random noise or measurement error.',
+                'multimodal': 'Multiple local optima exist, making optimization challenging.',
+                'unimodal': 'Single global optimum, relatively easier to optimize.',
+                'high_dimensional': 'Many parameters to optimize (>10 dimensions).',
+                'low_dimensional': 'Few parameters to optimize (<5 dimensions).',
+                'fast': 'Quick to evaluate, suitable for high-budget experiments.',
+                'expensive': 'Slow to evaluate, requires careful budget management.',
+                'standard': 'Commonly used benchmark in optimization literature.',
+                'classification': 'Machine learning classification benchmark.',
+                'regression': 'Machine learning regression benchmark.',
+                'small_dataset': 'Limited data available, may require careful validation.',
+                'large_dataset': 'Substantial data available, suitable for complex models.',
+                'multiclass': 'Classification with multiple target classes.',
+                'binary': 'Binary classification problem with two classes.',
+                'imbalanced': 'Unequal class distribution, requires careful metric selection.'
+            };
+            return tooltips[tag.toLowerCase()] || `Benchmark characteristic: ${tag}. This property affects algorithm performance and suitability.`;
+        }
+
         // Initialize dashboard
         document.addEventListener('DOMContentLoaded', function() {
+            // Initialize API status with tooltip
+            updateApiStatus('Checking...', 'bg-secondary');
             loadDashboard();
         });
     </script>

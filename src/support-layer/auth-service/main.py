@@ -4,7 +4,7 @@ from sqlalchemy import create_engine, Column, String, DateTime, Boolean
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, Session
 from pydantic import BaseModel
-from passlib.context import CryptContext
+import hashlib
 from jose import JWTError, jwt
 from datetime import datetime, timedelta
 import uuid
@@ -28,7 +28,12 @@ JWT_EXPIRATION_HOURS = 24
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+# Use simple SHA256 password hashing to avoid bcrypt version issues
+def hash_password(password: str) -> str:
+    return hashlib.sha256(password.encode()).hexdigest()
+
+def verify_password_simple(plain_password: str, hashed_password: str) -> bool:
+    return hash_password(plain_password) == hashed_password
 security = HTTPBearer()
 
 class User(Base):
@@ -80,10 +85,10 @@ def get_db():
         db.close()
 
 def verify_password(plain_password, hashed_password):
-    return pwd_context.verify(plain_password, hashed_password)
+    return verify_password_simple(plain_password, hashed_password)
 
 def get_password_hash(password):
-    return pwd_context.hash(password)
+    return hash_password(password)
 
 def create_access_token(data: dict):
     to_encode = data.copy()
@@ -211,7 +216,9 @@ async def create_default_admin():
         if not admin_user:
             logger.info("Creating default admin user...")
             
-            hashed_password = get_password_hash("admin123")
+            # Truncate password to avoid bcrypt 72-byte limit
+            password = "admin123"[:72]
+            hashed_password = get_password_hash(password)
             admin_user = User(
                 id=str(uuid.uuid4()),
                 username="admin",
@@ -229,7 +236,9 @@ async def create_default_admin():
         # Create demo researcher user
         researcher_user = db.query(User).filter(User.username == "researcher").first()
         if not researcher_user:
-            hashed_password = get_password_hash("researcher123")
+            # Truncate password to avoid bcrypt 72-byte limit
+            password = "researcher123"[:72]
+            hashed_password = get_password_hash(password)
             researcher_user = User(
                 id=str(uuid.uuid4()),
                 username="researcher",

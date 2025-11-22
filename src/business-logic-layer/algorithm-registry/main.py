@@ -2,7 +2,7 @@ from fastapi import FastAPI, HTTPException, Depends, Query
 from sqlalchemy import create_engine, Column, String, Float, Integer, DateTime, JSON, Text, Boolean
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, Session
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 from typing import List, Dict, Any, Optional
 from datetime import datetime
 import uuid
@@ -127,17 +127,22 @@ class AlgorithmVersionResponse(BaseModel):
     id: str
     algorithm_id: str
     version: str
-    plugin_location: Optional[str]
+    plugin_location: Optional[str] = None
     sdk_version: str
     status: str
     release_notes: str
-    parameter_schema_json: Dict[str, Any]
-    requirements_json: Dict[str, Any]
-    performance_characteristics_json: Dict[str, Any]
+    parameter_schema_json: Dict[str, Any] = {}
+    requirements_json: Dict[str, Any] = {}
+    performance_characteristics_json: Dict[str, Any] = {}
     created_at: datetime
     created_by: str
     download_count: int
-    metadata_json: Dict[str, Any]
+    metadata_json: Dict[str, Any] = {}
+    
+    @field_validator('parameter_schema_json', 'requirements_json', 'performance_characteristics_json', 'metadata_json', mode='before')
+    @classmethod
+    def validate_json_fields(cls, v):
+        return v if v is not None else {}
     
     class Config:
         from_attributes = True
@@ -200,10 +205,22 @@ async def create_algorithm(algorithm: AlgorithmCreate, db: Session = Depends(get
         AlgorithmVersion.algorithm_id == db_algorithm.id
     ).order_by(AlgorithmVersion.created_at.desc()).first()
     
-    response = AlgorithmResponse.from_orm(db_algorithm)
-    response.tags = db_algorithm.tags.split(",") if db_algorithm.tags else []
-    response.version_count = version_count
-    response.latest_version = latest_version_obj.version if latest_version_obj else None
+    response = AlgorithmResponse(
+        id=db_algorithm.id,
+        name=db_algorithm.name,
+        algorithm_type=db_algorithm.algorithm_type,
+        is_builtin=db_algorithm.is_builtin,
+        description=db_algorithm.description,
+        author=db_algorithm.author,
+        primary_publication_id=db_algorithm.primary_publication_id,
+        created_at=db_algorithm.created_at,
+        updated_at=db_algorithm.updated_at,
+        metadata_json=db_algorithm.metadata_json or {},
+        tags=db_algorithm.tags.split(",") if db_algorithm.tags else [],
+        status=db_algorithm.status,
+        version_count=version_count,
+        latest_version=latest_version_obj.version if latest_version_obj else None
+    )
     
     return response
 
@@ -223,10 +240,22 @@ async def get_algorithm(algorithm_id: str, db: Session = Depends(get_db)):
         AlgorithmVersion.algorithm_id == algorithm_id
     ).order_by(AlgorithmVersion.created_at.desc()).first()
     
-    response = AlgorithmResponse.from_orm(db_algorithm)
-    response.tags = db_algorithm.tags.split(",") if db_algorithm.tags else []
-    response.version_count = version_count
-    response.latest_version = latest_version_obj.version if latest_version_obj else None
+    response = AlgorithmResponse(
+        id=db_algorithm.id,
+        name=db_algorithm.name,
+        algorithm_type=db_algorithm.algorithm_type,
+        is_builtin=db_algorithm.is_builtin,
+        description=db_algorithm.description,
+        author=db_algorithm.author,
+        primary_publication_id=db_algorithm.primary_publication_id,
+        created_at=db_algorithm.created_at,
+        updated_at=db_algorithm.updated_at,
+        metadata_json=db_algorithm.metadata_json or {},
+        tags=db_algorithm.tags.split(",") if db_algorithm.tags else [],
+        status=db_algorithm.status,
+        version_count=version_count,
+        latest_version=latest_version_obj.version if latest_version_obj else None
+    )
     
     return response
 
@@ -267,10 +296,22 @@ async def list_algorithms(
             AlgorithmVersion.algorithm_id == algorithm.id
         ).order_by(AlgorithmVersion.created_at.desc()).first()
         
-        response = AlgorithmResponse.from_orm(algorithm)
-        response.tags = algorithm.tags.split(",") if algorithm.tags else []
-        response.version_count = version_count
-        response.latest_version = latest_version_obj.version if latest_version_obj else None
+        response = AlgorithmResponse(
+            id=algorithm.id,
+            name=algorithm.name,
+            algorithm_type=algorithm.algorithm_type,
+            is_builtin=algorithm.is_builtin,
+            description=algorithm.description,
+            author=algorithm.author,
+            primary_publication_id=algorithm.primary_publication_id,
+            created_at=algorithm.created_at,
+            updated_at=algorithm.updated_at,
+            metadata_json=algorithm.metadata_json or {},
+            tags=algorithm.tags.split(",") if algorithm.tags else [],
+            status=algorithm.status,
+            version_count=version_count,
+            latest_version=latest_version_obj.version if latest_version_obj else None
+        )
         responses.append(response)
     
     return responses

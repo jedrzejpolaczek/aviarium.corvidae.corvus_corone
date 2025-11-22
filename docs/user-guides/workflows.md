@@ -8,19 +8,19 @@
 
 Corvus Corone system supports research teams through defined processes and workflows that ensure effective HPO algorithm benchmarking.
 
-### 🔬 Research Activities
+### Research Activities
 - **Experiment Design** - Systematic approach to benchmark planning
 - **Results Analysis** - Statistical algorithm comparison  
 - **Experiment Reproduction** - Ensuring result reproducibility
 - **Results Publishing** - Report and documentation generation
 
-### 🔧 Technical Activities  
+### Technical Activities  
 - **Algorithm Development** - Plugin development workflow
 - **Data Management** - Dataset management and versioning
 - **Experiment Monitoring** - Real-time tracking and alerting
 - **Capacity Planning** - Resource scaling and optimization
 
-### 🏛️ Administrative Activities
+### Administrative Activities
 - **Governance** - Algorithm and benchmark approval
 - **Backup & Recovery** - Disaster recovery procedures  
 - **Security Management** - Security and audit
@@ -38,7 +38,7 @@ Corvus Corone system supports research teams through defined processes and workf
 | **G4 – Extrapolation** | Study of HPO algorithm behavior on diverse problem instances (scalability, difficulty, size) |
 | **G5 – Theory and development** | Support for developing new HPO algorithms and linking results to theory and scientific literature |
 
-### 📋 Planning Phase
+### Planning Phase
 
 #### 1. Research Objectives Definition
 ```

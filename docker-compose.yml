@@ -30,7 +30,7 @@ services:
   experiment-orchestrator:
     build: ./src/business-logic-layer/experiment-orchestrator
     environment:
-      - RABBITMQ_URL=amqp://rabbitmq:5672
+      - RABBITMQ_URL=amqp://admin:admin@rabbitmq:5672
       - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/corvus_corone
       - TRACKING_SERVICE_URL=http://experiment-tracking:8002
       - BENCHMARK_SERVICE_URL=http://benchmark-definition:8003
@@ -65,7 +65,7 @@ services:
       - "8005:8005"
     environment:
       - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/corvus_corone
-      - RABBITMQ_URL=amqp://rabbitmq:5672
+      - RABBITMQ_URL=amqp://admin:admin@rabbitmq:5672
     depends_on:
       - postgres
       - rabbitmq
@@ -134,7 +134,7 @@ services:
   worker:
     build: ./src/execution-layer/worker-runtime
     environment:
-      - RABBITMQ_URL=amqp://rabbitmq:5672
+      - RABBITMQ_URL=amqp://admin:admin@rabbitmq:5672
       - TRACKING_SERVICE_URL=http://experiment-tracking:8002
       - BENCHMARK_SERVICE_URL=http://benchmark-definition:8003
       - ALGORITHM_REGISTRY_URL=http://algorithm-registry:8004

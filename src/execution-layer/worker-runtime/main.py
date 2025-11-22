@@ -130,13 +130,13 @@ class HPOWorker:
             
             # Try to update run status to failed
             try:
-                if 'run_id' in locals():
-                    await self._update_run_status(
+                if 'run_id' in locals() and 'loop' in locals():
+                    loop.run_until_complete(self._update_run_status(
                         run_id, 
                         "failed", 
                         end_time=datetime.utcnow(),
                         error_message=str(e)
-                    )
+                    ))
             except:
                 logger.error("Failed to update run status after error")
             

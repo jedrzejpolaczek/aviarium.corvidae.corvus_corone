@@ -1,7 +1,12 @@
 from fastapi import FastAPI, HTTPException, BackgroundTasks
 from typing import List, Dict, Any, Optional
+from enum import Enum
+from pydantic import BaseModel, Field
 import logging
 from datetime import datetime
+import httpx
+import os
+import uuid
 
 # Import components and shared utilities
 from components import (
@@ -25,6 +30,10 @@ from shared import (
 config = get_orchestrator_config()
 logging.basicConfig(level=getattr(logging, config.log_level))
 logger = logging.getLogger(__name__)
+
+# Service URLs
+ALGORITHM_REGISTRY_URL = os.getenv("ALGORITHM_REGISTRY_URL", "http://algorithm-registry:8004")
+BENCHMARK_SERVICE_URL = os.getenv("BENCHMARK_SERVICE_URL", "http://benchmark-definition:8003")
 
 app = FastAPI(
     title="Experiment Orchestrator Service",

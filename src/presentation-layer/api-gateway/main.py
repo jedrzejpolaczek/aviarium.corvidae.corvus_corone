@@ -58,8 +58,8 @@ async def health_check():
 @app.api_route("/api/experiments", methods=["GET", "POST", "PUT", "DELETE"])
 async def proxy_experiments_base(request: Request):
     """Proxy experiment-related requests (base path)"""
-    # Route to orchestrator for creation/management, tracking for queries
-    if request.method in ["POST", "PUT", "DELETE"]:
+    # Route to orchestrator for creation/management, tracking for queries and deletion
+    if request.method in ["POST", "PUT"]:
         service = "orchestrator"
         target_path = "/api/experiments"
     else:
@@ -71,8 +71,8 @@ async def proxy_experiments_base(request: Request):
 @app.api_route("/api/experiments/{path:path}", methods=["GET", "POST", "PUT", "DELETE"])
 async def proxy_experiments(path: str, request: Request):
     """Proxy experiment-related requests"""
-    # Route to orchestrator for creation/management, tracking for queries
-    if request.method in ["POST", "PUT", "DELETE"]:
+    # Route to orchestrator for creation/management, tracking for queries and deletion
+    if request.method in ["POST", "PUT"]:
         service = "orchestrator"
         target_path = f"/api/experiments/{path}"
     else:

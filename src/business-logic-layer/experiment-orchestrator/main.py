@@ -506,6 +506,38 @@ async def cancel_experiment(experiment_id: str):
     
     return {"message": "Experiment cancelled", "experiment_id": experiment_id}
 
+@app.delete("/api/experiments/{experiment_id}")
+async def delete_experiment(experiment_id: str):
+    """Delete experiment and all associated data"""
+    if experiment_id not in experiments_store:
+        raise HTTPException(status_code=404, detail="Experiment not found")
+    
+    try:
+        # Delete from tracking service first (this will cascade delete runs, metrics, etc.)
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            response = await client.delete(f"{TRACKING_SERVICE_URL}/api/tracking/experiments/{experiment_id}")
+            
+            if response.status_code not in [200, 204, 404]:  # 404 is OK if already deleted
+                logger.warning(f"Failed to delete experiment {experiment_id} from tracking service. Status: {response.status_code}")
+        
+        # Remove from local storage
+        experiment = experiments_store.pop(experiment_id)
+        if experiment_id in run_plans_store:
+            run_plans_store.pop(experiment_id)
+        
+        logger.info(f"Successfully deleted experiment {experiment_id}")
+        return {"message": "Experiment deleted successfully", "experiment_id": experiment_id}
+        
+    except httpx.RequestError as e:
+        logger.error(f"Network error deleting experiment {experiment_id}: {e}")
+        # Still remove from local storage even if tracking service delete fails
+        experiments_store.pop(experiment_id, None)
+        run_plans_store.pop(experiment_id, None)
+        return {"message": "Experiment deleted locally (tracking service unreachable)", "experiment_id": experiment_id}
+    except Exception as e:
+        logger.error(f"Unexpected error deleting experiment {experiment_id}: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to delete experiment: {str(e)}")
+
 async def build_and_schedule_experiment(experiment_id: str, config: ExperimentConfig, start_immediately: bool):
     """Background task to build execution plan and optionally start experiment"""
     try:

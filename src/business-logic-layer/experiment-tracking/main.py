@@ -49,13 +49,13 @@ class Experiment(Base):
     status = Column(String, default="pending")
     
     # Relationships
-    runs = relationship("Run", back_populates="experiment")
+    runs = relationship("Run", back_populates="experiment", cascade="all, delete-orphan")
 
 class Run(Base):
     __tablename__ = "runs"
     
     id = Column(String, primary_key=True)
-    experiment_id = Column(String, ForeignKey("experiments.id"), nullable=False)
+    experiment_id = Column(String, ForeignKey("experiments.id", ondelete="CASCADE"), nullable=False)
     algorithm_version_id = Column(String, nullable=False)
     benchmark_instance_id = Column(String, nullable=False)
     seed = Column(Integer, nullable=False)
@@ -69,14 +69,14 @@ class Run(Base):
     
     # Relationships
     experiment = relationship("Experiment", back_populates="runs")
-    metrics = relationship("Metric", back_populates="run")
-    artifacts = relationship("Artifact", back_populates="run")
+    metrics = relationship("Metric", back_populates="run", cascade="all, delete-orphan")
+    artifacts = relationship("Artifact", back_populates="run", cascade="all, delete-orphan")
 
 class Metric(Base):
     __tablename__ = "metrics"
     
     id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
-    run_id = Column(String, ForeignKey("runs.id"), nullable=False)
+    run_id = Column(String, ForeignKey("runs.id", ondelete="CASCADE"), nullable=False)
     name = Column(String, nullable=False)  # e.g., "objective", "validation_error", "time_elapsed"
     value = Column(Float, nullable=False)
     step = Column(Integer, default=0)  # For multi-step metrics
@@ -90,7 +90,7 @@ class Artifact(Base):
     __tablename__ = "artifacts"
     
     id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
-    run_id = Column(String, ForeignKey("runs.id"), nullable=False)
+    run_id = Column(String, ForeignKey("runs.id", ondelete="CASCADE"), nullable=False)
     name = Column(String, nullable=False)  # e.g., "model.pkl", "convergence_plot.png"
     artifact_type = Column(String, nullable=False)  # e.g., "model", "plot", "log"
     storage_path = Column(String, nullable=False)  # Path in object storage
@@ -486,6 +486,28 @@ async def get_run_artifacts(run_id: str, db: Session = Depends(get_db)):
     """Get all artifacts for run"""
     artifacts = db.query(Artifact).filter(Artifact.run_id == run_id).order_by(Artifact.created_at).all()
     return [ArtifactResponse.from_orm(artifact) for artifact in artifacts]
+
+@app.delete("/api/tracking/experiments/{experiment_id}")
+async def delete_experiment(experiment_id: str, db: Session = Depends(get_db)):
+    """Delete experiment and all associated data (runs, metrics, artifacts)"""
+    # Check if experiment exists
+    experiment = db.query(Experiment).filter(Experiment.id == experiment_id).first()
+    if not experiment:
+        raise HTTPException(status_code=404, detail="Experiment not found")
+    
+    try:
+        # Delete will cascade due to foreign key constraints
+        # This will automatically delete all runs, metrics, and artifacts associated with the experiment
+        db.delete(experiment)
+        db.commit()
+        
+        logger.info(f"Successfully deleted experiment {experiment_id} and all associated data")
+        return {"message": "Experiment and all associated data deleted successfully", "experiment_id": experiment_id}
+        
+    except Exception as e:
+        db.rollback()
+        logger.error(f"Failed to delete experiment {experiment_id}: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to delete experiment: {str(e)}")
 
 if __name__ == "__main__":
     import uvicorn

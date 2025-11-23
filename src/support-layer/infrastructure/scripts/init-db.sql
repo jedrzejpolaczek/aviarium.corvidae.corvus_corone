@@ -1,7 +1,7 @@
 -- Corvus Corone Database Initialization
 -- This script sets up the basic database structure
 
-CREATE DATABASE IF NOT EXISTS corvus_corone;
+-- PostgreSQL database initialization
 
 -- Enable UUID extension
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";

@@ -481,12 +481,43 @@
                         Built with ❤️ by Aviarium Software<br>
                         <small>API Status: <span id="api-status" class="badge bg-secondary" 
                                                  data-bs-toggle="tooltip" 
-                                                 data-bs-placement="top">Checking...</span></small>
+                                                 data-bs-placement="top">Checking...</span></small><br>
+                        <small>Test Status: <span id="test-status" class="badge bg-secondary" 
+                                                 data-bs-toggle="tooltip" 
+                                                 data-bs-placement="top">Unknown</span></small>
                     </p>
                 </div>
             </div>
         </div>
     </footer>
+
+    <!-- Delete Experiment Confirmation Modal -->
+    <div class="modal fade" id="deleteExperimentModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="bi bi-exclamation-triangle text-danger me-2"></i>
+                        Delete Experiment
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to delete the experiment <strong id="delete-experiment-name"></strong>?</p>
+                    <div class="alert alert-warning">
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        <strong>Warning:</strong> This action cannot be undone. All experiment data, runs, metrics, and artifacts will be permanently deleted.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" id="confirm-delete-btn">
+                        <i class="bi bi-trash me-2"></i>Delete Experiment
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
@@ -507,12 +538,26 @@
         function getStatusBadgeClass(status) {
             const statusClasses = {
                 'pending': 'bg-warning',
-                'running': 'bg-primary',
+                'running': 'bg-primary', 
                 'completed': 'bg-success',
                 'failed': 'bg-danger',
                 'cancelled': 'bg-secondary'
             };
             return statusClasses[status] || 'bg-secondary';
+        }
+        
+        function getExperimentStatusTooltip(status) {
+            const tooltips = {
+                'pending': '⏳ Experiment created and validated but not yet started. Waiting for resources or manual start.',
+                'validating': '🔍 Experiment configuration is being validated. Checking algorithms, benchmarks, and parameters.',
+                'running': '▶️ Experiment is actively executing. Optimization runs are being performed and results collected.',
+                'completed': '✅ Experiment finished successfully. All planned runs completed and results are available.',
+                'failed': '❌ Experiment failed due to errors. Check logs for details about what went wrong.',
+                'cancelled': '⏹️ Experiment was manually stopped before completion. Results may be partial.',
+                'paused': '⏸️ Experiment temporarily paused. Can be resumed to continue from current state.',
+                'queued': '📋 Experiment is waiting in queue for available resources to start execution.'
+            };
+            return tooltips[status.toLowerCase()] || `Experiment status: ${status}. Hover for more details about this state.`;
         }
         
         // API Status Management
@@ -539,6 +584,121 @@
                 new bootstrap.Tooltip(statusElement);
             } catch (error) {
                 console.warn('Failed to update tooltip:', error);
+            }
+        }
+
+        // Test Status Management
+        function updateTestStatus(status, badgeClass) {
+            const statusElement = document.getElementById('test-status');
+            statusElement.className = `badge ${badgeClass}`;
+            statusElement.textContent = status;
+            
+            // Update tooltip content based on status - Test Status States
+            const tooltips = {
+                '🔄 Unknown': 'Status not checked yet - Test system status has not been verified.',
+                '🟡 Running': 'Tests currently executing - System validation is in progress, please wait...',
+                '✅ Passed': 'All tests passed successfully - The system is verified to be working correctly.',
+                '❌ Failed': 'All tests failed - There are significant issues with system functionality.',
+                '🔴 Error': 'Unable to run tests - System errors or connectivity issues prevent testing.'
+            };
+            
+            // Handle partial success states (X/Y Passed)
+            const partialMatch = status.match(/^(\d+)\/(\d+) Passed$/);
+            let tooltipText = tooltips[status];
+            if (partialMatch && !tooltipText) {
+                const [, passed, total] = partialMatch;
+                tooltipText = `⚠️ Partial success - ${passed} out of ${total} tests passed. Some services may not be fully functional.`;
+            }
+            
+            statusElement.setAttribute('title', tooltipText || 'Test status information not available');
+            
+            // Reinitialize tooltip for updated content
+            try {
+                const existingTooltip = bootstrap.Tooltip.getInstance(statusElement);
+                if (existingTooltip) {
+                    existingTooltip.dispose();
+                }
+                new bootstrap.Tooltip(statusElement);
+            } catch (error) {
+                console.warn('Failed to update test status tooltip:', error);
+            }
+        }
+
+        // Automated Testing - Check test status by running system validation
+        async function checkTestStatus() {
+            try {
+                updateTestStatus('🟡 Running', 'bg-warning');
+                
+                // Automated Testing: Run basic connectivity tests
+                const testResults = {
+                    apiGateway: false,    // API Gateway Health Check
+                    algorithms: false,    // Algorithms Service Test  
+                    benchmarks: false,    // Benchmarks Service Test
+                    experiments: false    // Experiments Service Test
+                };
+                
+                // Test 1: API Gateway Health Check - Tests if main gateway is responding
+                try {
+                    const response = await fetch(`${API_BASE_URL}/health`, { 
+                        method: 'GET',
+                        timeout: 5000 
+                    });
+                    if (response.ok) {
+                        testResults.apiGateway = true;
+                        console.log('✅ API Gateway health check passed');
+                    }
+                } catch (e) {
+                    console.warn('❌ API Gateway health check failed:', e.message);
+                }
+                
+                // Test 2: Algorithms Service Test - Verifies algorithm registry connectivity
+                try {
+                    await apiCall('/api/algorithms');
+                    testResults.algorithms = true;
+                    console.log('✅ Algorithms service test passed');
+                } catch (e) {
+                    console.warn('❌ Algorithms service test failed:', e.message);
+                }
+                
+                // Test 3: Benchmarks Service Test - Checks benchmark definition service  
+                try {
+                    await apiCall('/api/benchmarks');
+                    testResults.benchmarks = true;
+                    console.log('✅ Benchmarks service test passed');
+                } catch (e) {
+                    console.warn('❌ Benchmarks service test failed:', e.message);
+                }
+                
+                // Test 4: Experiments Service Test - Validates experiment tracking functionality
+                try {
+                    await apiCall('/api/experiments');
+                    testResults.experiments = true;
+                    console.log('✅ Experiments service test passed');
+                } catch (e) {
+                    console.warn('❌ Experiments service test failed:', e.message);
+                }
+                
+                // Calculate overall test status and apply Test Status States
+                const passedTests = Object.values(testResults).filter(Boolean).length;
+                const totalTests = Object.keys(testResults).length;
+                
+                if (passedTests === totalTests) {
+                    // All tests passed successfully
+                    updateTestStatus('✅ Passed', 'bg-success');
+                } else if (passedTests > 0) {
+                    // Partial success (X/Y tests passed)
+                    updateTestStatus(`${passedTests}/${totalTests} Passed`, 'bg-warning');
+                } else {
+                    // All tests failed  
+                    updateTestStatus('❌ Failed', 'bg-danger');
+                }
+                
+                console.log(`Test Status: ${passedTests}/${totalTests} tests passed`);
+                
+            } catch (error) {
+                console.error('Error running automated tests:', error);
+                // Unable to run tests due to system errors
+                updateTestStatus('🔴 Error', 'bg-danger');
             }
         }
         
@@ -702,7 +862,10 @@
                             <small class="text-muted">Created: ${formatDate(exp.created_at)}</small>
                         </div>
                         <div class="col-md-3">
-                            <span class="badge status-badge ${getStatusBadgeClass(exp.status)}">${exp.status.toUpperCase()}</span>
+                            <span class="badge status-badge ${getStatusBadgeClass(exp.status)}" 
+                                  data-bs-toggle="tooltip" 
+                                  data-bs-placement="top" 
+                                  title="${getExperimentStatusTooltip(exp.status)}">${exp.status.toUpperCase()}</span>
                             <div class="mt-1">
                                 <small class="text-muted">
                                     ${exp.completed_runs || 0}/${exp.total_runs || 0} runs completed
@@ -710,11 +873,24 @@
                             </div>
                         </div>
                         <div class="col-md-3 text-end">
-                            <button class="btn btn-sm btn-outline-primary" onclick="viewExperiment('${exp.id}')">View</button>
+                            <div class="btn-group" role="group">
+                                <button class="btn btn-sm btn-outline-primary" onclick="viewExperiment('${exp.id}')">View</button>
+                                <button class="btn btn-sm btn-outline-danger" onclick="deleteExperiment('${exp.id}', '${exp.name.replace(/'/g, '\\\'')}')" title="Delete experiment">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
             `).join('');
+            
+            // Initialize tooltips for experiment status badges
+            setTimeout(() => {
+                var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+                var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                    return new bootstrap.Tooltip(tooltipTriggerEl);
+                });
+            }, 100);
         }
         
         function displayAllExperiments(experiments) {
@@ -755,7 +931,10 @@
                             </div>
                             <div class="col-md-4 text-end">
                                 <div class="mb-2">
-                                    <span class="badge status-badge ${getStatusBadgeClass(exp.status)} fs-6">${exp.status.toUpperCase()}</span>
+                                    <span class="badge status-badge ${getStatusBadgeClass(exp.status)} fs-6" 
+                                          data-bs-toggle="tooltip" 
+                                          data-bs-placement="top" 
+                                          title="${getExperimentStatusTooltip(exp.status)}">${exp.status.toUpperCase()}</span>
                                 </div>
                                 <div class="mb-2">
                                     <small class="text-muted d-block">
@@ -769,12 +948,23 @@
                                     <button class="btn btn-sm btn-outline-secondary" onclick="editExperiment('${exp.id}')">
                                         <i class="fas fa-edit me-1"></i>Edit
                                     </button>
+                                    <button class="btn btn-sm btn-outline-danger" onclick="deleteExperiment('${exp.id}', '${exp.name.replace(/'/g, '\\\'')}')" title="Delete experiment">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             `).join('');
+            
+            // Initialize tooltips for experiment status badges in modal
+            setTimeout(() => {
+                var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+                var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                    return new bootstrap.Tooltip(tooltipTriggerEl);
+                });
+            }, 100);
         }
         
         function viewExperiment(experimentId) {
@@ -1855,11 +2045,96 @@
             return tooltips[tag.toLowerCase()] || `Benchmark characteristic: ${tag}. This property affects algorithm performance and suitability.`;
         }
 
+        // Delete experiment functionality
+        let experimentToDelete = null;
+
+        function deleteExperiment(experimentId, experimentName) {
+            console.log('Delete experiment requested:', experimentId, experimentName);
+            experimentToDelete = experimentId;
+            document.getElementById('delete-experiment-name').textContent = experimentName;
+            
+            const modal = new bootstrap.Modal(document.getElementById('deleteExperimentModal'));
+            modal.show();
+        }
+
+        async function confirmDeleteExperiment() {
+            if (!experimentToDelete) {
+                console.error('No experiment selected for deletion');
+                return;
+            }
+
+            const confirmBtn = document.getElementById('confirm-delete-btn');
+            const originalText = confirmBtn.innerHTML;
+            
+            try {
+                // Show loading state
+                confirmBtn.innerHTML = '<i class="bi bi-spinner-border spinner-border-sm me-2"></i>Deleting...';
+                confirmBtn.disabled = true;
+
+                console.log('Deleting experiment:', experimentToDelete);
+                await apiCall(`/api/experiments/${experimentToDelete}`, { method: 'DELETE' });
+                
+                // Close modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('deleteExperimentModal'));
+                modal.hide();
+                
+                // Show success message
+                showToast('Success', 'Experiment deleted successfully', 'success');
+                
+                // Refresh experiments list
+                await loadExperiments();
+                
+                console.log('Experiment deleted successfully:', experimentToDelete);
+                
+            } catch (error) {
+                console.error('Failed to delete experiment:', error);
+                showToast('Error', `Failed to delete experiment: ${error.message}`, 'danger');
+            } finally {
+                // Reset button state
+                confirmBtn.innerHTML = originalText;
+                confirmBtn.disabled = false;
+                experimentToDelete = null;
+            }
+        }
+
+        function showToast(title, message, type = 'info') {
+            // Simple toast implementation - you can enhance this with a proper toast library
+            const alertClass = type === 'success' ? 'alert-success' : 
+                              type === 'danger' ? 'alert-danger' : 
+                              'alert-info';
+            
+            const toast = document.createElement('div');
+            toast.className = `alert ${alertClass} alert-dismissible fade show position-fixed`;
+            toast.style.cssText = 'top: 20px; right: 20px; z-index: 9999; max-width: 350px;';
+            toast.innerHTML = `
+                <strong>${title}:</strong> ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            
+            document.body.appendChild(toast);
+            
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                if (toast.parentNode) {
+                    toast.parentNode.removeChild(toast);
+                }
+            }, 5000);
+        }
+
         // Initialize dashboard
         document.addEventListener('DOMContentLoaded', function() {
             // Initialize API status with tooltip
             updateApiStatus('Checking...', 'bg-secondary');
+            
+            // Initialize test status with tooltip
+            updateTestStatus('🔄 Unknown', 'bg-secondary');
+            
+            // Run initial test status check after a short delay
+            setTimeout(checkTestStatus, 2000);
             loadDashboard();
+            
+            // Set up delete confirmation handler
+            document.getElementById('confirm-delete-btn').addEventListener('click', confirmDeleteExperiment);
         });
     </script>
 </body>

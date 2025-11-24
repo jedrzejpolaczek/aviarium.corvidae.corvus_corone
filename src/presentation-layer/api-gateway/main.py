@@ -121,6 +121,32 @@ async def proxy_publications(path: str, request: Request, user=Depends(auth_comp
     """Proxy publication requests"""
     return await service_router.proxy_request("publications", f"/api/publications/{path}", request)
 
+# Experiment control endpoints - Route to orchestrator service
+@app.post("/api/experiments/{experiment_id}/start")
+async def start_experiment(experiment_id: str, request: Request):
+    """Start an experiment"""
+    return await service_router.proxy_request("orchestrator", f"/api/experiments/{experiment_id}/start", request)
+
+@app.post("/api/experiments/{experiment_id}/pause")
+async def pause_experiment(experiment_id: str, request: Request):
+    """Pause an experiment"""
+    return await service_router.proxy_request("orchestrator", f"/api/experiments/{experiment_id}/pause", request)
+
+@app.post("/api/experiments/{experiment_id}/cancel")
+async def cancel_experiment(experiment_id: str, request: Request):
+    """Cancel an experiment"""
+    return await service_router.proxy_request("orchestrator", f"/api/experiments/{experiment_id}/cancel", request)
+
+@app.get("/api/experiments/{experiment_id}/runs")
+async def get_experiment_runs(experiment_id: str, request: Request):
+    """Get runs for an experiment"""
+    return await service_router.proxy_request("tracking", f"/api/experiments/{experiment_id}/runs", request)
+
+@app.get("/api/experiments/{experiment_id}/metrics")
+async def get_experiment_metrics(experiment_id: str, request: Request):
+    """Get metrics for an experiment"""
+    return await service_router.proxy_request("tracking", f"/api/experiments/{experiment_id}/metrics", request)
+
 # Report generation routes
 @app.api_route("/api/reports/{path:path}", methods=["GET", "POST"])
 async def proxy_reports(path: str, request: Request, user=Depends(auth_component.verify_token)):

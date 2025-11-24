@@ -5,9 +5,10 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - REACT_APP_API_URL=http://localhost:8080
+      - API_GATEWAY_URL=http://localhost:8080
     depends_on:
-      - api-gateway
+      api-gateway:
+        condition: service_healthy
     networks:
       - corvus-network
 
@@ -18,19 +19,30 @@ services:
     ports:
       - "8080:8080"
     environment:
-      - RABBITMQ_URL=amqp://rabbitmq:5672
+      - RABBITMQ_URL=amqp://admin:admin@rabbitmq:5672
       - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/corvus_corone
       - AUTH_SERVICE_URL=http://auth-service:8001
     depends_on:
-      - postgres
-      - rabbitmq
-      - auth-service
+      postgres:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
+      auth-service:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
     networks:
       - corvus-network
 
   # Business Logic Layer
   experiment-orchestrator:
     build: ./src/business-logic-layer/experiment-orchestrator
+    ports:
+      - "8000:8000"
     environment:
       - RABBITMQ_URL=amqp://admin:admin@rabbitmq:5672
       - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/corvus_corone
@@ -38,11 +50,16 @@ services:
       - BENCHMARK_SERVICE_URL=http://benchmark-definition:8003
       - ALGORITHM_REGISTRY_URL=http://algorithm-registry:8004
     depends_on:
-      - postgres
-      - rabbitmq
-      - experiment-tracking
-      - benchmark-definition
-      - algorithm-registry
+      postgres:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
+      experiment-tracking:
+        condition: service_started
+      benchmark-definition:
+        condition: service_started
+      algorithm-registry:
+        condition: service_started
     networks:
       - corvus-network
 
@@ -144,11 +161,16 @@ services:
       - MINIO_ACCESS_KEY=minioadmin
       - MINIO_SECRET_KEY=minioadmin
     depends_on:
-      - rabbitmq
-      - experiment-tracking
-      - benchmark-definition
-      - algorithm-registry
-      - minio
+      rabbitmq:
+        condition: service_healthy
+      experiment-tracking:
+        condition: service_started
+      benchmark-definition:
+        condition: service_started
+      algorithm-registry:
+        condition: service_started
+      minio:
+        condition: service_started
     deploy:
       replicas: 2
     networks:
@@ -206,6 +228,12 @@ services:
     ports:
       - "5672:5672"
       - "15672:15672"
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    restart: unless-stopped
     networks:
       - corvus-network
 

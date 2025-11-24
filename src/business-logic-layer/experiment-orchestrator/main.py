@@ -477,22 +477,101 @@ async def list_experiments(
     return [ExperimentResponse(**exp) for exp in experiments]
 
 @app.post("/api/experiments/{experiment_id}/start")
-async def start_experiment(experiment_id: str, background_tasks: BackgroundTasks):
+async def start_experiment(experiment_id: str, background_tasks: BackgroundTasks, restart: bool = False):
     """Start experiment execution"""
-    if experiment_id not in experiments_store:
-        raise HTTPException(status_code=404, detail="Experiment not found")
+    experiment = None
     
-    experiment = experiments_store[experiment_id]
-    if experiment["status"] not in [ExperimentStatus.PENDING, ExperimentStatus.DRAFT]:
-        raise HTTPException(status_code=400, detail="Experiment cannot be started in current status")
+    # First check local store
+    if experiment_id not in experiments_store:
+        # Try to fetch from tracking service
+        try:
+            async with httpx.AsyncClient(timeout=10.0) as client:
+                response = await client.get(f"{TRACKING_SERVICE_URL}/api/tracking/experiments/{experiment_id}")
+                if response.status_code == 200:
+                    experiment_data = response.json()
+                    # Convert to our format and store locally, preserving status
+                    tracking_status = experiment_data.get("status", "pending")
+                    
+                    # Map tracking status to orchestrator status
+                    status_mapping = {
+                        "pending": ExperimentStatus.PENDING,
+                        "running": ExperimentStatus.RUNNING,
+                        "completed": ExperimentStatus.COMPLETED,
+                        "failed": ExperimentStatus.FAILED,
+                        "cancelled": ExperimentStatus.CANCELLED
+                    }
+                    
+                    orchestrator_status = status_mapping.get(tracking_status, ExperimentStatus.PENDING)
+                    
+                    experiment = {
+                        "id": experiment_data["id"],
+                        "status": orchestrator_status,  # Use actual status from tracking
+                        "config": experiment_data["config_json"] or experiment_data.get("config", {}),
+                        "created_at": experiment_data["created_at"],
+                        "updated_at": datetime.utcnow(),
+                        "created_by_user": experiment_data.get("created_by_user", "unknown"),
+                        "total_runs": experiment_data.get("total_runs", 0),
+                        "completed_runs": experiment_data.get("completed_runs", 0),
+                        "failed_runs": experiment_data.get("failed_runs", 0)
+                    }
+                    experiments_store[experiment_id] = experiment
+                    
+                    # Generate run plan
+                    await generate_run_plan(experiment_id, experiment["config"])
+                    logger.info(f"Imported experiment {experiment_id} from tracking service")
+                else:
+                    raise HTTPException(status_code=404, detail="Experiment not found in tracking service")
+        except httpx.RequestError as e:
+            logger.error(f"Failed to fetch experiment from tracking service: {e}")
+            raise HTTPException(status_code=503, detail="Cannot connect to tracking service")
+    else:
+        experiment = experiments_store[experiment_id]
+    
+    current_status = experiment["status"]
+    if current_status not in [ExperimentStatus.PENDING, ExperimentStatus.DRAFT]:
+        if current_status == ExperimentStatus.COMPLETED and not restart:
+            raise HTTPException(
+                status_code=400, 
+                detail=f"Experiment has already completed successfully. Status: {current_status}. "
+                       f"Total runs: {experiment.get('total_runs', 0)}, "
+                       f"Completed: {experiment.get('completed_runs', 0)}, "
+                       f"Failed: {experiment.get('failed_runs', 0)}. "
+                       f"Use restart=true parameter to restart completed experiment."
+            )
+        elif current_status == ExperimentStatus.RUNNING:
+            raise HTTPException(status_code=400, detail=f"Experiment is already running. Status: {current_status}")
+        elif current_status not in [ExperimentStatus.COMPLETED, ExperimentStatus.FAILED, ExperimentStatus.CANCELLED] and not restart:
+            raise HTTPException(status_code=400, detail=f"Experiment cannot be started in current status: {current_status}")
     
     # Schedule runs
     if experiment_id in run_plans_store:
         background_tasks.add_task(execute_experiment, experiment_id)
         experiment["status"] = ExperimentStatus.RUNNING
         experiment["updated_at"] = datetime.utcnow()
-    
-    return {"message": "Experiment started", "experiment_id": experiment_id}
+        
+        # Update status in tracking service  
+        try:
+            async with httpx.AsyncClient(timeout=10.0) as client:
+                response = await client.put(
+                    f"{TRACKING_SERVICE_URL}/api/tracking/experiments/{experiment_id}",
+                    json={"status": "running"}
+                )
+                if response.status_code == 200:
+                    logger.info(f"Successfully updated experiment {experiment_id} status to running in tracking service")
+                else:
+                    logger.warning(f"Failed to update tracking service status. HTTP {response.status_code}: {response.text}")
+        except Exception as e:
+            logger.warning(f"Failed to update experiment status in tracking service: {e}")
+        
+        logger.info(f"Started experiment {experiment_id}")
+        return {"message": "Experiment started", "experiment_id": experiment_id}
+    else:
+        raise HTTPException(status_code=400, detail="No run plan found for experiment")
+
+@app.post("/api/experiments/{experiment_id}/restart")
+async def restart_experiment(experiment_id: str, background_tasks: BackgroundTasks):
+    """Restart a completed or failed experiment"""
+    return await start_experiment(experiment_id, background_tasks, restart=True)
 
 @app.post("/api/experiments/{experiment_id}/cancel")
 async def cancel_experiment(experiment_id: str):
@@ -537,6 +616,28 @@ async def delete_experiment(experiment_id: str):
     except Exception as e:
         logger.error(f"Unexpected error deleting experiment {experiment_id}: {e}")
         raise HTTPException(status_code=500, detail=f"Failed to delete experiment: {str(e)}")
+
+async def generate_run_plan(experiment_id: str, config_dict: dict):
+    """Generate run plan for an imported experiment"""
+    try:
+        # Convert dict to ExperimentConfig
+        config = ExperimentConfig(**config_dict)
+        
+        # Build execution plan
+        runs = await plan_builder.build_plan(experiment_id, config)
+        run_plans_store[experiment_id] = runs
+        
+        logger.info(f"Generated run plan for imported experiment {experiment_id} with {len(runs)} runs")
+        
+        # Update experiment with run count
+        if experiment_id in experiments_store:
+            experiment = experiments_store[experiment_id]
+            experiment["total_runs"] = len(runs)
+            experiment["updated_at"] = datetime.utcnow()
+        
+    except Exception as e:
+        logger.error(f"Failed to generate run plan for experiment {experiment_id}: {e}")
+        raise
 
 async def build_and_schedule_experiment(experiment_id: str, config: ExperimentConfig, start_immediately: bool):
     """Background task to build execution plan and optionally start experiment"""

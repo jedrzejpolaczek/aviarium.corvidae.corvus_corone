@@ -449,13 +449,28 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-md-6">
-                                <label for="evaluationBudget" class="form-label">Evaluation Budget</label>
+                            <div class="col-md-4">
+                                <label for="evaluationBudget" class="form-label" data-bs-toggle="tooltip" data-bs-placement="top" title="Maximum number of function evaluations (algorithm iterations) allowed per run. Higher budgets allow more thorough optimization but take longer to complete.">Evaluation Budget</label>
                                 <input type="number" class="form-control" id="evaluationBudget" value="50" min="10" max="1000">
                             </div>
-                            <div class="col-md-6">
-                                <label for="randomSeeds" class="form-label">Random Seeds (comma-separated)</label>
-                                <input type="text" class="form-control" id="randomSeeds" value="42,123,456">
+                            <div class="col-md-4">
+                                <label for="numberOfRuns" class="form-label" data-bs-toggle="tooltip" data-bs-placement="top" title="Total number of optimization runs to execute for this experiment. Each run uses a different random seed and tests all algorithm-benchmark combinations.">Number of Runs</label>
+                                <input type="number" class="form-control" id="numberOfRuns" value="3" min="1" max="100">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="maxParallelRuns" class="form-label" data-bs-toggle="tooltip" data-bs-placement="top" title="Maximum number of runs that can execute simultaneously. Higher values speed up execution but use more resources.">Max Parallel Runs</label>
+                                <input type="number" class="form-control" id="maxParallelRuns" value="2" min="1" max="10">
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                <label for="randomSeeds" class="form-label" data-bs-toggle="tooltip" data-bs-placement="top" title="Random seeds for reproducible runs. If fewer seeds than runs are specified, additional seeds will be generated automatically.">Random Seeds (comma-separated, optional)</label>
+                                <input type="text" class="form-control" id="randomSeeds" value="42,123,456" placeholder="Leave empty to auto-generate seeds">
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <div class="alert alert-info" id="experimentSummary">
+                                <small><strong>Experiment Summary:</strong> <span id="summaryText">Configure your experiment above to see a summary</span></small>
                             </div>
                         </div>
                     </form>
@@ -519,12 +534,34 @@
         </div>
     </div>
 
+    <!-- Experiment Details Modal -->
+    <div class="modal fade" id="experimentDetailsModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="experimentDetailsTitle">Experiment Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="experimentDetailsBody">
+                    <!-- Content will be populated dynamically -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="runExperimentBtn">Start/Resume</button>
+                    <button type="button" class="btn btn-warning" id="pauseExperimentBtn">Pause</button>
+                    <button type="button" class="btn btn-danger" id="cancelExperimentBtn">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         // API Configuration
         const API_BASE_URL = window.location.hostname === 'localhost' 
             ? 'http://localhost:8080' 
-            : window.location.origin;
+            : `${window.location.protocol}//${window.location.hostname}:8080`;
+        console.log('JavaScript initializing, API_BASE_URL:', API_BASE_URL);
         
         // Global state
         let currentUser = null;
@@ -714,17 +751,23 @@
                 headers['Authorization'] = `Bearer ${authToken}`;
             }
             
+            console.log(`Making API call to: ${url}`);
+            
             try {
                 const response = await fetch(url, {
                     ...options,
                     headers
                 });
                 
+                console.log(`API response status for ${endpoint}:`, response.status, response.statusText);
+                
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 }
                 
-                return await response.json();
+                const data = await response.json();
+                console.log(`API response data for ${endpoint}:`, data);
+                return data;
             } catch (error) {
                 console.error(`API call failed: ${endpoint}`, error);
                 throw error;
@@ -734,39 +777,46 @@
         // Load dashboard data
         async function loadDashboard() {
             console.log('loadDashboard() called');
+            
+            // Check API status first (most important)
             try {
-                // Try to authenticate, but continue without auth if it fails
+                console.log('Attempting API health check to:', `${API_BASE_URL}/health`);
+                const healthResponse = await apiCall('/health');
+                console.log('Health check successful:', healthResponse);
+                updateApiStatus('Online', 'bg-success');
+            } catch (healthError) {
+                console.error('API health check failed:', healthError);
+                console.error('API_BASE_URL:', API_BASE_URL);
+                console.error('Full URL attempted:', `${API_BASE_URL}/health`);
+                updateApiStatus('Offline', 'bg-danger');
+                // Don't return here - continue with other attempts
+            }
+            
+            // Try to authenticate (optional)
+            try {
                 if (!authToken) {
-                    try {
-                        const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ 
-                                username: 'researcher', 
-                                password: 'researcher123' 
-                            })
-                        });
-                        if (response.ok) {
-                            const tokenData = await response.json();
-                            authToken = tokenData.access_token;
-                            localStorage.setItem('auth_token', authToken);
-                            console.log('Auto-authenticated with demo user');
-                        }
-                    } catch (error) {
-                        console.warn('Auto-authentication failed, trying without authentication:', error);
-                        authToken = null;
+                    console.log('Attempting authentication...');
+                    const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ 
+                            username: 'researcher', 
+                            password: 'researcher123' 
+                        })
+                    });
+                    if (response.ok) {
+                        const tokenData = await response.json();
+                        authToken = tokenData.access_token;
+                        localStorage.setItem('auth_token', authToken);
+                        console.log('Auto-authenticated with demo user');
                     }
                 }
+            } catch (error) {
+                console.warn('Authentication failed (continuing without auth):', error);
+                authToken = null;
+            }
                 
-                // Check API status independently
-                try {
-                    await apiCall('/health');
-                    updateApiStatus('Online', 'bg-success');
-                } catch (healthError) {
-                    console.error('API health check failed:', healthError);
-                    updateApiStatus('Offline', 'bg-danger');
-                }
-                
+            try {
                 // Load experiments with retry logic
                 let retryCount = 0;
                 const maxRetries = 3;
@@ -815,12 +865,14 @@
                     document.getElementById('benchmark-datasets').className = 'text-danger';
                 }
                 
-                // Calculate stats
-                const activeExperiments = experiments.filter(exp => exp.status === 'running').length;
-                document.getElementById('active-experiments').textContent = activeExperiments;
-                
-                const completedRuns = experiments.reduce((sum, exp) => sum + (exp.completed_runs || 0), 0);
-                document.getElementById('completed-runs').textContent = completedRuns;
+                // Note: Experiment stats are handled in loadExperiments() function
+                // Initialize to 0 if not loaded yet
+                if (!document.getElementById('active-experiments').textContent || document.getElementById('active-experiments').textContent === '-') {
+                    document.getElementById('active-experiments').textContent = '0';
+                }
+                if (!document.getElementById('completed-runs').textContent || document.getElementById('completed-runs').textContent === '-') {
+                    document.getElementById('completed-runs').textContent = '0';
+                }
                 
                 // Initialize tooltips for all elements (including API status)
                 setTimeout(() => {
@@ -967,10 +1019,716 @@
             }, 100);
         }
         
-        function viewExperiment(experimentId) {
-            // TODO: Implement experiment detail view
-            alert(`View experiment: ${experimentId}`);
+        async function viewExperiment(experimentId) {
+            try {
+                // Load experiment details
+                const experiment = await apiCall(`/api/experiments/${experimentId}`);
+                
+                // Load experiment runs
+                let runs = [];
+                try {
+                    runs = await apiCall(`/api/experiments/${experimentId}/runs`);
+                    console.log('Loaded runs:', runs);
+                } catch (error) {
+                    console.warn('Failed to load experiment runs:', error);
+                    runs = [];
+                }
+                
+                // Load experiment metrics
+                let metrics = [];
+                try {
+                    metrics = await apiCall(`/api/experiments/${experimentId}/metrics`);
+                    console.log('Loaded metrics:', metrics);
+                } catch (error) {
+                    console.warn('Failed to load experiment metrics:', error);
+                    metrics = [];
+                }
+                
+                // Update modal title
+                document.getElementById('experimentDetailsTitle').textContent = `${experiment.name} - Details`;
+                
+                // Generate experiment details content
+                const detailsContent = generateExperimentDetailsContent(experiment, runs, metrics);
+                document.getElementById('experimentDetailsBody').innerHTML = detailsContent;
+                
+                // Setup action buttons
+                setupExperimentActionButtons(experiment);
+                
+                // Initialize any charts or progress bars
+                initializeExperimentCharts(runs, metrics);
+                
+                // Initialize tooltips
+                setTimeout(() => {
+                    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+                    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                        return new bootstrap.Tooltip(tooltipTriggerEl);
+                    });
+                }, 100);
+                
+                // Show the modal
+                const modal = new bootstrap.Modal(document.getElementById('experimentDetailsModal'));
+                modal.show();
+                
+            } catch (error) {
+                console.error('Failed to load experiment details:', error);
+                alert(`Failed to load experiment details: ${error.message}`);
+            }
         }
+        
+        function generateExperimentDetailsContent(experiment, runs, metrics) {
+            const statusBadge = `<span class="badge ${getStatusBadgeClass(experiment.status)} fs-6" 
+                                       data-bs-toggle="tooltip" 
+                                       data-bs-placement="top" 
+                                       title="${getExperimentStatusTooltip(experiment.status)}">${experiment.status.toUpperCase()}</span>`;
+            
+            // Fix progress calculation - if status is pending/validating, progress should be 0
+            let progressPercent = 0;
+            if (experiment.status && ['completed', 'running', 'failed', 'cancelled'].includes(experiment.status.toLowerCase())) {
+                progressPercent = experiment.total_runs > 0 ? Math.round((experiment.completed_runs || 0) / experiment.total_runs * 100) : 0;
+            }
+            // Cap at 100% and ensure it matches status
+            if (experiment.status && experiment.status.toLowerCase() === 'completed') {
+                progressPercent = 100;
+            }
+            
+            return `
+                <div class="container-fluid">
+                    <!-- Experiment Overview -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6 class="mb-0"><i class="fas fa-info-circle me-2"></i>Experiment Overview</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-8">
+                                            <table class="table table-sm">
+                                                <tr><td><strong>Name:</strong></td><td>${experiment.name}</td></tr>
+                                                <tr><td><strong>Description:</strong></td><td>${experiment.description || 'No description provided'}</td></tr>
+                                                <tr><td><strong>Status:</strong></td><td>${statusBadge}</td></tr>
+                                                <tr><td><strong>Created:</strong></td><td>${formatDate(experiment.created_at)}</td></tr>
+                                                <tr><td><strong>Created by:</strong></td><td>${experiment.created_by_user || 'Unknown'}</td></tr>
+                                                <tr><td><strong>Last Updated:</strong></td><td>${formatDate(experiment.updated_at || experiment.created_at)}</td></tr>
+                                                <tr><td><strong>Tags:</strong></td><td>${experiment.tags || 'None'}</td></tr>
+                                            </table>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <h6>Progress</h6>
+                                            <div class="progress mb-2" style="height: 20px;">
+                                                <div class="progress-bar" role="progressbar" style="width: ${progressPercent}%" 
+                                                     aria-valuenow="${progressPercent}" aria-valuemin="0" aria-valuemax="100">
+                                                    ${progressPercent}%
+                                                </div>
+                                            </div>
+                                            <p class="mb-1"><strong>Runs:</strong> ${experiment.completed_runs || 0} / ${experiment.total_runs || 0}</p>
+                                            <p class="mb-1"><strong>Success Rate:</strong> ${calculateSuccessRate(runs)}%</p>
+                                            <p class="mb-0"><strong>Runtime:</strong> ${calculateTotalRuntime(runs)}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Configuration Details -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6 class="mb-0"><i class="fas fa-cogs me-2"></i>Algorithms</h6>
+                                </div>
+                                <div class="card-body">
+                                    ${generateAlgorithmsTable(experiment)}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6 class="mb-0"><i class="fas fa-database me-2"></i>Benchmarks</h6>
+                                </div>
+                                <div class="card-body">
+                                    ${generateBenchmarksTable(experiment)}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Runs and Results -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <h6 class="mb-0"><i class="fas fa-play me-2"></i>Experiment Runs (${runs.length})</h6>
+                                    <div class="btn-group btn-group-sm">
+                                        <button class="btn btn-outline-primary" onclick="refreshExperimentRuns('${experiment.id}')">Refresh</button>
+                                        <button class="btn btn-outline-success" onclick="exportResults('${experiment.id}')">Export</button>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    ${generateRunsTable(runs)}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Metrics and Analysis -->
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6 class="mb-0"><i class="fas fa-chart-line me-2"></i>Performance Analysis</h6>
+                                </div>
+                                <div class="card-body">
+                                    ${generateMetricsAnalysis(metrics, runs)}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function generateAlgorithmsTable(experiment) {
+            const config = experiment.config_json || experiment.config || {};
+            const algorithms = config.algorithms || [];
+            
+            if (algorithms.length === 0) {
+                return '<p class="text-muted">No algorithms configured</p>';
+            }
+            
+            return `
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Algorithm</th>
+                                <th>Version</th>
+                                <th data-bs-toggle="tooltip" data-bs-placement="top" title="Maximum number of function evaluations (algorithm iterations) allowed per run. This limits how long each optimization run can continue.">Budget</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${algorithms.map(algo => `
+                                <tr>
+                                    <td><strong>${algo.algorithm_id}</strong></td>
+                                    <td>${algo.version || '1.0.0'}</td>
+                                    <td>${algo.budget_limit || 'Default'}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+        
+        function generateBenchmarksTable(experiment) {
+            const config = experiment.config_json || experiment.config || {};
+            const benchmarks = config.benchmarks || [];
+            
+            if (benchmarks.length === 0) {
+                return '<p class="text-muted">No benchmarks configured</p>';
+            }
+            
+            return `
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Benchmark</th>
+                                <th data-bs-toggle="tooltip" data-bs-placement="top" title="Test problem instances from the benchmark dataset. 'All' means the algorithm will be tested on every available problem instance, 'Selected' means only specific instances are used.">Instances</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${benchmarks.map(bench => `
+                                <tr>
+                                    <td><strong>${bench.benchmark_id}</strong></td>
+                                    <td>${bench.include_all_instances ? 'All' : 'Selected'}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+        
+        function generateRunsTable(runs) {
+            if (runs.length === 0) {
+                return '<p class="text-muted">No runs completed yet</p>';
+            }
+            
+            return `
+                <div class="table-responsive">
+                    <table class="table table-sm table-striped">
+                        <thead>
+                            <tr>
+                                <th>Run ID</th>
+                                <th>Algorithm</th>
+                                <th>Benchmark</th>
+                                <th>Status</th>
+                                <th>Score</th>
+                                <th>Runtime</th>
+                                <th>Started</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${runs.slice(0, 20).map(run => {
+                                const algorithm = run.algorithm_version_id || run.config_json?.algorithm_id || 'Unknown';
+                                const benchmark = run.benchmark_instance_id || 'Unknown';
+                                const runtime = run.resource_usage_json?.execution_time_seconds ? 
+                                    (run.resource_usage_json.execution_time_seconds * 1000).toFixed(0) + 'ms' : 
+                                    (run.end_time && run.start_time ? 
+                                        ((new Date(run.end_time) - new Date(run.start_time)) / 1000).toFixed(2) + 's' : 
+                                        'N/A');
+                                return `
+                                <tr>
+                                    <td><code>${run.id.substring(0, 8)}...</code></td>
+                                    <td>${algorithm}</td>
+                                    <td>${benchmark}</td>
+                                    <td><span class="badge ${getStatusBadgeClass(run.status)}">${run.status.toUpperCase()}</span></td>
+                                    <td>N/A</td>
+                                    <td>${runtime}</td>
+                                    <td>${formatDate(run.start_time)}</td>
+                                </tr>`;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                </div>
+                ${runs.length > 20 ? `<p class="text-muted">Showing 20 of ${runs.length} runs. <a href="#" onclick="showAllRuns('${runs[0].experiment_id}')">View all</a></p>` : ''}
+            `;
+        }
+        
+        function generateMetricsAnalysis(metrics, runs) {
+            const completedRuns = runs.filter(run => run.status === 'completed');
+            
+            if (completedRuns.length === 0) {
+                return '<p class="text-muted">No completed runs available for analysis</p>';
+            }
+            
+            // Calculate average runtime from actual execution times
+            const runtimesSeconds = completedRuns.map(run => {
+                if (run.resource_usage_json?.execution_time_seconds) {
+                    return run.resource_usage_json.execution_time_seconds;
+                } else if (run.end_time && run.start_time) {
+                    return (new Date(run.end_time) - new Date(run.start_time)) / 1000;
+                }
+                return null;
+            }).filter(t => t !== null);
+            
+            const avgRuntime = runtimesSeconds.length > 0 ? 
+                runtimesSeconds.reduce((sum, time) => sum + time, 0) / runtimesSeconds.length : 
+                null;
+            
+            // Calculate objective metrics
+            const objectiveMetrics = metrics.filter(m => m.name === 'objective');
+            let bestScore = null;
+            let avgScore = null;
+            
+            if (objectiveMetrics.length > 0) {
+                const objectiveValues = objectiveMetrics.map(m => parseFloat(m.value));
+                bestScore = Math.min(...objectiveValues); // Assuming minimization
+                avgScore = objectiveValues.reduce((sum, val) => sum + val, 0) / objectiveValues.length;
+            }
+            
+            return `
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="text-center">
+                            <h4 class="${bestScore !== null ? 'text-success' : 'text-muted'}">${bestScore !== null ? bestScore.toFixed(4) : 'N/A'}</h4>
+                            <small class="text-muted">Best Score</small>
+                            <small class="d-block text-info">${bestScore !== null ? 'Objective value' : 'No objective metrics available'}</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-center">
+                            <h4 class="${avgScore !== null ? 'text-info' : 'text-muted'}">${avgScore !== null ? avgScore.toFixed(4) : 'N/A'}</h4>
+                            <small class="text-muted">Average Score</small>
+                            <small class="d-block text-info">${avgScore !== null ? 'Objective value' : 'No objective metrics available'}</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-center">
+                            <h4 class="text-info">${avgRuntime ? (avgRuntime < 1 ? (avgRuntime * 1000).toFixed(0) + 'ms' : avgRuntime.toFixed(2) + 's') : 'N/A'}</h4>
+                            <small class="text-muted">Average Runtime</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-center">
+                            <h4 class="text-warning">${completedRuns.length}</h4>
+                            <small class="text-muted">Completed Runs</small>
+                        </div>
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-12">
+                        <h6>Performance Over Time</h6>
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <strong>Interactive Charts Coming Soon!</strong><br>
+                            In a full implementation, this section would display:
+                            <ul class="mb-0 mt-2">
+                                <li>Convergence plots showing optimization progress</li>
+                                <li>Algorithm comparison charts</li>
+                                <li>Statistical significance tests</li>
+                                <li>Parameter correlation analysis</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function calculateSuccessRate(runs) {
+            if (runs.length === 0) return 0;
+            const successfulRuns = runs.filter(run => run.status === 'completed').length;
+            return Math.round((successfulRuns / runs.length) * 100);
+        }
+        
+        function calculateTotalRuntime(runs) {
+            let totalSeconds = 0;
+            const now = new Date();
+            
+            runs.forEach(run => {
+                if (run.runtime_seconds) {
+                    // Completed run - use stored runtime
+                    totalSeconds += run.runtime_seconds;
+                } else if (run.start_time && run.end_time) {
+                    // Calculate runtime from timestamps
+                    const runtime = (new Date(run.end_time) - new Date(run.start_time)) / 1000;
+                    totalSeconds += runtime;
+                } else if (run.start_time && run.status === 'running') {
+                    // Running run - calculate elapsed time
+                    const elapsed = (now - new Date(run.start_time)) / 1000;
+                    totalSeconds += elapsed;
+                }
+            });
+            
+            if (totalSeconds === 0) return 'N/A';
+            
+            const hours = Math.floor(totalSeconds / 3600);
+            const minutes = Math.floor((totalSeconds % 3600) / 60);
+            const seconds = Math.floor(totalSeconds % 60);
+            
+            if (hours > 0) {
+                return `${hours}h ${minutes}m`;
+            } else if (minutes > 0) {
+                return `${minutes}m ${seconds}s`;
+            } else {
+                return `${seconds}s`;
+            }
+        }
+        
+        function setupExperimentActionButtons(experiment) {
+            const runBtn = document.getElementById('runExperimentBtn');
+            const pauseBtn = document.getElementById('pauseExperimentBtn');
+            const cancelBtn = document.getElementById('cancelExperimentBtn');
+            
+            // Configure buttons based on experiment status
+            let runAction = 'start';
+            switch (experiment.status.toLowerCase()) {
+                case 'pending':
+                case 'paused':
+                    runBtn.textContent = 'Start Experiment';
+                    runBtn.disabled = false;
+                    pauseBtn.disabled = true;
+                    cancelBtn.disabled = false;
+                    runAction = 'start';
+                    break;
+                case 'running':
+                    runBtn.textContent = 'Resume Experiment';
+                    runBtn.disabled = true;
+                    pauseBtn.disabled = false;
+                    cancelBtn.disabled = false;
+                    runAction = 'start';
+                    break;
+                case 'completed':
+                case 'failed':
+                case 'cancelled':
+                    runBtn.textContent = 'Restart Experiment';
+                    runBtn.disabled = false;
+                    pauseBtn.disabled = true;
+                    cancelBtn.disabled = true;
+                    runAction = 'restart';
+                    break;
+                default:
+                    runBtn.disabled = true;
+                    pauseBtn.disabled = true;
+                    cancelBtn.disabled = true;
+                    runAction = 'start';
+            }
+            
+            // Setup event handlers
+            runBtn.onclick = () => handleExperimentAction(experiment.id, runAction);
+            pauseBtn.onclick = () => handleExperimentAction(experiment.id, 'pause');
+            cancelBtn.onclick = () => handleExperimentAction(experiment.id, 'cancel');
+        }
+        
+        async function handleExperimentAction(experimentId, action) {
+            try {
+                const actionText = action.charAt(0).toUpperCase() + action.slice(1);
+                console.log(`Attempting to ${action} experiment ${experimentId}`);
+                
+                // Use orchestrator endpoints for experiment control
+                const endpoint = action === 'start' ? 'start' : action === 'restart' ? 'restart' : action === 'pause' ? 'pause' : 'cancel';
+                const result = await apiCall(`/api/experiments/${experimentId}/${endpoint}`, {
+                    method: 'POST'
+                });
+                
+                console.log(`${actionText} response:`, result);
+                
+                // Show success message
+                alert(`Experiment ${actionText.toLowerCase()}ed successfully!`);
+                
+                // Refresh the experiment view
+                setTimeout(() => {
+                    viewExperiment(experimentId);
+                }, 1000);
+                
+            } catch (error) {
+                console.error(`Failed to ${action} experiment:`, error);
+                console.error('Error details:', error.stack);
+                
+                let errorMessage = `Failed to ${action} experiment: ${error.message}`;
+                
+                // Provide more helpful error messages
+                if (error.message.includes('404')) {
+                    errorMessage += `\n\nThis might be because:\n- The experiment service is not running\n- The experiment ID is invalid\n- The ${action} endpoint is not implemented`;
+                } else if (error.message.includes('500')) {
+                    errorMessage += `\n\nServer error occurred. Check the service logs.`;
+                }
+                
+                alert(errorMessage);
+            }
+        }
+        
+        function initializeExperimentCharts(runs, metrics) {
+            // Placeholder for chart initialization
+            // In a full implementation, this would set up interactive charts using libraries like Chart.js or D3.js
+            console.log('Chart initialization placeholder - runs:', runs.length, 'metrics:', metrics.length);
+        }
+        
+        async function refreshExperimentRuns(experimentId) {
+            // Refresh the current experiment view
+            viewExperiment(experimentId);
+        }
+        
+        async function exportResults(experimentId) {
+            try {
+                // Show loading message
+                const loadingAlert = document.createElement('div');
+                loadingAlert.className = 'alert alert-info position-fixed';
+                loadingAlert.style.cssText = 'top: 20px; right: 20px; z-index: 9999;';
+                loadingAlert.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Preparing export files...';
+                document.body.appendChild(loadingAlert);
+
+                // Fetch experiment data
+                const experiment = await apiCall(`/api/experiments/${experimentId}`);
+                const runs = await apiCall(`/api/experiments/${experimentId}/runs`);
+                const metrics = await apiCall(`/api/experiments/${experimentId}/metrics`);
+
+                // Generate files
+                const csvContent = generateRunsCSV(runs, metrics);
+                const summaryReport = generateSummaryReport(experiment, runs, metrics);
+                const configBackup = generateConfigBackup(experiment);
+
+                // Create and download files
+                downloadFile(`${experiment.name}_runs.csv`, csvContent, 'text/csv');
+                downloadFile(`${experiment.name}_summary.txt`, summaryReport, 'text/plain');
+                downloadFile(`${experiment.name}_config.json`, configBackup, 'application/json');
+
+                // Show success message
+                loadingAlert.remove();
+                showSuccessMessage('Export completed! 3 files downloaded successfully.');
+
+            } catch (error) {
+                console.error('Export failed:', error);
+                showErrorMessage(`Export failed: ${error.message}`);
+                document.querySelector('.alert-info')?.remove();
+            }
+        }
+
+        function generateRunsCSV(runs, metrics) {
+            // Group metrics by run_id for easy lookup
+            const metricsByRun = {};
+            metrics.forEach(metric => {
+                if (!metricsByRun[metric.run_id]) {
+                    metricsByRun[metric.run_id] = {};
+                }
+                metricsByRun[metric.run_id][metric.name] = metric.value;
+            });
+
+            // CSV headers
+            const headers = [
+                'run_id', 'status', 'start_time', 'end_time', 'runtime_seconds',
+                'seed', 'algorithm_version_id', 'benchmark_instance_id',
+                'objective_value', 'best_so_far', 'error_message'
+            ];
+
+            let csv = headers.join(',') + '\n';
+
+            // Add run data
+            runs.forEach(run => {
+                const runMetrics = metricsByRun[run.id] || {};
+                const row = [
+                    run.id,
+                    run.status,
+                    run.start_time || '',
+                    run.end_time || '',
+                    calculateRuntime(run),
+                    run.seed || '',
+                    run.algorithm_version_id || '',
+                    run.benchmark_instance_id || '',
+                    runMetrics.objective || '',
+                    runMetrics.best_so_far || '',
+                    (run.error_message || '').replace(/,/g, ';').replace(/\n/g, ' ')
+                ];
+                csv += row.map(field => `"${field}"`).join(',') + '\n';
+            });
+
+            return csv;
+        }
+
+        function generateSummaryReport(experiment, runs, metrics) {
+            const completedRuns = runs.filter(r => r.status === 'completed');
+            const failedRuns = runs.filter(r => r.status === 'failed');
+            const objectiveMetrics = metrics.filter(m => m.name === 'objective').map(m => parseFloat(m.value));
+
+            let report = `EXPERIMENT SUMMARY REPORT\n`;
+            report += `${'='.repeat(50)}\n\n`;
+            
+            report += `Experiment: ${experiment.name}\n`;
+            report += `Description: ${experiment.description || 'No description'}\n`;
+            report += `Goal: ${experiment.goal_type}\n`;
+            report += `Created: ${formatDateTime(experiment.created_at)}\n`;
+            report += `Status: ${experiment.status}\n\n`;
+
+            report += `RUN STATISTICS\n`;
+            report += `${'-'.repeat(20)}\n`;
+            report += `Total Runs: ${runs.length}\n`;
+            report += `Completed: ${completedRuns.length}\n`;
+            report += `Failed: ${failedRuns.length}\n`;
+            report += `Success Rate: ${calculateSuccessRate(runs)}%\n\n`;
+
+            if (objectiveMetrics.length > 0) {
+                report += `OBJECTIVE PERFORMANCE\n`;
+                report += `${'-'.repeat(20)}\n`;
+                report += `Best Score: ${Math.min(...objectiveMetrics).toFixed(6)}\n`;
+                report += `Worst Score: ${Math.max(...objectiveMetrics).toFixed(6)}\n`;
+                report += `Average Score: ${(objectiveMetrics.reduce((a,b) => a+b, 0) / objectiveMetrics.length).toFixed(6)}\n`;
+                report += `Standard Deviation: ${calculateStandardDeviation(objectiveMetrics).toFixed(6)}\n\n`;
+            }
+
+            report += `CONFIGURATION\n`;
+            report += `${'-'.repeat(20)}\n`;
+            report += `Algorithms: ${experiment.config_json?.algorithms?.map(a => a.algorithm_id).join(', ') || 'N/A'}\n`;
+            report += `Benchmarks: ${experiment.config_json?.benchmarks?.map(b => b.benchmark_id).join(', ') || 'N/A'}\n`;
+            report += `Seeds: ${experiment.config_json?.seeds?.join(', ') || 'N/A'}\n`;
+            report += `Budget: ${experiment.config_json?.algorithms?.[0]?.budget_limit || 'N/A'}\n\n`;
+
+            report += `RUNTIME ANALYSIS\n`;
+            report += `${'-'.repeat(20)}\n`;
+            const runtimes = completedRuns.map(r => calculateRuntime(r)).filter(r => r > 0);
+            if (runtimes.length > 0) {
+                report += `Total Runtime: ${formatDuration(runtimes.reduce((a,b) => a+b, 0))}\n`;
+                report += `Average Runtime: ${formatDuration(runtimes.reduce((a,b) => a+b, 0) / runtimes.length)}\n`;
+                report += `Min Runtime: ${formatDuration(Math.min(...runtimes))}\n`;
+                report += `Max Runtime: ${formatDuration(Math.max(...runtimes))}\n`;
+            } else {
+                report += `No runtime data available\n`;
+            }
+
+            report += `\nGenerated: ${new Date().toISOString()}\n`;
+            return report;
+        }
+
+        function generateConfigBackup(experiment) {
+            const backup = {
+                experiment_metadata: {
+                    id: experiment.id,
+                    name: experiment.name,
+                    description: experiment.description,
+                    goal_type: experiment.goal_type,
+                    created_at: experiment.created_at,
+                    created_by_user: experiment.created_by_user,
+                    status: experiment.status,
+                    tags: experiment.tags
+                },
+                configuration: experiment.config_json,
+                export_metadata: {
+                    exported_at: new Date().toISOString(),
+                    export_version: "1.0",
+                    total_runs: experiment.total_runs,
+                    completed_runs: experiment.completed_runs,
+                    failed_runs: experiment.failed_runs
+                }
+            };
+            return JSON.stringify(backup, null, 2);
+        }
+
+        function downloadFile(filename, content, mimeType) {
+            const blob = new Blob([content], { type: mimeType });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }
+
+        function calculateRuntime(run) {
+            if (run.runtime_seconds) return run.runtime_seconds;
+            if (run.start_time && run.end_time) {
+                return (new Date(run.end_time) - new Date(run.start_time)) / 1000;
+            }
+            return 0;
+        }
+
+        function calculateStandardDeviation(values) {
+            const avg = values.reduce((a,b) => a+b, 0) / values.length;
+            const squareDiffs = values.map(value => Math.pow(value - avg, 2));
+            const avgSquareDiff = squareDiffs.reduce((a,b) => a+b, 0) / values.length;
+            return Math.sqrt(avgSquareDiff);
+        }
+
+        function formatDuration(seconds) {
+            const h = Math.floor(seconds / 3600);
+            const m = Math.floor((seconds % 3600) / 60);
+            const s = Math.floor(seconds % 60);
+            if (h > 0) return `${h}h ${m}m ${s}s`;
+            if (m > 0) return `${m}m ${s}s`;
+            return `${s}s`;
+        }
+
+        function formatDateTime(dateString) {
+            return new Date(dateString).toLocaleString();
+        }
+
+        function showSuccessMessage(message) {
+            const alert = document.createElement('div');
+            alert.className = 'alert alert-success position-fixed';
+            alert.style.cssText = 'top: 20px; right: 20px; z-index: 9999;';
+            alert.innerHTML = `<i class="fas fa-check"></i> ${message}`;
+            document.body.appendChild(alert);
+            setTimeout(() => alert.remove(), 5000);
+        }
+
+        function showErrorMessage(message) {
+            const alert = document.createElement('div');
+            alert.className = 'alert alert-danger position-fixed';
+            alert.style.cssText = 'top: 20px; right: 20px; z-index: 9999;';
+            alert.innerHTML = `<i class="fas fa-exclamation-triangle"></i> ${message}`;
+            document.body.appendChild(alert);
+            setTimeout(() => alert.remove(), 8000);
+        }
+        
+        function showAllRuns(experimentId) {
+            alert(`Full runs table view for experiment ${experimentId} would be implemented here.\n\nThis would show:\n- All runs in a paginated table\n- Advanced filtering and sorting\n- Detailed run information`);
+        }
+        
+
         
         function editExperiment(experimentId) {
             // TODO: Implement experiment editing
@@ -992,9 +1750,33 @@
         
         // Modal functions
         function showNewExperimentModal() {
+            console.log('Opening new experiment modal');
             const modal = new bootstrap.Modal(document.getElementById('newExperimentModal'));
-            loadAlgorithmsForSelection();
-            loadBenchmarksForSelection();
+            
+            // Show initial summary before loading algorithms/benchmarks
+            updateExperimentSummary();
+            
+            // Add event listeners for the form fields immediately
+            addSummaryEventListeners();
+            
+            // Load algorithms and benchmarks asynchronously
+            Promise.all([
+                loadAlgorithmsForSelection(),
+                loadBenchmarksForSelection()
+            ]).then(() => {
+                // Update summary after content loads
+                setTimeout(() => {
+                    addFormCheckboxListeners();
+                    updateExperimentSummary();
+                }, 50);
+            }).catch(error => {
+                console.log('Error loading modal content:', error);
+                // Still update summary even if loading fails
+                setTimeout(() => {
+                    updateExperimentSummary();
+                }, 50);
+            });
+            
             modal.show();
         }
         
@@ -1018,13 +1800,36 @@
                     document.getElementById(`algo-${algorithms[1].id}`).checked = true;
                 }
                 
+                // Summary will be updated by modal event listeners
+                
             } catch (error) {
-                document.getElementById('algorithm-selection').innerHTML = `
-                    <div class="alert alert-warning">
+                // Create demo algorithms for offline testing
+                const demoAlgorithms = [
+                    { id: 'random_search', name: 'Random Search', algorithm_type: 'random' },
+                    { id: 'tpe', name: 'TPE (Tree-structured Parzen Estimator)', algorithm_type: 'bayesian' }
+                ];
+                
+                const container = document.getElementById('algorithm-selection');
+                container.innerHTML = `
+                    <div class="alert alert-warning mb-3">
                         <i class="bi bi-exclamation-triangle"></i> <strong>Algorithm Service Unavailable</strong><br>
-                        Cannot load available algorithms. Please ensure the algorithm registry service is running and try again.
+                        Using demo algorithms for testing. Please ensure the algorithm registry service is running for full functionality.
                     </div>
+                    ${demoAlgorithms.map(algo => `
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="algo-${algo.id}" value="${algo.id}" onchange="syncAlgorithmSelections()">
+                            <label class="form-check-label" for="algo-${algo.id}">
+                                ${algo.name} <span class="text-muted">(${algo.algorithm_type})</span>
+                            </label>
+                        </div>
+                    `).join('')}
                 `;
+                
+                // Pre-select first two algorithms
+                document.getElementById(`algo-${demoAlgorithms[0].id}`).checked = true;
+                document.getElementById(`algo-${demoAlgorithms[1].id}`).checked = true;
+                
+                // Summary will be updated by modal event listeners
             }
         }
         
@@ -1047,6 +1852,8 @@
                     document.getElementById(`bench-${benchmarks[0].id}`).checked = true;
                 }
                 
+                // Summary will be updated by modal event listeners
+                
             } catch (error) {
                 // Use the same demo benchmarks as the catalog, matching actual database
                 const demoBenchmarks = [
@@ -1062,12 +1869,26 @@
                     }
                 ];
                 
-                document.getElementById('benchmark-selection').innerHTML = `
-                    <div class="alert alert-warning">
+                const container = document.getElementById('benchmark-selection');
+                container.innerHTML = `
+                    <div class="alert alert-warning mb-3">
                         <i class="bi bi-exclamation-triangle"></i> <strong>Benchmark Service Unavailable</strong><br>
-                        Cannot load available benchmarks. Please ensure the benchmark definition service is running and try again.
+                        Using demo benchmarks for testing. Please ensure the benchmark definition service is running for full functionality.
                     </div>
+                    ${demoBenchmarks.map(bench => `
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="bench-${bench.id}" value="${bench.id}" onchange="syncBenchmarkSelections()">
+                            <label class="form-check-label" for="bench-${bench.id}">
+                                ${bench.name} <span class="text-muted">(${bench.problem_type})</span>
+                            </label>
+                        </div>
+                    `).join('')}
                 `;
+                
+                // Pre-select first benchmark
+                document.getElementById(`bench-${demoBenchmarks[0].id}`).checked = true;
+                
+                // Summary will be updated by modal event listeners
             }
         }
         
@@ -1077,7 +1898,24 @@
                 const name = document.getElementById('experimentName').value;
                 const description = document.getElementById('experimentDescription').value;
                 const budget = parseInt(document.getElementById('evaluationBudget').value);
-                const seeds = document.getElementById('randomSeeds').value.split(',').map(s => parseInt(s.trim()));
+                const numberOfRuns = parseInt(document.getElementById('numberOfRuns').value);
+                const maxParallelRuns = parseInt(document.getElementById('maxParallelRuns').value);
+                const seedsInput = document.getElementById('randomSeeds').value.trim();
+                
+                // Generate or parse seeds based on number of runs
+                let seeds;
+                if (seedsInput) {
+                    seeds = seedsInput.split(',').map(s => parseInt(s.trim()));
+                    // If fewer seeds than runs, generate additional ones
+                    while (seeds.length < numberOfRuns) {
+                        seeds.push(Math.floor(Math.random() * 1000000));
+                    }
+                    // If more seeds than runs, use only the first N
+                    seeds = seeds.slice(0, numberOfRuns);
+                } else {
+                    // Auto-generate seeds
+                    seeds = Array.from({length: numberOfRuns}, () => Math.floor(Math.random() * 1000000));
+                }
                 
                 // Collect selected goals
                 const goals = [];
@@ -1115,6 +1953,9 @@
                     return;
                 }
                 
+                // Calculate total runs for the experiment
+                const totalRuns = numberOfRuns * algorithms.length * benchmarks.length;
+                
                 const experimentConfig = {
                     config: {
                         name,
@@ -1123,33 +1964,65 @@
                         algorithms,
                         benchmarks,
                         seeds,
-                        max_parallel_runs: 2
+                        max_parallel_runs: maxParallelRuns,
+                        total_runs: totalRuns
                     },
-                    start_immediately: true
+                    start_immediately: false
                 };
                 
-                // Create experiment
-                const result = await apiCall('/api/experiments', {
-                    method: 'POST',
-                    body: JSON.stringify(experimentConfig)
-                });
-                
-                // Show success message
-                const successAlert = document.createElement('div');
-                successAlert.className = 'alert alert-success alert-dismissible fade show position-fixed';
-                successAlert.style.cssText = 'top: 20px; right: 20px; z-index: 9999; max-width: 400px;';
-                successAlert.innerHTML = `
-                    <strong>Success!</strong> Experiment "${name}" created successfully! ID: ${result.id}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                `;
-                document.body.appendChild(successAlert);
-                
-                // Auto-remove the alert after 5 seconds
-                setTimeout(() => {
-                    if (successAlert.parentNode) {
-                        successAlert.remove();
-                    }
-                }, 5000);
+                try {
+                    // Create experiment
+                    const result = await apiCall('/api/experiments', {
+                        method: 'POST',
+                        body: JSON.stringify(experimentConfig)
+                    });
+                    
+                    // Show success message
+                    const successAlert = document.createElement('div');
+                    successAlert.className = 'alert alert-success alert-dismissible fade show position-fixed';
+                    successAlert.style.cssText = 'top: 20px; right: 20px; z-index: 9999; max-width: 400px;';
+                    successAlert.innerHTML = `
+                        <strong>Success!</strong> Experiment "${name}" created successfully! ID: ${result.id}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    `;
+                    document.body.appendChild(successAlert);
+                    
+                    // Auto-remove the alert after 5 seconds
+                    setTimeout(() => {
+                        if (successAlert.parentNode) {
+                            successAlert.remove();
+                        }
+                    }, 5000);
+                    
+                } catch (error) {
+                    // If backend is not running, create a demo experiment for testing
+                    console.log('Backend not available, creating demo experiment:', error);
+                    const demoResult = {
+                        id: 'demo-' + Math.random().toString(36).substr(2, 9),
+                        name: name,
+                        total_runs: totalRuns,
+                        completed_runs: 0,
+                        status: 'created',
+                        created_at: new Date().toISOString()
+                    };
+                    
+                    // Show success message for demo
+                    const successAlert = document.createElement('div');
+                    successAlert.className = 'alert alert-warning alert-dismissible fade show position-fixed';
+                    successAlert.style.cssText = 'top: 20px; right: 20px; z-index: 9999; max-width: 400px;';
+                    successAlert.innerHTML = `
+                        <strong>Demo Mode:</strong> Experiment "${name}" created for testing! Total runs: ${totalRuns}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    `;
+                    document.body.appendChild(successAlert);
+                    
+                    // Auto-remove the alert after 5 seconds
+                    setTimeout(() => {
+                        if (successAlert.parentNode) {
+                            successAlert.remove();
+                        }
+                    }, 5000);
+                }
                 
                 // Close modal and refresh
                 bootstrap.Modal.getInstance(document.getElementById('newExperimentModal')).hide();
@@ -1177,10 +2050,6 @@
             }
         }
         
-        function viewExperiment(experimentId) {
-            alert(`Viewing experiment ${experimentId}\n\nIn a full implementation, this would navigate to a detailed experiment view with:\n- Real-time progress tracking\n- Convergence plots\n- Statistical analysis\n- Run details and logs`);
-        }
-        
         // Global algorithm data
         let allAlgorithms = [];
         let selectedAlgorithms = new Set();
@@ -1188,6 +2057,111 @@
         // Global benchmark data
         let allBenchmarks = [];
         let selectedBenchmarks = new Set();
+
+        // Update experiment summary based on current form selections
+        function updateExperimentSummary() {
+            console.log('updateExperimentSummary called');
+            try {
+                const numberOfRunsElement = document.getElementById('numberOfRuns');
+                const maxParallelRunsElement = document.getElementById('maxParallelRuns');
+                const summaryElement = document.getElementById('summaryText');
+                
+                console.log('Elements found:', {
+                    numberOfRuns: !!numberOfRunsElement,
+                    maxParallelRuns: !!maxParallelRunsElement,
+                    summary: !!summaryElement
+                });
+                
+                if (!numberOfRunsElement || !maxParallelRunsElement || !summaryElement) {
+                    console.log('Required elements not found, skipping update');
+                    return;
+                }
+                
+                const numberOfRuns = parseInt(numberOfRunsElement.value) || 1;
+                const maxParallelRuns = parseInt(maxParallelRunsElement.value) || 1;
+                
+                // Count selected algorithms in the experiment form
+                const algorithmCheckboxes = document.querySelectorAll('#algorithm-selection input[type="checkbox"]:checked');
+                const selectedAlgorithmCount = algorithmCheckboxes.length;
+                
+                // Count selected benchmarks in the experiment form
+                const benchmarkCheckboxes = document.querySelectorAll('#benchmark-selection input[type="checkbox"]:checked');
+                const selectedBenchmarkCount = benchmarkCheckboxes.length;
+                
+                // Calculate total runs
+                const totalRuns = numberOfRuns * selectedAlgorithmCount * selectedBenchmarkCount;
+                
+                console.log(`Summary update: runs=${numberOfRuns}, algorithms=${selectedAlgorithmCount}, benchmarks=${selectedBenchmarkCount}, total=${totalRuns}`);
+                
+                let summaryText = '';
+                if (selectedAlgorithmCount === 0 && selectedBenchmarkCount === 0) {
+                    summaryText = `Ready to create experiment with ${numberOfRuns} run${numberOfRuns !== 1 ? 's' : ''} per combination. Please select algorithms and benchmarks below.`;
+                } else if (selectedAlgorithmCount === 0) {
+                    summaryText = `${selectedBenchmarkCount} benchmark${selectedBenchmarkCount !== 1 ? 's' : ''} selected. Please select at least one algorithm to complete configuration.`;
+                } else if (selectedBenchmarkCount === 0) {
+                    summaryText = `${selectedAlgorithmCount} algorithm${selectedAlgorithmCount !== 1 ? 's' : ''} selected. Please select at least one benchmark to complete configuration.`;
+                } else {
+                    summaryText = `Will create ${totalRuns} total runs (${numberOfRuns} run${numberOfRuns !== 1 ? 's' : ''} per combination) across ${selectedAlgorithmCount} algorithm${selectedAlgorithmCount !== 1 ? 's' : ''} and ${selectedBenchmarkCount} benchmark${selectedBenchmarkCount !== 1 ? 's' : ''}`;
+                    if (maxParallelRuns > 1) {
+                        summaryText += ` with up to ${maxParallelRuns} parallel runs`;
+                    }
+                }
+                
+                if (summaryElement) {
+                    summaryElement.textContent = summaryText;
+                }
+            } catch (error) {
+                console.log('Error updating experiment summary:', error);
+            }
+        }
+
+        // Add event listeners to update summary when form changes
+        function addSummaryEventListeners() {
+            console.log('Adding summary event listeners');
+            
+            // Remove any existing listeners to avoid duplicates
+            const numberOfRunsElement = document.getElementById('numberOfRuns');
+            const maxParallelRunsElement = document.getElementById('maxParallelRuns');
+            
+            console.log('Found elements:', {
+                numberOfRuns: !!numberOfRunsElement,
+                maxParallelRuns: !!maxParallelRunsElement
+            });
+            
+            if (numberOfRunsElement) {
+                // Remove any existing listener
+                numberOfRunsElement.removeEventListener('input', updateExperimentSummary);
+                numberOfRunsElement.addEventListener('input', function() {
+                    console.log('numberOfRuns changed to:', numberOfRunsElement.value);
+                    updateExperimentSummary();
+                });
+                console.log('Added listener to numberOfRuns');
+            }
+            if (maxParallelRunsElement) {
+                // Remove any existing listener
+                maxParallelRunsElement.removeEventListener('input', updateExperimentSummary);
+                maxParallelRunsElement.addEventListener('input', function() {
+                    console.log('maxParallelRuns changed to:', maxParallelRunsElement.value);
+                    updateExperimentSummary();
+                });
+                console.log('Added listener to maxParallelRuns');
+            }
+        }
+
+        // Function to add listeners to algorithm and benchmark checkboxes
+        function addFormCheckboxListeners() {
+            // Add listeners to algorithm checkboxes
+            const algorithmCheckboxes = document.querySelectorAll('#algorithm-selection input[type="checkbox"]');
+            algorithmCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', updateExperimentSummary);
+            });
+            
+            // Add listeners to benchmark checkboxes
+            const benchmarkCheckboxes = document.querySelectorAll('#benchmark-selection input[type="checkbox"]');
+            benchmarkCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', updateExperimentSummary);
+            });
+        }
 
         async function showAlgorithms() {
             const modal = new bootstrap.Modal(document.getElementById('algorithmCatalogModal'));
@@ -1506,6 +2480,9 @@
             if (allAlgorithms.length > 0) {
                 displayAlgorithms(allAlgorithms);
             }
+            
+            // Update experiment summary
+            updateExperimentSummary();
         }
         
         function syncBenchmarkSelections() {
@@ -1520,34 +2497,9 @@
             if (allBenchmarks.length > 0) {
                 displayBenchmarks(allBenchmarks);
             }
-        }
-
-        function syncAlgorithmSelections() {
-            // Sync from experiment form to catalog
-            selectedAlgorithms.clear();
-            document.querySelectorAll('input[type="checkbox"][id^="algo-"]:checked').forEach(checkbox => {
-                const algoId = checkbox.value;
-                selectedAlgorithms.add(algoId);
-            });
             
-            // Refresh algorithm display if catalog is open
-            if (allAlgorithms.length > 0) {
-                displayAlgorithms(allAlgorithms);
-            }
-        }
-        
-        function syncBenchmarkSelections() {
-            // Sync from experiment form to catalog
-            selectedBenchmarks.clear();
-            document.querySelectorAll('input[type="checkbox"][id^="bench-"]:checked').forEach(checkbox => {
-                const benchId = checkbox.value;
-                selectedBenchmarks.add(benchId);
-            });
-            
-            // Refresh benchmark display if catalog is open
-            if (allBenchmarks.length > 0) {
-                displayBenchmarks(allBenchmarks);
-            }
+            // Update experiment summary
+            updateExperimentSummary();
         }
         
         function updateResourceCounts() {
@@ -2123,6 +3075,8 @@
 
         // Initialize dashboard
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOMContentLoaded fired, initializing...');
+            
             // Initialize API status with tooltip
             updateApiStatus('Checking...', 'bg-secondary');
             
@@ -2131,10 +3085,19 @@
             
             // Run initial test status check after a short delay
             setTimeout(checkTestStatus, 2000);
+            console.log('Calling loadDashboard()...');
             loadDashboard();
             
             // Set up delete confirmation handler
             document.getElementById('confirm-delete-btn').addEventListener('click', confirmDeleteExperiment);
+            
+            // Set up experiment summary event listeners
+            addSummaryEventListeners();
+            
+            // Initialize experiment summary
+            updateExperimentSummary();
+            
+            console.log('DOM loaded, event listeners added');
         });
     </script>
 </body>

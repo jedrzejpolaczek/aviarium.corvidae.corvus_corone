@@ -244,8 +244,14 @@ async def create_experiment(experiment: ExperimentCreate, db: Session = Depends(
     )
     
     db.add(db_experiment)
-    db.commit()
-    db.refresh(db_experiment)
+    try:
+        db.commit()
+        db.refresh(db_experiment)
+        logger.info(f"Created experiment {db_experiment.id} in database")
+    except Exception as e:
+        logger.error(f"Failed to commit experiment {db_experiment.id}: {e}")
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Failed to create experiment: {e}")
     
     # Convert to response model
     response = ExperimentResponse(
@@ -299,6 +305,42 @@ async def get_experiment(experiment_id: str, db: Session = Depends(get_db)):
     
     return response
 
+@app.put("/api/tracking/experiments/{experiment_id}", response_model=ExperimentResponse)
+async def update_experiment(experiment_id: str, experiment_update: dict, db: Session = Depends(get_db)):
+    """Update experiment (e.g., status)"""
+    db_experiment = db.query(Experiment).filter(Experiment.id == experiment_id).first()
+    if not db_experiment:
+        raise HTTPException(status_code=404, detail="Experiment not found")
+    
+    # Update fields
+    updated = False
+    if "status" in experiment_update:
+        old_status = db_experiment.status
+        db_experiment.status = experiment_update["status"]
+        logger.info(f"Updated experiment {experiment_id} status: {old_status} -> {experiment_update['status']}")
+        updated = True
+    
+    if "name" in experiment_update:
+        db_experiment.name = experiment_update["name"]
+        updated = True
+        
+    if "description" in experiment_update:
+        db_experiment.description = experiment_update["description"]
+        updated = True
+    
+    if updated:
+        db_experiment.updated_at = datetime.utcnow()
+        try:
+            db.commit()
+            db.refresh(db_experiment)
+        except Exception as e:
+            logger.error(f"Failed to update experiment {experiment_id}: {e}")
+            db.rollback()
+            raise HTTPException(status_code=500, detail=f"Failed to update experiment: {e}")
+    
+    # Return updated experiment with run statistics
+    return await get_experiment(experiment_id, db)
+
 @app.get("/api/tracking/experiments", response_model=List[ExperimentResponse])
 async def list_experiments(
     limit: int = Query(50, le=200),
@@ -321,6 +363,17 @@ async def list_experiments(
     
     responses = []
     for exp in experiments:
+        # Calculate run statistics for each experiment
+        total_runs = db.query(Run).filter(Run.experiment_id == exp.id).count()
+        completed_runs = db.query(Run).filter(
+            Run.experiment_id == exp.id,
+            Run.status == "completed"
+        ).count()
+        failed_runs = db.query(Run).filter(
+            Run.experiment_id == exp.id,
+            Run.status == "failed"
+        ).count()
+        
         response = ExperimentResponse(
             id=exp.id,
             name=exp.name,
@@ -331,11 +384,60 @@ async def list_experiments(
             updated_at=exp.updated_at,
             config_json=exp.config_json,
             status=exp.status,
-            tags=exp.tags.split(",") if exp.tags else []
+            tags=exp.tags.split(",") if exp.tags else [],
+            total_runs=total_runs,
+            completed_runs=completed_runs,
+            failed_runs=failed_runs
         )
         responses.append(response)
     
     return responses
+
+# Helper function to update experiment status
+def update_experiment_status(experiment_id: str, db: Session):
+    """Update experiment status based on run completion"""
+    experiment = db.query(Experiment).filter(Experiment.id == experiment_id).first()
+    if not experiment:
+        return
+    
+    # Get run statistics
+    total_runs = db.query(Run).filter(Run.experiment_id == experiment_id).count()
+    completed_runs = db.query(Run).filter(
+        Run.experiment_id == experiment_id,
+        Run.status == "completed"
+    ).count()
+    failed_runs = db.query(Run).filter(
+        Run.experiment_id == experiment_id,
+        Run.status == "failed"
+    ).count()
+    running_runs = db.query(Run).filter(
+        Run.experiment_id == experiment_id,
+        Run.status == "running"
+    ).count()
+    
+    # Update status based on run states
+    old_status = experiment.status
+    if total_runs == 0:
+        new_status = "pending"
+    elif running_runs > 0:
+        new_status = "running"
+    elif completed_runs + failed_runs == total_runs:
+        # All runs finished
+        if failed_runs == 0:
+            new_status = "completed"
+        elif completed_runs == 0:
+            new_status = "failed"
+        else:
+            new_status = "completed_with_failures"
+    else:
+        new_status = "running"
+    
+    # Update if status changed
+    if old_status != new_status:
+        experiment.status = new_status
+        experiment.updated_at = datetime.utcnow()
+        db.commit()
+        logger.info(f"Updated experiment {experiment_id} status: {old_status} -> {new_status}")
 
 # Run endpoints
 @app.post("/api/tracking/runs", response_model=RunResponse)
@@ -352,8 +454,17 @@ async def create_run(run: RunCreate, db: Session = Depends(get_db)):
     )
     
     db.add(db_run)
-    db.commit()
-    db.refresh(db_run)
+    try:
+        db.commit()
+        db.refresh(db_run)
+        logger.info(f"Created run {db_run.id} for experiment {run.experiment_id} in database")
+        
+        # Update experiment status
+        update_experiment_status(run.experiment_id, db)
+    except Exception as e:
+        logger.error(f"Failed to commit run {db_run.id}: {e}")
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Failed to create run: {e}")
     
     return RunResponse.from_orm(db_run)
 
@@ -385,8 +496,18 @@ async def update_run(run_id: str, run_update: RunUpdate, db: Session = Depends(g
     if run_update.error_message:
         db_run.error_message = run_update.error_message
     
-    db.commit()
-    db.refresh(db_run)
+    try:
+        db.commit()
+        db.refresh(db_run)
+        logger.info(f"Updated run {db_run.id} with status {run_update.status}")
+        
+        # Update experiment status when run status changes
+        if run_update.status:
+            update_experiment_status(db_run.experiment_id, db)
+    except Exception as e:
+        logger.error(f"Failed to update run {db_run.id}: {e}")
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Failed to update run: {e}")
     
     return RunResponse.from_orm(db_run)
 
@@ -456,6 +577,15 @@ async def get_run_metrics(run_id: str, db: Session = Depends(get_db)):
     metrics = db.query(Metric).filter(Metric.run_id == run_id).order_by(Metric.timestamp).all()
     return [MetricResponse.from_orm(metric) for metric in metrics]
 
+@app.get("/api/tracking/experiments/{experiment_id}/metrics", response_model=List[MetricResponse])
+async def get_experiment_metrics(experiment_id: str, db: Session = Depends(get_db)):
+    """Get all metrics for experiment"""
+    # Get all metrics for runs belonging to this experiment
+    metrics = db.query(Metric).join(Run).filter(
+        Run.experiment_id == experiment_id
+    ).order_by(Metric.timestamp).all()
+    return [MetricResponse.from_orm(metric) for metric in metrics]
+
 # Artifact endpoints
 @app.post("/api/tracking/artifacts", response_model=ArtifactResponse)
 async def create_artifact(artifact: ArtifactCreate, db: Session = Depends(get_db)):
@@ -508,6 +638,62 @@ async def delete_experiment(experiment_id: str, db: Session = Depends(get_db)):
         db.rollback()
         logger.error(f"Failed to delete experiment {experiment_id}: {e}")
         raise HTTPException(status_code=500, detail=f"Failed to delete experiment: {str(e)}")
+
+@app.get("/api/experiments/{experiment_id}/runs")
+async def get_experiment_runs(experiment_id: str, db: Session = Depends(get_db)):
+    """Get all runs for a specific experiment"""
+    logger.info(f"Getting runs for experiment {experiment_id}")
+    
+    # Check if experiment exists
+    experiment = db.query(Experiment).filter(Experiment.id == experiment_id).first()
+    if not experiment:
+        raise HTTPException(status_code=404, detail="Experiment not found")
+    
+    # Get all runs for the experiment
+    runs = db.query(Run).filter(Run.experiment_id == experiment_id).all()
+    
+    return [
+        {
+            "id": run.id,
+            "experiment_id": run.experiment_id,
+            "algorithm_id": run.algorithm_id,
+            "benchmark_id": run.benchmark_id,
+            "status": run.status,
+            "best_score": run.best_score,
+            "runtime_seconds": run.runtime_seconds,
+            "started_at": run.started_at,
+            "completed_at": run.completed_at,
+            "config": run.config_json,
+            "metadata": run.metadata_json
+        }
+        for run in runs
+    ]
+
+@app.get("/api/experiments/{experiment_id}/metrics")
+async def get_experiment_metrics(experiment_id: str, db: Session = Depends(get_db)):
+    """Get all metrics for a specific experiment"""
+    logger.info(f"Getting metrics for experiment {experiment_id}")
+    
+    # Check if experiment exists
+    experiment = db.query(Experiment).filter(Experiment.id == experiment_id).first()
+    if not experiment:
+        raise HTTPException(status_code=404, detail="Experiment not found")
+    
+    # Get all metrics for all runs in the experiment
+    metrics = db.query(Metric).join(Run).filter(Run.experiment_id == experiment_id).all()
+    
+    return [
+        {
+            "id": metric.id,
+            "run_id": metric.run_id,
+            "name": metric.name,
+            "value": metric.value,
+            "step": metric.step,
+            "timestamp": metric.timestamp,
+            "metadata": metric.metadata_json
+        }
+        for metric in metrics
+    ]
 
 if __name__ == "__main__":
     import uvicorn

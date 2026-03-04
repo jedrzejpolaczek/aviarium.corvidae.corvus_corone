@@ -1,10 +1,11 @@
-# Hyperparameter Optimization Algorithm Benchmarking Manifest
+# Hyperparameter Optimization Algorithm Benchmarking Manifesto
 
 ## Preamble
 
 We stand at the threshold of creating a new benchmarking system for hyperparameter optimization algorithms. This system is meant to serve the discovery of truth about algorithm performance, not their promotion. It should support science, not competition. It should build knowledge, not rankings.
 
-Drawing inspiration from experiences in optimization, machine learning, and design of experiments, we formulate the following values and principles that will form the foundation of our system.
+Drawing inspiration from experiences in optimization, machine learning, and design of experiments, we formulate the following values and principles that will form the foundation of our system. 
+> Note: This document draws primarily from "Benchmarking in Optimization: Best Practice and Open Issues" (Bartz-Beielstein et al., 2020), in the interest of full transparency.
 
 ---
 
@@ -12,7 +13,7 @@ Drawing inspiration from experiences in optimization, machine learning, and desi
 
 Through our work on the hyperparameter optimization algorithm benchmarking system, we have come to value:
 
-1. **Understanding algorithms** over creating winner rankings (or something similar).
+1. **Understanding algorithms** over ranking them by a single metric.
 2. **Problem representativeness** over ease of achieving results.
 3. **Research reproducibility** over speed of publication.
 4. **Experimental space** over single metrics.
@@ -78,6 +79,6 @@ The nine categories above are based on the fundamental aspects of benchmarking i
 - **Ecosystem** - Extended concept: Interoperability with existing platforms and community-driven development
 - **Ethical & Scientific** - Extended concept: Objectivity, fairness, and acknowledgment of theoretical limitations (e.g., No Free Lunch theorems)
 
-The first seven categories align with the paper's eight core aspects (with Measurement & Analysis combining two). The last two categories (Ecosystem and Ethical & Scientific) extend the framework to address modern collaborative and ethical considerations in benchmarking practice.
+The first seven categories derive from the paper's eight core aspects — Measurement & Analysis combines 'Performance' and 'Analysis' into one. The last two categories (Ecosystem and Ethical & Scientific) extend the framework to address modern collaborative and ethical considerations in benchmarking practice.
 
 ---

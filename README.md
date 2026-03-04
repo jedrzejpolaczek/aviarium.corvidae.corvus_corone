@@ -1,205 +1,197 @@
-# Corvus Corone - HPO Benchmarking Platform
+<!-- PROJECT SHIELDS -->
+[![CI status][ci-status-shield]](https://github.com/ORGANIZATION/REPO/actions)
+<!-- you can add seperate shields for diffrent CI/CD status or something else, just put link to .yml file -->
 
-Platform for benchmarking hyperparameter optimization (HPO) algorithms with emphasis on reproducibility and statistical rigor.
+# Project data
+<!-- This section contains essential details about the project. -->
 
-## 📖 Documentation
+Project name: WIP
 
-**Production-ready documentation** of the system has been organized into an easy-to-navigate structure:
+Application name: WIP
 
-**▶️ [Start here - Documentation Guide](docs/README.docs.md)**
+Additional names: WIP
 
-**🎯 Complete documentation includes:**
-- **Requirements**: Use cases, functional and non-functional requirements + Requirements Traceability Matrix
-- **Architecture**: Full C4 model (Context, Containers, Components, Code) 
-- **Design Decisions**: **12 complete ADRs** covering all key architectural decisions
-- **Operations**: Deployment examples, monitoring, **performance benchmarks & SLA definitions**
-- **Methodology**: Benchmarking practices, research methodologies
-- **User Guides**: Workflows, usage instructions
+Software version: 0.0.1
 
-### 🎯 Quick links:
-- [Use Cases](docs/requirements/use-cases.md) - Requirements and scenarios
-- [Methodologies](docs/methodology/benchmarking-practices.md) - Research practices
-- [System Architecture](docs/architecture/c1-context.md) - Technical overview (C4 Model)
-- [Deployment Guide](docs/operations/deployment-guide.md) - PC-first, Cloud-ready deployment
-- [Requirements Traceability](docs/requirements/requirements-traceability.md) - Requirements traceability matrix
+Repository Purpose: WIP
 
----
+# Table of Contents
+<!-- List of sections and their corresponding links for easy navigation. -->
+1. [Project Data](#project-data)
+3. [Project Task Board](#project-task-board)
+4. [Technical Details](#technical-details)
+   - [Environment](#environment)
+   - [File Structure](#file-structure)
+   - [Required Tools](#required-tools)
+   - [Build Procedure](#build-procedure)
+5. [Usage](#usage)
+6. [Testing Information](#testing-information)
+7. [Other Important Information](#other-important-information)
+   - [Coding standards](#coding-standards)
+   - [Knowledge base](#knowledge-base)
+   - [Contribution Guidelines](#contribution-guidelines)
+   - [Versioning Convention](#versioning-convention)
+   - [FAQs/Troubleshooting](#faqstroubleshooting)
+   - [License](#license)
+9. [Contact Information](#contact-information)
+10. [Acknowledgments](#acknowledgments)
+11. [Screenshots/Media](#screenshotmedia)
+12. [Release History](#release-history)
 
-*Detailed navigation and description of all documents: [docs/README.docs.md](docs/README.docs.md)*
+# Project task board
+<!-- Provide a link or description of the project's task board for tracking progress. -->
 
-## Project Data
+Project task board: WIP
 
-**Project name:** Corvus Corone  
-**Application name:** HPO Benchmarking Platform  
-**Software version:** 1.0.0  
-**Repository Purpose:** Hyperparameter Optimization algorithms benchmarking and comparison platform
+# Technical details
+<!-- Outline specific technical aspects of the project like architecture, languages used, etc. -->
+WIP
+<!--
+Example:
+The application is built using Python and Tensorflow as main AI framework.
+-->
 
-## Table of Contents
+## Environment
+<!-- Describe the environment in which the application runs (e.g., server specifications, operating systems). -->
+WIP
+<!--
+Example:
+The app is deployed on AWS EC2 instances running Ubuntu 20.04, with PostgreSQL as the database.
+-->
 
-1. [Documentation](#-documentation)
-2. [Project Data](#project-data)
-3. [System Architecture](#-system-architecture)
-4. [Technologies](#-technologies)
-5. [Project Structure](#-project-structure)
-6. [Installation and Setup](#-installation-and-setup)
-7. [Contributing](#-contributing)
-8. [License](#-license)
-
-## 🏗️ System Architecture
-
-Corvus Corone is a microservices platform designed for benchmarking HPO algorithms:
-
-- **Microservices**: API Gateway, Worker Pool, Experiment Tracking, Algorithm Registry + Plugin Runtime
-- **Container orchestration**: Kubernetes for scaling
-- **Message broker**: RabbitMQ (primary) / Redis (fallback) for asynchronous communication
-- **Storage**: PostgreSQL (Results Store), Object Storage (artifacts), Redis (cache)
-- **Monitoring**: Prometheus + Grafana, distributed tracing (see [Monitoring Stack](docs/operations/monitoring-guide.md))
-
-Details in [architecture documentation](docs/architecture/c1-context.md).
-
-## 💻 Technologies
-
-### Backend
-- **Python 3.9+** - Core application language
-- **FastAPI** - API framework
-- **SQLAlchemy** - ORM
-- **Celery** - Task queue
-- **Docker** - Containerization
-
-### Databases
-- **PostgreSQL** - Primary transactional data
-- **ClickHouse** - Analytics and time-series data
-- **Redis** - Caching and real-time data
-- **InfluxDB** - Monitoring metrics
-
-### Infrastructure
-- **Kubernetes** - Container orchestration
-- **RabbitMQ** - Message broker
-- **Prometheus + Grafana** - Monitoring
-- **Jaeger** - Distributed tracing
-
-### Environment
-System runs in Docker containers with support for:
-- **Cloud**: AWS, GCP, Azure (Kubernetes)
-- **On-premise**: Docker Compose, Kubernetes
-- **Development**: Local Docker setup
-
-## 📁 Project Structure
-
+## File structure
+<!-- Provide an overview of the project's directory layout. -->
 ```
-├── README.md                     <- This file - main project description
-├── docs/                         <- Complete system documentation
-│   ├── README.docs.md           <- Documentation guide
-│   ├── requirements/            <- Requirements and business analysis
-│   │   ├── use-cases.md        <- Use cases
-│   │   └── non-functional-requirements.md <- Non-functional requirements
-│   ├── architecture/            <- System architecture (C4 Model)
-│   │   ├── c1-context.md       <- C4-1: System context
-│   │   ├── c2-containers.md    <- C4-2: Containers and services
-│   │   └── c3-components.md    <- C4-3: Components and APIs
-│   ├── methodology/             <- Research methodologies
-│   │   └── benchmarking-practices.md <- Benchmarking practices
-│   ├── user-guides/             <- User guides
-│   │   └── workflows.md        <- Processes and workflows
-│   ├── operations/              <- Operational documentation
-│   │   ├── deployment-guide.md <- Deployment guide
-│   │   └── monitoring-guide.md <- Monitoring and alerting
-│   └── design/                  <- Design decisions
-│       └── design-decisions.md  <- Architectural Decision Records
+├── README.md              <- The top-level README for developers using this project.
+...
 │
-├── src/                         <- Application source code
-│   ├── api-gateway/            <- API Gateway service
-│   ├── orchestrator/           <- Experiment Orchestrator
-│   ├── worker/                 <- Worker Pool
-│   ├── tracking/               <- Experiment Tracking service
-│   ├── plugin-manager/         <- Plugin Manager
-│   ├── report-generator/       <- Report Generator
-│   └── web-ui/                 <- Web User Interface
-│
-├── deploy/                      <- Deployment configurations
-│   ├── docker/                 <- Docker configurations
-│   ├── kubernetes/             <- Kubernetes manifests
-│   └── compose/                <- Docker Compose files
-│
-├── tests/                       <- Test suites
-├── scripts/                     <- Utility scripts
-└── examples/                    <- Example algorithms and benchmarks
+└── tests                  <- Test scripts 
 ```
-## 🚀 Installation and Run
+## Required tools
+<!-- List tools and libraries required for building and running the code. --->
+WIP
+<!--
+Example:
+- Node.js (v14 or above)
+- Python (v3.8) (libraries in file requirements.txt)
+- Docker
+-->
 
-### Requirements
-- **Docker** 20.10+
-- **Docker Compose** 2.0+
-- **Python** 3.9+ (dla development)
-- **Kubernetes** 1.21+ (dla production)
+## Build procedure
+<!-- Steps to build or compile the project. -->
+WIP
+<!--
+Example:
+1. Clone the repository
+2. Run command `docker build .` to create Docker image
+-->
 
-### Quick start (Docker Compose)
+# Usage
+<!-- Instructions on how to use the application or code with examples. -->
+WIP
+<!--
+Example:
+To start the application, navigate to the project directory and run command: 
 ```bash
-# Clone repository
-git clone https://github.com/jedrzejpolaczek/aviarium.corvidae.corvus_corone.git
-cd aviarium.corvidae.corvus_corone
-
-# Run system
-docker-compose up -d
-
-# Check status
-docker-compose ps
+docker-compose up
 ```
+-->
 
-### App access
-- **Web UI**: http://localhost:3000
-- **API Gateway**: http://localhost:8080
-- **Monitoring**: http://localhost:3001 (Grafana)
+# Testing Information
+<!-- How to run tests for the project. -->
+WIP
 
-### Detailed Instructions
-Complete installation guide: [Deployment Guide](docs/operations/deployment-guide.md)
+# Other important informations
+<!-- Any additional information relevant to the project. -->
+## Coding standards
+Coding standard: [Google Python Style Guide](https://google.github.io/styleguide/pyguide.html)
 
-## 🤝 Contributing
+## Knowledge base
+WIP
+<!--
+Example:
+* All API keys and sensitive data are stored in environment variables.
+-->
 
-### How to contribute to the project
-1. **Fork** the repository
-2. **Create** a branch for your feature (`git checkout -b feature/AmazingFeature`)
-3. **Commit** your changes (`git commit -m 'Add some AmazingFeature'`)
-4. **Push** to the branch (`git push origin feature/AmazingFeature`)
-5. **Open** a Pull Request
+## Contribution Guidelines
+<!-- How others can contribute to the project, including coding standards and submission process. -->
+WIP
 
-### Coding Standards
-- **Python**: [Google Python Style Guide](https://google.github.io/styleguide/pyguide.html)
-- **JavaScript**: ESLint + Prettier
-- **Docker**: Best practices for multi-stage builds
-- **Documentation**: Markdown with Mermaid diagrams
+## Versioning convention
+<!-- Explain how version numbers are assigned.-->
+WIP
+<!--
+Example 1 (recommended for libs):
+You may find versioning convention here: [Versioning convention documment](https://semver.org/)
 
-### Testing
-```bash
-# Unit tests
-pytest tests/unit/
+Example 2 (your own convention and how to describe it):
+Version 1.0.0: Initial release
+Version 1.1.0: New feature added
+Version 1.1.1: Minor bug fixes
+Version 2.0.0: New release
+-->
 
-# Integration tests
-pytest tests/integration/
+## FAQs/Troubleshooting
+<!-- Frequently asked questions or common troubleshooting scenarios. -->
+WIP
+<!--
+Example:
+- issue with login under certain conditions,
+- slow response time on older Android devices,
+- specific problem during environment setup.
+    - how to solve it.
+-->
 
-# E2E tests
-pytest tests/e2e/
-```
+## License
+<!-- Information about the project's license. -->
+WIP
+<!--
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
+-->
 
-### Reporting Issues
-- **Bugs**: Use GitHub Issues with bug report template
-- **Feature requests**: GitHub Issues with feature request template
-- **Questions**: GitHub Discussions
+## Contact Information
+<!-- Where to direct questions and discussions about the project. -->
+WIP
+<!--
+Example:
+In case of any questions reach dev team through project [Slack channel](link to channel)
+-->
 
-## 📄 License
-
-This project is available under the MIT license. See the [LICENSE](LICENSE) file for details.
-
-## 🏆 Acknowledgments
-
+## Acknowledgments
+<!-- Acknowledge contributors, sponsors, or any third-party resources used. -->
+WIP
+<!--
+Example:
 This project was made possible thanks to:
-- **Research team** for concepts and requirements
-- **HPO Community** for feedback and algorithms
-- **Open Source** for tools and libraries
+- **John Doe** for initial development and ideas.
+- **Acme Corp** for providing the necessary infrastructure.
+- Special thanks to **Open Source Initiative** for resources and guides.
+-->
 
----
+## Screenshots/Media
+<!-- Screenshots, GIFs, or videos demonstrating the application or software. -->
+WIP
+<!--
+Example:
+Below are some screenshots and media demonstrating the application in action:
 
-**Corvus Corone** - Advancing HPO research through reproducible benchmarking 🚀
+- ![Main Interface](link_to_main_interface_screenshot)
+- ![Feature X Implementation](link_to_feature_x_screenshot)
+- A brief demo video of the application can be found [here](link_to_demo_video).
+-->
+
+# Release history
+<!-- Provide a record of release versions and changes. -->
+WIP
+<!-- 
+Example 1:
+You can put a link to the appropriate file or git branch history convention.
+
+Example 2:
+- v1.0.0: Initial launch
+- v1.1.0: Added user profile feature
+- v1.2.0: Improved performance and bug fixes
+-->
 
 <!-- MARKDOWN LINKS & IMAGES -->
-[ci-status-shield]: https://github.com/jedrzejpolaczek/aviarium.corvidae.corvus_corone/actions/workflows/main.yml/badge.svg?branch=main
+[ci-status-shield]: https://github.com/jedrzejpolaczek/aviarium.corvidae.corvus_corone/actions/workflows/ci.yml/badge.svg?branch=main

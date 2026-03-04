@@ -31,25 +31,25 @@ The system exists to serve the discovery of truth about algorithm performance, n
 
 ```mermaid
 flowchart LR
-  researcher(["Researcher\nDesigns studies, runs experiments, interprets results"]):::person
-  practitioner(["Practitioner\nSelects algorithms using benchmarking results"]):::person
-  alg_author(["Algorithm Author\nContributes HPO algorithm implementations"]):::person
-  contributor(["Community Contributor\nAdds problems, tools, documentation"]):::person
-  maintainer(["System Maintainer\nManages versioning, governance, infrastructure"]):::person
+  researcher(["Researcher<br>Designs studies, runs experiments, interprets results"]):::person
+  practitioner(["Practitioner<br>Selects algorithms using benchmarking results"]):::person
+  alg_author(["Algorithm Author<br>Contributes HPO algorithm implementations"]):::person
+  contributor(["Community Contributor<br>Adds problems, tools, documentation"]):::person
+  maintainer(["System Maintainer<br>Manages versioning, governance, infrastructure"]):::person
 
-  system["Corvus Corone\nPython library: rigorous HPO benchmarking, analysis, and reports"]:::system
+  system["Corvus Corone<br>Python library: rigorous HPO benchmarking, analysis, and reports"]:::system
 
   subgraph b_ecosystem["Benchmarking Ecosystem"]
-    coco["COCO\nContinuous black-box benchmark platform"]:::ext
-    nevergrad["Nevergrad\nGradient-free optimization platform"]:::ext
-    iohprofiler["IOHprofiler\nAnytime performance analysis"]:::ext
+    coco["COCO<br>Continuous black-box benchmark platform"]:::ext
+    nevergrad["Nevergrad<br>Gradient-free optimization platform"]:::ext
+    iohprofiler["IOHprofiler<br>Anytime performance analysis"]:::ext
   end
 
   subgraph b_infra["Infrastructure & Storage"]
-    hpc["HPC / Cloud Compute\nDistributed compute for parallel execution — V2"]:::ext
-    artifact_repo["Artifact Repository\nLong-term open storage, e.g. Zenodo"]:::ext
-    vcs["Version Control / CI\nSource code and CI platform, e.g. GitHub"]:::ext
-    platform_server["V2 Platform Server\nShared community result repository — V2"]:::ext
+    hpc["HPC / Cloud Compute<br>Distributed compute for parallel execution — V2"]:::ext
+    artifact_repo["Artifact Repository<br>Long-term open storage, e.g. Zenodo"]:::ext
+    vcs["Version Control / CI<br>Source code and CI platform, e.g. GitHub"]:::ext
+    platform_server["V2 Platform Server<br>Shared community result repository — V2"]:::ext
   end
 
   researcher & practitioner & alg_author & contributor & maintainer --> system

@@ -23,29 +23,29 @@ CONNECTS TO:
 
 ```mermaid
 flowchart LR
-  researcher(["Researcher\nDesigns and executes benchmarking studies"]):::person
-  alg_author(["Algorithm Author\nContributes algorithm implementations"]):::person
+  researcher(["Researcher<br>Designs and executes benchmarking studies"]):::person
+  alg_author(["Algorithm Author<br>Contributes algorithm implementations"]):::person
 
-  ecosystem["Benchmarking Ecosystem\nCOCO, Nevergrad, IOHprofiler"]:::ext
-  artifact_repo["Artifact Repository\nLong-term open data storage, e.g. Zenodo"]:::ext
+  ecosystem["Benchmarking Ecosystem<br>COCO, Nevergrad, IOHprofiler"]:::ext
+  artifact_repo["Artifact Repository<br>Long-term open data storage, e.g. Zenodo"]:::ext
 
   subgraph b_system["Corvus Corone (Python Library)"]
     subgraph b_entry["Entry"]
-      api["Public API + CLI\nPython, Click"]:::container
+      api["Public API + CLI<br>Python, Click"]:::container
     end
 
     subgraph b_core["Core"]
-      orchestrator["Study Orchestrator\nPython"]:::container
-      runner["Experiment Runner\nPython"]:::container
-      analysis["Analysis Engine\nPython, SciPy"]:::container
-      reporting["Reporting Engine\nPython, Matplotlib"]:::container
+      orchestrator["Study Orchestrator<br>Python"]:::container
+      runner["Experiment Runner<br>Python"]:::container
+      analysis["Analysis Engine<br>Python, SciPy"]:::container
+      reporting["Reporting Engine<br>Python, Matplotlib"]:::container
     end
 
     subgraph b_data["Data & Registry"]
-      registry["Algorithm Registry\nPython"]:::container
-      problems["Problem Repository\nPython"]:::container
-      store["Results Store\nPython, SQLite"]:::container
-      bridge["Ecosystem Bridge\nPython"]:::container
+      registry["Algorithm Registry<br>Python"]:::container
+      problems["Problem Repository<br>Python"]:::container
+      store["Results Store<br>Python, SQLite"]:::container
+      bridge["Ecosystem Bridge<br>Python"]:::container
     end
   end
 

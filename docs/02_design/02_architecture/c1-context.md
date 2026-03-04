@@ -29,104 +29,115 @@ The system exists to serve the discovery of truth about algorithm performance, n
 
 ## System Context Diagram
 
-```plantuml
-@startuml
-!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+```mermaid
+flowchart LR
+  researcher(["Researcher\nDesigns studies, runs experiments, interprets results"]):::person
+  practitioner(["Practitioner\nSelects algorithms using benchmarking results"]):::person
+  alg_author(["Algorithm Author\nContributes HPO algorithm implementations"]):::person
+  contributor(["Community Contributor\nAdds problems, tools, documentation"]):::person
+  maintainer(["System Maintainer\nManages versioning, governance, infrastructure"]):::person
 
-title System Context — Corvus Corone — General Overview
+  system["Corvus Corone\nPython library: rigorous HPO benchmarking, analysis, and reports"]:::system
 
-LAYOUT_LEFT_RIGHT()
+  subgraph b_ecosystem["Benchmarking Ecosystem"]
+    coco["COCO\nContinuous black-box benchmark platform"]:::ext
+    nevergrad["Nevergrad\nGradient-free optimization platform"]:::ext
+    iohprofiler["IOHprofiler\nAnytime performance analysis"]:::ext
+  end
 
-Person(actors, "Actors", "Interact with the system")
+  subgraph b_infra["Infrastructure & Storage"]
+    hpc["HPC / Cloud Compute\nDistributed compute for parallel execution — V2"]:::ext
+    artifact_repo["Artifact Repository\nLong-term open storage, e.g. Zenodo"]:::ext
+    vcs["Version Control / CI\nSource code and CI platform, e.g. GitHub"]:::ext
+    platform_server["V2 Platform Server\nShared community result repository — V2"]:::ext
+  end
 
-System(system, "Corvus Corone", "Python library: wrap your algorithm, get rigorous benchmarking, analysis, and reports")
+  researcher & practitioner & alg_author & contributor & maintainer --> system
+  system --> coco & iohprofiler & hpc & artifact_repo & vcs & platform_server
+  system <--> nevergrad
 
-Boundary(b_ecosystem, "Benchmarking Ecosystem") {
-  System_Ext(benchmarking_ecosystem, "Benchmark Platforms", "COCO · Nevergrad · IOHprofiler — see detail diagram below")
-}
-
-Boundary(b_infra, "Infrastructure & Storage") {
-  System_Ext(infrastructure_storage, "Infrastructure & Storage", "HPC · Zenodo · GitHub · V2 Platform Server — see detail diagram below")
-}
-
-Rel(actors, system, "Interact with system")
-Rel(system, benchmarking_ecosystem, "Exports and imports benchmark data")
-Rel(system, infrastructure_storage, "Stores artifacts, submits jobs, hosts code")
-
-@enduml
+  classDef person fill:#08427b,color:#fff,stroke:#073b6f
+  classDef system fill:#1168bd,color:#fff,stroke:#0e5db5
+  classDef ext fill:#6b6b6b,color:#fff,stroke:#5a5a5a
 ```
 
-```plantuml
-@startuml
-!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+```mermaid
+flowchart LR
+  actors(["Actors\nInteract with the system"]):::person
+  system["Corvus Corone\nPython library: rigorous HPO benchmarking, analysis, and reports"]:::system
 
-title System Context — Corvus Corone — Actors Details
+  subgraph b_ecosystem["Benchmarking Ecosystem"]
+    benchmarking_ecosystem["Benchmark Platforms\nCOCO · Nevergrad · IOHprofiler — see detail diagram below"]:::ext
+  end
 
-LAYOUT_TOP_DOWN()
+  subgraph b_infra["Infrastructure & Storage"]
+    infrastructure_storage["Infrastructure & Storage\nHPC · Zenodo · GitHub · V2 Platform Server — see detail diagram below"]:::ext
+  end
 
-Person(researcher, "Researcher", "Designs studies, runs experiments, interprets results")
-Person(practitioner, "Practitioner", "Selects algorithms using benchmarking results")
-Person(alg_author, "Algorithm Author", "Contributes HPO algorithm implementations")
-Person(contributor, "Community Contributor", "Adds problems, tools, documentation")
-Person(maintainer, "System Maintainer", "Manages versioning, governance, infrastructure")
+  actors --> system
+  system --> benchmarking_ecosystem & infrastructure_storage
 
-System(system, "Corvus Corone", "Python library: wrap your algorithm, get rigorous benchmarking, analysis, and reports")
-
-Rel(researcher, system, "Designs studies, triggers runs")
-Rel(practitioner, system, "Queries results for algorithm selection")
-Rel(alg_author, system, "Contributes algorithm implementations")
-Rel(contributor, system, "Contributes problems, tools, docs")
-Rel(maintainer, system, "Manages versioning and governance")
-
-@enduml
+  classDef person fill:#08427b,color:#fff,stroke:#073b6f
+  classDef system fill:#1168bd,color:#fff,stroke:#0e5db5
+  classDef ext fill:#6b6b6b,color:#fff,stroke:#5a5a5a
 ```
 
-```plantuml
-@startuml
-!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+```mermaid
+flowchart TD
+  researcher(["Researcher\nDesigns studies, runs experiments, interprets results"]):::person
+  practitioner(["Practitioner\nSelects algorithms using benchmarking results"]):::person
+  alg_author(["Algorithm Author\nContributes HPO algorithm implementations"]):::person
+  contributor(["Community Contributor\nAdds problems, tools, documentation"]):::person
+  maintainer(["System Maintainer\nManages versioning, governance, infrastructure"]):::person
 
-title System Context — Corvus Corone — Benchmarking Ecosystem Details
+  system["Corvus Corone\nPython library: rigorous HPO benchmarking, analysis, and reports"]:::system
 
-LAYOUT_LEFT_RIGHT()
+  researcher -->|"Designs studies, triggers runs"| system
+  practitioner -->|"Queries results"| system
+  alg_author -->|"Contributes algorithms"| system
+  contributor -->|"Contributes problems, tools, docs"| system
+  maintainer -->|"Manages versioning"| system
 
-System(system, "Corvus Corone", "Python library: wrap your algorithm, get rigorous benchmarking, analysis, and reports")
-
-Boundary(b_ecosystem, "Benchmarking Ecosystem") {
-  System_Ext(coco, "COCO", "Continuous black-box benchmark platform")
-  System_Ext(nevergrad, "Nevergrad", "Gradient-free optimization platform with algorithm portfolio")
-  System_Ext(iohprofiler, "IOHprofiler", "Anytime performance analysis and visualization")
-}
-
-Rel(system, coco, "Exports results", "data export")
-BiRel(system, nevergrad, "Imports algorithms / exports results", "data exchange")
-Rel(system, iohprofiler, "Exports performance curves", "data export")
-
-@enduml
+  classDef person fill:#08427b,color:#fff,stroke:#073b6f
+  classDef system fill:#1168bd,color:#fff,stroke:#0e5db5
 ```
 
-```plantuml
-@startuml
-!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+```mermaid
+flowchart LR
+  system["Corvus Corone\nPython library: rigorous HPO benchmarking, analysis, and reports"]:::system
 
-title System Context — Corvus Corone — Infrastructure & Storage Details
+  subgraph b_ecosystem["Benchmarking Ecosystem"]
+    coco["COCO\nContinuous black-box benchmark platform"]:::ext
+    nevergrad["Nevergrad\nGradient-free optimization platform with algorithm portfolio"]:::ext
+    iohprofiler["IOHprofiler\nAnytime performance analysis and visualization"]:::ext
+  end
 
-LAYOUT_LEFT_RIGHT()
+  system -->|"Exports results"| coco
+  system <-->|"Imports algorithms / exports results"| nevergrad
+  system -->|"Exports performance curves"| iohprofiler
 
-System(system, "Corvus Corone", "Python library: wrap your algorithm, get rigorous benchmarking, analysis, and reports")
+  classDef system fill:#1168bd,color:#fff,stroke:#0e5db5
+  classDef ext fill:#6b6b6b,color:#fff,stroke:#5a5a5a
+```
 
-Boundary(b_infra, "Infrastructure & Storage") {
-  System_Ext(hpc, "HPC / Cloud Compute", "Distributed compute for parallel execution (V2)")
-  System_Ext(artifact_repo, "Artifact Repository", "Long-term open storage, e.g. Zenodo")
-  System_Ext(vcs, "Version Control / CI", "Source code repository and CI platform, e.g. GitHub")
-  System_Ext(platform_server, "V2 Platform Server", "Shared community result repository (V2, planned)")
-}
+```mermaid
+flowchart LR
+  system["Corvus Corone\nPython library: rigorous HPO benchmarking, analysis, and reports"]:::system
 
-Rel(system, hpc, "Delegates parallel execution (V2)", "job submission")
-Rel(system, artifact_repo, "Publishes versioned datasets", "open data")
-Rel(system, vcs, "Source code, CI/CD, contributions", "code + CI")
-Rel(system, platform_server, "Stores/retrieves shared artifacts (V2)", "REST API")
+  subgraph b_infra["Infrastructure & Storage"]
+    hpc["HPC / Cloud Compute\nDistributed compute for parallel execution — V2"]:::ext
+    artifact_repo["Artifact Repository\nLong-term open storage, e.g. Zenodo"]:::ext
+    vcs["Version Control / CI\nSource code repository and CI platform, e.g. GitHub"]:::ext
+    platform_server["V2 Platform Server\nShared community result repository — V2"]:::ext
+  end
 
-@enduml
+  system -->|"Delegates parallel execution — V2"| hpc
+  system -->|"Publishes versioned datasets"| artifact_repo
+  system -->|"Source code, CI/CD"| vcs
+  system -->|"Stores/retrieves shared artifacts — V2"| platform_server
+
+  classDef system fill:#1168bd,color:#fff,stroke:#0e5db5
+  classDef ext fill:#6b6b6b,color:#fff,stroke:#5a5a5a
 ```
 
 > **`REF-TASK-0003 — Decided`** — HPC/cloud distributed execution is **deferred to V2**. In V1, all Runs execute locally (sequentially or with Python multiprocessing). The decision is recorded in `docs/02_design/02_architecture/adr/ADR-001-library-with-server-ready-data-layer.md`. Runs are independent by design (MANIFESTO Principle 18), so the execution backend can be swapped via the Repository/Runner abstraction without changing the data format.

@@ -21,59 +21,48 @@ CONNECTS TO:
 
 ## Container Diagram
 
-```plantuml
-@startuml
-!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+```mermaid
+flowchart LR
+  researcher(["Researcher\nDesigns and executes benchmarking studies"]):::person
+  alg_author(["Algorithm Author\nContributes algorithm implementations"]):::person
 
-title Container Diagram — Corvus Corone: HPO Algorithm Benchmarking Platform
+  ecosystem["Benchmarking Ecosystem\nCOCO, Nevergrad, IOHprofiler"]:::ext
+  artifact_repo["Artifact Repository\nLong-term open data storage, e.g. Zenodo"]:::ext
 
-LAYOUT_LEFT_RIGHT()
+  subgraph b_system["Corvus Corone (Python Library)"]
+    subgraph b_entry["Entry"]
+      api["Public API + CLI\nPython, Click"]:::container
+    end
 
-Person(researcher, "Researcher", "Designs and executes benchmarking studies")
-Person(alg_author, "Algorithm Author", "Contributes algorithm implementations")
+    subgraph b_core["Core"]
+      orchestrator["Study Orchestrator\nPython"]:::container
+      runner["Experiment Runner\nPython"]:::container
+      analysis["Analysis Engine\nPython, SciPy"]:::container
+      reporting["Reporting Engine\nPython, Matplotlib"]:::container
+    end
 
-System_Ext(ecosystem, "Benchmarking Ecosystem", "COCO, Nevergrad, IOHprofiler")
-System_Ext(artifact_repo, "Artifact Repository", "Long-term open data storage, e.g. Zenodo")
+    subgraph b_data["Data & Registry"]
+      registry["Algorithm Registry\nPython"]:::container
+      problems["Problem Repository\nPython"]:::container
+      store["Results Store\nPython, SQLite"]:::container
+      bridge["Ecosystem Bridge\nPython"]:::container
+    end
+  end
 
-Boundary(b_system, "Corvus Corone (Python Library)") {
+  researcher --> api
+  alg_author --> registry
 
-  Boundary(b_entry, "Entry") {
-    Container(api, "Public API + CLI", "Python, Click", "Entry point: study design, execution, reporting")
-  }
+  api --> orchestrator
+  orchestrator --> runner & analysis & reporting
+  runner --> registry & problems & store
+  analysis --> store
+  reporting --> store
+  bridge --> store & ecosystem
+  store --> artifact_repo
 
-  Boundary(b_core, "Core") {
-    Container(orchestrator, "Study Orchestrator", "Python", "Coordinates study execution; dispatches runs and tracks progress")
-    Container(runner, "Experiment Runner", "Python", "Executes individual (algorithm, problem, seed) runs; records raw observations")
-    Container(analysis, "Analysis Engine", "Python, SciPy", "Computes performance metrics and statistical tests on run data")
-    Container(reporting, "Reporting Engine", "Python, Matplotlib", "Produces audience-appropriate reports and visualizations")
-  }
-
-  Boundary(b_data, "Data & Registry") {
-    Container(registry, "Algorithm Registry", "Python", "Catalog of algorithm implementations and configurations")
-    Container(problems, "Problem Repository", "Python", "Catalog of benchmark problem instances and metadata")
-    Container(store, "Results Store", "Python, SQLite", "Persists runs, performance records, and study metadata")
-    Container(bridge, "Ecosystem Bridge", "Python", "Exports results to COCO, Nevergrad, and IOHprofiler formats")
-  }
-
-}
-
-Rel(researcher, api, "Designs studies, runs experiments, views reports", "Python / CLI")
-Rel(alg_author, registry, "Registers algorithm implementation", "Python")
-
-Rel(api, orchestrator, "Submits study for execution")
-Rel(orchestrator, runner, "Dispatches individual runs")
-Rel(orchestrator, analysis, "Triggers metric computation")
-Rel(orchestrator, reporting, "Triggers report generation")
-Rel(runner, registry, "Loads algorithm instance")
-Rel(runner, problems, "Loads problem instance")
-Rel(runner, store, "Writes run record and observations")
-Rel(analysis, store, "Reads run records; writes performance records")
-Rel(reporting, store, "Reads aggregated results")
-Rel(bridge, store, "Reads study artifacts")
-Rel(bridge, ecosystem, "Exports data files", "file I/O")
-Rel(store, artifact_repo, "Publishes versioned datasets", "open data")
-
-@enduml
+  classDef person fill:#08427b,color:#fff,stroke:#073b6f
+  classDef container fill:#1168bd,color:#fff,stroke:#0e5db5
+  classDef ext fill:#6b6b6b,color:#fff,stroke:#5a5a5a
 ```
 
 ---

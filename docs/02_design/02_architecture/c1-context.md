@@ -33,35 +33,40 @@ The system exists to serve the discovery of truth about algorithm performance, n
 C4Context
   title System Context — Corvus Corone: HPO Algorithm Benchmarking Platform
 
-  Person(researcher, "Researcher", "Designs benchmarking studies, formulates research questions, interprets results")
-  Person(practitioner, "Practitioner", "Consumes benchmarking results to select algorithms for ML applications")
-  Person(alg_author, "Algorithm Author", "Contributes HPO algorithm implementations for evaluation")
-  Person(contributor, "Community Contributor", "Adds benchmark problems, analysis tools, or documentation")
-  Person(maintainer, "System Maintainer", "Manages versioning, governance, and long-term availability")
+  Person(researcher, "Researcher", "Designs studies, runs experiments, interprets results")
+  Person(practitioner, "Practitioner", "Selects algorithms using benchmarking results")
+  Person(alg_author, "Algorithm Author", "Contributes HPO algorithm implementations")
+  Person(contributor, "Community Contributor", "Adds problems, tools, documentation")
+  Person(maintainer, "System Maintainer", "Manages versioning, governance, infrastructure")
 
-  System(system, "Corvus Corone: HPO Benchmarking Platform", "Python library: wrap your algorithm, get rigorous benchmarking, analysis, and reports automatically")
+  System(system, "Corvus Corone", "Python library: wrap your algorithm, get rigorous benchmarking, analysis, and reports")
 
-  System_Ext(coco, "COCO", "Comparing Continuous Optimizers — benchmark platform for continuous black-box optimization")
-  System_Ext(nevergrad, "Nevergrad", "Facebook's gradient-free optimization platform with algorithm portfolio")
-  System_Ext(iohprofiler, "IOHprofiler", "Iterative Optimization Heuristics profiler — anytime performance analysis")
-  System_Ext(hpc, "HPC / Cloud Compute", "Distributed compute infrastructure for parallel experiment execution (V2)")
-  System_Ext(artifact_repo, "Artifact Repository", "Long-term open storage (e.g. Zenodo) for published datasets and results")
-  System_Ext(vcs, "Version Control / CI", "Source code repository and continuous integration platform (e.g. GitHub)")
-  System_Ext(platform_server, "V2 Platform Server (future)", "Community server providing shared result repositories, discovery, and persistent artifact identifiers — planned for V2, not deployed in V1")
+  Boundary(b_ecosystem, "Benchmarking Ecosystem") {
+    System_Ext(coco, "COCO", "Continuous black-box benchmark platform")
+    System_Ext(nevergrad, "Nevergrad", "Gradient-free optimization platform with algorithm portfolio")
+    System_Ext(iohprofiler, "IOHprofiler", "Anytime performance analysis and visualization")
+  }
 
-  Rel(researcher, system, "Designs studies, runs experiments, receives analysis reports")
-  Rel(practitioner, system, "Queries results to inform algorithm selection")
-  Rel(alg_author, system, "Contributes algorithm implementations via defined interface")
-  Rel(contributor, system, "Contributes problems, tools, and documentation via pull requests")
-  Rel(maintainer, system, "Manages artifact versions, governance, infrastructure")
+  Boundary(b_infra, "Infrastructure & Storage") {
+    System_Ext(hpc, "HPC / Cloud Compute", "Distributed compute for parallel execution (V2)")
+    System_Ext(artifact_repo, "Artifact Repository", "Long-term open storage, e.g. Zenodo")
+    System_Ext(vcs, "Version Control / CI", "Source code repository and CI platform, e.g. GitHub")
+    System_Ext(platform_server, "V2 Platform Server", "Shared community result repository (V2, planned)")
+  }
 
-  Rel(system, coco, "Exports results in COCO-compatible format", "data export")
-  Rel(system, nevergrad, "Exports results and imports Nevergrad baselines", "data exchange")
-  Rel(system, iohprofiler, "Exports performance curves for IOHprofiler analysis", "data export")
-  Rel(system, hpc, "Delegates parallel experiment execution (V2)", "job submission")
-  Rel(system, artifact_repo, "Publishes versioned datasets and study artifacts", "open data")
-  Rel(system, vcs, "Source code, CI/CD, community contributions", "code + CI")
-  Rel(system, platform_server, "Stores and retrieves shared study artifacts via Repository interface (V2)", "REST API")
+  Rel(researcher, system, "Designs studies, triggers runs")
+  Rel(practitioner, system, "Queries results for algorithm selection")
+  Rel(alg_author, system, "Contributes algorithm implementations")
+  Rel(contributor, system, "Contributes problems, tools, docs")
+  Rel(maintainer, system, "Manages versioning and governance")
+
+  Rel(system, coco, "Exports results", "data export")
+  Rel(system, nevergrad, "Imports algorithms / exports results", "data exchange")
+  Rel(system, iohprofiler, "Exports performance curves", "data export")
+  Rel(system, hpc, "Delegates parallel execution (V2)", "job submission")
+  Rel(system, artifact_repo, "Publishes versioned datasets", "open data")
+  Rel(system, vcs, "Source code, CI/CD, contributions", "code + CI")
+  Rel(system, platform_server, "Stores/retrieves shared artifacts (V2)", "REST API")
 ```
 
 > **`REF-TASK-0003 — Decided`** — HPC/cloud distributed execution is **deferred to V2**. In V1, all Runs execute locally (sequentially or with Python multiprocessing). The decision is recorded in `docs/02_design/02_architecture/adr/ADR-001-library-with-server-ready-data-layer.md`. Runs are independent by design (MANIFESTO Principle 18), so the execution backend can be swapped via the Repository/Runner abstraction without changing the data format.

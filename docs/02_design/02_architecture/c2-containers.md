@@ -21,30 +21,44 @@ CONNECTS TO:
 
 ## Container Diagram
 
-<!--
-  Draw a C4 Container diagram (Mermaid or PlantUML).
-  Show each container as a labeled box with:
-    - Name
-    - Technology (language, runtime, storage type)
-    - One-line responsibility
+```mermaid
+C4Container
+  title Container Diagram — Corvus Corone: HPO Algorithm Benchmarking Platform
 
-  Show relationships between containers as arrows with:
-    - What protocol/mechanism is used (HTTP API, file I/O, message queue, function call)
-    - What data flows (in terms of entities from specs/data-format.md)
+  Person(researcher, "Researcher", "Designs and executes benchmarking studies")
+  Person(alg_author, "Algorithm Author", "Contributes algorithm implementations")
 
-  Also show the actors from C1 interacting with the outermost containers.
-  Also show the external systems from C1 and which containers talk to them.
+  System_Ext(ecosystem, "Benchmarking Ecosystem", "COCO, Nevergrad, IOHprofiler")
+  System_Ext(artifact_repo, "Artifact Repository", "Long-term open data storage, e.g. Zenodo")
 
-  Hint — containers to consider (adjust based on actual architecture decisions):
-    - Problem Repository (storage + access layer for benchmark problems)
-    - Algorithm Registry (catalog of algorithm implementations and configurations)
-    - Experiment Runner (orchestrates execution of studies)
-    - Measurement & Analysis Engine (computes metrics, runs statistical analysis)
-    - Results Store (persists run data, performance records, aggregates)
-    - Reporting & Visualization Layer (produces outputs for different audiences)
-    - Ecosystem Bridge (handles import/export to COCO, Nevergrad, IOHprofiler)
-    - API / CLI (entry points for researchers and automation)
--->
+  Boundary(b_system, "Corvus Corone (Python Library)") {
+    Container(api, "Public API + CLI", "Python, Click", "Entry point: study design, execution, reporting")
+    Container(orchestrator, "Study Orchestrator", "Python", "Coordinates study execution; dispatches runs and tracks progress")
+    Container(runner, "Experiment Runner", "Python", "Executes individual (algorithm, problem, seed) runs; records raw observations")
+    Container(analysis, "Analysis Engine", "Python, SciPy", "Computes performance metrics and statistical tests on run data")
+    Container(reporting, "Reporting Engine", "Python, Matplotlib", "Produces audience-appropriate reports and visualizations")
+    Container(registry, "Algorithm Registry", "Python", "Catalog of algorithm implementations and configurations")
+    Container(problems, "Problem Repository", "Python", "Catalog of benchmark problem instances and metadata")
+    Container(store, "Results Store", "Python, SQLite", "Persists runs, performance records, and study metadata")
+    Container(bridge, "Ecosystem Bridge", "Python", "Exports results to COCO, Nevergrad, and IOHprofiler formats")
+  }
+
+  Rel(researcher, api, "Designs studies, runs experiments, views reports", "Python / CLI")
+  Rel(alg_author, registry, "Registers algorithm implementation", "Python")
+
+  Rel(api, orchestrator, "Submits study for execution")
+  Rel(orchestrator, runner, "Dispatches individual runs")
+  Rel(orchestrator, analysis, "Triggers metric computation")
+  Rel(orchestrator, reporting, "Triggers report generation")
+  Rel(runner, registry, "Loads algorithm instance")
+  Rel(runner, problems, "Loads problem instance")
+  Rel(runner, store, "Writes run record and observations")
+  Rel(analysis, store, "Reads run records; writes performance records")
+  Rel(reporting, store, "Reads aggregated results")
+  Rel(bridge, store, "Reads study artifacts")
+  Rel(bridge, ecosystem, "Exports data files", "file I/O")
+  Rel(store, artifact_repo, "Publishes versioned datasets", "open data")
+```
 
 ---
 

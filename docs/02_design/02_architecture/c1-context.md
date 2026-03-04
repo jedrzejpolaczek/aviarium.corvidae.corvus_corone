@@ -34,11 +34,7 @@ C4Context
   title System Context — Corvus Corone: HPO Algorithm Benchmarking Platform — General 
   UpdateLayoutConfig($c4ShapeInRow="4", $c4BoundaryInRow="2")
 
-  Person(researcher, "Researcher", "Designs studies, runs experiments, interprets results")
-  Person(practitioner, "Practitioner", "Selects algorithms using benchmarking results")
-  Person(alg_author, "Algorithm Author", "Contributes HPO algorithm implementations")
-  Person(contributor, "Community Contributor", "Adds problems, tools, documentation")
-  Person(maintainer, "System Maintainer", "Manages versioning, governance, infrastructure")
+  Person(actors, "Actors", "Interact with the system")
 
   System(system, "Corvus Corone", "Python library: wrap your algorithm, get rigorous benchmarking, analysis, and reports")
 
@@ -50,14 +46,30 @@ C4Context
     System_Ext(infrastructure_storage, "Infrastructure & Storage", "HPC · Zenodo · GitHub · V2 Platform Server — see detail diagram below")
   }
 
+  Rel(actors, system, "Interact with system")
+  Rel(system, benchmarking_ecosystem, "Exports and imports benchmark data")
+  Rel(system, infrastructure_storage, "Stores artifacts, submits jobs, hosts code")
+
+```
+
+```mermaid
+C4Context
+  title System Context — Corvus Corone: HPO Algorithm Benchmarking Platform — General 
+  UpdateLayoutConfig($c4ShapeInRow="4", $c4BoundaryInRow="2")
+
+  Person(researcher, "Researcher", "Designs studies, runs experiments, interprets results")
+  Person(practitioner, "Practitioner", "Selects algorithms using benchmarking results")
+  Person(alg_author, "Algorithm Author", "Contributes HPO algorithm implementations")
+  Person(contributor, "Community Contributor", "Adds problems, tools, documentation")
+  Person(maintainer, "System Maintainer", "Manages versioning, governance, infrastructure")
+
+  System(system, "Corvus Corone", "Python library: wrap your algorithm, get rigorous benchmarking, analysis, and reports")
+
   Rel(researcher, system, "Designs studies, triggers runs")
   Rel(practitioner, system, "Queries results for algorithm selection")
   Rel(alg_author, system, "Contributes algorithm implementations")
   Rel(contributor, system, "Contributes problems, tools, docs")
   Rel(maintainer, system, "Manages versioning and governance")
-
-  Rel(system, benchmarking_ecosystem, "Exports and imports benchmark data")
-  Rel(system, infrastructure_storage, "Stores artifacts, submits jobs, hosts code")
 
 ```
 

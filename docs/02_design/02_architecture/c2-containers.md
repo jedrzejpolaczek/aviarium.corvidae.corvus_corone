@@ -49,16 +49,21 @@ flowchart LR
     end
   end
 
-  researcher --> api
-  alg_author --> registry
+  researcher -->|"Designs studies, runs experiments, views reports"| api
+  alg_author -->|"Registers algorithm implementation"| registry
 
-  api --> orchestrator
-  orchestrator --> runner & analysis & reporting
-  runner --> registry & problems & store
-  analysis --> store
-  reporting --> store
-  bridge --> store & ecosystem
-  store --> artifact_repo
+  api -->|"Submits study for execution"| orchestrator
+  orchestrator -->|"Dispatches individual runs"| runner
+  orchestrator -->|"Triggers metric computation"| analysis
+  orchestrator -->|"Triggers report generation"| reporting
+  runner -->|"Loads algorithm instance"| registry
+  runner -->|"Loads problem instance"| problems
+  runner -->|"Writes run record and observations"| store
+  analysis -->|"Reads run records; writes performance records"| store
+  reporting -->|"Reads aggregated results"| store
+  bridge -->|"Reads study artifacts"| store
+  bridge -->|"Exports data files"| ecosystem
+  store -->|"Publishes versioned datasets"| artifact_repo
 
   classDef person fill:#08427b,color:#fff,stroke:#073b6f
   classDef container fill:#1168bd,color:#fff,stroke:#0e5db5

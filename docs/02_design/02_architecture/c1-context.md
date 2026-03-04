@@ -31,7 +31,7 @@ The system exists to serve the discovery of truth about algorithm performance, n
 
 ```mermaid
 C4Context
-  title System Context — Corvus Corone: HPO Algorithm Benchmarking Platform
+  title System Context — Corvus Corone: HPO Algorithm Benchmarking Platform — General 
   UpdateLayoutConfig($c4ShapeInRow="4", $c4BoundaryInRow="2")
 
   Person(researcher, "Researcher", "Designs studies, runs experiments, interprets results")
@@ -43,16 +43,11 @@ C4Context
   System(system, "Corvus Corone", "Python library: wrap your algorithm, get rigorous benchmarking, analysis, and reports")
 
   Boundary(b_ecosystem, "Benchmarking Ecosystem") {
-    System_Ext(coco, "COCO", "Continuous black-box benchmark platform")
-    System_Ext(nevergrad, "Nevergrad", "Gradient-free optimization platform with algorithm portfolio")
-    System_Ext(iohprofiler, "IOHprofiler", "Anytime performance analysis and visualization")
+    System_Ext(benchmarking_ecosystem, "Benchmark Platforms", "COCO · Nevergrad · IOHprofiler — see detail diagram below")
   }
 
   Boundary(b_infra, "Infrastructure & Storage") {
-    System_Ext(hpc, "HPC / Cloud Compute", "Distributed compute for parallel execution (V2)")
-    System_Ext(artifact_repo, "Artifact Repository", "Long-term open storage, e.g. Zenodo")
-    System_Ext(vcs, "Version Control / CI", "Source code repository and CI platform, e.g. GitHub")
-    System_Ext(platform_server, "V2 Platform Server", "Shared community result repository (V2, planned)")
+    System_Ext(infrastructure_storage, "Infrastructure & Storage", "HPC · Zenodo · GitHub · V2 Platform Server — see detail diagram below")
   }
 
   Rel(researcher, system, "Designs studies, triggers runs")
@@ -61,9 +56,43 @@ C4Context
   Rel(contributor, system, "Contributes problems, tools, docs")
   Rel(maintainer, system, "Manages versioning and governance")
 
+  Rel(system, benchmarking_ecosystem, "Exports and imports benchmark data")
+  Rel(system, infrastructure_storage, "Stores artifacts, submits jobs, hosts code")
+
+```
+
+```mermaid
+C4Context
+  title System Context — Corvus Corone: HPO Algorithm Benchmarking Platform — Benchmarking Ecosystem Details
+  UpdateLayoutConfig($c4ShapeInRow="4", $c4BoundaryInRow="2")
+
+  System(system, "Corvus Corone", "Python library: wrap your algorithm, get rigorous benchmarking, analysis, and reports")
+
+  Boundary(b_ecosystem, "Benchmarking Ecosystem") {
+    System_Ext(coco, "COCO", "Continuous black-box benchmark platform")
+    System_Ext(nevergrad, "Nevergrad", "Gradient-free optimization platform with algorithm portfolio")
+    System_Ext(iohprofiler, "IOHprofiler", "Anytime performance analysis and visualization")
+  }
+
   Rel(system, coco, "Exports results", "data export")
   Rel(system, nevergrad, "Imports algorithms / exports results", "data exchange")
   Rel(system, iohprofiler, "Exports performance curves", "data export")
+```
+
+```mermaid
+C4Context
+  title System Context — Corvus Corone: HPO Algorithm Benchmarking Platform — Infrastructure & Storage Details
+  UpdateLayoutConfig($c4ShapeInRow="4", $c4BoundaryInRow="2")
+
+  System(system, "Corvus Corone", "Python library: wrap your algorithm, get rigorous benchmarking, analysis, and reports")
+
+  Boundary(b_infra, "Infrastructure & Storage") {
+    System_Ext(hpc, "HPC / Cloud Compute", "Distributed compute for parallel execution (V2)")
+    System_Ext(artifact_repo, "Artifact Repository", "Long-term open storage, e.g. Zenodo")
+    System_Ext(vcs, "Version Control / CI", "Source code repository and CI platform, e.g. GitHub")
+    System_Ext(platform_server, "V2 Platform Server", "Shared community result repository (V2, planned)")
+  }
+
   Rel(system, hpc, "Delegates parallel execution (V2)", "job submission")
   Rel(system, artifact_repo, "Publishes versioned datasets", "open data")
   Rel(system, vcs, "Source code, CI/CD, contributions", "code + CI")

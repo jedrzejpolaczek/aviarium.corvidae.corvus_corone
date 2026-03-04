@@ -32,6 +32,7 @@ The system exists to serve the discovery of truth about algorithm performance, n
 ```mermaid
 C4Context
   title System Context — Corvus Corone: HPO Algorithm Benchmarking Platform
+  UpdateLayoutConfig($c4ShapeInRow="4", $c4BoundaryInRow="2")
 
   Person(researcher, "Researcher", "Designs studies, runs experiments, interprets results")
   Person(practitioner, "Practitioner", "Selects algorithms using benchmarking results")

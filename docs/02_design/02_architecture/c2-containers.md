@@ -24,6 +24,7 @@ CONNECTS TO:
 ```mermaid
 C4Container
   title Container Diagram — Corvus Corone: HPO Algorithm Benchmarking Platform
+  UpdateLayoutConfig($c4ShapeInRow="3", $c4BoundaryInRow="1")
 
   Person(researcher, "Researcher", "Designs and executes benchmarking studies")
   Person(alg_author, "Algorithm Author", "Contributes algorithm implementations")

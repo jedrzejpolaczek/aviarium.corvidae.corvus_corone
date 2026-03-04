@@ -54,8 +54,8 @@ C4Context
 
 ```mermaid
 C4Context
-  title System Context — Corvus Corone: HPO Algorithm Benchmarking Platform — General 
-  UpdateLayoutConfig($c4ShapeInRow="4", $c4BoundaryInRow="2")
+  title System Context — Corvus Corone: HPO Algorithm Benchmarking Platform — ACtors details
+  UpdateLayoutConfig($c4ShapeInRow="5", $c4BoundaryInRow="1")
 
   Person(researcher, "Researcher", "Designs studies, runs experiments, interprets results")
   Person(practitioner, "Practitioner", "Selects algorithms using benchmarking results")
@@ -76,7 +76,7 @@ C4Context
 ```mermaid
 C4Context
   title System Context — Corvus Corone: HPO Algorithm Benchmarking Platform — Benchmarking Ecosystem Details
-  UpdateLayoutConfig($c4ShapeInRow="4", $c4BoundaryInRow="2")
+  UpdateLayoutConfig($c4ShapeInRow="3", $c4BoundaryInRow="1")
 
   System(system, "Corvus Corone", "Python library: wrap your algorithm, get rigorous benchmarking, analysis, and reports")
 
@@ -87,14 +87,14 @@ C4Context
   }
 
   Rel(system, coco, "Exports results", "data export")
-  Rel(system, nevergrad, "Imports algorithms / exports results", "data exchange")
+  BiRel(system, nevergrad, "Imports algorithms / exports results", "data exchange")
   Rel(system, iohprofiler, "Exports performance curves", "data export")
 ```
 
 ```mermaid
 C4Context
   title System Context — Corvus Corone: HPO Algorithm Benchmarking Platform — Infrastructure & Storage Details
-  UpdateLayoutConfig($c4ShapeInRow="4", $c4BoundaryInRow="2")
+  UpdateLayoutConfig($c4ShapeInRow="2", $c4BoundaryInRow="1")
 
   System(system, "Corvus Corone", "Python library: wrap your algorithm, get rigorous benchmarking, analysis, and reports")
 

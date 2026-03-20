@@ -85,6 +85,17 @@ Example:
 1. Clone the repository
 2. Run command `docker build .` to create Docker image
 -->
+First install [UV|https://docs.astral.sh/uv/getting-started/installation/#standalone-installer]. Youu can try (for windows):
+`powershell -c "irm https://astral.sh/uv/install.ps1 | more"` or (for macOS/Linux) `curl -LsSf https://astral.sh/uv/install.sh | less`
+
+and then:
+`pip install uv`
+
+To create virtual environment run:
+`uv venv`
+
+To run it:
+`uv <command eg. pip install ruff>`
 
 # Usage
 <!-- Instructions on how to use the application or code with examples. -->

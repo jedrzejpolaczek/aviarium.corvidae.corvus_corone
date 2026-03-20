@@ -6,6 +6,7 @@ __pycache__
 *cache*
 .mypy*
 .pytest*
+.venv*
 .ruff*
 others
 others/*

@@ -85,7 +85,10 @@ Example:
 1. Clone the repository
 2. Run command `docker build .` to create Docker image
 -->
-First install [UV|https://docs.astral.sh/uv/getting-started/installation/#standalone-installer]. Youu can try (for windows):
+First install [UV](https://docs.astral.sh/uv/getting-started/installation/#standalone-installer). 
+
+You can try (for windows):
+
 `powershell -c "irm https://astral.sh/uv/install.ps1 | more"` or (for macOS/Linux) `curl -LsSf https://astral.sh/uv/install.sh | less`
 
 and then:

@@ -30,12 +30,18 @@ The system exists to serve the discovery of truth about algorithm performance, n
 ## System Context Diagram
 
 ```mermaid
+---
+config:
+  look: neo
+  layout: elk
+  theme: redux-dark
+---
 flowchart LR
-  researcher(["Researcher<br>Designs studies, runs experiments, interprets results"]):::person
-  practitioner(["Practitioner<br>Selects algorithms using benchmarking results"]):::person
-  alg_author(["Algorithm Author<br>Contributes HPO algorithm implementations"]):::person
-  contributor(["Community Contributor<br>Adds problems, tools, documentation"]):::person
-  maintainer(["System Maintainer<br>Manages versioning, governance, infrastructure"]):::person
+  researcher(["Researcher"]):::person
+  practitioner(["Practitioner"]):::person
+  alg_author(["Algorithm Author"]):::person
+  contributor(["Community Contributor"]):::person
+  maintainer(["System Maintainer"]):::person
 
   system["Corvus Corone<br>Python library: rigorous HPO benchmarking, analysis, and reports"]:::system
 
@@ -52,13 +58,76 @@ flowchart LR
     platform_server["V2 Platform Server<br>Shared community result repository — V2"]:::ext
   end
 
-  researcher & practitioner & alg_author & contributor & maintainer --> system
-  system --> coco & iohprofiler & hpc & artifact_repo & vcs & platform_server
-  system <--> nevergrad
-
-  classDef person fill:#08427b,color:#fff,stroke:#073b6f
-  classDef system fill:#1168bd,color:#fff,stroke:#0e5db5
-  classDef ext fill:#6b6b6b,color:#fff,stroke:#5a5a5a
+  researcher L_researcher_system_0@-- Designs studies, runs experiments, interprets results --> system
+  practitioner L_practitioner_system_0@-- Selects algorithms using benchmarking results --> system
+  alg_author L_alg_author_system_0@-- Contributes HPO algorithm implementations --> system
+  contributor L_contributor_system_0@-- Adds problems, tools, documentation --> system
+  maintainer L_maintainer_system_0@-- Manages versioning, governance, infrastructure --> system
+  nevergrad L_nevergrad_system_0@-- Provides gradient-free optimizers for wrapping as Algorithm Instances --> system
+  system L_system_coco_0@-- Exports benchmark results in COCO archive format --> coco
+  system L_system_iohprofiler_0@-- Exports performance records in .dat format for anytime analysis --> iohprofiler
+  system L_system_hpc_0@-- Submits parallel experiment runs to distributed compute — V2 --> hpc
+  system L_system_artifact_repo_0@-- Publishes versioned experiment datasets with DOI --> artifact_repo
+  system L_system_vcs_0@-- Hosts source code, tracks issues, runs CI pipelines --> vcs
+  system L_system_platform_server_0@-- Syncs results to shared community repository — V2 --> platform_server
+  system L_system_nevergrad_0@-- Delegates optimization calls through adapter during runs --> nevergrad
+  researcher:::Peach
+  practitioner:::Peach
+  alg_author:::Peach
+  contributor:::Peach
+  maintainer:::Peach
+  system:::Aqua
+  coco:::Sky
+  nevergrad:::Sky
+  iohprofiler:::Sky
+  hpc:::Sky
+  artifact_repo:::Sky
+  vcs:::Sky
+  platform_server:::Sky
+  classDef Aqua stroke-width:1px, stroke-dasharray:none, stroke:#46EDC8, fill:#DEFFF8, color:#378E7A
+  classDef Ash stroke-width:1px, stroke-dasharray:none, stroke:#999999, fill:#EEEEEE, color:#000000
+  classDef Sky stroke-width:1px, stroke-dasharray:none, stroke:#374D7C, fill:#E2EBFF, color:#374D7C
+  classDef Rose stroke-width:1px, stroke-dasharray:none, stroke:#FF5978, fill:#FFDFE5, color:#8E2236
+  classDef Peach stroke-width:1px, stroke-dasharray:none, stroke:#FBB35A, fill:#FFEFDB, color:#8F632D
+  style system color:#000000
+  style researcher color:#000000
+  style practitioner color:#000000
+  style alg_author color:#000000
+  style contributor color:#000000
+  style maintainer color:#000000
+  style coco color:#000000
+  style nevergrad color:#000000
+  style iohprofiler color:#000000
+  style hpc color:#000000
+  style artifact_repo color:#000000
+  style vcs color:#000000
+  style platform_server color:#000000
+  linkStyle 0 stroke:#00C853,fill:none
+  linkStyle 1 stroke:#00C853,fill:none
+  linkStyle 2 stroke:#00C853,fill:none
+  linkStyle 3 stroke:#00C853,fill:none
+  linkStyle 4 stroke:#00C853,fill:none
+  linkStyle 5 stroke:#00C853,fill:none
+  linkStyle 6 stroke:#D50000,fill:none
+  linkStyle 7 stroke:#D50000,fill:none
+  linkStyle 8 stroke:#D50000,fill:none
+  linkStyle 9 stroke:#D50000,fill:none
+  linkStyle 10 stroke:#D50000,fill:none
+  linkStyle 11 stroke:#D50000,fill:none
+  linkStyle 12 stroke:#D50000,fill:none
+  L_researcher_system_0@{ animation: slow }
+  L_practitioner_system_0@{ animation: slow }
+  L_alg_author_system_0@{ animation: slow }
+  L_contributor_system_0@{ animation: slow }
+  L_maintainer_system_0@{ animation: slow }
+  L_nevergrad_system_0@{ animation: slow }
+  L_system_coco_0@{ animation: fast } 
+  L_system_iohprofiler_0@{ animation: fast }
+  L_system_hpc_0@{ animation: fast }
+  L_system_artifact_repo_0@{ animation: fast }
+  L_system_vcs_0@{ animation: fast }
+  L_system_platform_server_0@{ animation: fast }
+  L_system_nevergrad_0@{ animation: fast }
 ```
 
 > HPC/cloud distributed execution is **deferred to V2**. In V1, all Runs execute locally (sequentially or with Python multiprocessing). The decision is recorded in `docs/02-design/02-architecture/adr/ADR-001-library-with-server-ready-data-layer.md`. Runs are independent by design (MANIFESTO Principle 18), so the execution backend can be swapped via the Repository/Runner abstraction without changing the data format.

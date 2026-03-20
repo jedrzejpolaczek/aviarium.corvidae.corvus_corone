@@ -22,52 +22,132 @@ CONNECTS TO:
 ## Container Diagram
 
 ```mermaid
-flowchart LR
-  researcher(["Researcher<br>Designs and executes benchmarking studies"]):::person
-  alg_author(["Algorithm Author<br>Contributes algorithm implementations"]):::person
-
-  ecosystem["Benchmarking Ecosystem<br>COCO, Nevergrad, IOHprofiler"]:::ext
-  artifact_repo["Artifact Repository<br>Long-term open data storage, e.g. Zenodo"]:::ext
-
-  subgraph b_system["Corvus Corone (Python Library)"]
-    subgraph b_entry["Entry"]
-      api["Public API + CLI<br>Python, Click"]:::container
-    end
-
-    subgraph b_core["Core"]
-      orchestrator["Study Orchestrator<br>Python"]:::container
-      runner["Experiment Runner<br>Python"]:::container
-      analysis["Analysis Engine<br>Python, SciPy"]:::container
-      reporting["Reporting Engine<br>Python, Matplotlib"]:::container
-    end
-
-    subgraph b_data["Data & Registry"]
-      registry["Algorithm Registry<br>Python"]:::container
-      problems["Problem Repository<br>Python"]:::container
-      store["Results Store<br>Python, SQLite"]:::container
-      bridge["Ecosystem Bridge<br>Python"]:::container
-    end
+---
+config:
+  look: neo
+  layout: elk
+  theme: redux-dark
+  themeVariables:
+    background: transparent
+---
+flowchart TB
+  subgraph Client["Client"]
+    researcher(["Researcher"])
+    alg_author(["Algorithm Author"])
   end
 
-  researcher -->|"Designs studies, runs experiments, views reports"| api
-  alg_author -->|"Registers algorithm implementation"| registry
+  subgraph EntryLayer["Entry Layer"]
+    api["Public API + CLI\nPython · Click"]
+  end
 
-  api -->|"Submits study for execution"| orchestrator
-  orchestrator -->|"Dispatches individual runs"| runner
-  orchestrator -->|"Triggers metric computation"| analysis
-  orchestrator -->|"Triggers report generation"| reporting
-  runner -->|"Loads algorithm instance"| registry
-  runner -->|"Loads problem instance"| problems
-  runner -->|"Writes run record and observations"| store
-  analysis -->|"Reads run records; writes performance records"| store
-  reporting -->|"Reads aggregated results"| store
-  bridge -->|"Reads study artifacts"| store
-  bridge -->|"Exports data files"| ecosystem
-  store -->|"Publishes versioned datasets"| artifact_repo
+  subgraph CoreLayer["Core Layer"]
+    orchestrator["Study Orchestrator\nPython"]
+    runner["Experiment Runner\nPython"]
+    analysis["Analysis Engine\nPython · SciPy"]
+    reporting["Reporting Engine\nPython · Matplotlib"]
+  end
 
-  classDef person fill:#08427b,color:#fff,stroke:#073b6f
-  classDef container fill:#1168bd,color:#fff,stroke:#0e5db5
-  classDef ext fill:#6b6b6b,color:#fff,stroke:#5a5a5a
+  subgraph DataLayer["Data & Registry"]
+    registry["Algorithm Registry\nPython"]
+    problems["Problem Repository\nPython"]
+    store[("Results Store\nPython · SQLite")]
+    bridge["Ecosystem Bridge\nPython"]
+  end
+
+  subgraph CorvusCorone["Corvus Corone (Python Library)"]
+    EntryLayer
+    CoreLayer
+    DataLayer
+  end
+
+  subgraph ExternalSystems["External Systems"]
+    ecosystem["Benchmarking Ecosystem\nCOCO · Nevergrad · IOHprofiler"]
+    artifact_repo["Artifact Repository\nZenodo · Figshare"]
+  end
+
+  researcher L_researcher_api@-- Designs studies · runs experiments --> api
+  alg_author L_alg_author_registry@-- Registers algorithm implementation --> registry
+  api L_api_orchestrator@-- Submits study for execution --> orchestrator
+  orchestrator L_orchestrator_runner@-- Dispatches individual runs --> runner
+  orchestrator L_orchestrator_analysis@-- Triggers metric computation --> analysis
+  orchestrator L_orchestrator_reporting@-- Triggers report generation --> reporting
+  runner L_runner_registry@-- Loads algorithm instance --> registry
+  runner L_runner_problems@-- Loads problem instance --> problems
+  runner L_runner_store@-- Writes run records --> store
+  analysis L_analysis_store@-- Reads runs · writes performance records --> store
+  reporting L_reporting_store@-- Reads aggregated results --> store
+  bridge L_bridge_store@-- Reads study artifacts --> store
+  bridge L_bridge_ecosystem@-- Exports data files --> ecosystem
+  store L_store_artifact@-- Publishes versioned datasets --> artifact_repo
+
+  researcher:::Peach
+  alg_author:::Peach
+  api:::Aqua
+  orchestrator:::Aqua
+  runner:::Aqua
+  analysis:::Aqua
+  reporting:::Aqua
+  registry:::Aqua
+  problems:::Aqua
+  bridge:::Aqua
+  store:::Sky
+  ecosystem:::Sky
+  artifact_repo:::Sky
+
+  classDef Aqua stroke-width:1px, stroke-dasharray:none, stroke:#46EDC8, fill:#DEFFF8, color:#378E7A
+  classDef Sky stroke-width:1px, stroke-dasharray:none, stroke:#374D7C, fill:#E2EBFF, color:#374D7C
+  classDef Peach stroke-width:1px, stroke-dasharray:none, stroke:#FBB35A, fill:#FFEFDB, color:#8F632D
+
+  style researcher color:#000000
+  style alg_author color:#000000
+  style api color:#000000
+  style orchestrator color:#000000
+  style runner color:#000000
+  style analysis color:#000000
+  style reporting color:#000000
+  style registry color:#000000
+  style problems color:#000000
+  style store color:#000000
+  style bridge color:#000000
+  style ecosystem color:#000000
+  style artifact_repo color:#000000
+
+  style Client stroke:#666666,fill:#1e1e1e,color:#aaaaaa
+  style EntryLayer stroke:#FFD600
+  style CoreLayer stroke:#FF6D00
+  style DataLayer stroke:#AA00FF
+  style CorvusCorone stroke:#555555,fill:#161616,color:#aaaaaa
+  style ExternalSystems stroke:#555555,fill:#1e1e1e,color:#aaaaaa
+
+  linkStyle 0 stroke:#FFD600,fill:none
+  linkStyle 1 stroke:#FFD600,fill:none
+  linkStyle 2 stroke:#FFD600,fill:none
+  linkStyle 3 stroke:#FF6D00,fill:none
+  linkStyle 4 stroke:#FF6D00,fill:none
+  linkStyle 5 stroke:#FF6D00,fill:none
+  linkStyle 6 stroke:#00C853,fill:none
+  linkStyle 7 stroke:#00C853,fill:none
+  linkStyle 8 stroke:#00C853,fill:none
+  linkStyle 9 stroke:#AA00FF,fill:none
+  linkStyle 10 stroke:#AA00FF,fill:none
+  linkStyle 11 stroke:#AA00FF,fill:none
+  linkStyle 12 stroke:#2962FF,fill:none
+  linkStyle 13 stroke:#2962FF,fill:none
+
+  L_researcher_api@{ animation: slow }
+  L_alg_author_registry@{ animation: slow }
+  L_api_orchestrator@{ animation: fast }
+  L_orchestrator_runner@{ animation: fast }
+  L_orchestrator_analysis@{ animation: fast }
+  L_orchestrator_reporting@{ animation: fast }
+  L_runner_registry@{ animation: fast }
+  L_runner_problems@{ animation: fast }
+  L_runner_store@{ animation: fast }
+  L_analysis_store@{ animation: fast }
+  L_reporting_store@{ animation: fast }
+  L_bridge_store@{ animation: fast }
+  L_bridge_ecosystem@{ animation: fast }
+  L_store_artifact@{ animation: fast }
 ```
 
 ---

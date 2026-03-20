@@ -1,8 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(python scripts/create_github_issues.py)",
-      "Bash(python -c \":*)"
-    ]
-  }
-}

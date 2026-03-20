@@ -34,6 +34,7 @@ flowchart TB
   subgraph Client["Client"]
     researcher(["Researcher"])
     alg_author(["Algorithm Author"])
+    learner(["Learner"])
   end
 
   subgraph EntryLayer["Entry Layer"]
@@ -45,6 +46,7 @@ flowchart TB
     runner["Experiment Runner\nPython"]
     analysis["Analysis Engine\nPython · SciPy"]
     reporting["Reporting Engine\nPython · Matplotlib"]
+    viz_engine["Algorithm Visualization Engine\nPython · Matplotlib"]
   end
 
   subgraph DataLayer["Data & Registry"]
@@ -79,14 +81,20 @@ flowchart TB
   bridge L_bridge_store@-- Reads study artifacts --> store
   bridge L_bridge_ecosystem@-- Exports data files --> ecosystem
   store L_store_artifact@-- Publishes versioned datasets --> artifact_repo
+  learner L_learner_api@-- Explores algorithm visualisations and contextual help --> api
+  api L_api_viz@-- Dispatches visualisation requests --> viz_engine
+  viz_engine L_viz_registry@-- Reads algorithm metadata --> registry
+  viz_engine L_viz_store@-- Reads study data for data-driven visualisations --> store
 
   researcher:::Peach
   alg_author:::Peach
+  learner:::Peach
   api:::Aqua
   orchestrator:::Aqua
   runner:::Aqua
   analysis:::Aqua
   reporting:::Aqua
+  viz_engine:::Aqua
   registry:::Aqua
   problems:::Aqua
   bridge:::Aqua
@@ -108,6 +116,8 @@ flowchart TB
   style registry color:#000000
   style problems color:#000000
   style store color:#000000
+  style learner color:#000000
+  style viz_engine color:#000000
   style bridge color:#000000
   style ecosystem color:#000000
   style artifact_repo color:#000000
@@ -133,6 +143,10 @@ flowchart TB
   linkStyle 11 stroke:#AA00FF,fill:none
   linkStyle 12 stroke:#2962FF,fill:none
   linkStyle 13 stroke:#2962FF,fill:none
+  linkStyle 14 stroke:#FFD600,fill:none
+  linkStyle 15 stroke:#FF6D00,fill:none
+  linkStyle 16 stroke:#00C853,fill:none
+  linkStyle 17 stroke:#AA00FF,fill:none
 
   L_researcher_api@{ animation: slow }
   L_alg_author_registry@{ animation: slow }
@@ -148,6 +162,10 @@ flowchart TB
   L_bridge_store@{ animation: fast }
   L_bridge_ecosystem@{ animation: fast }
   L_store_artifact@{ animation: fast }
+  L_learner_api@{ animation: slow }
+  L_api_viz@{ animation: fast }
+  L_viz_registry@{ animation: fast }
+  L_viz_store@{ animation: fast }
 ```
 
 ---

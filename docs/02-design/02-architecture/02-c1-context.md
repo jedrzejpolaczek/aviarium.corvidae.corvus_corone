@@ -35,6 +35,8 @@ config:
   look: neo
   layout: elk
   theme: redux-dark
+  themeVariables:
+    background: transparent
 ---
 flowchart LR
   researcher(["Researcher"]):::person
@@ -42,6 +44,7 @@ flowchart LR
   alg_author(["Algorithm Author"]):::person
   contributor(["Community Contributor"]):::person
   maintainer(["System Maintainer"]):::person
+  learner(["Learner"]):::person
 
   system["Corvus Corone<br>Python library: rigorous HPO benchmarking, analysis, and reports"]:::system
 
@@ -71,11 +74,13 @@ flowchart LR
   system L_system_vcs_0@-- Hosts source code, tracks issues, runs CI pipelines --> vcs
   system L_system_platform_server_0@-- Syncs results to shared community repository — V2 --> platform_server
   system L_system_nevergrad_0@-- Delegates optimization calls through adapter during runs --> nevergrad
+  learner L_learner_system_0@-- Explores algorithms visually, contextually, and historically --> system
   researcher:::Peach
   practitioner:::Peach
   alg_author:::Peach
   contributor:::Peach
   maintainer:::Peach
+  learner:::Peach
   system:::Aqua
   coco:::Sky
   nevergrad:::Sky
@@ -102,6 +107,7 @@ flowchart LR
   style artifact_repo color:#000000
   style vcs color:#000000
   style platform_server color:#000000
+  style learner color:#000000
   linkStyle 0 stroke:#00C853,fill:none
   linkStyle 1 stroke:#00C853,fill:none
   linkStyle 2 stroke:#00C853,fill:none
@@ -115,6 +121,7 @@ flowchart LR
   linkStyle 10 stroke:#D50000,fill:none
   linkStyle 11 stroke:#D50000,fill:none
   linkStyle 12 stroke:#D50000,fill:none
+  linkStyle 13 stroke:#00C853,fill:none
   L_researcher_system_0@{ animation: slow }
   L_practitioner_system_0@{ animation: slow }
   L_alg_author_system_0@{ animation: slow }
@@ -128,6 +135,7 @@ flowchart LR
   L_system_vcs_0@{ animation: fast }
   L_system_platform_server_0@{ animation: fast }
   L_system_nevergrad_0@{ animation: fast }
+  L_learner_system_0@{ animation: slow }
 ```
 
 > HPC/cloud distributed execution is **deferred to V2**. In V1, all Runs execute locally (sequentially or with Python multiprocessing). The decision is recorded in `docs/02-design/02-architecture/adr/ADR-001-library-with-server-ready-data-layer.md`. Runs are independent by design (MANIFESTO Principle 18), so the execution backend can be swapped via the Repository/Runner abstraction without changing the data format.

@@ -1,0 +1,11 @@
+corvus_corone.egg-info
+uv.lock
+__pycache__
+*.pyc
+*cache
+*cache*
+.mypy*
+.pytest*
+.ruff*
+others
+others/*

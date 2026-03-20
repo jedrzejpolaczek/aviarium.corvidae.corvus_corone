@@ -10,11 +10,11 @@ NARRATIVE POSITION:
   → methodology/benchmarking-protocol.md §Step 6: the protocol invokes this guide there
 
 CONNECTS TO:
-  ← docs/01_manifesto/MANIFESTO.md Principles 13, 15 : directly operationalized by this document
-  ← docs/02_design/01_software_requirement_specification/SRS.md NFR-STAT-01 : non-functional requirement for statistical validity
-  → docs/03_technical_contracts/metric-taxonomy.md    : metric properties (distribution, bounds) guide test selection here
-  → docs/03_technical_contracts/interface-contracts.md §4 : Analyzer interface implements this methodology
-  → docs/03_technical_contracts/data-format.md §2.7   : Result Aggregate fields store uncertainty information defined here
+  ← docs/01-manifesto/MANIFESTO.md Principles 13, 15 : directly operationalized by this document
+  ← docs/02-design/01-software-requirement-specification/SRS.md NFR-STAT-01 : non-functional requirement for statistical validity
+  → docs/03-technical-contracts/metric-taxonomy.md    : metric properties (distribution, bounds) guide test selection here
+  → docs/03-technical-contracts/interface-contracts.md §4 : Analyzer interface implements this methodology
+  → docs/03-technical-contracts/data-format.md §2.7   : Result Aggregate fields store uncertainty information defined here
   → docs/04_scientific_practice/methodology/benchmarking-protocol.md : protocol's analysis step (Step 6) references this guide
   → docs/GLOSSARY.md            : terms like "Effect Size", "Anytime Performance" are defined there
 
@@ -44,7 +44,7 @@ The three-level framework is mandated by MANIFESTO Principle 13:
 Level 1 (Exploratory) → Level 2 (Confirmatory) → Level 3 (Practical)
 ```
 
-Hypotheses tested in Level 2 **MUST be pre-specified in the Study plan** (`docs/03_technical_contracts/data-format.md` §2.3 `pre_registered_hypotheses`) **before** Level 1 analysis begins. This is non-negotiable.
+Hypotheses tested in Level 2 **MUST be pre-specified in the Study plan** (`docs/03-technical-contracts/data-format.md` §2.3 `pre_registered_hypotheses`) **before** Level 1 analysis begins. This is non-negotiable.
 
 Post-hoc hypothesis selection — choosing what to test after seeing the data — is a form of p-hacking. It inflates the false positive rate without appearing to do so. MANIFESTO Principle 16 requires that experimental design precedes data collection; this extends to analysis design.
 
@@ -248,7 +248,7 @@ A catalogue of mistakes this methodology is designed to prevent. Each entry stat
 
 **MANIFESTO violation:** Principle 16 (planning precedes execution), Principle 29 (objectivity over promotion).
 
-**How this system prevents it:** Hypotheses are stored in the Study record's `pre_registered_hypotheses` field (`docs/03_technical_contracts/data-format.md` §2.3) before any data collection begins. The Analyzer interface (`docs/03_technical_contracts/interface-contracts.md` §4) only tests pre-registered hypotheses in Level 2; post-hoc observations are labeled "exploratory" in the output.
+**How this system prevents it:** Hypotheses are stored in the Study record's `pre_registered_hypotheses` field (`docs/03-technical-contracts/data-format.md` §2.3) before any data collection begins. The Analyzer interface (`docs/03-technical-contracts/interface-contracts.md` §4) only tests pre-registered hypotheses in Level 2; post-hoc observations are labeled "exploratory" in the output.
 
 ---
 
@@ -260,7 +260,7 @@ A catalogue of mistakes this methodology is designed to prevent. Each entry stat
 
 **MANIFESTO violation:** Principle 15 ("we report not only averages, but also spread, quantiles, success probabilities").
 
-**Prevention:** §6 Uncertainty Reporting Requirements — the system enforces that `ROBUSTNESS-RESULT_STABILITY` and `RELIABILITY-SUCCESS_RATE` are always reported alongside `QUALITY-BEST_VALUE_AT_BUDGET` in the Standard Reporting Set (`docs/03_technical_contracts/metric-taxonomy.md` §3).
+**Prevention:** §6 Uncertainty Reporting Requirements — the system enforces that `ROBUSTNESS-RESULT_STABILITY` and `RELIABILITY-SUCCESS_RATE` are always reported alongside `QUALITY-BEST_VALUE_AT_BUDGET` in the Standard Reporting Set (`docs/03-technical-contracts/metric-taxonomy.md` §3).
 
 ---
 
@@ -311,4 +311,4 @@ A catalogue of mistakes this methodology is designed to prevent. Each entry stat
 
 **MANIFESTO violation:** Principle 14 (full performance curves, not just endpoints).
 
-**Prevention:** `ANYTIME-ECDF_AREA` is mandatory in the Standard Reporting Set (`docs/03_technical_contracts/metric-taxonomy.md` §3). Full Performance Records are required to be stored for all Runs, enabling comparison at any budget level.
+**Prevention:** `ANYTIME-ECDF_AREA` is mandatory in the Standard Reporting Set (`docs/03-technical-contracts/metric-taxonomy.md` §3). Full Performance Records are required to be stored for all Runs, enabling comparison at any budget level.

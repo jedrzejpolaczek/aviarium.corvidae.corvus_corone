@@ -16,7 +16,7 @@ CONNECTS TO:
 
 MAINTENANCE RULE:
   When an ADR changes the meaning or scope of a term, update this glossary first.
-  When a new interface is defined in docs/03_technical_contracts/interface-contracts.md, add any new terms here first.
+  When a new interface is defined in docs/03-technical-contracts/interface-contracts.md, add any new terms here first.
   If a term appears in more than one document with slightly different meanings, that is a bug —
   resolve it here, then update all documents.
 -->
@@ -40,8 +40,8 @@ Format for each entry:
 Terms are listed alphabetically within sections.
 
 > **`TODO: REF-TASK-0001`** — Extend this glossary with terms introduced by
-> `docs/03_technical_contracts/interface-contracts.md` and
-> `docs/03_technical_contracts/data-format.md` once those documents are filled.
+> `docs/03-technical_contracts/interface-contracts.md` and
+> `docs/03-technical_contracts/data-format.md` once those documents are filled.
 > Owner: technical lead. Acceptance: all public method parameter names and entity field names
 > used in those documents appear here with definitions that match their docstrings.
 
@@ -55,7 +55,7 @@ Terms are listed alphabetically within sections.
 
 **Distinguished from:** *Algorithm Instance* (the same strategy with all hyperparameters fixed), *Implementation* (the executable code artifact).
 
-**Used in:** `docs/01_manifesto/MANIFESTO.md` Principle 8, `docs/02_design/01_software_requirement_specification/SRS.md`, `docs/03_technical_contracts/interface-contracts.md`.
+**Used in:** `docs/01-manifesto/MANIFESTO.md` Principle 8, `docs/02-design/01-software-requirement-specification/srs.md`, `docs/03-technical-contracts/interface-contracts.md`.
 
 **Example:** "Tree-structured Parzen Estimator (TPE)" is an Algorithm. A specific instantiation of TPE with `n_startup_trials=10` and `gamma=0.25` is an Algorithm Instance.
 
@@ -67,7 +67,7 @@ Terms are listed alphabetically within sections.
 
 **Distinguished from:** *Algorithm* (the abstract method concept), *Implementation* (the concrete code that executes it).
 
-**Used in:** `docs/01_manifesto/MANIFESTO.md` Principle 8, `docs/03_technical_contracts/data-format.md` §2.2, `docs/03_technical_contracts/interface-contracts.md` §2.
+**Used in:** `docs/01-manifesto/MANIFESTO.md` Principle 8, `docs/03-technical-contracts/data-format.md` §2.2, `docs/03-technical_contracts/interface-contracts.md` §2.
 
 **Example:** TPE with `n_startup_trials=10, gamma=0.25, seed=42` is an Algorithm Instance. The same TPE strategy with `gamma=0.5` is a different Algorithm Instance.
 
@@ -79,7 +79,7 @@ Terms are listed alphabetically within sections.
 
 **Distinguished from:** *Algorithm* (the concept), *Algorithm Instance* (the configured concept). Two Implementations of the same Algorithm Instance may produce different numerical results due to floating-point differences or library version changes — this is why Implementation must be reported separately (Principle 8).
 
-**Used in:** `docs/01_manifesto/MANIFESTO.md` Principle 8, `docs/03_technical_contracts/data-format.md` §2.2, `docs/05_community/contribution-guide.md`.
+**Used in:** `docs/01-manifesto/MANIFESTO.md` Principle 8, `docs/03-technical_contracts/data-format.md` §2.2, `docs/05-community/contribution-guide.md`.
 
 ---
 
@@ -89,7 +89,7 @@ Terms are listed alphabetically within sections.
 
 **Distinguished from:** *Problem Instance* (a fully specified, concrete parameterization of a Benchmark Problem with all characteristics fixed).
 
-**Used in:** `docs/01_manifesto/MANIFESTO.md` Principles 4–7, `docs/02_design/02_architecture/c1-context.md`, `docs/03_technical_contracts/data-format.md` §2.1.
+**Used in:** `docs/01-manifesto/MANIFESTO.md` Principles 4–7, `docs/02-design/02-architecture/c1-context.md`, `docs/03-technical-contracts/data-format.md` §2.1.
 
 **Example:** "SVM hyperparameter tuning on a classification task" is a Benchmark Problem. That same problem with a fixed dataset, 5-dimensional search space, evaluation budget of 100, and Gaussian noise σ=0.01 is a Problem Instance.
 
@@ -101,7 +101,7 @@ Terms are listed alphabetically within sections.
 
 **Distinguished from:** *Benchmark Problem* (the problem class from which instances are drawn). A Problem Instance is the specific object that an Algorithm Instance evaluates during a Run.
 
-**Used in:** `docs/01_manifesto/MANIFESTO.md` Principle 7, `docs/03_technical_contracts/data-format.md` §2.1, `docs/03_technical_contracts/interface-contracts.md` §1, `docs/04_scientific_practice/methodology/benchmarking-protocol.md` Step 3.
+**Used in:** `docs/01-manifesto/MANIFESTO.md` Principle 7, `docs/03-technical_contracts/data-format.md` §2.1, `docs/03-technical_contracts/interface-contracts.md` §1, `docs/04-scientific_practice/methodology/benchmarking-protocol.md` Step 3.
 
 ---
 
@@ -111,7 +111,7 @@ Terms are listed alphabetically within sections.
 
 **Distinguished from:** *Experiment* (the execution of a Study — the actual Runs performed). A Study is the plan; an Experiment is the realized plan.
 
-**Used in:** `docs/01_manifesto/MANIFESTO.md` Principle 16, `docs/03_technical_contracts/data-format.md` §2.3, `docs/04_scientific_practice/methodology/benchmarking-protocol.md`.
+**Used in:** `docs/01-manifesto/MANIFESTO.md` Principle 16, `docs/03-technical_contracts/data-format.md` §2.3, `docs/04_scientific-practice/methodology/benchmarking-protocol.md`.
 
 ---
 
@@ -121,7 +121,7 @@ Terms are listed alphabetically within sections.
 
 **Distinguished from:** *Study* (the plan), *Run* (a single execution unit within the Experiment). The same Study may produce multiple Experiments if re-executed for verification purposes.
 
-**Used in:** `docs/03_technical_contracts/data-format.md` §2.4, `docs/03_technical_contracts/interface-contracts.md` §3.
+**Used in:** `docs/03-technical-contracts/data-format.md` §2.4, `docs/03-technical-contracts/interface-contracts.md` §3.
 
 ---
 
@@ -131,7 +131,7 @@ Terms are listed alphabetically within sections.
 
 **Distinguished from:** *Experiment* (the full set of Runs). The Run is the atomic unit of reproducibility — given the same seed, the same Algorithm Instance, and the same Problem Instance, a Run must produce identical results.
 
-**Used in:** `docs/01_manifesto/MANIFESTO.md` Principle 18, `docs/03_technical_contracts/data-format.md` §2.5, `docs/03_technical_contracts/interface-contracts.md` §3.
+**Used in:** `docs/01-manifesto/MANIFESTO.md` Principle 18, `docs/03-technical-contracts/data-format.md` §2.5, `docs/03-technical-contracts/interface-contracts.md` §3.
 
 ---
 
@@ -143,7 +143,7 @@ Terms are listed alphabetically within sections.
 
 **Distinguished from:** final-budget performance (a single endpoint value). Anytime Performance reveals optimization dynamics, early convergence, and performance at any intermediate budget level.
 
-**Used in:** `docs/01_manifesto/MANIFESTO.md` Principle 14, `docs/03_technical_contracts/metric-taxonomy.md` §2 (ANYTIME category), `docs/04_scientific_practice/methodology/statistical-methodology.md` §5.
+**Used in:** `docs/01-manifesto/MANIFESTO.md` Principle 14, `docs/03-technical-contracts/metric-taxonomy.md` §2 (ANYTIME category), `docs/04_scientific_practice/methodology/statistical-methodology.md` §5.
 
 ---
 
@@ -153,17 +153,17 @@ Terms are listed alphabetically within sections.
 
 **Distinguished from:** wall-clock time alone. Evaluation budget and time budget are different constraints; a fair study uses the same budget type for all algorithms.
 
-**Used in:** `docs/01_manifesto/MANIFESTO.md` Principle 12, `docs/03_technical_contracts/data-format.md` §2.1, `docs/03_technical_contracts/interface-contracts.md` §1.
+**Used in:** `docs/01-manifesto/MANIFESTO.md` Principle 12, `docs/03-technical-contracts/data-format.md` §2.1, `docs/03-technical-contracts/interface-contracts.md` §1.
 
 ---
 
 ### Performance Metric
 
-**Definition:** A scalar quantity derived from one or more Runs that quantifies a specific aspect of algorithm behavior. All Performance Metrics used in this system are formally defined in `docs/03_technical_contracts/metric-taxonomy.md`.
+**Definition:** A scalar quantity derived from one or more Runs that quantifies a specific aspect of algorithm behavior. All Performance Metrics used in this system are formally defined in `docs/03-technical-contracts/metric-taxonomy.md`.
 
 **Distinguished from:** raw objective function values (which are unaggregated outputs of individual evaluations). A Performance Metric is always computed from the results of one or more complete Runs.
 
-**Used in:** `docs/01_manifesto/MANIFESTO.md` Principle 12, `docs/03_technical_contracts/metric-taxonomy.md`, `docs/04_scientific_practice/methodology/statistical-methodology.md`.
+**Used in:** `docs/01-manifesto/MANIFESTO.md` Principle 12, `docs/03-technical-contracts/metric-taxonomy.md`, `docs/04_scientific_practice/methodology/statistical-methodology.md`.
 
 ---
 
@@ -173,7 +173,7 @@ Terms are listed alphabetically within sections.
 
 **Distinguished from:** p-value (which measures statistical evidence for a difference, not its magnitude). A difference can be highly statistically significant yet have a negligible Effect Size.
 
-**Used in:** `docs/01_manifesto/MANIFESTO.md` Principle 13, `docs/04_scientific_practice/methodology/statistical-methodology.md` §4.
+**Used in:** `docs/01-manifesto/MANIFESTO.md` Principle 13, `docs/04_scientific_practice/methodology/statistical-methodology.md` §4.
 
 ---
 
@@ -185,7 +185,7 @@ Terms are listed alphabetically within sections.
 
 **Implication for this system:** Global algorithm rankings are scientifically invalid. Every conclusion about algorithm performance must be scoped to the specific Problem Instances tested. The goal of this system is to map which algorithms work well for which problem characteristics, not to crown a winner.
 
-**Used in:** `docs/01_manifesto/MANIFESTO.md` Principle 30, `docs/02_design/01_software_requirement_specification/SRS.md` §6 (Constraints).
+**Used in:** `docs/01-manifesto/MANIFESTO.md` Principle 30, `docs/02-design/01-software-requirement-specification/SRS.md` §6 (Constraints).
 
 ---
 
@@ -195,7 +195,7 @@ Terms are listed alphabetically within sections.
 
 **Distinguished from:** an informal motivation ("let's see how algorithm X does"). A valid Research Question is falsifiable, scoped, and drives the entire experimental design.
 
-**Used in:** `docs/01_manifesto/MANIFESTO.md` Principle 1, `docs/03_technical_contracts/data-format.md` §2.3, `docs/04_scientific_practice/methodology/benchmarking-protocol.md` Step 1.
+**Used in:** `docs/01-manifesto/MANIFESTO.md` Principle 1, `docs/03-technical-contracts/data-format.md` §2.3, `docs/04_scientific_practice/methodology/benchmarking-protocol.md` Step 1.
 
 ---
 
@@ -205,7 +205,7 @@ Terms are listed alphabetically within sections.
 
 **Distinguished from:** *Replicability* (same team, different data), *Generalizability* (same method applied to new problems). This system targets Reproducibility as a hard requirement, not an aspiration.
 
-**Used in:** `docs/01_manifesto/MANIFESTO.md` Principles 19–22, `docs/02_design/01_software_requirement_specification/SRS.md` §5 NFR-REPRO, `docs/05_community/versioning-governance.md`.
+**Used in:** `docs/01-manifesto/MANIFESTO.md` Principles 19–22, `docs/02-design/01-software-requirement-specification/SRS.md` §5 NFR-REPRO, `docs/05_community/versioning-governance.md`.
 
 ---
 
@@ -215,16 +215,16 @@ Terms are listed alphabetically within sections.
 
 **Definition:** Any versioned, stored product of the system — a Problem Instance specification, Algorithm Implementation, Experiment record, Results dataset, or Analysis output — subject to the versioning and governance policy in `docs/05_community/versioning-governance.md`.
 
-**Used in:** `docs/01_manifesto/MANIFESTO.md` Principle 21, `docs/05_community/versioning-governance.md`, `docs/03_technical_contracts/data-format.md`.
+**Used in:** `docs/01-manifesto/MANIFESTO.md` Principle 21, `docs/05_community/versioning-governance.md`, `docs/03-technical-contracts/data-format.md`.
 
 ---
 
 ### Schema Version
 
-**Definition:** The version identifier of the data format specification (`docs/03_technical_contracts/data-format.md`) under which a stored Artifact was created, enabling the system to validate, migrate, or reject Artifacts as the format evolves.
+**Definition:** The version identifier of the data format specification (`docs/03-technical-contracts/data-format.md`) under which a stored Artifact was created, enabling the system to validate, migrate, or reject Artifacts as the format evolves.
 
-**Used in:** `docs/03_technical_contracts/data-format.md` §6, `docs/05_community/versioning-governance.md` §1.
+**Used in:** `docs/03-technical-contracts/data-format.md` §6, `docs/05_community/versioning-governance.md` §1.
 
-> **`TODO: REF-TASK-0002`** — Once `docs/03_technical_contracts/data-format.md` §6 (Schema Versioning)
+> **`TODO: REF-TASK-0002`** — Once `docs/03-technical-contracts/data-format.md` §6 (Schema Versioning)
 > is filled, verify that the Schema Version definition above matches the versioning scheme adopted there.
 > Owner: technical lead. Acceptance: definition and data-format.md §6 use identical terminology.

@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+# Git pre-push hook — runs the same checks as CI locally.
+# Install: make install-hooks
+
+set -euo pipefail
+
+echo ">>> [pre-push] ruff check..."
+uv run ruff check .
+
+echo ">>> [pre-push] ruff format --check..."
+uv run ruff format --check .
+
+echo ">>> [pre-push] mypy..."
+uv run mypy .
+
+echo ">>> [pre-push] pytest..."
+uv run pytest
+
+echo ">>> [pre-push] All checks passed."

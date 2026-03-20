@@ -11,12 +11,12 @@ NARRATIVE POSITION:
   → Tutorials: each tutorial should walk through one or more steps of this protocol
 
 CONNECTS TO:
-  ← docs/01_manifesto/MANIFESTO.md Principles 1–3, 4–7, 8–11, 16–18 : each step implements these principles
-  ← docs/02_design/01_software_requirement_specification/SRS.md §3   : use case UC-01 maps to this protocol
+  ← docs/01-manifesto/MANIFESTO.md Principles 1–3, 4–7, 8–11, 16–18 : each step implements these principles
+  ← docs/02-design/01-software-requirement-specification/SRS.md §3   : use case UC-01 maps to this protocol
   → docs/04_scientific_practice/methodology/statistical-methodology.md : Steps 7–8 (Analyze, Report) delegate to that guide
-  → docs/03_technical_contracts/metric-taxonomy.md §4 : Step 5 (Specify metrics) uses the selection guide there
-  → docs/03_technical_contracts/interface-contracts.md : Steps 3–4 (configure algorithms/problems) must follow contracts
-  → docs/03_technical_contracts/data-format.md    : every step produces artifacts conforming to schemas there
+  → docs/03-technical-contracts/metric-taxonomy.md §4 : Step 5 (Specify metrics) uses the selection guide there
+  → docs/03-technical-contracts/interface-contracts.md : Steps 3–4 (configure algorithms/problems) must follow contracts
+  → docs/03-technical-contracts/data-format.md    : every step produces artifacts conforming to schemas there
   → docs/GLOSSARY.md        : exact terms used throughout — Algorithm Instance, Problem Instance, Study, Run, Budget
   → docs/05_community/TASKS.md : each step in a real study should correspond to trackable tasks
 
@@ -89,7 +89,7 @@ A valid Research Question (→ GLOSSARY) must contain four elements:
 
 **Output:** A written Research Question stored in the Study record's `research_question` field. The question should fit in 2–4 sentences. Vagueness at this step cascades into invalid analysis at Step 7.
 
-→ Study record format: `docs/03_technical_contracts/data-format.md` §2.3
+→ Study record format: `docs/03-technical-contracts/data-format.md` §2.3
 
 ---
 
@@ -108,17 +108,17 @@ Hypotheses selected after seeing data are observations, not predictions. They ar
 3. **Statistical test planned:** Which test will be used — to be filled using the test selection guide in `docs/04_scientific_practice/methodology/statistical-methodology.md` §3 (`TODO: REF-TASK-0020`)
 4. **Significance threshold α:** Typically 0.05, but must be stated explicitly
 5. **Multiple testing correction:** If more than one hypothesis is tested — state which correction method (`TODO: REF-TASK-0020`)
-6. **Metrics involved:** Which metric IDs from `docs/03_technical_contracts/metric-taxonomy.md` are used to evaluate this hypothesis
+6. **Metrics involved:** Which metric IDs from `docs/03-technical-contracts/metric-taxonomy.md` are used to evaluate this hypothesis
 
 **System enforcement:**
 
-Pre-registered hypotheses are stored in the Study record before the Experiment begins. The Analyzer (`docs/03_technical_contracts/interface-contracts.md` §4) only tests hypotheses found in this pre-registered list in Level 2 (Confirmatory) analysis. Any hypothesis tested outside this list is automatically labeled "post-hoc / exploratory" in the output and cannot appear in the confirmatory section of the report.
+Pre-registered hypotheses are stored in the Study record before the Experiment begins. The Analyzer (`docs/03-technical-contracts/interface-contracts.md` §4) only tests hypotheses found in this pre-registered list in Level 2 (Confirmatory) analysis. Any hypothesis tested outside this list is automatically labeled "post-hoc / exploratory" in the output and cannot appear in the confirmatory section of the report.
 
 **Exploratory analysis is still valuable — but it is separate:**
 
 Observations from Level 1 analysis may suggest new hypotheses. These are valid and should be documented — but they must be pre-registered in a *future* Study to receive confirmatory status. Never retrofit a post-hoc observation into the current Study's confirmed hypotheses.
 
-→ Storage: `docs/03_technical_contracts/data-format.md` §2.3 `pre_registered_hypotheses` field
+→ Storage: `docs/03-technical-contracts/data-format.md` §2.3 `pre_registered_hypotheses` field
 
 ---
 
@@ -146,7 +146,7 @@ Observations from Level 1 analysis may suggest new hypotheses. These are valid a
 - Known optimum or best-known solution, if available
 - Landscape characteristics, if known (modality, separability, etc.)
 
-→ These fields are documented in `docs/03_technical_contracts/data-format.md` §2.1.
+→ These fields are documented in `docs/03-technical-contracts/data-format.md` §2.1.
 
 **Documentation per selected instance:** Record why this instance was selected (representativeness argument) and which diversity characteristics it contributes. This justification is stored in the Problem Instance's `provenance` metadata.
 
@@ -178,7 +178,7 @@ Observations from Level 1 analysis may suggest new hypotheses. These are valid a
 | Algorithm Instance (all configuration parameter values with justification) | Algorithm Instance record |
 | Implementation (library name, exact version, code revision reference) | Algorithm Instance record |
 
-→ Full record format: `docs/03_technical_contracts/data-format.md` §2.2
+→ Full record format: `docs/03-technical-contracts/data-format.md` §2.2
 
 **Configuration fairness checklist:**
 - [ ] All Algorithm Instances receive exactly the same computational Budget
@@ -200,33 +200,44 @@ This sensitivity check is not part of the core Experiment but should be included
 
 ## Step 5: Specify Measurements
 
-<!--
-  Select metrics BEFORE running experiments — metric selection post-hoc enables cherry-picking.
+*Implements MANIFESTO Principles 12, 14, 16 (planning precedes execution).*
 
-  Required: all metrics in the Standard Reporting Set must be included.
-  → specs/metric-taxonomy.md §3
+**Metric selection must happen before data collection.** Choosing metrics after seeing the data enables cherry-picking — selective reporting that violates MANIFESTO Principle 29 (Objectivity over promotion). The metric list is locked when the Experiment begins, along with the rest of the Study record.
 
-  Optional additional metrics:
-    Use the Metric Selection Guide (specs/metric-taxonomy.md §4) for the research question type.
-    Document why each additional metric was chosen.
+**Required metrics — Standard Reporting Set:**
 
-  Performance curve requirements:
-    Specify at which evaluation counts performance snapshots will be recorded.
-    → PerformanceRecord sampling strategy: data-format.md §2.6
-    This must be decided now, before data collection. Recording more is always safe;
-    recording less may prevent anytime analysis later.
+All four metrics from `docs/03-technical-contracts/metric-taxonomy.md` §3 must be included in every study. No exceptions:
 
-  Budget specification:
-    State the exact evaluation budget for all algorithms.
-    If different algorithms receive different budgets (e.g., to normalize wall-clock time),
-    document and justify this explicitly.
+| Metric | Why mandatory |
+|---|---|
+| `QUALITY-BEST_VALUE_AT_BUDGET` | The most basic outcome measure — every study has a budget |
+| `RELIABILITY-SUCCESS_RATE` | Reliability matters independently of peak quality |
+| `ROBUSTNESS-RESULT_STABILITY` | Principle 15: report spread, not only averages |
+| `ANYTIME-ECDF_AREA` | Principle 14: full performance curves, not only endpoints |
 
-  Output: a completed Study record with:
-    → experimental_design.stopping_criteria
-    → pre_registered_hypotheses (from Step 2)
-    → problem_instances and algorithm_instances (from Steps 3–4)
-    → [implicitly] the metric list, which becomes the AnalysisConfig in Step 6
--->
+**Optional additional metrics:**
+
+Use the Metric Selection Guide (`docs/03-technical-contracts/metric-taxonomy.md` §4) to select metrics appropriate for your Research Question type. For each additional metric, document *why* it was chosen — metric selection that cannot be justified from the Research Question is a sign of post-hoc cherry-picking and will be flagged in the Confirmatory analysis step.
+
+**Performance curve sampling strategy:**
+
+Specify at which evaluation counts Performance Records will be stored during each Run. This must be decided now — recording more data is always safe, but recording fewer snapshots may prevent anytime analysis later and cannot be retroactively corrected. The sampling frequency is stored in the `PerformanceRecord` sampling configuration.
+
+→ PerformanceRecord schema: `docs/03-technical-contracts/data-format.md` §2.6
+
+**Budget specification:**
+
+State the exact evaluation budget for all Algorithm Instances. If different Algorithm Instances receive different budgets — for example, to normalize wall-clock time across algorithms with different per-evaluation costs — document and justify this explicitly. An unjustified differential budget is a configuration fairness violation (MANIFESTO Principle 10) and must appear in the study's limitations section.
+
+**Output of this step:**
+
+A completed and locked Study record containing:
+- `experimental_design.stopping_criteria`
+- `pre_registered_hypotheses` (from Step 2)
+- `problem_instances` and `algorithm_instances` (from Steps 3–4)
+- The metric list, which becomes the `AnalysisConfig` when Step 7 triggers analysis
+
+→ Study record format: `docs/03-technical-contracts/data-format.md` §2.3
 
 ---
 
@@ -279,7 +290,7 @@ Any observation from Level 1 that suggests an untested hypothesis must be docume
 For every hypothesis where Level 2 produces a statistically significant result, compute the Effect Size (→ GLOSSARY). Report the Effect Size alongside the p-value. A result is only actionable if both levels agree it is significant.
 
 **Standard Reporting Set:**
-Compute and report all metrics from the Standard Reporting Set (`docs/03_technical_contracts/metric-taxonomy.md` §3) for every (Algorithm Instance, Problem Instance) combination. These four metrics are non-negotiable:
+Compute and report all metrics from the Standard Reporting Set (`docs/03-technical-contracts/metric-taxonomy.md` §3) for every (Algorithm Instance, Problem Instance) combination. These four metrics are non-negotiable:
 - `QUALITY-BEST_VALUE_AT_BUDGET`
 - `RELIABILITY-SUCCESS_RATE`
 - `ROBUSTNESS-RESULT_STABILITY`

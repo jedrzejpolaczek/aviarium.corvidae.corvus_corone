@@ -8,14 +8,14 @@ two studies using "success rate" that mean different things.
 NARRATIVE POSITION:
   MANIFESTO Principle 12 (Multidimensionality) → Metric Taxonomy → (what we can measure)
   → docs/04_scientific_practice/methodology/statistical-methodology.md : which metrics get which statistical treatment
-  → docs/03_technical_contracts/data-format.md §2.7 : metric names in Result Aggregates MUST match names here
-  → docs/03_technical_contracts/interface-contracts.md §4 : Analyzer interface validates metric names against here
+  → docs/03-technical-contracts/data-format.md §2.7 : metric names in Result Aggregates MUST match names here
+  → docs/03-technical-contracts/interface-contracts.md §4 : Analyzer interface validates metric names against here
 
 CONNECTS TO:
-  ← docs/01_manifesto/MANIFESTO.md Principle 12 : "multiple aspects of performance" — this document is the inventory
-  ← docs/02_design/01_software_requirement_specification/SRS.md §4.4 : Measurement & Analysis Engine requirements
-  → docs/03_technical_contracts/data-format.md §2.7 : ResultAggregate.metrics keys must be valid metric IDs from here
-  → docs/03_technical_contracts/interface-contracts.md §4 : Analyzer.compute_metrics() validates against this taxonomy
+  ← docs/01-manifesto/MANIFESTO.md Principle 12 : "multiple aspects of performance" — this document is the inventory
+  ← docs/02-design/01-software-requirement-specification/SRS.md §4.4 : Measurement & Analysis Engine requirements
+  → docs/03-technical-contracts/data-format.md §2.7 : ResultAggregate.metrics keys must be valid metric IDs from here
+  → docs/03-technical-contracts/interface-contracts.md §4 : Analyzer.compute_metrics() validates against this taxonomy
   → docs/04_scientific_practice/methodology/statistical-methodology.md : statistical treatment varies by metric type
   → docs/GLOSSARY.md           : terms used here (Budget, Run, Anytime Performance, etc.) are defined there
   → Docstrings                 : analysis code references metric IDs from this document
@@ -236,7 +236,7 @@ Every benchmarking study produced or exported by this system **MUST** include at
 | `ROBUSTNESS-RESULT_STABILITY` | Spread across Runs is required by MANIFESTO Principle 15 ("not only averages, but spread") |
 | `ANYTIME-ECDF_AREA` | Full performance curves required by MANIFESTO Principle 14; this is its scalar summary |
 
-**Enforcement:** The Analyzer interface (`docs/03_technical_contracts/interface-contracts.md` §4) must validate that all four metrics are computed before producing any study report.
+**Enforcement:** The Analyzer interface (`docs/03-technical-contracts/interface-contracts.md` §4) must validate that all four metrics are computed before producing any study report.
 
 **Connection to protocol:** `docs/04_scientific_practice/methodology/benchmarking-protocol.md` Step 5 references this set as the non-negotiable minimum when specifying measurements.
 

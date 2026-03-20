@@ -10,11 +10,10 @@ NARRATIVE POSITION:
   They are written when a decision is made and referenced where the decision is visible.
 
 CONNECTS TO:
-  → docs/02_design/02_architecture/c1-context.md  : delivery form shapes the actor interactions and system boundary
-  → docs/03_technical_contracts/data-format.md §1 : server-compatibility is a design constraint on all entity schemas
-  → docs/03_technical_contracts/interface-contracts.md : storage interface defined as abstraction (§ TBD)
-  → docs/02_design/01_software_requirement_specification/SRS.md : satisfies NFR-MODULAR-01, NFR-USABILITY-01
-  → docs/05_community/TASKS.md : resolves REF-TASK-0003; creates REF-TASK-0023
+  → docs/02-design/02-architecture/c1-context.md  : delivery form shapes the actor interactions and system boundary
+  → docs/03-technical-contracts/data-format.md §1 : server-compatibility is a design constraint on all entity schemas
+  → docs/03-technical-contracts/interface-contracts.md : storage interface defined as abstraction (§ TBD)
+  → docs/02-design/01-software-requirement-specification/SRS.md : satisfies NFR-MODULAR-01, NFR-USABILITY-01
 
 NAMING CONVENTION: ADR-[zero-padded number]-[kebab-case-title].md
 -->
@@ -53,7 +52,7 @@ The question is: what is the right delivery form for V1, and how do we avoid bui
 
 **V1 is a Python library with no server deployment requirement.** Local file storage is the default and only backend in V1.
 
-**The storage layer is designed as an abstraction from day one.** The library never calls file I/O functions directly. All persistence is mediated through a `Repository` interface (defined in `docs/03_technical_contracts/interface-contracts.md`). V1 ships with a `LocalFileRepository` implementation. A `ServerRepository` implementation that delegates to a REST API can be plugged in without changing any other library code or any stored data format.
+**The storage layer is designed as an abstraction from day one.** The library never calls file I/O functions directly. All persistence is mediated through a `Repository` interface (defined in `docs/03-technical-contracts/interface-contracts.md`). V1 ships with a `LocalFileRepository` implementation. A `ServerRepository` implementation that delegates to a REST API can be plugged in without changing any other library code or any stored data format.
 
 **All entity schemas are designed for server-compatibility:**
 - Every entity has a globally unique ID (UUID format), not a local file path
@@ -147,8 +146,7 @@ This means a V2 server can store the same JSON entities in a database and serve 
 
 | Document | Relationship |
 |---|---|
-| `docs/02_design/02_architecture/c1-context.md` | Delivery form shapes actor interactions; V2 Platform Server added as a future planned external system |
-| `docs/03_technical_contracts/data-format.md §1` | Server-compatibility is a design constraint on all entity schemas defined there |
-| `docs/03_technical_contracts/interface-contracts.md` | `Repository` interface must be defined here (blocked by `REF-TASK-0023`) |
-| `docs/02_design/01_software_requirement_specification/SRS.md §5` | NFR-MODULAR-01 (extensibility) and NFR-USABILITY-01 (onboarding friction) both informed this decision |
-| `docs/05_community/TASKS.md` | Resolves `REF-TASK-0003`; creates `REF-TASK-0023` (storage abstraction design) |
+| `docs/02-design/02-architecture/c1-context.md` | Delivery form shapes actor interactions; V2 Platform Server added as a future planned external system |
+| `docs/03-technical-contracts/data-format.md §1` | Server-compatibility is a design constraint on all entity schemas defined there |
+| `docs/03-technical-contracts/interface-contracts.md` | `Repository` interface must be defined here (blocked by `REF-TASK-0023`) |
+| `docs/02-design/01-software-requirement-specification/SRS.md §5` | NFR-MODULAR-01 (extensibility) and NFR-USABILITY-01 (onboarding friction) both informed this decision |

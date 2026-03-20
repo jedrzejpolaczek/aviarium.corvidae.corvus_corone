@@ -11,9 +11,9 @@ NARRATIVE POSITION:
 
 CONNECTS TO:
   ← MANIFESTO                        : values/principles explain WHY these actors and integrations exist
-  → docs/02_design/01_software_requirement_specification/SRS.md : each actor here becomes a stakeholder (§3); each external system becomes an interface requirement (§7)
-  → docs/02_design/02_architecture/c2-containers.md             : the "System" black box here is decomposed into containers there
-  → docs/03_technical_contracts/data-format.md                  : data exchanged with external systems must conform to schemas defined there (§3 Interoperability Mappings)
+  → docs/02-design/01-software-requirement-specification/SRS.md : each actor here becomes a stakeholder (§3); each external system becomes an interface requirement (§7)
+  → docs/02-design/02-architecture/c2-containers.md             : the "System" black box here is decomposed into containers there
+  → docs/03-technical-contracts/data-format.md                  : data exchanged with external systems must conform to schemas defined there (§3 Interoperability Mappings)
   → docs/GLOSSARY.md                 : all actor and system names used here are defined there
 -->
 
@@ -61,7 +61,7 @@ flowchart LR
   classDef ext fill:#6b6b6b,color:#fff,stroke:#5a5a5a
 ```
 
-> **`REF-TASK-0003 — Decided`** — HPC/cloud distributed execution is **deferred to V2**. In V1, all Runs execute locally (sequentially or with Python multiprocessing). The decision is recorded in `docs/02_design/02_architecture/adr/ADR-001-library-with-server-ready-data-layer.md`. Runs are independent by design (MANIFESTO Principle 18), so the execution backend can be swapped via the Repository/Runner abstraction without changing the data format.
+> HPC/cloud distributed execution is **deferred to V2**. In V1, all Runs execute locally (sequentially or with Python multiprocessing). The decision is recorded in `docs/02-design/02-architecture/adr/ADR-001-library-with-server-ready-data-layer.md`. Runs are independent by design (MANIFESTO Principle 18), so the execution backend can be swapped via the Repository/Runner abstraction without changing the data format.
 
 ---
 
@@ -152,7 +152,7 @@ flowchart LR
 
 **Direction:** Outbound export — our system produces data exportable to COCO's format. Import of COCO problem definitions is a secondary use case.
 
-**Risk:** COCO's data format evolves. If incompatible changes are made, the export mapping must be updated. Format mapping is documented in `docs/03_technical_contracts/data-format.md` §3.
+**Risk:** COCO's data format evolves. If incompatible changes are made, the export mapping must be updated. Format mapping is documented in `docs/03-technical-contracts/data-format.md` §3.
 
 > **`TODO: REF-TASK-0005`** — Define the COCO format mapping in `data-format.md` §3 when the
 > internal data format is finalized. Owner: ecosystem integration lead. Acceptance: a study result
@@ -212,9 +212,9 @@ flowchart LR
 
 **Direction:** Bidirectional — the library's `Repository` interface can be backed by this server in V2. Researchers store studies locally in V1; they can republish to the shared server in V2 without migrating their data because all entity schemas are server-compatible from V1.
 
-**V1 design constraint:** All entity schemas must use globally unique IDs (UUIDs), be JSON-serializable, and reference other entities by ID — not by local file path. This ensures V1-produced artifacts are valid V2 server artifacts without any migration step. This constraint is documented in `docs/03_technical_contracts/data-format.md §1` and enforced by `ADR-001`.
+**V1 design constraint:** All entity schemas must use globally unique IDs (UUIDs), be JSON-serializable, and reference other entities by ID — not by local file path. This ensures V1-produced artifacts are valid V2 server artifacts without any migration step. This constraint is documented in `docs/03-technical-contracts/data-format.md §1` and enforced by `ADR-001`.
 
-> **`TODO: REF-TASK-0023`** — Design the storage abstraction interface (`Repository`) that allows switching between `LocalFileRepository` (V1) and `ServerRepository` (V2) without modifying library code. Owner: library design lead. Acceptance: `docs/03_technical_contracts/interface-contracts.md` contains the `Repository` interface specification; a `LocalFileRepository` implementation passes the interface contract test suite.
+> **`TODO: REF-TASK-0023`** — Design the storage abstraction interface (`Repository`) that allows switching between `LocalFileRepository` (V1) and `ServerRepository` (V2) without modifying library code. Owner: library design lead. Acceptance: `docs/03-technical-contracts/interface-contracts.md` contains the `Repository` interface specification; a `LocalFileRepository` implementation passes the interface contract test suite.
 
 ---
 
@@ -244,7 +244,7 @@ flowchart LR
 
 The choice of delivery form (Python library) and the server-ready data layer design are documented in:
 
-> `docs/02_design/02_architecture/adr/ADR-001-library-with-server-ready-data-layer.md`
+> `docs/02-design/02-architecture/adr/ADR-001-library-with-server-ready-data-layer.md`
 
 ---
 
@@ -261,4 +261,4 @@ The following are explicitly outside this system's scope. Each exclusion traces 
 | Proprietary or closed data formats | Anti-pattern 5 | Isolation from the benchmarking ecosystem defeats the purpose |
 | Marketing-oriented result presentation | Anti-pattern 6 | Reports communicate limitations alongside results, not promotional summaries |
 
-> These exclusions become hard constraints in `docs/02_design/01_software_requirement_specification/SRS.md` §6.
+> These exclusions become hard constraints in `docs/02-design/01-software-requirement-specification/SRS.md` §6.

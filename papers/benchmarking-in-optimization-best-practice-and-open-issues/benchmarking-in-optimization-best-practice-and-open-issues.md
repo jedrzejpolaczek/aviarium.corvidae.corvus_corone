@@ -1,5 +1,5 @@
 ---
-title: "Benchmarking w optymalizacji: dobre praktyki i otwarte problemy (tłumaczenie na język polski, część 1)"
+title: "Benchmarking w optymalizacji: dobre praktyki i otwarte problemy"
 author: "Tłumaczenie automatyczne z języka angielskiego"
 date: "2020-12-18 (oryginał), tłumaczenie: [uzupełnij]"
 ---

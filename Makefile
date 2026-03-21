@@ -4,7 +4,7 @@ lint:
 	uv run ruff check .
 
 type:
-	uv run mypy .
+	uv run mypy
 
 test:
 	uv run pytest

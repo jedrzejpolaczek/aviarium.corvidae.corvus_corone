@@ -19,7 +19,7 @@ dev = [
 [tool.ruff]
 target-version = "py313"
 line-length = 100
-src = ["src"]
+src = ["packages/corvus-corone-lib/src", "packages/corvus-corone-pilot/src"]
 
 [tool.ruff.lint]
 extend-select = ["I"]
@@ -31,10 +31,21 @@ ignore_missing_imports = true
 warn_unused_ignores = true
 warn_redundant_casts = true
 warn_unused_configs = true
-namespace_packages = true
-explicit_package_bases = false
+mypy_path = ["packages/corvus-corone-lib/src", "packages/corvus-corone-pilot/src"]
+explicit_package_bases = true
+files = [
+    "packages/corvus-corone-lib/src",
+    "packages/corvus-corone-pilot/src",
+]
 exclude = [".venv", "build", "dist"]
 
 [tool.pytest.ini_options]
-testpaths = ["tests"]
+testpaths = ["packages/corvus-corone-lib/tests", "packages/corvus-corone-pilot/tests"]
 addopts = "-q"
+
+[tool.uv.sources]
+corvus-corone-lib = { workspace = true }
+corvus-corone-pilot = { workspace = true }
+
+[tool.uv.workspace]
+members = ["packages/*"]

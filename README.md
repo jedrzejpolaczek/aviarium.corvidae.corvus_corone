@@ -1,211 +1,284 @@
 <!-- PROJECT SHIELDS -->
-[![CI status][ci-status-shield]](https://github.com/ORGANIZATION/REPO/actions)
-<!-- you can add seperate shields for diffrent CI/CD status or something else, just put link to .yml file -->
+[![CI status][ci-status-shield]](https://github.com/jedrzejpolaczek/aviarium.corvidae.corvus_corone/actions)
 
 # Project data
-<!-- This section contains essential details about the project. -->
 
-Project name: WIP
+Project name: Corvus Corone — HPO Algorithm Benchmarking Platform
 
-Application name: WIP
+Application name: corvus-corone
 
-Additional names: WIP
+Additional names: corvus (CLI command name)
 
-Software version: 0.0.1
+Software version: 0.1.0
 
-Repository Purpose: WIP
+Repository Purpose: Python library and AI-powered pilot for reproducible, statistically rigorous benchmarking of hyperparameter optimization (HPO) algorithms. The system enforces scientific best practices — pre-registration of research questions, seed management, run independence, scoped conclusions — derived from the benchmarking methodology in *Benchmarking in Optimization: Best Practice and Open Issues* (Bartz-Beielstein et al., 2020).
 
 # Table of Contents
-<!-- List of sections and their corresponding links for easy navigation. -->
 1. [Project Data](#project-data)
-3. [Project Task Board](#project-task-board)
-4. [Technical Details](#technical-details)
+2. [Project Task Board](#project-task-board)
+3. [Technical Details](#technical-details)
    - [Environment](#environment)
    - [File Structure](#file-structure)
    - [Required Tools](#required-tools)
    - [Build Procedure](#build-procedure)
-5. [Usage](#usage)
-6. [Testing Information](#testing-information)
-7. [Other Important Information](#other-important-information)
+4. [Usage](#usage)
+5. [Testing Information](#testing-information)
+6. [Other Important Information](#other-important-information)
    - [Coding standards](#coding-standards)
    - [Knowledge base](#knowledge-base)
    - [Contribution Guidelines](#contribution-guidelines)
    - [Versioning Convention](#versioning-convention)
    - [FAQs/Troubleshooting](#faqstroubleshooting)
    - [License](#license)
-9. [Contact Information](#contact-information)
-10. [Acknowledgments](#acknowledgments)
-11. [Screenshots/Media](#screenshotmedia)
-12. [Release History](#release-history)
+7. [Contact Information](#contact-information)
+8. [Acknowledgments](#acknowledgments)
+9. [Screenshots/Media](#screenshotsmedia)
+10. [Release History](#release-history)
 
 # Project task board
-<!-- Provide a link or description of the project's task board for tracking progress. -->
 
-Project task board: WIP
+GitHub Milestones track all open documentation and implementation tasks. See [docs/ROADMAP.md](docs/ROADMAP.md) for the full milestone list and open task index (REF-TASK and IMPL tasks).
+
+WIP: GitHub project board URL pending repository setup.
 
 # Technical details
-<!-- Outline specific technical aspects of the project like architecture, languages used, etc. -->
-WIP
-<!--
-Example:
-The application is built using Python and Tensorflow as main AI framework.
--->
+
+Corvus Corone is structured as a **uv workspace** with two packages:
+
+- **corvus-corone-lib** — core benchmarking library: Problem/Algorithm interfaces, Experiment Runner, Reproducibility Layer, Statistical Analysis, Reporting Engine, and CLI (`corvus run`, `corvus list-problems`, `corvus list-algorithms`).
+- **corvus-corone-pilot** — AI-powered pilot built on LangGraph, MCP, and Ollama. Three planned tiers: V1 (library only), V2 Researcher (ReAct + multi-agent), V3 Autonomous (hypothesis generation, safety guards, DVC pipeline).
+
+The system interoperates with COCO, IOHprofiler, and Nevergrad ecosystems via documented data-format mappings.
+
+Full architecture documentation: [docs/02-design/02-architecture/](docs/02-design/02-architecture/)
 
 ## Environment
-<!-- Describe the environment in which the application runs (e.g., server specifications, operating systems). -->
-WIP
-<!--
-Example:
-The app is deployed on AWS EC2 instances running Ubuntu 20.04, with PostgreSQL as the database.
--->
+
+- **Python**: 3.13 (enforced via `.python-version` and `pyproject.toml`)
+- **Package manager**: [uv](https://docs.astral.sh/uv/) workspace
+- **Platforms**: Windows, macOS, Linux
+- **External integrations** (planned): COCO, IOHprofiler, Nevergrad, Ollama (local LLM), MLflow
 
 ## File structure
-<!-- Provide an overview of the project's directory layout. -->
+
 ```
-├── README.md              <- The top-level README for developers using this project.
-...
-│
-└── tests                  <- Test scripts 
+├── .github/workflows/          <- GitHub Actions CI (workflow_dispatch only)
+├── docs/
+│   ├── 01-manifesto/           <- MANIFESTO.md — values and principles
+│   ├── 02-design/              <- SRS, architecture (C1–C4), ADRs
+│   ├── 03-technical-contracts/ <- Data format, interface contracts, metric taxonomy
+│   ├── 04-scientific-practice/ <- Benchmarking protocol, statistical methodology
+│   ├── 05-community/           <- Contribution guide, versioning governance
+│   ├── 06-tutorials/           <- Step-by-step tutorials
+│   ├── GLOSSARY.md
+│   └── ROADMAP.md
+├── packages/
+│   ├── corvus-corone-lib/      <- Core benchmarking library
+│   │   ├── src/corvus_corone/
+│   │   └── tests/
+│   └── corvus-corone-pilot/    <- AI-powered pilot
+│       ├── src/corvus_corone_pilot/
+│       └── tests/
+├── scripts/
+│   ├── pre-push                <- Git pre-push hook (runs linters + tests)
+│   └── create_github_issues.py <- Syncs ROADMAP tasks to GitHub Issues
+├── spikes/                     <- Exploratory prototypes (not production code)
+├── Makefile                    <- Developer commands (lint, format, type, test)
+├── pyproject.toml              <- uv workspace root
+└── README.md
 ```
+
 ## Required tools
-<!-- List tools and libraries required for building and running the code. --->
-WIP
-<!--
-Example:
-- Node.js (v14 or above)
-- Python (v3.8) (libraries in file requirements.txt)
-- Docker
--->
+
+- **Python 3.13** — enforced by the workspace; `uv` will install it automatically
+- **[uv](https://docs.astral.sh/uv/)** — required for all package management and running commands
+- **Git** — required for version control and the pre-push hook
+- **make** — optional; macOS/Linux only; provides shorthand Makefile commands (`make lint`, `make test`, etc.)
 
 ## Build procedure
-<!-- Steps to build or compile the project. -->
-WIP
-<!--
-Example:
-1. Clone the repository
-2. Run command `docker build .` to create Docker image
--->
-First install [UV](https://docs.astral.sh/uv/getting-started/installation/#standalone-installer). 
 
-You can try (for windows):
+**1. Install [uv](https://docs.astral.sh/uv/getting-started/installation/)**
 
-`powershell -c "irm https://astral.sh/uv/install.ps1 | more"` or (for macOS/Linux) `curl -LsSf https://astral.sh/uv/install.sh | less`
+Windows:
+```powershell
+powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
+```
 
-and then:
-`pip install uv`
+macOS / Linux:
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
 
-To create virtual environment run:
-`uv venv`
+**2. Clone the repository and install dependencies**
 
-To run it:
-`uv <command eg. pip install ruff>`
+```bash
+git clone https://github.com/jedrzejpolaczek/aviarium.corvidae.corvus_corone.git
+cd aviarium.corvidae.corvus_corone
+uv sync --all-extras
+```
+
+This creates a virtual environment and installs all workspace packages (`corvus-corone-lib`, `corvus-corone-pilot`) along with their dev dependencies.
+
+**3. Install the pre-push hook (optional but recommended)**
+
+macOS / Linux:
+```bash
+make install-hooks
+```
+
+Windows (Git Bash or PowerShell):
+```bash
+cp scripts/pre-push .git/hooks/pre-push
+```
+
+The hook runs ruff, mypy, and pytest automatically before every `git push`.
 
 # Usage
-<!-- Instructions on how to use the application or code with examples. -->
-WIP
-<!--
-Example:
-To start the application, navigate to the project directory and run command: 
+
+> **Status: v0.1.0 — API is not yet stable.**
+
+After installing (see [Build Procedure](#build-procedure)), `uv sync --all-extras` installs both workspace packages into the shared virtual environment. All `uv run` commands below must be executed from the repository root.
+
+---
+
+### corvus-corone-lib — core benchmarking library
+
+Run an interactive Python session with the library available:
+
 ```bash
-docker-compose up
+uv run --package corvus-corone-lib python
 ```
--->
+
+```python
+>>> import corvus_corone
+>>> corvus_corone.__version__
+'0.1.0'
+```
+
+Run the library tests only:
+
+```bash
+uv run pytest packages/corvus-corone-lib/tests
+```
+
+---
+
+### corvus-corone-pilot — AI-powered pilot
+
+Run an interactive Python session with the pilot available:
+
+```bash
+uv run --package corvus-corone-pilot python
+```
+
+```python
+>>> import corvus_corone_pilot
+>>> corvus_corone_pilot.__version__
+'0.1.0'
+```
+
+Run the pilot tests only:
+
+```bash
+uv run pytest packages/corvus-corone-pilot/tests
+```
+
+---
+
+### Day-to-day development (linters, type checker, tests)
+
+macOS / Linux — use the `Makefile`:
+
+```bash
+make lint      # ruff check
+make format    # ruff format
+make type      # mypy
+make test      # pytest (all packages)
+```
+
+Windows — call `uv run` directly:
+
+```bash
+uv run ruff check .
+uv run ruff format .
+uv run mypy .
+uv run pytest
+```
+
+Full API and tutorial documentation will be added as the codebase stabilises. See [docs/06-tutorials/](docs/06-tutorials/) for upcoming tutorials.
 
 # Testing Information
-<!-- How to run tests for the project. -->
-WIP
+
+Tests live inside each workspace package:
+
+- `packages/corvus-corone-lib/tests/` — unit and integration tests for the core library
+- `packages/corvus-corone-pilot/tests/` — unit and integration tests for the pilot
+
+Run all tests from the repository root:
+
+```bash
+uv run pytest
+```
+
+Run tests for a single package:
+
+```bash
+uv run pytest packages/corvus-corone-lib/tests
+uv run pytest packages/corvus-corone-pilot/tests
+```
+
+The same checks run automatically via the pre-push hook and the GitHub Actions CI workflow (`.github/workflows/ci.yml`, manually triggered via `workflow_dispatch`).
+
+WIP: acceptance test strategy — see [docs/02-design/01-software-requirement-specification/07-acceptance-test-strategy/](docs/02-design/01-software-requirement-specification/07-acceptance-test-strategy/) (REF-TASK-0013).
 
 # Other important informations
-<!-- Any additional information relevant to the project. -->
+
 ## Coding standards
-Coding standard: [Google Python Style Guide](https://google.github.io/styleguide/pyguide.html)
+
+- **Style guide**: [Google Python Style Guide](https://google.github.io/styleguide/pyguide.html)
+- **Linter / formatter**: [ruff](https://docs.astral.sh/ruff/) — line length 100, import sorting enabled (`extend-select = ["I"]`)
+- **Type checker**: [mypy](https://mypy.readthedocs.io/) in strict mode
+- **Terminology**: all code identifiers and docstrings must use exact terms from [docs/GLOSSARY.md](docs/GLOSSARY.md)
 
 ## Knowledge base
-WIP
-<!--
-Example:
-* All API keys and sensitive data are stored in environment variables.
--->
+
+WIP: documentation narrative reading order is described in [docs/README.md](docs/README.md).
 
 ## Contribution Guidelines
-<!-- How others can contribute to the project, including coding standards and submission process. -->
-WIP
+
+Contribution types: new benchmark problems, algorithm implementations, analysis tools/metrics, documentation, bug fixes, and architecture changes (require an ADR).
+
+Full process, review criteria, and quality checklist: [docs/05-community/01-contribution-guide.md](docs/05-community/01-contribution-guide.md)
 
 ## Versioning convention
-<!-- Explain how version numbers are assigned.-->
-WIP
-<!--
-Example 1 (recommended for libs):
-You may find versioning convention here: [Versioning convention documment](https://semver.org/)
 
-Example 2 (your own convention and how to describe it):
-Version 1.0.0: Initial release
-Version 1.1.0: New feature added
-Version 1.1.1: Minor bug fixes
-Version 2.0.0: New release
--->
+WIP: versioning scheme pending ADR decision (REF-TASK-0011). Governance rules for artifact versioning (problem instances, algorithm implementations, data schemas, experiment results) are outlined in [docs/05-community/02-versioning-governance.md](docs/05-community/02-versioning-governance.md).
 
 ## FAQs/Troubleshooting
-<!-- Frequently asked questions or common troubleshooting scenarios. -->
+
 WIP
-<!--
-Example:
-- issue with login under certain conditions,
-- slow response time on older Android devices,
-- specific problem during environment setup.
-    - how to solve it.
--->
 
 ## License
-<!-- Information about the project's license. -->
-WIP
-<!--
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
--->
+
+WIP: license pending ADR decision (REF-TASK-0011). The intent from the manifesto is open code and open data under licenses that support scientific reuse and community contributions.
 
 ## Contact Information
-<!-- Where to direct questions and discussions about the project. -->
+
 WIP
-<!--
-Example:
-In case of any questions reach dev team through project [Slack channel](link to channel)
--->
 
 ## Acknowledgments
-<!-- Acknowledge contributors, sponsors, or any third-party resources used. -->
-WIP
-<!--
-Example:
-This project was made possible thanks to:
-- **John Doe** for initial development and ideas.
-- **Acme Corp** for providing the necessary infrastructure.
-- Special thanks to **Open Source Initiative** for resources and guides.
--->
+
+The scientific methodology underlying Corvus Corone is derived primarily from:
+
+> Bartz-Beielstein, T., Doerr, C., van den Berg, D., Bossek, J., Chandrasekaran, S., Eftimov, T., ... & Volz, V. (2020). **Benchmarking in Optimization: Best Practice and Open Issues**. *arXiv:2007.03488*.
 
 ## Screenshots/Media
-<!-- Screenshots, GIFs, or videos demonstrating the application or software. -->
-WIP
-<!--
-Example:
-Below are some screenshots and media demonstrating the application in action:
 
-- ![Main Interface](link_to_main_interface_screenshot)
-- ![Feature X Implementation](link_to_feature_x_screenshot)
-- A brief demo video of the application can be found [here](link_to_demo_video).
--->
+WIP
 
 # Release history
-<!-- Provide a record of release versions and changes. -->
-WIP
-<!-- 
-Example 1:
-You can put a link to the appropriate file or git branch history convention.
 
-Example 2:
-- v1.0.0: Initial launch
-- v1.1.0: Added user profile feature
-- v1.2.0: Improved performance and bug fixes
--->
+- **v0.1.0** — Initial monorepo setup: uv workspace, package scaffolding, documentation foundation (MANIFESTO, SRS, C1–C2 architecture, use cases, functional requirements, NFRs, constraints, interface requirements, benchmarking protocol, statistical methodology, metric taxonomy, interface contracts, data format, contribution guide, versioning governance, ROADMAP, GLOSSARY).
 
 <!-- MARKDOWN LINKS & IMAGES -->
 [ci-status-shield]: https://github.com/jedrzejpolaczek/aviarium.corvidae.corvus_corone/actions/workflows/ci.yml/badge.svg?branch=main

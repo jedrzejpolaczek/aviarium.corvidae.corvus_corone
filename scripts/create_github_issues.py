@@ -428,7 +428,6 @@ IMPL-010 (LocalFileRepository must be implemented before its layout can be docum
 Run a small study end-to-end, capture the resulting directory with `tree`, annotate each file against the entity definitions in `data-format.md §2`. Close when the annotated tree is merged into `data-format.md §3` and matches the actual file output verified by the repository contract tests.
 """,
     },
-
     # ── MILESTONE: V1 Methodology — Statistics & Metrics ─────────────────────
     {
         "milestone": "V1 Methodology — Statistics & Metrics",
@@ -664,7 +663,6 @@ class SensitivityReport(BaseModel):
 Completion of `data-format.md` §2.2
 """,
     },
-
     # ── MILESTONE: V1 Interoperability ────────────────────────────────────────
     {
         "milestone": "V1 Interoperability — Ecosystem Integration",
@@ -781,7 +779,6 @@ Export Performance Records in IOHprofiler's `.dat` format so researchers can use
 Completion of `data-format.md` §2.6 (PerformanceRecord)
 """,
     },
-
     # ── MILESTONE: V1 Infrastructure — ADRs & Technical Constraints ───────────
     {
         "milestone": "V1 Infrastructure — ADRs & Technical Constraints",
@@ -819,10 +816,8 @@ ADR-006 with benchmark numbers and chosen format.
 `data-format.md` §2.6 (PerformanceRecord); REF-TASK-0023 (Repository interface)
 """,
     },
-
     # ── MILESTONE: Post-V1 ────────────────────────────────────────────────────
     # (REF-TASK-0014 and 0018 already above with post-v1 label)
-
     # ── MILESTONE: Learner Actor ──────────────────────────────────────────────
     {
         "milestone": "Learner Actor — Education Platform",
@@ -1039,6 +1034,7 @@ print(f"Milestones referenced: {milestones_in_issues}")
 
 # ── MAIN ──────────────────────────────────────────────────────────────────────
 
+
 def get_or_create_milestone(repo, title, description):
     """Get existing milestone by title or create it."""
     for m in repo.get_milestones(state="open"):
@@ -1066,54 +1062,51 @@ def get_or_create_label(repo, name, color="0075ca"):
 
 LABEL_COLORS = {
     "documentation": "0075ca",
-    "architecture":  "e4e669",
-    "methodology":   "a2eeef",
-    "metrics":       "7057ff",
-    "interop":       "d93f0b",
-    "infrastructure":"0052cc",
-    "spike":         "e11d48",
-    "adr":           "f97316",
-    "srs":           "6366f1",
-    "glossary":      "84cc16",
-    "testing":       "22c55e",
-    "tutorial":      "14b8a6",
-    "post-v1":       "f59e0b",
-    "learner":       "c026d3",
-    "c1":            "6b7280",
-    "c2":            "6b7280",
-    "c3":            "6b7280",
+    "architecture": "e4e669",
+    "methodology": "a2eeef",
+    "metrics": "7057ff",
+    "interop": "d93f0b",
+    "infrastructure": "0052cc",
+    "spike": "e11d48",
+    "adr": "f97316",
+    "srs": "6366f1",
+    "glossary": "84cc16",
+    "testing": "22c55e",
+    "tutorial": "14b8a6",
+    "post-v1": "f59e0b",
+    "learner": "c026d3",
+    "c1": "6b7280",
+    "c2": "6b7280",
+    "c3": "6b7280",
     "visualization": "ec4899",
-    "agent":         "f97316",
+    "agent": "f97316",
     "algorithm-author": "0ea5e9",
-    "coco":          "dc2626",
-    "nevergrad":     "2563eb",
-    "iohprofiler":   "16a34a",
-    "storage":       "78716c",
-    "problems":      "854d0e",
-    "algorithms":    "0e7490",
-    "data-format":   "6d28d9",
-    "blocked":       "b91c1c",
+    "coco": "dc2626",
+    "nevergrad": "2563eb",
+    "iohprofiler": "16a34a",
+    "storage": "78716c",
+    "problems": "854d0e",
+    "algorithms": "0e7490",
+    "data-format": "6d28d9",
+    "blocked": "b91c1c",
     "implementation": "10b981",
-    "portfolio":     "0ea5e9",
-    "pilot-v2":      "06b6d4",
-    "pilot-v3":      "f97316",
-    "ml-foundations":"8b5cf6",
-    "ci-cd":         "64748b",
-    "mcp":           "0ea5e9",
-    "langgraph":     "6366f1",
-    "rag":           "f59e0b",
-    "llm":           "4f46e5",
-    "mlops":         "059669",
-    "dvc":           "84cc16",
-    "security":      "dc2626",
-    "multi-agent":   "7c3aed",
-    "optuna":        "3b82f6",
-    "nevergrad":     "2563eb",
-    "spike":         "e11d48",
-    "reporting":     "0891b2",
-    "statistics":    "4f46e5",
+    "portfolio": "0ea5e9",
+    "pilot-v2": "06b6d4",
+    "pilot-v3": "f97316",
+    "ml-foundations": "8b5cf6",
+    "ci-cd": "64748b",
+    "mcp": "0ea5e9",
+    "langgraph": "6366f1",
+    "rag": "f59e0b",
+    "llm": "4f46e5",
+    "mlops": "059669",
+    "dvc": "84cc16",
+    "security": "dc2626",
+    "multi-agent": "7c3aed",
+    "optuna": "3b82f6",
+    "reporting": "0891b2",
+    "statistics": "4f46e5",
 }
-
 
 
 # ── IMPLEMENTATION MILESTONES ─────────────────────────────────────────────────
@@ -1199,7 +1192,6 @@ None — this is the first task.
 ADR-002 technical constraints, REF-TASK-0011
 """,
     },
-
     # ── Phase 1: corvus_corone Library ─────────────────────────────────────
     {
         "milestone": "IMPL Phase 1 — corvus_corone Library (weeks 1–16)",
@@ -1664,7 +1656,6 @@ Implement the public API one-liner entry point and Click CLI per REF-TASK-0004 a
 REF-TASK-0004, NFR-MODULAR-01
 """,
     },
-
     # ── Phase 2: Repo Closure ─────────────────────────────────────────────
     {
         "milestone": "IMPL Phase 2 — Repo Closure (weeks 17–30)",
@@ -1955,7 +1946,6 @@ Implement RAG over `papers/` to answer methodology questions during development.
 LLM block
 """,
     },
-
     # ── Phase 3a: Pilot V2 ─────────────────────────────────────────────────
     {
         "milestone": "IMPL Phase 3a — Pilot V2 Researcher (weeks 31–38)",
@@ -2179,7 +2169,6 @@ Finalize V2 with Click CLI, MLflow experiment tracking, and LangGraph thread-bas
 - [ ] `uv run corvus-pilot run -q "Does TPE outperform CMA-ES on 5D problems?"` works end-to-end
 """,
     },
-
     # ── Phase 3b: Pilot V3 ─────────────────────────────────────────────────
     {
         "milestone": "IMPL Phase 3b — Pilot V3 Autonomous (weeks 39–46)",
@@ -2345,7 +2334,6 @@ Implement evaluation harness for the autonomous V3 agent: pass@k metric, task co
 - [ ] Target baseline: pass@1 ≥ 0.6, safety_violations = 0
 """,
     },
-
     # ── Phase 4: Learner ───────────────────────────────────────────────────
     {
         "milestone": "IMPL Phase 4 — Learner Actor (weeks 47+)",
@@ -2523,9 +2511,19 @@ def main():
     )
     parser.add_argument("--repo", required=True, help="GitHub repo in format owner/repo")
     parser.add_argument("--token", help="GitHub token (or set GITHUB_TOKEN env var)")
-    parser.add_argument("--dry-run", action="store_true", help="Print what would be created without creating")
-    parser.add_argument("--docs-only", action="store_true", help="Create only documentation tasks (REF-TASK-0001..0030), skip implementation tasks")
-    parser.add_argument("--impl-only", action="store_true", help="Create only implementation tasks (IMPL-000..046), skip documentation tasks")
+    parser.add_argument(
+        "--dry-run", action="store_true", help="Print what would be created without creating"
+    )
+    parser.add_argument(
+        "--docs-only",
+        action="store_true",
+        help="Create only documentation tasks (REF-TASK-0001..0030), skip implementation tasks",
+    )
+    parser.add_argument(
+        "--impl-only",
+        action="store_true",
+        help="Create only implementation tasks (IMPL-000..046), skip documentation tasks",
+    )
     args = parser.parse_args()
 
     token = args.token or os.environ.get("GITHUB_TOKEN")
@@ -2600,7 +2598,9 @@ def main():
             continue
 
         milestone = milestone_objects.get(issue_data["milestone"])
-        labels = [label_objects[l] for l in issue_data.get("labels", []) if l in label_objects]
+        labels = [
+            label_objects[lbl] for lbl in issue_data.get("labels", []) if lbl in label_objects
+        ]
 
         try:
             issue = repo.create_issue(
@@ -2615,7 +2615,7 @@ def main():
         except GithubException as e:
             print(f"  ✗ Failed: {title[:60]} — {e}")
 
-    print(f"\n══ Done ══")
+    print("\n══ Done ══")
     print(f"  Milestones: {len(milestone_objects)}")
     print(f"  Issues created: {created}")
     print(f"  Issues skipped (already exist): {skipped}")

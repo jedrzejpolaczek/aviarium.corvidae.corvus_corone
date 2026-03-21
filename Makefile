@@ -4,7 +4,7 @@ lint:
 	uv run ruff check .
 
 type:
-	uv run mypy --package corvus-corone --package corvus-corone-pilot
+	uv run mypy
 
 test:
 	uv run pytest

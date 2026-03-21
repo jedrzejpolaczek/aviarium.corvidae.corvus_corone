@@ -33,6 +33,10 @@ warn_redundant_casts = true
 warn_unused_configs = true
 mypy_path = ["packages/corvus-corone-lib/src", "packages/corvus-corone-pilot/src"]
 explicit_package_bases = true
+files = [
+    "packages/corvus-corone-lib/src/corvus_corone",
+    "packages/corvus-corone-pilot/src/corvus_corone_pilot",
+]
 exclude = [".venv", "build", "dist"]
 
 [tool.pytest.ini_options]

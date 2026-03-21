@@ -201,7 +201,7 @@ Windows — call `uv run` directly:
 ```bash
 uv run ruff check .
 uv run ruff format .
-uv run mypy --package corvus_corone --package corvus_corone_pilot
+uv run mypy
 uv run pytest
 ```
 

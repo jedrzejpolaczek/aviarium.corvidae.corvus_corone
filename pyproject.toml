@@ -34,8 +34,8 @@ warn_unused_configs = true
 mypy_path = ["packages/corvus-corone-lib/src", "packages/corvus-corone-pilot/src"]
 explicit_package_bases = true
 files = [
-    "packages/corvus-corone-lib/src/corvus_corone",
-    "packages/corvus-corone-pilot/src/corvus_corone_pilot",
+    "packages/corvus-corone-lib/src",
+    "packages/corvus-corone-pilot/src",
 ]
 exclude = [".venv", "build", "dist"]
 

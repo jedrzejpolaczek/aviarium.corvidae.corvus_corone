@@ -31,8 +31,8 @@ ignore_missing_imports = true
 warn_unused_ignores = true
 warn_redundant_casts = true
 warn_unused_configs = true
-namespace_packages = true
-explicit_package_bases = false
+mypy_path = ["packages/corvus-corone-lib/src", "packages/corvus-corone-pilot/src"]
+explicit_package_bases = true
 exclude = [".venv", "build", "dist"]
 
 [tool.pytest.ini_options]

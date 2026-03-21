@@ -39,7 +39,7 @@ Repository Purpose: Python library and AI-powered pilot for reproducible, statis
 
 GitHub Milestones track all open documentation and implementation tasks. See [docs/ROADMAP.md](docs/ROADMAP.md) for the full milestone list and open task index (REF-TASK and IMPL tasks).
 
-WIP: GitHub project board URL pending repository setup.
+GitHub project board [URL](https://github.com/users/jedrzejpolaczek/projects/12).
 
 # Technical details
 
@@ -92,7 +92,7 @@ Full architecture documentation: [docs/02-design/02-architecture/](docs/02-desig
 
 - **Python 3.13** — enforced by the workspace; `uv` will install it automatically
 - **[uv](https://docs.astral.sh/uv/)** — required for all package management and running commands
-- **Git** — required for version control and the pre-push hook
+- **[Git](https://git-scm.com/)** — required for version control and the pre-push hook
 - **make** — optional; macOS/Linux only; provides shorthand Makefile commands (`make lint`, `make test`, etc.)
 
 ## Build procedure
@@ -201,7 +201,7 @@ Windows — call `uv run` directly:
 ```bash
 uv run ruff check .
 uv run ruff format .
-uv run mypy .
+uv run mypy --package corvus_corone --package corvus_corone_pilot
 uv run pytest
 ```
 

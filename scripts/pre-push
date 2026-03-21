@@ -11,7 +11,7 @@ echo ">>> [pre-push] ruff format --check..."
 uv run ruff format --check .
 
 echo ">>> [pre-push] mypy..."
-uv run mypy .
+uv run mypy --package corvus_corone --package corvus_corone_pilot
 
 echo ">>> [pre-push] pytest..."
 uv run pytest

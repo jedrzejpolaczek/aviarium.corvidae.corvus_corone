@@ -74,10 +74,10 @@ Full architecture documentation: [docs/02-design/02-architecture/](docs/02-desig
 │   └── ROADMAP.md
 ├── packages/
 │   ├── corvus-corone-lib/      <- Core benchmarking library
-│   │   ├── src/corvus_corone/
+│   │   ├── src/
 │   │   └── tests/
 │   └── corvus-corone-pilot/    <- AI-powered pilot
-│       ├── src/corvus_corone_pilot/
+│       ├── src/
 │       └── tests/
 ├── scripts/
 │   ├── pre-push                <- Git pre-push hook (runs linters + tests)
@@ -150,8 +150,8 @@ uv run --package corvus-corone-lib python
 ```
 
 ```python
->>> import corvus_corone
->>> corvus_corone.__version__
+>>> import corvus-corone
+>>> corvus-corone.__version__
 '0.1.0'
 ```
 
@@ -172,8 +172,8 @@ uv run --package corvus-corone-pilot python
 ```
 
 ```python
->>> import corvus_corone_pilot
->>> corvus_corone_pilot.__version__
+>>> import corvus-corone_pilot
+>>> corvus-corone-pilot.__version__
 '0.1.0'
 ```
 

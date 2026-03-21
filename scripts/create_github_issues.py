@@ -1176,10 +1176,10 @@ Repository contains documentation only. No Python code exists yet.
 aviarium.corvidae.corvus_corone/
 ├── pyproject.toml          # uv workspace root
 ├── uv.lock
-├── corvus_corone/
+├── corvus-corone/
 │   ├── pyproject.toml
 │   └── __init__.py
-├── corvus_corone_pilot/
+├── corvus-corone_pilot/
 │   ├── pyproject.toml
 │   └── __init__.py
 └── .github/workflows/ci.yml

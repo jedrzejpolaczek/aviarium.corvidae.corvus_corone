@@ -56,14 +56,15 @@ Six milestones group all open documentation and design tasks.
 - [ ] **[REF-TASK-0002] Verify Schema Version definition against data-format.md** — GLOSSARY entry must use identical terminology to versioning scheme in `data-format.md §6` ·
 
 ### SRS
-- [ ] **[REF-TASK-0009] Expand UC-01 and UC-02 into full use case descriptions** — main flow, preconditions, postconditions, failure scenarios, end-to-end tests ·
+- [x] **[REF-TASK-0009] Expand UC-01 and UC-02 into full use case descriptions** — main flow, preconditions, postconditions, failure scenarios, end-to-end tests ·
 - [ ] **[REF-TASK-0008] §4/§5/§7/§8 complete** — FR-XX from working public methods (§4), measurable NFR criteria (§5), interface requirements (§7), acceptance test strategy (§8) ·
 - [ ] **[REF-TASK-0010] §5 NFR measurable criteria** — testable pass/fail criteria for REPRO, STAT, INTEROP, OPEN, MODULAR, USABILITY ·
-- [ ] **[REF-TASK-0011] §6 Technical constraints** — Python version, OS support, dependency licensing; record as ADR-002 ·
+- [ ] **[REF-TASK-0011] §6 Technical constraints** — Python version, OS support, dependency licensing; record as ADR-006 ·
 - [ ] **[REF-TASK-0012] §7 Interface requirements** — per external system; requires REF-TASK-0005/0006/0007 ·
 - [ ] **[REF-TASK-0013] §8 Acceptance test strategy** — every FR-XX maps to at least one test category ·
 
 ### Interface Contracts & Data Format
+- [ ] **[REF-TASK-0037] Define public API facade contract** — new `docs/03-technical-contracts/04-public-api-contract.md`
 - [ ] **[REF-TASK-0023] Repository storage abstraction interface** — `LocalFileRepository` spec satisfying ADR-001; document after IMPL-010 is merged ·
 - [ ] **[REF-TASK-0036] LocalFileRepository directory structure** — annotated directory tree for a completed study; notes that layout is an implementation detail, not part of the `Repository` interface; document after IMPL-010 ·
 
@@ -80,10 +81,10 @@ Six milestones group all open documentation and design tasks.
 ## Milestone: V1 Methodology — Statistics & Metrics
 > Scientific methodology: ECDF_AREA formalization, statistical test selection, diversity requirements, sensitivity documentation.
 
-- [ ] **[REF-TASK-0016] ANYTIME-ECDF_AREA computation procedure** — exact normalization (ADR-003: empirical min/max) and aggregation across problems ·
+- [ ] **[REF-TASK-0016] ANYTIME-ECDF_AREA computation procedure** — exact normalization (ADR-007 *(planned)*: empirical min/max) and aggregation across problems ·
 - [ ] **[REF-TASK-0017] TIME-EVALUATIONS_TO_TARGET Standard Reporting Set decision** — weigh pre-specification burden vs. efficiency metric value; create ADR ·
 - [ ] **[REF-TASK-0020] Statistical test selection procedure** — decision tree: Wilcoxon (2 algorithms) vs Kruskal-Wallis + Holm-Bonferroni (>2); document in `statistical-methodology.md §3` ·
-- [ ] **[REF-TASK-0021] Problem instance diversity minimum requirements** — quantitative floor (ADR-005 candidate: ≥5 instances, ≥2 dimensionality ranges, ≥1 noise + ≥1 deterministic) ·
+- [ ] **[REF-TASK-0021] Problem instance diversity minimum requirements** — quantitative floor (ADR-008 *(planned)* candidate: ≥5 instances, ≥2 dimensionality ranges, ≥1 noise + ≥1 deterministic) ·
 - [ ] **[REF-TASK-0022] Algorithm sensitivity documentation format** — `SensitivityReport` schema field in `AlgorithmInstance`; requires `data-format.md §2.2` ·
 - [ ] **[REF-TASK-0019] Level 1 required visualizations** — mandatory EDA set (boxplot, convergence curves, ECDF, violin); document in `statistical-methodology.md §2` ·
 - [ ] **[REF-TASK-0015] Metric implementation references** — link each metric definition to `corvus_corone/analysis/metrics.py`; fulfilled as part of IMPL-011 ·
@@ -104,14 +105,14 @@ Six milestones group all open documentation and design tasks.
 
 ## Milestone: V1 Infrastructure — ADRs & Technical Constraints
 
-- [ ] **[REF-TASK-0024] Bulk PerformanceRecord storage format decision** *(spike first)* — benchmark JSON vs Parquet vs HDF5 at 150 k records; create ADR-006 ·
+- [ ] **[REF-TASK-0024] Bulk PerformanceRecord storage format decision** *(spike first)* — benchmark JSON vs Parquet vs HDF5 at 150 k records; create ADR-009 ·
 
 ---
 
 ## IMPL Phase 0 — Project Setup
 > Monorepo initialization. Must complete before any implementation task.
 
-- [ ] **`[IMPL-000]`** Setup monorepo: uv workspace, `pyproject.toml` (corvus_corone + corvus_corone_pilot), GitHub Actions CI matrix (ubuntu + macos × Python 3.10/3.11/3.12) · *Refs: ADR-002, REF-TASK-0011*
+- [x] **`[IMPL-000]`** Setup monorepo: uv workspace, `pyproject.toml` (corvus_corone + corvus_corone_pilot), GitHub Actions CI matrix (ubuntu + macos × Python 3.10/3.11/3.12) · *Refs: ADR-006 *(planned)*, REF-TASK-0011*
 
 ---
 
@@ -130,7 +131,7 @@ Six milestones group all open documentation and design tasks.
 - [ ] **`[IMPL-010]`** Repository interface + LocalFileRepository — `storage/repository.py`: `Repository` ABC, `LocalFileRepository`, `RepositoryContractTest` · *Fulfills: REF-TASK-0023*
 - [ ] **`[IMPL-011]`** Metric taxonomy — `analysis/metrics.py`: `@metric` registry; `QUALITY-BEST_VALUE_AT_BUDGET`, `TIME-EVALUATIONS_TO_TARGET`, `RELIABILITY-SUCCESS_RATE`; implementation refs added to `metric-taxonomy.md` · *Fulfills: REF-TASK-0015*
 - [ ] **`[IMPL-012]`** Statistical analysis — `analysis/statistical.py`: three-level (exploratory summary, Wilcoxon/Kruskal-Wallis + Holm-Bonferroni, Cliff's delta); `ThreeLevelAnalysis.analyze()` requires all three levels · *Fulfills: REF-TASK-0020*
-- [ ] **`[IMPL-013]`** Anytime performance — `analysis/anytime.py`: `compute_anytime_curve`, `compute_ecdf`, `compute_ecdf_area` (empirical normalization per ADR-003); basic IOHprofiler `.dat` export · *Fulfills: REF-TASK-0016*
+- [ ] **`[IMPL-013]`** Anytime performance — `analysis/anytime.py`: `compute_anytime_curve`, `compute_ecdf`, `compute_ecdf_area` (empirical normalization per ADR-007 *(planned)*; LOCF per ADR-003); basic IOHprofiler `.dat` export · *Fulfills: REF-TASK-0016*
 - [ ] **`[IMPL-014]`** Reporting Engine — `reporting/reports.py`: `StudyReport` (required `scope_statement`, `limitations`); Jinja2 templates for researcher + practitioner reports; raises `ValueError` when scope absent · *Fulfills: REF-TASK-0019*
 - [ ] **`[IMPL-015]`** Visualizations — `reporting/visualizations.py`: VIZ-L1-01 boxplot, VIZ-L1-02 convergence curves, VIZ-L1-03 ECDF (`plt.step(where='post')`), VIZ-L1-04 violin (n > 50); auto-generated for every report
 - [ ] **`[IMPL-016]`** Study Orchestrator — `orchestrator.py`: `StudyConfig`, `StudyOrchestrator.run()`, diversity validation, `SeedSequence` seed generation, Facade over all modules · *Refs: REF-TASK-0021*
@@ -141,11 +142,11 @@ Six milestones group all open documentation and design tasks.
 ## IMPL Phase 2 — Repo Closure
 > ADRs, bulk storage after spike, ecosystem bridges (IOHprofiler/COCO/Nevergrad), LLM tools.
 
-- [ ] **`[IMPL-018]`** ADR-002: Technical constraints — `pyproject.toml` `requires-python = ">=3.10"`, MIT license, optional extras (`optuna`, `rag`, `all`), CI license check · *Fulfills: REF-TASK-0011*
-- [ ] **`[IMPL-019]`** ADR-003 + ADR-004: ECDF_AREA normalization (empirical min/max, limitations documented) + Standard Reporting Set definition; update `metric-taxonomy.md §3` · *Fulfills: REF-TASK-0016, REF-TASK-0017*
-- [ ] **`[IMPL-020]`** ADR-005 + statistical-methodology.md: diversity requirements (≥5 problems, ≥2 dimensionality ranges); Level 1 VIZ-L1-01..03 spec in §2; Wilcoxon/Kruskal decision tree in §3 · *Fulfills: REF-TASK-0019, REF-TASK-0020, REF-TASK-0021*
+- [ ] **`[IMPL-018]`** ADR-006: Technical constraints — `pyproject.toml` `requires-python = ">=3.10"`, MIT license, optional extras (`optuna`, `rag`, `all`), CI license check · *Fulfills: REF-TASK-0011*
+- [ ] **`[IMPL-019]`** ADR-007 + ADR-008: ECDF_AREA normalization (empirical min/max, limitations documented) + Standard Reporting Set definition; update `metric-taxonomy.md §3` · *Fulfills: REF-TASK-0016, REF-TASK-0017*
+- [ ] **`[IMPL-020]`** ADR-008 + statistical-methodology.md: diversity requirements (≥5 problems, ≥2 dimensionality ranges); Level 1 VIZ-L1-01..03 spec in §2; Wilcoxon/Kruskal decision tree in §3 · *Fulfills: REF-TASK-0019, REF-TASK-0020, REF-TASK-0021*
 - [ ] **`[IMPL-021]`** Sensitivity documentation — `SensitivityReport(BaseModel)` in `storage/entities.py`, `data-format.md §2.2`, `contribution-guide.md §2` · *Fulfills: REF-TASK-0022*
-- [ ] **`[IMPL-022]`** Bulk PerformanceRecord storage — **blocked on REF-TASK-0024 spike**; ADR-006 from benchmark evidence; `LocalFileRepository.save_bulk_records()`; round-trip test · *Fulfills: REF-TASK-0024*
+- [ ] **`[IMPL-022]`** Bulk PerformanceRecord storage — **blocked on REF-TASK-0024 spike**; ADR-009 from benchmark evidence; `LocalFileRepository.save_bulk_records()`; round-trip test · *Fulfills: REF-TASK-0024*
 - [ ] **`[IMPL-023]`** IOHprofiler bridge — `bridge/iohprofiler.py`: full `.dat` export + `.meta.json` sidecar (seed, run_id, wall_time); round-trip test; `data-format.md §3` mapping table · *Fulfills: REF-TASK-0007*
 - [ ] **`[IMPL-024]`** COCO bridge — **blocked on REF-TASK-0005 spike**; `bridge/coco_exporter.py`; continuous-only warning; `data-format.md §3` mapping with documented data loss · *Fulfills: REF-TASK-0005*
 - [ ] **`[IMPL-025]`** Nevergrad adapter — **blocked on REF-TASK-0006 spike**; `algorithms/adapters/nevergrad_adapter.py`; `ng.p.Dict` → `SearchSpace`; tutorial; `data-format.md §3` mapping · *Fulfills: REF-TASK-0006*
@@ -229,6 +230,8 @@ MANIFESTO ──► C1 ──► C2/C3/C4 (complete)
 REF-TASK-0005/0006/0007 spikes ──► IMPL-024/025/023 bridges ──► SRS §7 (REF-TASK-0012)
 REF-TASK-0024 spike ──► IMPL-022 bulk storage (ADR-006)
 
+REF-TASK-0037 (public API contract) ──► IMPL-017 (Public API + CLI)
+
 Phase 0 ──► Phase 1 (IMPL-001..017) ──► Phase 2 (IMPL-018..027)
                                                     │
                                           ──► Phase 3a (IMPL-028..036) V2 Researcher
@@ -287,6 +290,7 @@ REF-TASK-0025 ──► 0026 ──► 0027 ──► 0028 ──► 0029 ──
 | REF-TASK-0034 — Specify report output format — sections, visualizations, audience language | V1 Core | Blocked on IMPL-014/015 |
 | REF-TASK-0035 — Add competitive differentiation statement to SRS §2 | V1 Core | Open |
 | REF-TASK-0036 — Document LocalFileRepository directory structure | V1 Core | Blocked on IMPL-010 |
+| REF-TASK-0037 — Define public API facade contract (`cc.*` functions, response objects, exceptions) | V1 Core | Open; blocks IMPL-017 |
 
 ### Implementation Tasks (IMPL)
 
@@ -309,12 +313,12 @@ REF-TASK-0025 ──► 0026 ──► 0027 ──► 0028 ──► 0029 ──
 | IMPL-014 — Reporting Engine | Phase 1 | `reporting/reports.py`, Jinja2 templates |
 | IMPL-015 — Visualizations | Phase 1 | `reporting/visualizations.py`, VIZ-L1-01..04 |
 | IMPL-016 — Study Orchestrator | Phase 1 | `orchestrator.py`, StudyConfig, Facade |
-| IMPL-017 — Public API + CLI | Phase 1 | `api.py`, `cli.py`, corvus run/list commands |
-| IMPL-018 — ADR-002 technical constraints | Phase 2 | ADR-002, pyproject.toml finalized |
-| IMPL-019 — ADR-003 + ADR-004 ECDF + SRS | Phase 2 | ADR-003/004, metric-taxonomy.md §3 |
-| IMPL-020 — ADR-005 + statistical-methodology | Phase 2 | ADR-005, statistical-methodology.md §2/§3 |
+| IMPL-017 — Public API + CLI | Phase 1 | `api.py`, `cli.py`, corvus run/list commands · *Blocked on REF-TASK-0037* |
+| IMPL-018 — ADR-006 technical constraints | Phase 2 | ADR-006, pyproject.toml finalized |
+| IMPL-019 — ADR-007 + ADR-008 ECDF + SRS | Phase 2 | ADR-007/008, metric-taxonomy.md §3 |
+| IMPL-020 — ADR-008 + statistical-methodology | Phase 2 | ADR-008, statistical-methodology.md §2/§3 |
 | IMPL-021 — Sensitivity documentation | Phase 2 | SensitivityReport schema, data-format.md §2.2 |
-| IMPL-022 — Bulk PerformanceRecord storage | Phase 2 | ADR-006, `save_bulk_records()` (spike first) |
+| IMPL-022 — Bulk PerformanceRecord storage | Phase 2 | ADR-009, `save_bulk_records()` (spike first) |
 | IMPL-023 — IOHprofiler bridge | Phase 2 | `bridge/iohprofiler.py`, .dat + .meta.json |
 | IMPL-024 — COCO bridge | Phase 2 | `bridge/coco_exporter.py` (spike first) |
 | IMPL-025 — Nevergrad adapter | Phase 2 | `adapters/nevergrad_adapter.py` (spike first) |

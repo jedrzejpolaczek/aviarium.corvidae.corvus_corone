@@ -76,7 +76,7 @@ flowchart TB
   runner L_runner_registry@-- Loads algorithm instance --> registry
   runner L_runner_problems@-- Loads problem instance --> problems
   runner L_runner_store@-- Writes run records --> store
-  analysis L_analysis_store@-- Reads runs · writes performance records --> store
+  analysis L_analysis_store@-- Reads PerformanceRecords · writes ResultAggregates --> store
   reporting L_reporting_store@-- Reads aggregated results --> store
   bridge L_bridge_store@-- Reads study artifacts --> store
   bridge L_bridge_ecosystem@-- Exports data files --> ecosystem

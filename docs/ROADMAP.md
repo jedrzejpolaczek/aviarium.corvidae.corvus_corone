@@ -52,8 +52,8 @@ Six milestones group all open documentation and design tasks.
 > Foundation tasks: SRS functional requirements, interface contracts, data format, GLOSSARY. Unblocked after Phases 1–2 implementation.
 
 ### GLOSSARY
-- [ ] **[REF-TASK-0001] Extend GLOSSARY from interface-contracts and data-format** — all new terms from those documents added with precise definitions ·
-- [ ] **[REF-TASK-0002] Verify Schema Version definition against data-format.md** — GLOSSARY entry must use identical terminology to versioning scheme in `data-format.md §6` ·
+- [x] **[REF-TASK-0001] Extend GLOSSARY from interface-contracts and data-format** — all new terms from those documents added with precise definitions ·
+- [x] **[REF-TASK-0002] Verify Schema Version definition against data-format.md** — GLOSSARY entry must use identical terminology to versioning scheme in `data-format.md §6` ·
 
 ### SRS
 - [x] **[REF-TASK-0009] Expand UC-01 and UC-02 into full use case descriptions** — main flow, preconditions, postconditions, failure scenarios, end-to-end tests ·

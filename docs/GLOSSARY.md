@@ -535,10 +535,8 @@ Terms are listed alphabetically within sections.
 
 ### Schema Version
 
-**Definition:** The version identifier of the data format specification (`docs/03-technical-contracts/01-data-format/01-data-format.md`) under which a stored Artifact was created, enabling the system to validate, migrate, or reject Artifacts as the format evolves.
+**Definition:** A `MAJOR.MINOR.PATCH` semantic version identifier stored in every Artifact record, recording the version of the data format specification (`docs/03-technical-contracts/01-data-format/`) under which the Artifact was created. The system uses this identifier to decide whether to accept, migrate, or reject an Artifact: same MAJOR → compatible (MINOR/PATCH differences are handled automatically); different MAJOR → incompatible, a migration script must be applied first.
 
-**Used in:** `docs/03-technical-contracts/01-data-format/13-schema-versioning.md`, `docs/05-community/02-versioning-governance.md` §1.
+**Format:** `MAJOR.MINOR.PATCH` where MAJOR increments on breaking changes (removed/renamed fields, type changes), MINOR increments on non-breaking additions (new optional fields, new entity types), and PATCH increments on corrections only.
 
-> **`TODO: REF-TASK-0002`** — Once `docs/03-technical-contracts/01-data-format/13-schema-versioning.md`
-> is filled, verify that the Schema Version definition above matches the versioning scheme adopted there.
-> Owner: technical lead. Acceptance: definition and data-format.md §6 use identical terminology.
+**Used in:** `docs/03-technical-contracts/01-data-format/13-schema-versioning.md` §6.3–6.4, `docs/05-community/02-versioning-governance.md` §1–2; present in every entity record (Problem Instance, Algorithm Instance, Study, Experiment, Run, ResultAggregate, Report).

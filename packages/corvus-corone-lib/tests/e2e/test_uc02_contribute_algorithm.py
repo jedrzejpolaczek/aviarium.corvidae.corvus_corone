@@ -66,7 +66,6 @@ import pytest
 from tests.e2e._stubs import (
     EvaluationResult,
     MinimalRunner,
-    PerformanceRecord,
     SearchSpace,
     StubGreedyAlgorithm,
     StubNoisySphereProblem,

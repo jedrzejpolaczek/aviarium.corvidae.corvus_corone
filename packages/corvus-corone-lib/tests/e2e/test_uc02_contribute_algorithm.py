@@ -110,7 +110,13 @@ def _is_pinned(code_reference: str) -> bool:
     return False
 
 
-_REQUIRED_METHODS = ("initialize", "suggest", "observe", "get_supported_variable_types", "get_metadata")
+_REQUIRED_METHODS = (
+    "initialize",
+    "suggest",
+    "observe",
+    "get_supported_variable_types",
+    "get_metadata",
+)
 _REQUIRED_METADATA_FIELDS = (
     "id",
     "name",
@@ -196,15 +202,25 @@ class _MissingObserve:
     """F1: observe() is missing."""
 
     def initialize(self, search_space: Any, seed: int) -> None: ...  # noqa: E704
-    def suggest(self, context: Any, batch_size: int = 1) -> list[list[float]]: return []  # noqa: E704
-    def get_supported_variable_types(self) -> list[str]: return ["continuous"]  # noqa: E704
+    def suggest(self, context: Any, batch_size: int = 1) -> list[list[float]]:
+        return []  # noqa: E704
+
+    def get_supported_variable_types(self) -> list[str]:
+        return ["continuous"]  # noqa: E704
+
     def get_metadata(self) -> dict[str, Any]:
         return {
-            "id": "x", "name": "x", "algorithm_family": "x",
-            "hyperparameters": {}, "configuration_justification": "justified",
-            "code_reference": "pkg==1.0.0", "language": "python",
-            "framework": "stdlib", "framework_version": "3.12",
-            "known_assumptions": [], "contributed_by": "author",
+            "id": "x",
+            "name": "x",
+            "algorithm_family": "x",
+            "hyperparameters": {},
+            "configuration_justification": "justified",
+            "code_reference": "pkg==1.0.0",
+            "language": "python",
+            "framework": "stdlib",
+            "framework_version": "3.12",
+            "known_assumptions": [],
+            "contributed_by": "author",
             "supported_variable_types": ["continuous"],
         }
 
@@ -214,14 +230,22 @@ class _MissingSuggest:
 
     def initialize(self, search_space: Any, seed: int) -> None: ...  # noqa: E704
     def observe(self, solution: Any, result: Any) -> None: ...  # noqa: E704
-    def get_supported_variable_types(self) -> list[str]: return ["continuous"]  # noqa: E704
+    def get_supported_variable_types(self) -> list[str]:
+        return ["continuous"]  # noqa: E704
+
     def get_metadata(self) -> dict[str, Any]:
         return {
-            "id": "x", "name": "x", "algorithm_family": "x",
-            "hyperparameters": {}, "configuration_justification": "justified",
-            "code_reference": "pkg==1.0.0", "language": "python",
-            "framework": "stdlib", "framework_version": "3.12",
-            "known_assumptions": [], "contributed_by": "author",
+            "id": "x",
+            "name": "x",
+            "algorithm_family": "x",
+            "hyperparameters": {},
+            "configuration_justification": "justified",
+            "code_reference": "pkg==1.0.0",
+            "language": "python",
+            "framework": "stdlib",
+            "framework_version": "3.12",
+            "known_assumptions": [],
+            "contributed_by": "author",
             "supported_variable_types": ["continuous"],
         }
 
@@ -230,16 +254,26 @@ class _FloatingCodeRef:
     """F2: code_reference points to a branch name, not a pinned version."""
 
     def initialize(self, search_space: Any, seed: int) -> None: ...  # noqa: E704
-    def suggest(self, context: Any, batch_size: int = 1) -> list[list[float]]: return []  # noqa: E704
+    def suggest(self, context: Any, batch_size: int = 1) -> list[list[float]]:
+        return []  # noqa: E704
+
     def observe(self, solution: Any, result: Any) -> None: ...  # noqa: E704
-    def get_supported_variable_types(self) -> list[str]: return ["continuous"]  # noqa: E704
+    def get_supported_variable_types(self) -> list[str]:
+        return ["continuous"]  # noqa: E704
+
     def get_metadata(self) -> dict[str, Any]:
         return {
-            "id": "x", "name": "x", "algorithm_family": "x",
-            "hyperparameters": {}, "configuration_justification": "justified",
+            "id": "x",
+            "name": "x",
+            "algorithm_family": "x",
+            "hyperparameters": {},
+            "configuration_justification": "justified",
             "code_reference": "git+https://github.com/org/repo@main",  # ← branch!
-            "language": "python", "framework": "stdlib", "framework_version": "3.12",
-            "known_assumptions": [], "contributed_by": "author",
+            "language": "python",
+            "framework": "stdlib",
+            "framework_version": "3.12",
+            "known_assumptions": [],
+            "contributed_by": "author",
             "supported_variable_types": ["continuous"],
         }
 
@@ -248,16 +282,26 @@ class _EmptyJustification:
     """F3: configuration_justification is an empty string."""
 
     def initialize(self, search_space: Any, seed: int) -> None: ...  # noqa: E704
-    def suggest(self, context: Any, batch_size: int = 1) -> list[list[float]]: return []  # noqa: E704
+    def suggest(self, context: Any, batch_size: int = 1) -> list[list[float]]:
+        return []  # noqa: E704
+
     def observe(self, solution: Any, result: Any) -> None: ...  # noqa: E704
-    def get_supported_variable_types(self) -> list[str]: return ["continuous"]  # noqa: E704
+    def get_supported_variable_types(self) -> list[str]:
+        return ["continuous"]  # noqa: E704
+
     def get_metadata(self) -> dict[str, Any]:
         return {
-            "id": "x", "name": "x", "algorithm_family": "x",
-            "hyperparameters": {}, "configuration_justification": "",  # ← empty!
-            "code_reference": "pkg==1.0.0", "language": "python",
-            "framework": "stdlib", "framework_version": "3.12",
-            "known_assumptions": [], "contributed_by": "author",
+            "id": "x",
+            "name": "x",
+            "algorithm_family": "x",
+            "hyperparameters": {},
+            "configuration_justification": "",  # ← empty!
+            "code_reference": "pkg==1.0.0",
+            "language": "python",
+            "framework": "stdlib",
+            "framework_version": "3.12",
+            "known_assumptions": [],
+            "contributed_by": "author",
             "supported_variable_types": ["continuous"],
         }
 
@@ -266,15 +310,24 @@ class _MissingMetadataField:
     """F4: required metadata field (contributed_by) is absent."""
 
     def initialize(self, search_space: Any, seed: int) -> None: ...  # noqa: E704
-    def suggest(self, context: Any, batch_size: int = 1) -> list[list[float]]: return []  # noqa: E704
+    def suggest(self, context: Any, batch_size: int = 1) -> list[list[float]]:
+        return []  # noqa: E704
+
     def observe(self, solution: Any, result: Any) -> None: ...  # noqa: E704
-    def get_supported_variable_types(self) -> list[str]: return ["continuous"]  # noqa: E704
+    def get_supported_variable_types(self) -> list[str]:
+        return ["continuous"]  # noqa: E704
+
     def get_metadata(self) -> dict[str, Any]:
         return {
-            "id": "x", "name": "x", "algorithm_family": "x",
-            "hyperparameters": {}, "configuration_justification": "justified",
-            "code_reference": "pkg==1.0.0", "language": "python",
-            "framework": "stdlib", "framework_version": "3.12",
+            "id": "x",
+            "name": "x",
+            "algorithm_family": "x",
+            "hyperparameters": {},
+            "configuration_justification": "justified",
+            "code_reference": "pkg==1.0.0",
+            "language": "python",
+            "framework": "stdlib",
+            "framework_version": "3.12",
             "known_assumptions": [],
             # ← "contributed_by" missing
             "supported_variable_types": ["continuous"],
@@ -371,9 +424,7 @@ class TestAlgorithmInterfaceCompliance:
         for t in types:
             assert t in valid, f"unknown variable type: '{t}'"
 
-    def test_get_metadata_returns_dict(
-        self, random_search: StubRandomSearchAlgorithm
-    ) -> None:
+    def test_get_metadata_returns_dict(self, random_search: StubRandomSearchAlgorithm) -> None:
         metadata = random_search.get_metadata()
         assert isinstance(metadata, dict)
 
@@ -459,9 +510,7 @@ class TestRegistrationValidation:
         errors = validate_for_registration(random_search)
         assert errors == [], f"Expected no errors but got: {errors}"
 
-    def test_valid_greedy_passes_all_checks(
-        self, greedy_search: StubGreedyAlgorithm
-    ) -> None:
+    def test_valid_greedy_passes_all_checks(self, greedy_search: StubGreedyAlgorithm) -> None:
         errors = validate_for_registration(greedy_search)
         assert errors == [], f"Expected no errors but got: {errors}"
 
@@ -498,19 +547,17 @@ class TestRegistrationValidation:
     @pytest.mark.parametrize(
         "code_ref,expected_valid",
         [
-            ("git+https://github.com/org/repo@abc1234", True),   # short SHA
+            ("git+https://github.com/org/repo@abc1234", True),  # short SHA
             ("git+https://github.com/org/repo@a1b2c3d4e5f6", True),  # longer SHA
-            ("optuna==3.6.1", True),                              # pinned package
-            ("scipy==1.13.0", True),                              # pinned package
-            ("git+https://github.com/org/repo@main", False),     # branch name
-            ("git+https://github.com/org/repo@master", False),   # branch name
-            ("git+https://github.com/org/repo@HEAD", False),     # HEAD ref
-            ("optuna", False),                                    # unpinned
+            ("optuna==3.6.1", True),  # pinned package
+            ("scipy==1.13.0", True),  # pinned package
+            ("git+https://github.com/org/repo@main", False),  # branch name
+            ("git+https://github.com/org/repo@master", False),  # branch name
+            ("git+https://github.com/org/repo@HEAD", False),  # HEAD ref
+            ("optuna", False),  # unpinned
         ],
     )
-    def test_code_reference_pinning_detection(
-        self, code_ref: str, expected_valid: bool
-    ) -> None:
+    def test_code_reference_pinning_detection(self, code_ref: str, expected_valid: bool) -> None:
         assert _is_pinned(code_ref) == expected_valid, (
             f"_is_pinned({code_ref!r}) should be {expected_valid}"
         )
@@ -716,9 +763,7 @@ class TestReproducibility:
 class TestSeedIsolation:
     """Verify no unseeded randomness escapes the algorithm (cross-cutting §6)."""
 
-    def test_rng_is_none_before_initialize(
-        self, random_search: StubRandomSearchAlgorithm
-    ) -> None:
+    def test_rng_is_none_before_initialize(self, random_search: StubRandomSearchAlgorithm) -> None:
         """RNG must be None (unset) before initialize() is called."""
         assert random_search._rng is None
 
@@ -745,9 +790,7 @@ class TestSeedIsolation:
         # Different seeds → different RNG state
         assert rng_first.getstate() != rng_second.getstate()
 
-    def test_greedy_rng_is_none_before_initialize(
-        self, greedy_search: StubGreedyAlgorithm
-    ) -> None:
+    def test_greedy_rng_is_none_before_initialize(self, greedy_search: StubGreedyAlgorithm) -> None:
         assert greedy_search._rng is None
 
     def test_greedy_best_solution_is_none_before_initialize(

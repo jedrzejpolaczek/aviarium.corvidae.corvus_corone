@@ -669,7 +669,10 @@ class TestAlgorithmInterface:
         self, random_search: StubRandomSearchAlgorithm
     ) -> None:
         """get_supported_variable_types() must return the same list on every call (postcondition §2)."""
-        assert random_search.get_supported_variable_types() == random_search.get_supported_variable_types()
+        assert (
+            random_search.get_supported_variable_types()
+            == random_search.get_supported_variable_types()
+        )
 
     def test_get_metadata_includes_supported_variable_types(
         self, random_search: StubRandomSearchAlgorithm

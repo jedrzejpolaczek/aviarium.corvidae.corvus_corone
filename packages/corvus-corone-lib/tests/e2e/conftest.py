@@ -7,10 +7,7 @@ Stub implementations live in _stubs.py; this file only wires them into fixtures.
 
 from __future__ import annotations
 
-from typing import Any
-
 import pytest
-
 from tests.e2e._stubs import (
     ExperimentRecord,
     MinimalRunner,
@@ -21,9 +18,7 @@ from tests.e2e._stubs import (
     StudyRecord,
     compute_result_aggregates,
     create_study,
-    generate_reports,
 )
-
 
 # ---------------------------------------------------------------------------
 # Problem fixtures

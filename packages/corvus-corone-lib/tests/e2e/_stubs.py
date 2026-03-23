@@ -30,7 +30,6 @@ import statistics
 from dataclasses import dataclass, field
 from typing import Any
 
-
 # ---------------------------------------------------------------------------
 # Data containers  (minimal implementation of data-format.md §2.x entities)
 # ---------------------------------------------------------------------------
@@ -353,9 +352,7 @@ class StubNoisySphereProblem:
                 f"Problem {self._id}: expected {self._dim}-d solution, got {len(solution)}-d."
             )
         if self._rng is None:
-            raise RuntimeError(
-                f"Problem {self._id}: reset() must be called before evaluate()."
-            )
+            raise RuntimeError(f"Problem {self._id}: reset() must be called before evaluate().")
 
         self._eval_count += 1
         raw_f = sum(x**2 for x in solution)
@@ -420,27 +417,33 @@ class StubRandomSearchAlgorithm:
         self._search_space = search_space
         self._rng = random.Random(seed)
 
-    def suggest(self, context: dict[str, Any]) -> list[float]:
-        """Propose the next solution — a uniformly random point in the search space.
+    def suggest(self, context: dict[str, Any], batch_size: int = 1) -> list[list[float]]:
+        """Propose one or more solutions — uniformly random points in the search space.
 
         Parameters
         ----------
         context:
             RunContext with remaining_budget and elapsed_evaluations.
+        batch_size:
+            Number of solutions to propose. Must be ≥ 1. Default 1.
 
         Returns
         -------
-        list[float]
-            A point within search_space bounds (postcondition §2).
+        list[list[float]]
+            A list of length batch_size; each element is a point within search_space bounds
+            (postcondition §2).
         """
         assert self._search_space is not None and self._rng is not None
         lo, hi = self._search_space.lower, self._search_space.upper
         return [
-            self._rng.uniform(lo, hi) for _ in range(self._search_space.dimensions)
+            [self._rng.uniform(lo, hi) for _ in range(self._search_space.dimensions)]
+            for _ in range(batch_size)
         ]
 
     def observe(self, solution: list[float], result: EvaluationResult) -> None:
         """Update internal model — random search ignores observations.
+
+        Required by the Algorithm Interface (§2); no-op for random search.
 
         Parameters
         ----------
@@ -449,6 +452,16 @@ class StubRandomSearchAlgorithm:
         result:
             The EvaluationResult from Problem.evaluate().
         """
+
+    def get_supported_variable_types(self) -> list[str]:
+        """Declare supported search space variable types (interface-contracts.md §2).
+
+        Returns
+        -------
+        list[str]
+            ["continuous"] — random search operates only over continuous variables.
+        """
+        return ["continuous"]
 
     def get_metadata(self) -> dict[str, Any]:
         """Return AlgorithmInstance metadata (data-format.md §2.2).
@@ -462,7 +475,15 @@ class StubRandomSearchAlgorithm:
             "id": self._id,
             "name": "StubRandomSearch",
             "algorithm_family": "random",
+            "hyperparameters": {},
             "configuration_justification": "Uniform random sampling; no configuration.",
+            "code_reference": "corvus-corone-stubs==0.1.0",
+            "language": "python",
+            "framework": "stdlib",
+            "framework_version": "3.12",
+            "known_assumptions": ["continuous search space"],
+            "contributed_by": "corvus-corone-test-suite",
+            "supported_variable_types": self.get_supported_variable_types(),
         }
 
 
@@ -503,34 +524,36 @@ class StubGreedyAlgorithm:
         self._best_solution = None
         self._best_value = float("inf")
 
-    def suggest(self, context: dict[str, Any]) -> list[float]:
-        """Propose the next solution.
+    def suggest(self, context: dict[str, Any], batch_size: int = 1) -> list[list[float]]:
+        """Propose one or more solutions.
 
         On the first call: uniform random. Subsequently: perturbs the current
         best solution with a step size that shrinks as elapsed evaluations grow.
+        For batch_size > 1, each solution is an independent perturbation.
 
         Parameters
         ----------
         context:
             RunContext with elapsed_evaluations used to decay the perturbation step.
+        batch_size:
+            Number of solutions to propose. Must be ≥ 1. Default 1.
 
         Returns
         -------
-        list[float]
-            A point within search_space bounds.
+        list[list[float]]
+            A list of length batch_size; each element is a point within search_space bounds.
         """
         assert self._search_space is not None and self._rng is not None
         lo, hi = self._search_space.lower, self._search_space.upper
-        if self._best_solution is None:
-            return [
-                self._rng.uniform(lo, hi) for _ in range(self._search_space.dimensions)
-            ]
-        elapsed = context.get("elapsed_evaluations", 1)
-        step = 0.5 * (hi - lo) / (1.0 + elapsed)
-        return [
-            max(lo, min(hi, x + self._rng.gauss(0.0, step)))
-            for x in self._best_solution
-        ]
+
+        def _one() -> list[float]:
+            if self._best_solution is None:
+                return [self._rng.uniform(lo, hi) for _ in range(self._search_space.dimensions)]  # type: ignore[union-attr]
+            elapsed = context.get("elapsed_evaluations", 1)
+            step = 0.5 * (hi - lo) / (1.0 + elapsed)
+            return [max(lo, min(hi, x + self._rng.gauss(0.0, step))) for x in self._best_solution]  # type: ignore[union-attr]
+
+        return [_one() for _ in range(batch_size)]
 
     def observe(self, solution: list[float], result: EvaluationResult) -> None:
         """Update best solution if result improves the current best.
@@ -546,6 +569,16 @@ class StubGreedyAlgorithm:
             self._best_value = result.objective_value
             self._best_solution = list(solution)
 
+    def get_supported_variable_types(self) -> list[str]:
+        """Declare supported search space variable types (interface-contracts.md §2).
+
+        Returns
+        -------
+        list[str]
+            ["continuous"] — greedy perturbation operates only over continuous variables.
+        """
+        return ["continuous"]
+
     def get_metadata(self) -> dict[str, Any]:
         """Return AlgorithmInstance metadata (data-format.md §2.2).
 
@@ -558,7 +591,15 @@ class StubGreedyAlgorithm:
             "id": self._id,
             "name": "StubGreedy",
             "algorithm_family": "local_search",
+            "hyperparameters": {},
             "configuration_justification": "Greedy perturbation with decaying step size.",
+            "code_reference": "corvus-corone-stubs==0.1.0",
+            "language": "python",
+            "framework": "stdlib",
+            "framework_version": "3.12",
+            "known_assumptions": ["continuous search space"],
+            "contributed_by": "corvus-corone-test-suite",
+            "supported_variable_types": self.get_supported_variable_types(),
         }
 
 
@@ -636,7 +677,7 @@ class MinimalRunner:
                 "remaining_budget": budget - eval_num + 1,
                 "elapsed_evaluations": eval_num - 1,
             }
-            solution = algorithm.suggest(context)
+            solution = algorithm.suggest(context, batch_size=1)[0]
             result = problem.evaluate(solution)
             algorithm.observe(solution, result)
 
@@ -864,9 +905,7 @@ def update_study(study: StudyRecord, **kwargs: Any) -> None:
         Always, because create_study() always returns a locked study.
     """
     if study.status == "locked":
-        raise StudyLockedError(
-            f"Study {study.study_id} is locked. Modification attempt recorded."
-        )
+        raise StudyLockedError(f"Study {study.study_id} is locked. Modification attempt recorded.")
     for k, v in kwargs.items():
         setattr(study, k, v)
 
@@ -953,10 +992,7 @@ def generate_reports(
             "problem instances only. Generalization beyond the tested problem "
             "characteristics is not supported."
         ),
-        (
-            f"Budget={study.budget} evaluations. Conclusions do not extend "
-            "to other budget levels."
-        ),
+        (f"Budget={study.budget} evaluations. Conclusions do not extend to other budget levels."),
     ]
     if study.improvement_epsilon is not None:
         limitations.append(

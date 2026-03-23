@@ -47,7 +47,6 @@ References
 from __future__ import annotations
 
 import pytest
-
 from tests.e2e._stubs import (
     VALID_TRIGGER_REASONS,
     ExperimentRecord,
@@ -67,7 +66,6 @@ from tests.e2e._stubs import (
     update_study,
 )
 from tests.e2e.conftest import make_study_with_cap, make_study_with_epsilon
-
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -94,9 +92,7 @@ def _scheduled_records(run: RunRecord) -> list[PerformanceRecord]:
 class TestStudyLock:
     """Pre-registration gate: a locked Study must not be modifiable (UC-01 F3)."""
 
-    def test_study_status_is_locked_after_creation(
-        self, locked_study: StudyRecord
-    ) -> None:
+    def test_study_status_is_locked_after_creation(self, locked_study: StudyRecord) -> None:
         assert locked_study.status == "locked"
 
     def test_update_raises_study_locked_error(self, locked_study: StudyRecord) -> None:
@@ -134,9 +130,7 @@ class TestPerformanceRecordStrategy:
         for run in completed_experiment.runs:
             assert run.records, f"Run {run.run_id} has no PerformanceRecords."
 
-    def test_end_of_run_record_always_present(
-        self, completed_experiment: ExperimentRecord
-    ) -> None:
+    def test_end_of_run_record_always_present(self, completed_experiment: ExperimentRecord) -> None:
         """ADR-002: end-of-run trigger is mandatory — always fires at budget exhaustion."""
         for run in completed_experiment.runs:
             end_records = _end_of_run_records(run)
@@ -209,9 +203,7 @@ class TestPerformanceRecordStrategy:
                     f"trigger_reason='{rec.trigger_reason}'."
                 )
 
-    def test_best_so_far_is_non_increasing(
-        self, completed_experiment: ExperimentRecord
-    ) -> None:
+    def test_best_so_far_is_non_increasing(self, completed_experiment: ExperimentRecord) -> None:
         """best_so_far must be non-increasing across records within a Run."""
         for run in completed_experiment.runs:
             prev = float("inf")
@@ -222,12 +214,10 @@ class TestPerformanceRecordStrategy:
                 )
                 prev = rec.best_so_far
 
-    def test_combined_trigger_at_budget_50_with_schedule(
-        self, locked_study: StudyRecord
-    ) -> None:
+    def test_combined_trigger_at_budget_50_with_schedule(self, locked_study: StudyRecord) -> None:
         """Eval 50 = budget endpoint; it appears in the {1,2,5}×10^1 schedule.
-        The last record should have trigger_reason containing both 'scheduled'
-        and 'end_of_run' (at minimum).
+        The last record must have both 'scheduled' and 'end_of_run' triggers active.
+        Uses has_trigger() — substring matching fails for combined names like 'all'.
         """
         problem = StubNoisySphereProblem("prob-001", dim=2, budget=50, noise_std=0.0)
         algorithm = StubRandomSearchAlgorithm("alg-001")
@@ -235,8 +225,8 @@ class TestPerformanceRecordStrategy:
         run = runner.run_single(problem, algorithm, seed=0)
         last_record = run.records[-1]
         assert last_record.evaluation_number == 50
-        assert "end_of_run" in last_record.trigger_reason
-        assert "scheduled" in last_record.trigger_reason
+        assert has_trigger(last_record, "end_of_run")
+        assert has_trigger(last_record, "scheduled")
 
 
 # ---------------------------------------------------------------------------
@@ -249,9 +239,9 @@ class TestImprovementEpsilon:
 
     def test_strict_inequality_default_records_every_improvement(self) -> None:
         """With epsilon=None (default), every obj < best_so_far fires an improvement record."""
-        study = make_study_with_epsilon.__wrapped__ if hasattr(  # type: ignore[attr-defined]
-            make_study_with_epsilon, "__wrapped__"
-        ) else make_study_with_epsilon
+        # study = make_study_with_epsilon.__wrapped__ if hasattr(  # type: ignore[attr-defined]
+        #     make_study_with_epsilon, "__wrapped__"
+        # ) else make_study_with_epsilon
         # Use the helper directly (not a fixture) to avoid pytest fixture injection
         locked = make_study_with_epsilon(epsilon=0.0)
         # epsilon=0.0 means best_so_far - obj > 0 → same as strict inequality for non-zero diffs
@@ -320,9 +310,7 @@ class TestImprovementEpsilon:
 
         for report in reports:
             assert report.has_limitations_section
-            epsilon_disclosed = any(
-                "improvement_epsilon" in lim for lim in report.limitations
-            )
+            epsilon_disclosed = any("improvement_epsilon" in lim for lim in report.limitations)
             assert epsilon_disclosed, (
                 f"Report type='{report.report_type}': improvement_epsilon not disclosed "
                 "in limitations section (ADR-004 requires automatic disclosure)."
@@ -355,8 +343,7 @@ class TestStorageCap:
         run = self._run_with_cap(cap)
         # Count only records whose trigger_reason is purely improvement-driven
         pure_improvement_count = sum(
-            1 for r in run.records
-            if r.trigger_reason in ("improvement", "improvement_end_of_run")
+            1 for r in run.records if r.trigger_reason in ("improvement", "improvement_end_of_run")
         )
         assert pure_improvement_count <= cap, (
             f"Expected ≤ {cap} pure improvement records with cap={cap}, "
@@ -450,9 +437,7 @@ class TestReproducibility:
             f"Seeds: {seeds}"
         )
 
-    def test_same_seed_produces_identical_records(
-        self, locked_study: StudyRecord
-    ) -> None:
+    def test_same_seed_produces_identical_records(self, locked_study: StudyRecord) -> None:
         """Determinism: two runs with identical (problem, algorithm, seed) must produce
         identical PerformanceRecords (NFR-REPRO-01).
         """
@@ -513,9 +498,7 @@ class TestReproducibility:
 class TestUC01Postconditions:
     """UC-01 postconditions must all hold after a successful study execution."""
 
-    def test_experiment_status_is_completed(
-        self, completed_experiment: ExperimentRecord
-    ) -> None:
+    def test_experiment_status_is_completed(self, completed_experiment: ExperimentRecord) -> None:
         assert completed_experiment.status == "completed"
 
     def test_run_count_equals_problems_times_algorithms_times_repetitions(
@@ -535,14 +518,9 @@ class TestUC01Postconditions:
             f"{locked_study.repetitions} repetitions), got {actual}."
         )
 
-    def test_all_runs_completed_successfully(
-        self, completed_experiment: ExperimentRecord
-    ) -> None:
+    def test_all_runs_completed_successfully(self, completed_experiment: ExperimentRecord) -> None:
         failed = [r for r in completed_experiment.runs if r.status != "completed"]
-        assert not failed, (
-            f"{len(failed)} run(s) did not complete: "
-            f"{[r.run_id for r in failed]}"
-        )
+        assert not failed, f"{len(failed)} run(s) did not complete: {[r.run_id for r in failed]}"
 
     def test_result_aggregates_exist_for_every_problem_algorithm_pair(
         self,
@@ -552,9 +530,7 @@ class TestUC01Postconditions:
     ) -> None:
         """UC-01: Result Aggregates exist for every (problem, algorithm) pair."""
         expected_pairs = {
-            (p, a)
-            for p in locked_study.problem_ids
-            for a in locked_study.algorithm_ids
+            (p, a) for p in locked_study.problem_ids for a in locked_study.algorithm_ids
         }
         actual_pairs = {(agg.problem_id, agg.algorithm_id) for agg in result_aggregates}
         missing = expected_pairs - actual_pairs
@@ -650,3 +626,137 @@ class TestUC01Postconditions:
             assert run.algorithm_id in locked_study.algorithm_ids, (
                 f"Run {run.run_id}: algorithm_id '{run.algorithm_id}' not in Study."
             )
+
+
+# ---------------------------------------------------------------------------
+# TestAlgorithmInterface — interface-contracts.md §2
+# ---------------------------------------------------------------------------
+
+
+class TestAlgorithmInterface:
+    """Algorithm Interface contract (interface-contracts.md §2).
+
+    Covers the three design decisions made in §2:
+      1. observe() is required (all algorithms must implement it)
+      2. search space types are declared via get_supported_variable_types()
+      3. suggest() supports batch proposals via batch_size parameter
+    """
+
+    _VALID_VARIABLE_TYPES = frozenset({"continuous", "integer", "categorical"})
+
+    # --- get_supported_variable_types() ---
+
+    def test_random_search_declares_supported_variable_types(
+        self, random_search: StubRandomSearchAlgorithm
+    ) -> None:
+        """get_supported_variable_types() must return a non-empty list from the allowed set."""
+        types = random_search.get_supported_variable_types()
+        assert types, "get_supported_variable_types() returned an empty list."
+        for t in types:
+            assert t in self._VALID_VARIABLE_TYPES, (
+                f"'{t}' is not a valid variable type. Allowed: {self._VALID_VARIABLE_TYPES}"
+            )
+
+    def test_greedy_declares_supported_variable_types(
+        self, greedy_search: StubGreedyAlgorithm
+    ) -> None:
+        types = greedy_search.get_supported_variable_types()
+        assert types
+        for t in types:
+            assert t in self._VALID_VARIABLE_TYPES
+
+    def test_supported_variable_types_stable_across_calls(
+        self, random_search: StubRandomSearchAlgorithm
+    ) -> None:
+        """get_supported_variable_types() must return the same list on every call (postcondition §2)."""
+        assert random_search.get_supported_variable_types() == random_search.get_supported_variable_types()
+
+    def test_get_metadata_includes_supported_variable_types(
+        self, random_search: StubRandomSearchAlgorithm
+    ) -> None:
+        """AlgorithmInstance metadata must expose supported_variable_types (§2 postcondition)."""
+        meta = random_search.get_metadata()
+        assert "supported_variable_types" in meta, (
+            "get_metadata() must include 'supported_variable_types' "
+            "(interface-contracts.md §2 get_metadata postcondition)."
+        )
+        assert meta["supported_variable_types"] == random_search.get_supported_variable_types()
+
+    # --- suggest() batch support ---
+
+    def test_suggest_batch_size_1_returns_list_of_length_1(
+        self, random_search: StubRandomSearchAlgorithm
+    ) -> None:
+        """suggest(context, batch_size=1) must return a list of exactly one Solution."""
+        space = StubNoisySphereProblem("p", dim=2, budget=10).get_search_space()
+        random_search.initialize(space, seed=0)
+        ctx = {"remaining_budget": 10, "elapsed_evaluations": 0}
+        result = random_search.suggest(ctx, batch_size=1)
+        assert isinstance(result, list)
+        assert len(result) == 1
+
+    def test_suggest_default_batch_size_returns_list_of_length_1(
+        self, random_search: StubRandomSearchAlgorithm
+    ) -> None:
+        """suggest(context) with default batch_size must return a list of one Solution."""
+        space = StubNoisySphereProblem("p", dim=2, budget=10).get_search_space()
+        random_search.initialize(space, seed=0)
+        ctx = {"remaining_budget": 10, "elapsed_evaluations": 0}
+        result = random_search.suggest(ctx)
+        assert isinstance(result, list)
+        assert len(result) == 1
+
+    def test_suggest_batch_size_3_returns_list_of_length_3(
+        self, random_search: StubRandomSearchAlgorithm
+    ) -> None:
+        """suggest(context, batch_size=3) must return a list of exactly three Solutions."""
+        space = StubNoisySphereProblem("p", dim=2, budget=10).get_search_space()
+        random_search.initialize(space, seed=0)
+        ctx = {"remaining_budget": 10, "elapsed_evaluations": 0}
+        result = random_search.suggest(ctx, batch_size=3)
+        assert isinstance(result, list)
+        assert len(result) == 3
+
+    def test_suggest_batch_solutions_respect_search_space_bounds(
+        self, greedy_search: StubGreedyAlgorithm
+    ) -> None:
+        """Every solution in the batch must be within search_space bounds (postcondition §2)."""
+        dim = 3
+        problem = StubNoisySphereProblem("p", dim=dim, budget=20, noise_std=0.0)
+        space = problem.get_search_space()
+        greedy_search.initialize(space, seed=42)
+        ctx = {"remaining_budget": 20, "elapsed_evaluations": 0}
+        solutions = greedy_search.suggest(ctx, batch_size=5)
+        assert len(solutions) == 5
+        for sol in solutions:
+            assert len(sol) == dim
+            for v in sol:
+                assert space.lower <= v <= space.upper, (
+                    f"Solution value {v} outside [{space.lower}, {space.upper}]."
+                )
+
+    # --- observe() is required ---
+
+    def test_observe_is_callable_on_random_search(
+        self, random_search: StubRandomSearchAlgorithm
+    ) -> None:
+        """observe() must exist and be callable — required by §2 even for non-adaptive algorithms."""
+        assert callable(getattr(random_search, "observe", None)), (
+            "StubRandomSearchAlgorithm must implement observe() (interface-contracts.md §2)."
+        )
+
+    def test_observe_is_callable_on_greedy(self, greedy_search: StubGreedyAlgorithm) -> None:
+        assert callable(getattr(greedy_search, "observe", None))
+
+    def test_observe_does_not_raise_for_random_search(
+        self, random_search: StubRandomSearchAlgorithm
+    ) -> None:
+        """observe() call on random search (no-op) must not raise."""
+        from tests.e2e._stubs import EvaluationResult
+
+        space = StubNoisySphereProblem("p", dim=2, budget=10).get_search_space()
+        random_search.initialize(space, seed=0)
+        ctx = {"remaining_budget": 10, "elapsed_evaluations": 0}
+        solution = random_search.suggest(ctx, batch_size=1)[0]
+        result = EvaluationResult(objective_value=1.0, metadata={}, evaluation_number=1)
+        random_search.observe(solution, result)  # must not raise

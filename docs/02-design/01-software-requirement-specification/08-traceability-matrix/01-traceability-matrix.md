@@ -74,12 +74,12 @@ NOTE ON C2 CONTAINER COLUMN:
 
 | Req ID | MANIFESTO Principles | File | C2 Container | UC exercised | Test Category | Status |
 |---|---|---|---|---|---|---|
-| NFR-REPRO-01 | 19–22 | `non-functional-requirements.md` | Reproducibility Layer, Results Store | UC-01, UC-05 | Reproducibility | Criteria pending |
-| NFR-STAT-01 | 13, 15 | `non-functional-requirements.md` | Analysis Engine | UC-01 | Statistical validity | Criteria pending |
-| NFR-INTEROP-01 | 26 | `non-functional-requirements.md` | Ecosystem Bridge | UC-06 | Interoperability | Criteria pending |
-| NFR-OPEN-01 | 20, 22 | `non-functional-requirements.md` | All | UC-01, UC-04 | Open format compliance | Criteria pending |
-| NFR-MODULAR-01 | Value 6, Principle 27 | `non-functional-requirements.md` | All | UC-02, UC-04 | Plugin | Criteria pending |
-| NFR-USABILITY-01 | 28 | `non-functional-requirements.md` | Public API, CLI | UC-01, UC-02 | Usability | Criteria pending |
+| NFR-REPRO-01 | 19–22 | `non-functional-requirements.md` | Reproducibility Layer, Results Store | UC-01, UC-05 | Reproducibility | Defined |
+| NFR-STAT-01 | 13, 15 | `non-functional-requirements.md` | Analysis Engine | UC-01 | Statistical validity | Defined |
+| NFR-INTEROP-01 | 26 | `non-functional-requirements.md` | Ecosystem Bridge | UC-06 | Interoperability | Defined |
+| NFR-OPEN-01 | 20, 22 | `non-functional-requirements.md` | All | UC-01, UC-04 | Open format compliance | Defined |
+| NFR-MODULAR-01 | Value 6, Principle 27 | `non-functional-requirements.md` | All | UC-02, UC-04 | Plugin | Defined |
+| NFR-USABILITY-01 | 28 | `non-functional-requirements.md` | Public API, CLI | UC-01, UC-02 | Usability | Defined |
 
 ---
 

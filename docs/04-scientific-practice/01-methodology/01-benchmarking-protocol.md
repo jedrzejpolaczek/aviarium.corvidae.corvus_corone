@@ -221,9 +221,15 @@ Use the Metric Selection Guide (`docs/03-technical-contracts/metric-taxonomy.md`
 
 **Performance curve sampling strategy:**
 
-Specify at which evaluation counts Performance Records will be stored during each Run. This must be decided now — recording more data is always safe, but recording fewer snapshots may prevent anytime analysis later and cannot be retroactively corrected. The sampling frequency is stored in the `PerformanceRecord` sampling configuration.
+Specify at which evaluation counts Performance Records will be stored during each Run. This must be decided now — recording more data is always safe, but recording fewer snapshots may prevent anytime analysis later and cannot be retroactively corrected. The sampling strategy is stored in the Study record and locked before execution begins. See [ADR-002](../../02-design/02-architecture/01-adr/adr-002-performance-recording-strategy.md) for the full strategy specification.
 
-→ PerformanceRecord schema: `docs/03-technical-contracts/data-format.md` §2.6
+The following fields must be set in the Study record at this step:
+- `sampling_strategy` — e.g., `log_scale_plus_improvement` (the default)
+- `log_scale_schedule` — base points and multiplier (default: `{1,2,5} × 10^i`)
+- `improvement_epsilon` — minimum improvement to trigger a record; `null` for strict inequality (see [ADR-004](../../02-design/02-architecture/01-adr/adr-004-improvement-sensitivity-threshold.md))
+
+→ Study schema: `docs/03-technical-contracts/01-data-format.md` §2.3
+→ PerformanceRecord schema: `docs/03-technical-contracts/01-data-format.md` §2.6
 
 **Budget specification:**
 
@@ -235,6 +241,7 @@ A completed and locked Study record containing:
 - `experimental_design.stopping_criteria`
 - `pre_registered_hypotheses` (from Step 2)
 - `problem_instances` and `algorithm_instances` (from Steps 3–4)
+- `sampling_strategy`, `log_scale_schedule`, `improvement_epsilon` (from this step)
 - The metric list, which becomes the `AnalysisConfig` when Step 7 triggers analysis
 
 → Study record format: `docs/03-technical-contracts/data-format.md` §2.3

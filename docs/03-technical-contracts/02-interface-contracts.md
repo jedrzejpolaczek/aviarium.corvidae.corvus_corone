@@ -164,6 +164,26 @@ CONTRACT FORMAT for each method:
       - experiment exists in the Results Store
       - incomplete Runs are identifiable from stored state
 
+  ### on_evaluation(eval_number: int, objective_value: float) → None
+    Semantics:
+      Callback invoked by the Problem Interface after every objective evaluation.
+      The Runner base class intercepts this callback to decide whether to write a
+      PerformanceRecord (per ADR-002: scheduled trigger, improvement trigger, end-of-run
+      trigger). Algorithm Authors do NOT call this method; it is wired by the framework.
+    Preconditions:
+      - eval_number is the current evaluation count (1-indexed, monotonically increasing)
+      - objective_value is the raw value returned by Problem.evaluate()
+    Postconditions:
+      - If any trigger fires, a PerformanceRecord is written to the Results Store with
+        the correct trigger_reason, is_improvement, and elapsed_time fields
+      - The Runner's internal best_so_far is updated if objective_value improves
+    Note:
+      Subclasses may override on_evaluation() to implement custom logging behaviour,
+      but MUST call super().on_evaluation() to preserve the standard trigger logic,
+      or populate trigger_reason manually per ADR-002.
+    → PerformanceRecord schema: 01-data-format.md §2.6
+    → Recording strategy: ADR-002-performance-recording-strategy.md
+
   Isolation contract (critical for reproducibility):
     - Each Run executes in isolation: no shared mutable state between runs
     - Seeds are injected by the Runner, never generated inside Problem or Algorithm
@@ -174,7 +194,6 @@ CONTRACT FORMAT for each method:
     - Parallel execution: how does the Runner manage concurrent runs?
       Shared-memory parallelism vs. process isolation vs. distributed? → ADR candidate
     - How are failures handled? Retry? Skip? Abort study?
-    - What is logged at the Runner level vs. at the Problem level?
 -->
 
 ---
@@ -210,6 +229,34 @@ CONTRACT FORMAT for each method:
     Postconditions:
       - conclusion_scope explicitly states which problems and conditions the conclusion applies to
         (prevents over-generalization, Principle 3)
+
+  ### InterpolationStrategy (abstract)
+    Semantics:
+      Pluggable strategy for reconstructing best-so-far at an unlogged evaluation count.
+      The Analyzer holds a reference to an InterpolationStrategy and delegates all
+      gap-filling to it. See ADR-003 for the decision rationale.
+
+    #### reconstruct(records: list[PerformanceRecord], eval_number: int) → float
+      Semantics:
+        Returns the best-so-far value at eval_number given the sorted list of
+        PerformanceRecords for a single Run.
+      Preconditions:
+        - records is sorted ascending by evaluation_number
+        - records is non-empty (at least the eval-1 record exists per ADR-002)
+        - eval_number ≥ 1 and ≤ run.budget_used
+      Postconditions:
+        - returned value equals objective_value of the most recent record with
+          evaluation_number ≤ eval_number (LOCF — the default implementation)
+
+    Default implementation: LastObservationCarriedForward
+      Returns records[-1 where evaluation_number ≤ n].objective_value.
+      This is the only implementation permitted without explicit pre-registration
+      in the Study record (ADR-003).
+
+    Any non-default implementation:
+      - Must be declared in Study record before execution
+      - Will be labeled in the Report's limitations section (FR-21)
+    → Interpolation decision: ADR-003-anytime-curve-interpolation.md
 
   Additional hints:
     - Should analysis be streaming (incremental as runs complete) or batch (after all runs)?

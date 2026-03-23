@@ -135,6 +135,36 @@ Terms are listed alphabetically within sections.
 
 ---
 
+### Performance Record
+
+**Definition:** A single timestamped snapshot of a Run's progress, capturing the evaluation count, elapsed wall-clock time, current best objective value, and whether that value is an improvement over all prior snapshots. A sequence of Performance Records for one Run forms its anytime performance curve.
+
+**Distinguished from:** *Run* (the full execution that produces Performance Records), *Result Aggregate* (statistics computed across multiple Runs). A Performance Record is raw per-evaluation data; a Result Aggregate is a derived summary.
+
+**Used in:** `docs/01-manifesto/MANIFESTO.md` Principle 14, `docs/03-technical-contracts/01-data-format.md` §2.6.
+
+---
+
+### Result Aggregate
+
+**Definition:** A derived record of aggregated statistics computed across all Runs of the same (Algorithm Instance, Problem Instance) combination within an Experiment. Captures central tendency, spread, and summarized anytime curves so that comparisons can be made without re-processing raw Performance Records.
+
+**Distinguished from:** *Performance Record* (raw per-evaluation snapshot within a single Run), *Run* (a single execution). A Result Aggregate is always computed — never directly recorded during execution.
+
+**Used in:** `docs/01-manifesto/MANIFESTO.md` Principles 12–14, `docs/03-technical-contracts/01-data-format.md` §2.7, `docs/03-technical-contracts/03-metric-taxonomy.md`.
+
+---
+
+### Report
+
+**Definition:** A system-generated document produced for every completed Experiment, presenting findings in one of two forms: a *Researcher Report* (full statistical analysis, effect sizes, confirmatory test results, methodology details) or a *Practitioner Report* (practical guidance scoped to the tested Problem Instances and Algorithm Instances, without global rankings). Every Report must include a mandatory limitations section.
+
+**Distinguished from:** *Result Aggregate* (the underlying computed statistics from which Reports are derived). A Result Aggregate is a data record; a Report is a human-readable artifact generated from one or more Result Aggregates.
+
+**Used in:** `docs/01-manifesto/MANIFESTO.md` Principles 24–25, `docs/02-design/01-software-requirement-specification/03-functional-requirements/07-fr-4.6-reporting-and-visualization.md` FR-20–FR-22, `docs/03-technical-contracts/01-data-format.md` §2.8.
+
+---
+
 ## Performance & Measurement
 
 ### Anytime Performance

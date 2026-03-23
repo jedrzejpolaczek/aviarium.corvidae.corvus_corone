@@ -11,7 +11,7 @@
 **All experimental data, algorithm code, and analysis scripts MUST be publicly available under open licenses in standardized, well-documented formats readable without proprietary tools.**
 
 - **Source:** MANIFESTO Principles 20, 22
-- **Measurable criterion:** `TODO: REF-TASK-0010` — license type, format approval list
+- **Measurable criterion:** (1) All Raw Data exports are valid JSON or CSV parseable by the Python standard library (`json` or `csv` module) with no additional dependencies. (2) All files under `packages/` carry an approved open source license header (verified by `licensecheck` or equivalent CI check). (3) No output format produced by the system requires a proprietary tool to parse — verified by the open format compliance test category, which attempts to read each output format using only OSI-approved open source tools.
 - **Operationalized in:** `docs/05-community/02-versioning-governance.md` §5
 - **Exercises:** UC-01 (postcondition: Raw Data export available in open format); UC-04 (contributed Problem Instance published openly)
 - **Tested by:** License and format compliance checks — verify all output formats are on the approved open-format list; verify license headers on code artifacts

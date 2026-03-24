@@ -82,3 +82,25 @@ The nine categories above are based on the fundamental aspects of benchmarking i
 The first seven categories derive from the paper's eight core aspects — Measurement & Analysis combines 'Performance' and 'Analysis' into one. The last two categories (Ecosystem and Ethical & Scientific) extend the framework to address modern collaborative and ethical considerations in benchmarking practice.
 
 ---
+
+## Anti-patterns
+
+The following practices are explicitly rejected by this system. They represent the ways a benchmarking system most commonly undermines its own scientific purpose — each is the direct inverse of one or more Principles above.
+
+Anti-patterns AP-1 and AP-3 through AP-7 drive the design exclusions listed in
+`docs/02-design/02-architecture/02-c4-leve1-context/01-c1-context.md` (Explicit Scope Exclusions).
+AP-2 is a scientific validity constraint on problem selection; it does not map to a design exclusion
+(the system cannot prevent researchers from passing biased inputs) but must be stated here because
+CONST-SCI constraints reference it.
+
+| # | Anti-pattern | Inverse of | Description |
+|---|---|---|---|
+| AP-1 | Global algorithm rankings and "best algorithm" declarations | Principles 2, 3, 30 | Producing or displaying performance-independent rankings, leaderboards, or "best algorithm" recommendations. Such outputs make claims beyond what the tested problem set can support and serve algorithm promotion rather than scientific understanding. No Free Lunch theorems make universal rankings mathematically invalid. |
+| AP-2 | Biased or cherry-picked problem selection | Principles 4, 5, 6 | Constructing or selecting problem sets that are not representative of real optimization challenges, or that are chosen specifically to favor certain algorithms over others. Any conclusion drawn from a biased problem set is scientifically invalid regardless of the rigor applied to the rest of the study. |
+| AP-3 | Competition-style framing and scoring | Principles 1, 2 | Structuring a benchmarking study as a competition — with league tables, prize optimizations, or "winning" algorithm declarations — instead of as a scientific inquiry into context-dependent performance. Shifts the goal from understanding algorithm behavior to determining a winner, producing promotion rather than knowledge. |
+| AP-4 | Opaque analysis pipelines | Principles 13, 15, 19 | Implementing analysis workflows that cannot be independently inspected, reproduced, or understood by the user. Every statistical test, aggregation, and visualization step must be transparent so that conclusions can be verified and contested. Black-box analysis violates the reproducibility requirements of Principles 19–22. |
+| AP-5 | Proprietary or closed data formats | Principles 20, 22, 26 | Storing or producing data in formats that prevent interoperability with the broader benchmarking ecosystem (COCO, IOHprofiler, Nevergrad) or that require proprietary software to read. Closed formats isolate results, break long-term availability guarantees, and contradict the open-data mandate of Principles 20 and 22. |
+| AP-6 | Marketing-oriented result presentation | Principles 24, 29 | Generating reports or summaries that emphasize positive findings, downplay limitations, or omit scope conditions — serving algorithm promotion rather than scientific communication. Every conclusion must be accompanied by the conditions under which it holds; cherry-picked highlights are not benchmarking results. |
+| AP-7 | Automated algorithm selection as a substitute for researcher judgment | Principles 1, 3, 25 | Making algorithm selection recommendations or decisions on behalf of the user — treating benchmarking output as a recommendation engine rather than as evidence. The system produces structured evidence that a researcher interprets; it does not decide which algorithm a practitioner should use. |
+
+---

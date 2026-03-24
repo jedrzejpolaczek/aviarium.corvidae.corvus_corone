@@ -31,6 +31,7 @@ from corvus_corone.exceptions import (
     StudyAlreadyLockedError,
     ValidationError,
 )
+from corvus_corone.repository.in_memory import InMemoryRepositoryFactory
 from corvus_corone.repository.interfaces import (
     AlgorithmFilter,
     ProblemFilter,
@@ -38,8 +39,6 @@ from corvus_corone.repository.interfaces import (
     RunFilter,
     StudyFilter,
 )
-from corvus_corone.repository.in_memory import InMemoryRepositoryFactory
-
 
 # ---------------------------------------------------------------------------
 # Fixtures

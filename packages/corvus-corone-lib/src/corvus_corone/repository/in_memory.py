@@ -27,12 +27,12 @@ from copy import deepcopy
 from typing import Any
 
 from corvus_corone.exceptions import (
+    CodeReferenceError,
     DuplicateEvaluationError,
     EntityNotFoundError,
     ImmutableFieldError,
     StudyAlreadyLockedError,
     ValidationError,
-    CodeReferenceError,
 )
 from corvus_corone.repository.interfaces import (
     AlgorithmFilter,
@@ -40,8 +40,8 @@ from corvus_corone.repository.interfaces import (
     ExperimentRepository,
     ProblemFilter,
     ProblemRepository,
-    RepositoryFactory,
     ReportRepository,
+    RepositoryFactory,
     ResultAggregateRepository,
     RunFilter,
     RunRepository,

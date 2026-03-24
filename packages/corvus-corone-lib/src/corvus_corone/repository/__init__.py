@@ -12,17 +12,17 @@ References
 → docs/02-design/02-architecture/01-adr/adr-001-library-with-server-ready-data-layer.md
 """
 
+from corvus_corone.repository.in_memory import InMemoryRepositoryFactory
 from corvus_corone.repository.interfaces import (
     AlgorithmRepository,
     ExperimentRepository,
     ProblemRepository,
-    RepositoryFactory,
     ReportRepository,
+    RepositoryFactory,
     ResultAggregateRepository,
     RunRepository,
     StudyRepository,
 )
-from corvus_corone.repository.in_memory import InMemoryRepositoryFactory
 
 __all__ = [
     "ProblemRepository",

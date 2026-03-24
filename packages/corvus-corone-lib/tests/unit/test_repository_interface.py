@@ -89,9 +89,7 @@ VALID_STUDY = {
 # ---------------------------------------------------------------------------
 
 
-UUID_RE = re.compile(
-    r"^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
-)
+UUID_RE = re.compile(r"^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$")
 
 
 def assert_uuid(value: str) -> None:
@@ -171,18 +169,14 @@ class TestProblemRepository:
                 reason="Gone",
             )
 
-    def test_deprecated_still_retrievable_by_id(
-        self, factory: InMemoryRepositoryFactory
-    ) -> None:
+    def test_deprecated_still_retrievable_by_id(self, factory: InMemoryRepositoryFactory) -> None:
         """Deprecated instances remain retrievable by ID for reproducibility."""
         pid = factory.problems.register_problem(VALID_PROBLEM.copy())
         factory.problems.deprecate_problem(pid, reason="Old version")
         problem = factory.problems.get_problem(pid)
         assert problem["deprecated"] is True
 
-    def test_landscape_characteristics_filter(
-        self, factory: InMemoryRepositoryFactory
-    ) -> None:
+    def test_landscape_characteristics_filter(self, factory: InMemoryRepositoryFactory) -> None:
         """Filter by landscape_characteristics performs subset match."""
         factory.problems.register_problem(
             {**VALID_PROBLEM, "name": "Noisy", "landscape_characteristics": ["noisy"]}
@@ -190,9 +184,7 @@ class TestProblemRepository:
         factory.problems.register_problem(
             {**VALID_PROBLEM, "name": "Both", "landscape_characteristics": ["noisy", "multimodal"]}
         )
-        result = factory.problems.list_problems(
-            ProblemFilter(landscape_characteristics=["noisy"])
-        )
+        result = factory.problems.list_problems(ProblemFilter(landscape_characteristics=["noisy"]))
         names = [p["name"] for p in result]
         assert "Noisy" in names
         assert "Both" in names
@@ -225,9 +217,7 @@ class TestAlgorithmRepository:
         with pytest.raises(EntityNotFoundError):
             factory.algorithms.get_algorithm("00000000-0000-4000-8000-000000000000")
 
-    def test_register_empty_justification_raises(
-        self, factory: InMemoryRepositoryFactory
-    ) -> None:
+    def test_register_empty_justification_raises(self, factory: InMemoryRepositoryFactory) -> None:
         """FR-07: configuration_justification must be non-empty."""
         bad = {**VALID_ALGORITHM, "configuration_justification": ""}
         with pytest.raises(ValidationError) as exc_info:
@@ -265,9 +255,7 @@ class TestAlgorithmRepository:
         listed = factory.algorithms.list_algorithms()
         assert not any(a["id"] == aid for a in listed)
 
-    def test_deprecated_still_retrievable_by_id(
-        self, factory: InMemoryRepositoryFactory
-    ) -> None:
+    def test_deprecated_still_retrievable_by_id(self, factory: InMemoryRepositoryFactory) -> None:
         aid = factory.algorithms.register_algorithm(VALID_ALGORITHM.copy())
         factory.algorithms.deprecate_algorithm(aid, reason="Old")
         alg = factory.algorithms.get_algorithm(aid)
@@ -314,9 +302,7 @@ class TestStudyRepository:
         with pytest.raises(EntityNotFoundError):
             factory.studies.lock_study("00000000-0000-4000-8000-000000000000")
 
-    def test_lock_missing_required_field_raises(
-        self, factory: InMemoryRepositoryFactory
-    ) -> None:
+    def test_lock_missing_required_field_raises(self, factory: InMemoryRepositoryFactory) -> None:
         """lock_study() raises ValidationError if required fields are absent."""
         incomplete = {"name": "Incomplete Study"}
         sid = factory.studies.create_study(incomplete)
@@ -340,9 +326,7 @@ class TestStudyRepository:
         assert len(locked) == 1
         assert len(drafts) == 1
 
-    def test_list_with_problem_ids_overlap_filter(
-        self, factory: InMemoryRepositoryFactory
-    ) -> None:
+    def test_list_with_problem_ids_overlap_filter(self, factory: InMemoryRepositoryFactory) -> None:
         sid1 = factory.studies.create_study({**VALID_STUDY, "problem_ids": ["prob-A", "prob-B"]})
         factory.studies.create_study({**VALID_STUDY, "problem_ids": ["prob-C"]})
 
@@ -429,9 +413,7 @@ class TestRunRepository:
         assert run["status"] == "completed"
         assert run["budget_used"] == 50
 
-    def test_save_and_get_performance_records(
-        self, factory: InMemoryRepositoryFactory
-    ) -> None:
+    def test_save_and_get_performance_records(self, factory: InMemoryRepositoryFactory) -> None:
         """save_performance_records() → get_performance_records() round-trip."""
         rid = factory.runs.create_run({"experiment_id": "exp-001", "seed": 0})
         records = [
@@ -445,9 +427,7 @@ class TestRunRepository:
         assert fetched[0]["evaluation_number"] == 1
         assert fetched[2]["evaluation_number"] == 5
 
-    def test_performance_records_sorted_ascending(
-        self, factory: InMemoryRepositoryFactory
-    ) -> None:
+    def test_performance_records_sorted_ascending(self, factory: InMemoryRepositoryFactory) -> None:
         """Records are always returned in ascending evaluation_number order."""
         rid = factory.runs.create_run({"experiment_id": "exp-001", "seed": 0})
         factory.runs.save_performance_records(
@@ -461,9 +441,7 @@ class TestRunRepository:
         nums = [r["evaluation_number"] for r in fetched]
         assert nums == sorted(nums)
 
-    def test_duplicate_evaluation_number_raises(
-        self, factory: InMemoryRepositoryFactory
-    ) -> None:
+    def test_duplicate_evaluation_number_raises(self, factory: InMemoryRepositoryFactory) -> None:
         """Saving a duplicate evaluation_number raises DuplicateEvaluationError."""
         rid = factory.runs.create_run({"experiment_id": "exp-001", "seed": 0})
         factory.runs.save_performance_records(
@@ -475,9 +453,7 @@ class TestRunRepository:
             )
         assert exc_info.value.error_code == "DUPLICATE_EVALUATION"
 
-    def test_non_monotonic_sequence_raises(
-        self, factory: InMemoryRepositoryFactory
-    ) -> None:
+    def test_non_monotonic_sequence_raises(self, factory: InMemoryRepositoryFactory) -> None:
         """Out-of-order evaluation_numbers raise ValidationError."""
         rid = factory.runs.create_run({"experiment_id": "exp-001", "seed": 0})
         with pytest.raises(ValidationError):
@@ -505,9 +481,7 @@ class TestRunRepository:
         completed = factory.runs.list_runs("exp-A", RunFilter(status="completed"))
         assert all(r["status"] == "completed" for r in completed)
 
-    def test_save_records_unknown_run_raises(
-        self, factory: InMemoryRepositoryFactory
-    ) -> None:
+    def test_save_records_unknown_run_raises(self, factory: InMemoryRepositoryFactory) -> None:
         with pytest.raises(EntityNotFoundError):
             factory.runs.save_performance_records(
                 "00000000-0000-4000-8000-000000000000",
@@ -668,9 +642,7 @@ class TestReportRepository:
 
 def _register_and_retrieve_problem(repo_factory: RepositoryFactory) -> None:
     """Client function — uses only the RepositoryFactory interface."""
-    pid = repo_factory.problems.register_problem(
-        {"name": "SwapTestProblem", "dimensions": 3}
-    )
+    pid = repo_factory.problems.register_problem({"name": "SwapTestProblem", "dimensions": 3})
     problem = repo_factory.problems.get_problem(pid)
     assert problem["name"] == "SwapTestProblem"
     assert problem["dimensions"] == 3

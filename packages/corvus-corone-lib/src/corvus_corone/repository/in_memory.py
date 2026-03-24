@@ -96,11 +96,7 @@ class _InMemoryProblemRepository(ProblemRepository):
         self,
         filters: ProblemFilter | None = None,
     ) -> list[dict[str, Any]]:
-        results = [
-            deepcopy(p)
-            for p in self._store.values()
-            if not p.get("deprecated", False)
-        ]
+        results = [deepcopy(p) for p in self._store.values() if not p.get("deprecated", False)]
         if filters is None:
             return results
         if filters.min_dimensions is not None:
@@ -113,8 +109,7 @@ class _InMemoryProblemRepository(ProblemRepository):
         if filters.landscape_characteristics:
             required = set(filters.landscape_characteristics)
             results = [
-                p for p in results
-                if required.issubset(set(p.get("landscape_characteristics", [])))
+                p for p in results if required.issubset(set(p.get("landscape_characteristics", [])))
             ]
         return results
 
@@ -177,11 +172,7 @@ class _InMemoryAlgorithmRepository(AlgorithmRepository):
         self,
         filters: AlgorithmFilter | None = None,
     ) -> list[dict[str, Any]]:
-        results = [
-            deepcopy(a)
-            for a in self._store.values()
-            if not a.get("deprecated", False)
-        ]
+        results = [deepcopy(a) for a in self._store.values() if not a.get("deprecated", False)]
         if filters is None:
             return results
         if filters.algorithm_family is not None:
@@ -193,8 +184,7 @@ class _InMemoryAlgorithmRepository(AlgorithmRepository):
         if filters.supported_variable_types:
             required = set(filters.supported_variable_types)
             results = [
-                a for a in results
-                if required.issubset(set(a.get("supported_variable_types", [])))
+                a for a in results if required.issubset(set(a.get("supported_variable_types", [])))
             ]
         return results
 
@@ -305,10 +295,7 @@ class _InMemoryStudyRepository(StudyRepository):
             results = [s for s in results if s.get("created_by") == filters.created_by]
         if filters.problem_ids:
             overlap = set(filters.problem_ids)
-            results = [
-                s for s in results
-                if overlap.intersection(set(s.get("problem_ids", [])))
-            ]
+            results = [s for s in results if overlap.intersection(set(s.get("problem_ids", [])))]
         return results
 
     def create_study(self, study: dict[str, Any]) -> str:
@@ -422,9 +409,7 @@ class _InMemoryRunRepository(RunRepository):
         filters: RunFilter | None = None,
     ) -> list[dict[str, Any]]:
         results = [
-            deepcopy(r)
-            for r in self._store.values()
-            if r.get("experiment_id") == experiment_id
+            deepcopy(r) for r in self._store.values() if r.get("experiment_id") == experiment_id
         ]
         if filters is None:
             return results
@@ -478,7 +463,11 @@ class _InMemoryRunRepository(RunRepository):
                 raise ValidationError(
                     f"Run '{run_id}': evaluation_number={eval_num} is not strictly "
                     f"greater than previous={prev_eval}.",
-                    context={"run_id": run_id, "evaluation_number": eval_num, "previous": prev_eval},
+                    context={
+                        "run_id": run_id,
+                        "evaluation_number": eval_num,
+                        "previous": prev_eval,
+                    },
                 )
             existing_evals.add(eval_num)
             prev_eval = eval_num
@@ -521,9 +510,7 @@ class _InMemoryResultAggregateRepository(ResultAggregateRepository):
         experiment_id: str,
     ) -> list[dict[str, Any]]:
         return [
-            deepcopy(a)
-            for a in self._store.values()
-            if a.get("experiment_id") == experiment_id
+            deepcopy(a) for a in self._store.values() if a.get("experiment_id") == experiment_id
         ]
 
     def save_result_aggregates(
@@ -566,9 +553,7 @@ class _InMemoryReportRepository(ReportRepository):
 
     def list_reports(self, experiment_id: str) -> list[dict[str, Any]]:
         return [
-            deepcopy(r)
-            for r in self._store.values()
-            if r.get("experiment_id") == experiment_id
+            deepcopy(r) for r in self._store.values() if r.get("experiment_id") == experiment_id
         ]
 
     def save_report(self, report: dict[str, Any]) -> str:

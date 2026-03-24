@@ -98,8 +98,8 @@ Six milestones group all open documentation and design tasks.
 
 - [ ] **[REF-TASK-0004] Algorithm Author tutorial** — wrap Optuna sampler in ≤ 15 lines; interface acceptance test ·
 - [x] **[REF-TASK-0005] COCO format mapping** *(spike first)* — map Corvus entities to COCO `.info`/`.dat`/`.tdat`; document data loss; round-trip test ·
-- [ ] **[REF-TASK-0006] Nevergrad adapter pattern** *(spike first)* — generic `NevergradAdapter`; tutorial; `data-format.md §3` mapping ·
-- [ ] **[REF-TASK-0007] IOHprofiler export format mapping** — `.dat` export + `.meta.json` sidecar for unsupported fields; full spec + round-trip test ·
+- [x] **[REF-TASK-0006] Nevergrad adapter pattern** *(spike first)* — generic `NevergradAdapter`; tutorial; `data-format.md §3` mapping ·
+- [x] **[REF-TASK-0007] IOHprofiler export format mapping** — `.dat` export + `.meta.json` sidecar for unsupported fields; full spec + round-trip test ·
 
 ---
 

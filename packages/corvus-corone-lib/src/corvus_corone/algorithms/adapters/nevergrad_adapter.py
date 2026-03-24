@@ -141,6 +141,8 @@ class NevergradAdapter:
         by variable name) is converted to an ordered list matching
         ``search_space.variables`` order.
         """
+        if self._optimizer is None:
+            raise RuntimeError("initialize() must be called before suggest()")
         solutions: list[list[Any]] = []
         for _ in range(batch_size):
             candidate = self._optimizer.ask()

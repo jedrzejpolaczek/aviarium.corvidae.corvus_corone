@@ -172,41 +172,49 @@ flowchart TB
 
 ## Containers
 
-<!--
-  For each container, provide a section with the following structure.
-  Copy and repeat this block for each container identified in the diagram.
--->
+### Public API + CLI
 
-### [Container Name]
+**Responsibility:** Expose the complete researcher-facing surface of the library — the
+Python module API (`import corvus_corone as cc`) and the `corvus` terminal commands —
+as a single thin coordination layer that delegates to the Core Layer.
 
-<!--
-  Responsibility:
-    One sentence. What is this container's single concern?
-    Hint: if you need "and" to describe it, consider splitting into two containers.
+**Technology:** Python · [Click](https://click.palletsprojects.com/) (CLI framework).
+Click was chosen because it integrates cleanly with Python packaging (`console_scripts`
+entry point), supports composable command groups, and generates `--help` output
+automatically from docstrings and parameter annotations. No separate build step is
+required.
 
-  Technology:
-    What runtime, language, framework, or storage engine?
-    Why this choice? → Create an ADR in architecture/adr/ for non-obvious decisions.
+**Interfaces exposed:**
 
-  Interfaces exposed:
-    What does this container offer to others?
-    (REST API, CLI command, Python library, file system path, message topic, etc.)
-    → Formal interface definitions belong in specs/interface-contracts.md
+| Surface | Form | Who uses it |
+|---|---|---|
+| Python API | Module functions: `cc.create_study()`, `cc.run()`, `cc.list_problems()`, `cc.generate_reports()`, `cc.export_raw_data()`, etc. | Researcher (scripts, notebooks), Algorithm Author |
+| CLI | `corvus run`, `corvus list-problems`, `corvus list-algorithms`, `corvus report`, `corvus verify`, `corvus export` | Researcher (terminal), CI scripts |
 
-  Dependencies:
-    Which other containers does this container call or depend on?
-    List them with the reason for the dependency.
+Full Python API contract:
+`docs/03-technical-contracts/04-public-api-contract.md`
 
-  Data owned:
-    What persisted data lives in or is managed by this container?
-    → Data schemas belong in specs/data-format.md
+Full CLI command reference and complete example session:
+[`02-cli-spec.md`](02-cli-spec.md)
 
-  Actors served:
-    Which actors from C1 interact with this container directly?
+**Dependencies:**
 
-  Relevant SRS section:
-    Which functional requirement group in SRS §4 does this container implement?
--->
+| Dependency | Reason |
+|---|---|
+| Study Orchestrator | `cc.create_study()` and `cc.run()` delegate orchestration to this component |
+| Algorithm Registry | `cc.list_algorithms()` / `cc.get_algorithm()` read from the registry |
+| Problem Repository | `cc.list_problems()` / `cc.get_problem()` read from the repository |
+| Results Store | `cc.get_experiment()`, `cc.get_runs()`, `cc.get_result_aggregates()`, `cc.export_raw_data()` read from the store |
+| Reporting Engine | `cc.generate_reports()` delegates report generation here |
+
+**Data owned:** None. This container holds no persistent state. All storage is
+delegated to the Data & Registry layer.
+
+**Actors served:** Researcher (primary), Algorithm Author (registry reads), Learner
+(future — visualisation commands).
+
+**Relevant SRS section:** FR-4.1 (problem registry reads), FR-4.2 (algorithm registry
+reads), FR-4.3 (study execution), FR-4.5 (reproducibility), FR-4.6 (reporting).
 
 ---
 

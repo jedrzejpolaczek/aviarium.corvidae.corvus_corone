@@ -163,6 +163,8 @@ class NevergradAdapter:
         For maximization problems (``objective="maximize"``) the loss is negated
         before the ``tell()`` call because Nevergrad always minimizes internally.
         """
+        if self._optimizer is None:
+            raise RuntimeError("initialize() must be called before observe()")
         candidate = self._pending.popleft()
         loss = result.objective_value if self._objective == "minimize" else -result.objective_value
         self._optimizer.tell(candidate, float(loss))

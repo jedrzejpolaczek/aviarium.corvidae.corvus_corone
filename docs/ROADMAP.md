@@ -61,7 +61,7 @@ Six milestones group all open documentation and design tasks.
 - [x] **[REF-TASK-0010] §5 NFR measurable criteria** — testable pass/fail criteria for REPRO, STAT, INTEROP, OPEN, MODULAR, USABILITY ·
 - [x] **[REF-TASK-0011] §6 Technical constraints** — Python version, OS support, dependency licensing; record as ADR-006 ·
 - [x] **[REF-TASK-0012] §7 Interface requirements** — per external system; requires REF-TASK-0005/0006/0007 ·
-- [ ] **[REF-TASK-0013] §8 Acceptance test strategy** — every FR-XX maps to at least one test category ·
+- [x] **[REF-TASK-0013] §8 Acceptance test strategy** — every FR-XX maps to at least one test category ·
 
 ### Interface Contracts & Data Format
 - [ ] **[REF-TASK-0037] Define public API facade contract** — new `docs/03-technical-contracts/04-public-api-contract.md`

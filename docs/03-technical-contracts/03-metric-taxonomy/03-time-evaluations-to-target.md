@@ -18,7 +18,7 @@ If $\min_k f(x_k) > \tau$, the value is $B + 1$.
 
 **Statistical treatment:** Distribution is often right-skewed (many Runs reach target early; some never do). The censored values ($B+1$) require survival analysis methods or non-parametric tests. See `docs/04-scientific-practice/01-methodology/02-statistical-methodology.md` §3.
 
-**When to use:** When the research question is "which algorithm is most efficient?" or "which algorithm finds acceptable solutions fastest?" The target $\tau$ must be ecologically valid — chosen based on domain knowledge, not post-hoc.
+**When to use:** When the research question is "which algorithm is most efficient?" or "which algorithm finds acceptable solutions fastest?" The target $\tau$ must be ecologically valid — chosen based on domain knowledge before data collection (Benchmarking Protocol Step 5), not post-hoc. This metric is **not** in the Standard Reporting Set (ADR-008); it is opt-in. When no ecologically valid τ is available, use `ANYTIME-ECDF_AREA` instead.
 
 **Limitations:** Highly sensitive to the choice of target $\tau$. A single target may not capture algorithm behavior across the full quality range. Use alongside `ANYTIME-ECDF_AREA` for a target-free view.
 

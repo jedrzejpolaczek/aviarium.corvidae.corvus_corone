@@ -218,17 +218,14 @@ study = cc.create_study(
         "(2–5 variable) synthetic HPO problems with moderate noise? "
         "Conclusions do not extend to high-dimensional or deterministic problems."
     ),
-    problem_instance_ids=selected_problems,
-    algorithm_instance_ids=selected_algorithms,
-    experimental_design={
-        "repetitions": 10,
-        "budget_allocation": "50 evaluations per run, equal across all algorithms",
-        "stopping_criteria": "budget_exhausted",
-        "seed_strategy": "sequential",
-    },
+    problem_ids=selected_problems,
+    algorithm_ids=selected_algorithms,
+    repetitions=10,
+    budget=50,
+    seed_strategy="sequential",
     sampling_strategy="log_scale_plus_improvement",
     log_scale_schedule={"base_points": [1, 2, 5], "multiplier_base": 10},
-    improvement_epsilon=None,   # strict inequality — log every genuine improvement
+    improvement_epsilon=None,
     pre_registered_hypotheses=hypotheses,
 )
 
@@ -314,12 +311,12 @@ across all runs. Verify they exist before generating reports:
 aggregates = cc.get_result_aggregates(experiment.id)
 
 for agg in aggregates:
-    problem = cc.get_problem(agg.problem_instance_id).name
-    algorithm = cc.get_algorithm(agg.algorithm_instance_id).name
-    quality = agg.metrics["QUALITY-BEST_VALUE_AT_BUDGET"].statistics
+    problem = cc.get_problem(agg.problem_id).name
+    algorithm = cc.get_algorithm(agg.algorithm_id).name
+    quality = agg.metrics["QUALITY-BEST_VALUE_AT_BUDGET"]
     print(
         f"{algorithm:30s} on {problem:30s} | "
-        f"median={quality['median']:.4f}  iqr={quality['q75']-quality['q25']:.4f}"
+        f"median={quality.median:.4f}  iqr={quality.q75 - quality.q25:.4f}"
     )
 ```
 
@@ -343,8 +340,8 @@ analysis in the report will test your pre-registered hypotheses.
 reports = cc.generate_reports(experiment.id)
 
 # Two reports are always generated:
-researcher_report = next(r for r in reports if r.type == "researcher")
-practitioner_report = next(r for r in reports if r.type == "practitioner")
+researcher_report = next(r for r in reports if r.report_type == "researcher")
+practitioner_report = next(r for r in reports if r.report_type == "practitioner")
 
 print(f"Researcher report: {researcher_report.artifact_reference}")
 print(f"Practitioner report: {practitioner_report.artifact_reference}")

@@ -322,7 +322,7 @@ class TestRoundTrip:
             exported_evals = [e for e, _ in exported]
             source_evals = [rec.evaluation_number for rec in source_run.records]
             assert exported_evals == source_evals, (
-                f"evaluation_number mismatch for run {source_run.run_id}"
+                f"evaluation_number mismatch for run {source_run.id}"
             )
 
     def test_raw_y_matches_best_so_far(

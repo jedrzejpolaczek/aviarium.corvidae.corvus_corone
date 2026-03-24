@@ -463,6 +463,16 @@ Terms are listed alphabetically within sections.
 
 ---
 
+### BBOB (Black-Box Optimization Benchmarking)
+
+**Definition:** A standardized suite of 24 single-objective continuous test functions distributed with the COCO framework, designed to evaluate optimizer behavior across a representative range of landscape properties including unimodal/multimodal, separable/non-separable, ill-conditioned, and noisy variants. Each function is parameterized by dimension and instance number; the instance number seeds random affine transformations (rotation, translation, scaling) of the base function, ensuring that different algorithm runs explore equivalent but non-identical problem realizations.
+
+**Distinguished from:** *COCO* (the surrounding framework for experiment execution, data format, and post-processing — BBOB is one of several suites within COCO). Also distinct from `bbob-noisy` (stochastic variant), `bbob-mixint` (mixed-integer variant), and `bbob-biobj` (bi-objective variant).
+
+**Used in:** `docs/03-technical-contracts/01-data-format/11-interoperability-mappings.md` §4.1 (COCO export mapping).
+
+---
+
 ### batch_size
 
 **Definition:** The number of candidate Solutions requested from `Algorithm.suggest()` in a single call. All Algorithm implementations must accept any `batch_size ≥ 1`; implementations that do not natively support batching may invoke their single-suggestion logic `batch_size` times. The sequential V1 Runner always passes `batch_size=1`.
@@ -510,6 +520,16 @@ Terms are listed alphabetically within sections.
 **Distinguished from:** Python's built-in exception hierarchy. Corvus Corone exceptions are domain-specific and replace bare `ValueError`, `RuntimeError`, etc. when the failure has a defined semantic meaning in the system. All exceptions are importable from `corvus_corone.exceptions`.
 
 **Used in:** `docs/03-technical-contracts/02-interface-contracts/07-cross-cutting-contracts.md`, all interface implementations.
+
+---
+
+### Information-Loss Manifest
+
+**Definition:** A non-empty list of structured entries returned by every `export()` call, documenting every field, relationship, or semantic meaning that could not be fully preserved when converting Corvus Corone entities to a target external format. Each entry carries a manifest key (e.g., `LOSS-COCO-01`), a severity level (`critical`, `warning`, or `informational`), the condition under which the loss applies, and a human-readable description. The manifest is always non-empty — at minimum informational entries are present for every export — so that callers can make informed decisions about whether the output is fit for their downstream use case.
+
+**Distinguished from:** error messages or exceptions (which indicate an operation that *failed*). The Information-Loss Manifest is returned on *success*; it documents completeness and semantic fidelity issues rather than failures. A `critical` severity entry may cause the export to be blocked unless the caller provides an explicit override mapping; `warning` entries require acknowledgement; `informational` entries are advisory only.
+
+**Used in:** FR-26 (manifest delivery requirement), NFR-INTEROP-01 (non-empty manifest acceptance criterion), `docs/03-technical-contracts/01-data-format/11-interoperability-mappings.md` §4.1.2 (COCO manifest items), §4.2–4.3 (pending).
 
 ---
 

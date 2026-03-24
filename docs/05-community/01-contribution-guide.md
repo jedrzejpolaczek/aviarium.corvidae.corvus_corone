@@ -44,7 +44,24 @@ The specs define the "what"; this guide describes the "how and who".
 
 ---
 
-## 1. Adding a Benchmark Problem
+## 1. Adding new task to project backlog
+<!--
+1. Link to project booard here + in README: https://github.com/users/jedrzejpolaczek/projects/12/views/1
+2. Suggested template as:
+## Why This Task
+## Summary
+## Acceptance Criteria
+(Optional)
+## Proposed Decision
+## Source
+## Reference
+## Implementation notes
+etc.
+-->
+
+---
+
+## 2. Adding a Benchmark Problem
 
 <!--
   When to contribute a new problem:
@@ -79,7 +96,7 @@ The specs define the "what"; this guide describes the "how and who".
 
 ---
 
-## 2. Adding an Algorithm Implementation
+## 3. Adding an Algorithm Implementation
 
 <!--
   When to contribute a new algorithm:
@@ -109,7 +126,7 @@ The specs define the "what"; this guide describes the "how and who".
 
 ---
 
-## 3. Adding Analysis Tools or Metrics
+## 4. Adding Analysis Tools or Metrics
 
 <!--
   When to contribute a new metric:
@@ -132,7 +149,7 @@ The specs define the "what"; this guide describes the "how and who".
 
 ---
 
-## 4. Documentation Contributions
+## 5. Documentation Contributions
 
 <!--
   Types of documentation contributions:
@@ -162,7 +179,7 @@ The specs define the "what"; this guide describes the "how and who".
 
 ---
 
-## 5. Bug Fixes
+## 6. Bug Fixes
 
 <!--
   For all bug fixes:
@@ -179,7 +196,7 @@ The specs define the "what"; this guide describes the "how and who".
 
 ---
 
-## 6. Review Process
+## 7. Review Process
 
 <!--
   Stages of contribution review:
@@ -215,7 +232,7 @@ The specs define the "what"; this guide describes the "how and who".
 
 ---
 
-## 7. Quality Checklist
+## 8. Quality Checklist
 
 <!--
   Every contribution must pass this checklist before requesting review.

@@ -81,7 +81,7 @@ Six milestones group all open documentation and design tasks.
 ## Milestone: V1 Methodology — Statistics & Metrics
 > Scientific methodology: ECDF_AREA formalization, statistical test selection, diversity requirements, sensitivity documentation.
 
-- [ ] **[REF-TASK-0016] ANYTIME-ECDF_AREA computation procedure** — exact normalization (ADR-007 *(planned)*: empirical min/max) and aggregation across problems
+- [x] **[REF-TASK-0016] ANYTIME-ECDF_AREA computation procedure** — exact normalization (ADR-007 *(planned)*: empirical min/max) and aggregation across problems
 - [ ] **[REF-TASK-0017] TIME-EVALUATIONS_TO_TARGET Standard Reporting Set decision** — weigh pre-specification burden vs. efficiency metric value; create ADR
 - [ ] **[REF-TASK-0020] Statistical test selection procedure** — decision tree: Wilcoxon (2 algorithms) vs Kruskal-Wallis + Holm-Bonferroni (>2); document in `statistical-methodology.md §3`
 - [ ] **[REF-TASK-0021] Problem instance diversity minimum requirements** — quantitative floor (ADR-008 *(planned)* candidate: ≥5 instances, ≥2 dimensionality ranges, ≥1 noise + ≥1 deterministic)

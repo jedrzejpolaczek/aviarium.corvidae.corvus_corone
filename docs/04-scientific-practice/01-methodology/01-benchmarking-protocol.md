@@ -152,10 +152,20 @@ Observations from Level 1 analysis may suggest new hypotheses. These are valid a
 
 **The critical anti-pattern:** Selecting problems where the researcher's preferred algorithm is already known to perform well — and avoiding problems where it is known to perform poorly. This is a form of cherry-picking that violates Principle 29 (Objectivity over promotion). Even if unintentional, it produces biased conclusions.
 
-> **`TODO: REF-TASK-0021`** — Define minimum diversity requirements once the Problem Repository
-> is designed: minimum number of instances per study, required spread across characteristics.
-> Owner: methodology lead. Acceptance: constraints documented in SRS §4.1 and enforced by
-> the system when validating a Study record.
+**Minimum diversity requirements (ADR-009; FR-05, FR-06):**
+
+The system validates the following three rules before any Experiment begins. Failure raises
+`DiversityValidationError`. Studies declared `exploratory` in the `study_type` field are
+exempt but produce no Level 2 (Confirmatory) output.
+
+| Rule | Requirement | Rationale |
+|---|---|---|
+| D-1 | ≥ 5 Problem Instances | Minimum for Wilcoxon signed-rank power (statistical-methodology.md §3.4) |
+| D-2 | Instances from ≥ 2 of: low (≤5 dims), medium (6–20), high (>20) | Results must span more than one dimensionality regime to be generalisable |
+| D-3 | ≥ 1 stochastic + ≥ 1 deterministic (`objective.noise_level`) | Noise fundamentally changes algorithm behaviour; both classes must be represented |
+
+These are minimum floors. A study meeting exactly D-1 through D-3 produces the weakest valid
+conclusion. Include more diverse instances whenever compute budget permits.
 
 ---
 

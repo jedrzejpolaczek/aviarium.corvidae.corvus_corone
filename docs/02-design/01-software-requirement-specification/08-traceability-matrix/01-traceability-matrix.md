@@ -93,9 +93,13 @@ NOTE ON C2 CONTAINER COLUMN:
 | CONST-SCI-04 | Anti-pattern 4 | `constraints.md` | UC-01 | FR-15, FR-16 (inspectable analysis) | Defined |
 | CONST-SCI-05 | Anti-pattern 6 | `constraints.md` | UC-01, UC-03 | FR-21 (mandatory limitations section) | Defined |
 | CONST-SCI-06 | Principle 3 | `constraints.md` | UC-01, UC-03 | FR-21 (scoped conclusions) | Defined |
-| CONST-COM-01 | Principle 20 | `constraints.md` | All | License ADR (→ `REF-TASK-0011`) | Pending ADR |
+| CONST-COM-01 | Principle 20 | `constraints.md` | All | CONST-TECH-06 (licensecheck CI gate); ADR-006 | Defined |
 | CONST-COM-02 | Principle 20 | `constraints.md` | UC-01, UC-04 | versioning-governance.md §5 | Defined |
 | CONST-COM-03 | Principle 22 | `constraints.md` | UC-01 Step 10 | FR-22 (open format export) | Defined |
 | CONST-TECH-01 | ADR-001 | `constraints.md` | All | Repository interface design | Defined |
 | CONST-TECH-02 | ADR-001 | `constraints.md` | All | data-format.md §1 | Defined |
 | CONST-TECH-03 | ADR-001 | `constraints.md` | All | FR-17, FR-19 | Defined |
+| CONST-TECH-04 | ADR-006 | `constraints.md` | All | CI Python 3.10/3.11/3.12 matrix | Defined |
+| CONST-TECH-05 | ADR-006 | `constraints.md` | All | CI Linux + macOS blocking; Windows non-blocking | Defined |
+| CONST-TECH-06 | ADR-006 | `constraints.md` | All | licensecheck CI step | Defined |
+| CONST-TECH-07 | ADR-006 | `constraints.md` | All | pyproject.toml dependency declarations | Defined |

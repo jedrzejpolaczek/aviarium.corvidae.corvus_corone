@@ -29,18 +29,37 @@
 
 ---
 
-## Pending Technical Decisions
+## CONST-TECH-04
 
-*(REF-TASK-0011 — each decision below requires an ADR when resolved)*
+**The library MUST support Python 3.10, 3.11, and 3.12. Python 3.9 and earlier MUST NOT be listed as supported. CI MUST run on all three versions and all three must pass before a release.**
 
-| Decision area | Status | Notes |
-|---|---|---|
-| Python version minimum | Pending ADR | Must support the Python versions used by target research environments |
-| OS support targets | Pending ADR | Linux required (HPC/server); Windows and macOS for local development |
-| Dependency restrictions | Pending ADR | Avoid GPL-only dependencies if MIT/Apache license is targeted |
-| Execution platform targets | Pending ADR | Local multiprocessing (V1); HPC/Cloud (V2 Horizon) |
+- Source: ADR-006
+- Connects to: `docs/02-design/02-architecture/01-adr/adr-006-python-version-and-platform-constraints.md`
+
+## CONST-TECH-05
+
+**Linux (x86-64) and macOS (arm64 and x86-64) are the primary supported platforms; CI failures on either are release blockers. Windows (x86-64) is supported on a best-effort basis; CI runs on Windows but failures are non-blocking.**
+
+- Source: ADR-006
+- Connects to: `docs/02-design/02-architecture/01-adr/adr-006-python-version-and-platform-constraints.md`
+
+## CONST-TECH-06
+
+**The runtime dependency tree MUST NOT include packages distributed under GPL-2.0-only, GPL-3.0-only, AGPL-3.0, or equivalent copyleft licenses that would make the combined work GPL. Permissive licenses (MIT, BSD-2-Clause, BSD-3-Clause, Apache-2.0, ISC, PSF-2.0) and LGPL with dynamic linking are permitted. A `licensecheck` step in CI MUST fail the build if a GPL-only dependency is introduced.**
+
+- Source: ADR-006; CONST-COM-01
+- Connects to: `docs/02-design/02-architecture/01-adr/adr-006-python-version-and-platform-constraints.md`; `docs/02-design/01-software-requirement-specification/05-constraints/03-const-community.md` CONST-COM-01
+
+## CONST-TECH-07
+
+**The core runtime dependency set is: `numpy>=1.24`, `scipy>=1.11`, `pydantic>=2.0`, `click>=8.1`, `matplotlib>=3.7`. No runtime dependency may be added without an ADR or a documented justification in the PR description. Pydantic v1 compatibility is explicitly NOT maintained.**
+
+- Source: ADR-006
+- Connects to: `docs/02-design/02-architecture/01-adr/adr-006-python-version-and-platform-constraints.md`
+
+---
 
 **Connects to:**
 - `docs/02-design/02-architecture/01-adr/adr-001-library-with-server-ready-data-layer.md` — source of CONST-TECH-01, 02, 03
-- `docs/02-design/02-architecture/01-adr/` — future ADRs for pending decisions
+- `docs/02-design/02-architecture/01-adr/adr-006-python-version-and-platform-constraints.md` — source of CONST-TECH-04, 05, 06, 07
 - `docs/02-design/01-software-requirement-specification/03-functional-requirements/06-fr-4.5-reproducibility-layer.md` — FR-17, FR-19 enforce CONST-TECH-01, CONST-TECH-03

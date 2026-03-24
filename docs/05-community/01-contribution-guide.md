@@ -98,31 +98,56 @@ etc.
 
 ## 3. Adding an Algorithm Implementation
 
-<!--
-  When to contribute a new algorithm:
-    - The algorithm family is not already represented, OR
-    - You have a meaningfully different implementation or configuration of an existing algorithm
+**When to contribute:**
+- The algorithm family is not already represented in the Algorithm Registry, OR
+- You have a meaningfully different implementation or configuration of an existing algorithm
+  (different library, significantly different default hyperparameters, or a variant warranting
+  independent evaluation)
 
-  Requirements — your contribution MUST:
-    - Implement the Algorithm Interface: specs/interface-contracts.md §2
-    - Provide a complete Algorithm Instance record: specs/data-format.md §2.2
-      including: algorithm_family, configuration with justification, known_assumptions
-    - Include a default configuration and document why it is "best reasonable" → Principle 10
-    - Include a sensitivity report: how does performance change when key parameters vary?
-      → Principle 11 (Sensitivity documentation)
-    - Include tests (unit tests for interface compliance, integration test with a simple problem)
-    - Reference the original paper or source for the algorithm concept
+**Requirements — your contribution MUST:**
 
-  Review criteria:
-    - Interface compliance
-    - Configuration justification quality
-    - Declared assumptions are honest (algorithm that assumes continuous space must say so)
-    - Sensitivity report included
-    - Code quality and test coverage
+1. Implement the Algorithm Interface (`docs/03-technical-contracts/02-interface-contracts/` §2)
+   — all methods, all contracts, all cross-cutting requirements.
 
-  After acceptance:
-    → versioning-governance.md §1 for versioning
--->
+2. Provide a complete Algorithm Instance record (`docs/03-technical-contracts/01-data-format/03-algorithm-instance.md` §2.2)
+   including all required fields: `algorithm_family`, `hyperparameters`, `configuration_justification`,
+   `code_reference`, `framework_version`, `known_assumptions`.
+
+3. Document the default configuration and justify why it is "best reasonable"
+   (MANIFESTO Principle 10) — not "library defaults" or "what I tried first".
+
+4. **Include a `sensitivity_report`** (data-format.md §2.2.1) documenting how performance
+   changes when key configuration parameters are varied — this is a mandatory review criterion,
+   not optional. Minimum requirements:
+   - At least 1 Problem Instance used for sensitivity testing
+   - At least 10 repetitions per parameter configuration
+   - At least 3 values tested per parameter
+   - `overall_stability` declared with written `notes`
+   - If `overall_stability = "sensitive"`: `configuration_justification` must explain how
+     the chosen value was determined (MANIFESTO Principle 11)
+
+5. Include tests: unit tests for interface compliance, and one integration test demonstrating
+   the algorithm runs to completion on a simple problem and returns a valid result.
+
+6. Reference the original paper or source for the algorithm concept in the Algorithm Instance
+   record (`source_reference` or `configuration_justification`).
+
+**Review criteria:**
+
+| Criterion | Check type | Notes |
+|---|---|---|
+| Interface compliance | Automated | Fails CI if any interface method missing or contract violated |
+| Algorithm Instance record completeness | Automated | Schema validation against data-format.md §2.2 |
+| `sensitivity_report` present and valid | Automated | Rejected if absent or fails §2.2.1 validation |
+| Configuration justification quality | Human review | "Default settings" is not an acceptable justification |
+| `known_assumptions` honest and complete | Human review | An algorithm that assumes continuous space must declare it; reviewers check against tested problems |
+| Sensitivity level `"sensitive"` accompanied by extended justification | Human review | `overall_stability = "sensitive"` without justification is a blocking review comment |
+| Test coverage | Automated | Unit + integration tests required |
+
+**After acceptance:**
+- Assigned an Algorithm Instance ID and version
+- Enters the versioning pipeline → `docs/05-community/02-versioning-governance.md` §1
+- Listed in the Algorithm Registry with your name in `contributed_by`
 
 ---
 
@@ -258,9 +283,10 @@ etc.
 
   For algorithm contributions:
     [ ] Algorithm Instance record is complete (data-format.md §2.2)
-    [ ] Default configuration is documented with justification
+    [ ] Default configuration is documented with justification (not "library defaults")
     [ ] known_assumptions are honest and complete
-    [ ] Sensitivity report included
+    [ ] sensitivity_report present and passes §2.2.1 validation (min 10 reps/config, min 3 values/param)
+    [ ] If overall_stability = "sensitive": configuration_justification explains the chosen value
 
   For documentation contributions:
     [ ] STORY ROLE comment is accurate and updated

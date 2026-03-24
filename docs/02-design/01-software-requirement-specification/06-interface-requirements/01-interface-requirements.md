@@ -20,9 +20,9 @@ CONNECTS TO:
   → docs/ROADMAP.md                                                    : V2 interfaces are V2 Horizon items
 
 NOTE ON MAPPING STATUS:
-  Field-level format mappings (data-format.md §4) are not yet written.
-  REF-TASK-0005 (COCO), REF-TASK-0006 (Nevergrad), REF-TASK-0007 (IOHprofiler) track this work.
-  This document records the interface requirements; data-format.md §4 will record the field details.
+  Field-level format mappings (data-format.md §4) are complete.
+  REF-TASK-0005 (COCO), REF-TASK-0006 (Nevergrad), REF-TASK-0007 (IOHprofiler) delivered.
+  REF-TASK-0012 delivered — this document is now fully specified.
 -->
 
 ---
@@ -31,10 +31,8 @@ NOTE ON MAPPING STATUS:
 
 | Section | Interface | Direction | Status | File |
 |---|---|---|---|---|
-| §7.1 | COCO Export | Export → COCO | Mapping pending (REF-TASK-0005) | [02-ir-7.1-coco-export.md](02-ir-7.1-coco-export.md) |
-| §7.2 | IOHprofiler Export | Export → IOHprofiler | Mapping pending (REF-TASK-0007) | [03-ir-7.2-iohprofiler-export.md](03-ir-7.2-iohprofiler-export.md) |
-| §7.3 | Nevergrad Algorithm | Import ← Nevergrad | Mapping pending (REF-TASK-0006) | [04-ir-7.3-nevergrad-algorithm.md](04-ir-7.3-nevergrad-algorithm.md) |
+| §7.1 | COCO Export | Export → COCO | ✅ Complete | [02-ir-7.1-coco-export.md](02-ir-7.1-coco-export.md) |
+| §7.2 | IOHprofiler Export | Export → IOHprofiler | ✅ Complete | [03-ir-7.2-iohprofiler-export.md](03-ir-7.2-iohprofiler-export.md) |
+| §7.3 | Nevergrad Algorithm | Import ← Nevergrad (bidirectional) | ✅ Complete | [04-ir-7.3-nevergrad-algorithm.md](04-ir-7.3-nevergrad-algorithm.md) |
 | §7.4 | HPC / Cloud Job Submission | Integration → scheduler | V2 Horizon — not in V1 scope | [05-ir-7.4-hpc-cloud.md](05-ir-7.4-hpc-cloud.md) |
 | §7.5 | Artifact Repository Publication | Export → open repository | V1 manual; V2 automated | [06-ir-7.5-artifact-repository.md](06-ir-7.5-artifact-repository.md) |
-
-> **`TODO: REF-TASK-0012`** — Complete field-level format specifications for each interface once `docs/03-technical-contracts/01-data-format.md` §4 mappings are written (blocked on REF-TASK-0005, REF-TASK-0006, REF-TASK-0007).

@@ -97,14 +97,14 @@ class TestStudyLock:
 
     def test_update_raises_study_locked_error(self, locked_study: StudyRecord) -> None:
         """Attempting any modification raises StudyLockedError."""
-        with pytest.raises(StudyLockedError, match=str(locked_study.study_id)):
-            update_study(locked_study, repetitions=99)
+        with pytest.raises(StudyLockedError, match=str(locked_study.id)):
+            update_study(locked_study.id, repetitions=99)
 
     def test_update_does_not_mutate_study(self, locked_study: StudyRecord) -> None:
         """StudyLockedError is raised before any mutation occurs."""
         original_repetitions = locked_study.repetitions
         try:
-            update_study(locked_study, repetitions=99)
+            update_study(locked_study.id, repetitions=99)
         except StudyLockedError:
             pass
         assert locked_study.repetitions == original_repetitions
@@ -128,14 +128,14 @@ class TestPerformanceRecordStrategy:
         self, completed_experiment: ExperimentRecord
     ) -> None:
         for run in completed_experiment.runs:
-            assert run.records, f"Run {run.run_id} has no PerformanceRecords."
+            assert run.records, f"Run {run.id} has no PerformanceRecords."
 
     def test_end_of_run_record_always_present(self, completed_experiment: ExperimentRecord) -> None:
         """ADR-002: end-of-run trigger is mandatory — always fires at budget exhaustion."""
         for run in completed_experiment.runs:
             end_records = _end_of_run_records(run)
             assert end_records, (
-                f"Run {run.run_id}: no end-of-run PerformanceRecord found. "
+                f"Run {run.id}: no end-of-run PerformanceRecord found. "
                 "ADR-002 requires this record to always be written."
             )
 
@@ -146,7 +146,7 @@ class TestPerformanceRecordStrategy:
         for run in completed_experiment.runs:
             end_records = _end_of_run_records(run)
             assert end_records[-1].evaluation_number == locked_study.budget, (
-                f"Run {run.run_id}: end-of-run record not at budget "
+                f"Run {run.id}: end-of-run record not at budget "
                 f"(expected eval {locked_study.budget})."
             )
 
@@ -163,7 +163,7 @@ class TestPerformanceRecordStrategy:
             recorded_evals = {r.evaluation_number for r in run.records}
             missing = expected_schedule - recorded_evals
             assert not missing, (
-                f"Run {run.run_id}: missing scheduled checkpoint(s) {sorted(missing)}. "
+                f"Run {run.id}: missing scheduled checkpoint(s) {sorted(missing)}. "
                 "ADR-002 requires all {1,2,5}×10^i evaluations to have records."
             )
 
@@ -174,7 +174,7 @@ class TestPerformanceRecordStrategy:
         for run in completed_experiment.runs:
             evals = [r.evaluation_number for r in run.records]
             assert evals == sorted(set(evals)), (
-                f"Run {run.run_id}: evaluation_numbers are not strictly increasing or "
+                f"Run {run.id}: evaluation_numbers are not strictly increasing or "
                 f"contain duplicates: {evals}"
             )
 
@@ -185,7 +185,7 @@ class TestPerformanceRecordStrategy:
         for run in completed_experiment.runs:
             for rec in run.records:
                 assert rec.trigger_reason in VALID_TRIGGER_REASONS, (
-                    f"Run {run.run_id}, eval {rec.evaluation_number}: "
+                    f"Run {run.id}, eval {rec.evaluation_number}: "
                     f"invalid trigger_reason '{rec.trigger_reason}'. "
                     f"Valid values: {VALID_TRIGGER_REASONS}"
                 )
@@ -198,7 +198,7 @@ class TestPerformanceRecordStrategy:
             for rec in run.records:
                 has_improvement_trigger = has_trigger(rec, "improvement")
                 assert rec.is_improvement == has_improvement_trigger, (
-                    f"Run {run.run_id}, eval {rec.evaluation_number}: "
+                    f"Run {run.id}, eval {rec.evaluation_number}: "
                     f"is_improvement={rec.is_improvement} inconsistent with "
                     f"trigger_reason='{rec.trigger_reason}'."
                 )
@@ -209,7 +209,7 @@ class TestPerformanceRecordStrategy:
             prev = float("inf")
             for rec in run.records:
                 assert rec.best_so_far <= prev + 1e-9, (
-                    f"Run {run.run_id}, eval {rec.evaluation_number}: "
+                    f"Run {run.id}, eval {rec.evaluation_number}: "
                     f"best_so_far increased from {prev} to {rec.best_so_far}."
                 )
                 prev = rec.best_so_far
@@ -388,7 +388,7 @@ class TestStorageCap:
         """Without max_records_per_run, cap_reached_at_evaluation must be None."""
         for run in completed_experiment.runs:
             assert run.cap_reached_at_evaluation is None, (
-                f"Run {run.run_id}: cap_reached_at_evaluation is set but "
+                f"Run {run.id}: cap_reached_at_evaluation is set but "
                 "max_records_per_run was not configured."
             )
 
@@ -433,8 +433,7 @@ class TestReproducibility:
         """UC-01 F4: no two Runs in the same Experiment may use the same seed."""
         seeds = [run.seed for run in completed_experiment.runs]
         assert len(seeds) == len(set(seeds)), (
-            f"Seed collision detected in experiment {completed_experiment.experiment_id}. "
-            f"Seeds: {seeds}"
+            f"Seed collision detected in experiment {completed_experiment.id}. Seeds: {seeds}"
         )
 
     def test_same_seed_produces_identical_records(self, locked_study: StudyRecord) -> None:
@@ -520,7 +519,7 @@ class TestUC01Postconditions:
 
     def test_all_runs_completed_successfully(self, completed_experiment: ExperimentRecord) -> None:
         failed = [r for r in completed_experiment.runs if r.status != "completed"]
-        assert not failed, f"{len(failed)} run(s) did not complete: {[r.run_id for r in failed]}"
+        assert not failed, f"{len(failed)} run(s) did not complete: {[r.id for r in failed]}"
 
     def test_result_aggregates_exist_for_every_problem_algorithm_pair(
         self,
@@ -613,7 +612,7 @@ class TestUC01Postconditions:
         self, completed_experiment: ExperimentRecord, locked_study: StudyRecord
     ) -> None:
         """Experiment is traceable to its Study (data-format.md §2.4)."""
-        assert completed_experiment.study_id == locked_study.study_id
+        assert completed_experiment.study_id == locked_study.id
 
     def test_all_runs_reference_valid_problem_and_algorithm_ids(
         self, completed_experiment: ExperimentRecord, locked_study: StudyRecord
@@ -621,10 +620,10 @@ class TestUC01Postconditions:
         """Every RunRecord must reference a problem and algorithm declared in the Study."""
         for run in completed_experiment.runs:
             assert run.problem_id in locked_study.problem_ids, (
-                f"Run {run.run_id}: problem_id '{run.problem_id}' not in Study."
+                f"Run {run.id}: problem_id '{run.problem_id}' not in Study."
             )
             assert run.algorithm_id in locked_study.algorithm_ids, (
-                f"Run {run.run_id}: algorithm_id '{run.algorithm_id}' not in Study."
+                f"Run {run.id}: algorithm_id '{run.algorithm_id}' not in Study."
             )
 
 

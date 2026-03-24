@@ -74,7 +74,7 @@ class PerformanceRecord:
 class RunRecord:
     """data-format.md §2.5 — one Run (single problem × algorithm × seed)."""
 
-    run_id: str
+    id: str
     problem_id: str
     algorithm_id: str
     seed: int
@@ -89,7 +89,7 @@ class RunRecord:
 class StudyRecord:
     """data-format.md §2.3 — locked before Experiment begins (MANIFESTO Principle 16)."""
 
-    study_id: str
+    id: str
     name: str
     research_question: str
     problem_ids: list[str]
@@ -109,10 +109,14 @@ class StudyRecord:
 class ExperimentRecord:
     """data-format.md §2.4 — produced by the Runner."""
 
-    experiment_id: str
+    id: str
     study_id: str
     runs: list[RunRecord] = field(default_factory=list)
     status: str = "completed"
+
+    @property
+    def run_ids(self) -> list[str]:
+        return [r.id for r in self.runs]
 
 
 @dataclass
@@ -755,7 +759,7 @@ class MinimalRunner:
         meta = problem.get_metadata()
         alg_meta = algorithm.get_metadata()
         return RunRecord(
-            run_id=f"run-{meta['id']}-{alg_meta['id']}-seed{seed}",
+            id=f"run-{meta['id']}-{alg_meta['id']}-seed{seed}",
             problem_id=str(meta["id"]),
             algorithm_id=str(alg_meta["id"]),
             seed=seed,
@@ -805,8 +809,8 @@ class MinimalRunner:
                     runs.append(run)
 
         return ExperimentRecord(
-            experiment_id=f"exp-{self._study.study_id}",
-            study_id=self._study.study_id,
+            id=f"exp-{self._study.id}",
+            study_id=self._study.id,
             runs=runs,
             status="completed",
         )
@@ -872,7 +876,7 @@ def create_study(
         A locked study record (status == "locked").
     """
     return StudyRecord(
-        study_id=study_id,
+        id=study_id,
         name=name,
         research_question=research_question,
         problem_ids=problem_ids,
@@ -889,13 +893,13 @@ def create_study(
     )
 
 
-def update_study(study: StudyRecord, **kwargs: Any) -> None:
-    """Attempt to update a Study field — raises StudyLockedError if locked (UC-01 F3).
+def update_study(study_id: str, **kwargs: Any) -> None:
+    """Attempt to update a Study field — raises StudyLockedError (UC-01 F3).
 
     Parameters
     ----------
-    study:
-        The StudyRecord to modify.
+    study_id:
+        The ID of the StudyRecord to modify.
     **kwargs:
         Fields to update.
 
@@ -904,10 +908,7 @@ def update_study(study: StudyRecord, **kwargs: Any) -> None:
     StudyLockedError
         Always, because create_study() always returns a locked study.
     """
-    if study.status == "locked":
-        raise StudyLockedError(f"Study {study.study_id} is locked. Modification attempt recorded.")
-    for k, v in kwargs.items():
-        setattr(study, k, v)
+    raise StudyLockedError(f"Study {study_id} is locked. Modification attempt recorded.")
 
 
 # ---------------------------------------------------------------------------
@@ -1011,7 +1012,7 @@ def generate_reports(
     return [
         Report(
             report_type=report_type,
-            experiment_id=experiment.experiment_id,
+            experiment_id=experiment.id,
             has_limitations_section=True,
             limitations=limitations,
             confirmatory_results=[],

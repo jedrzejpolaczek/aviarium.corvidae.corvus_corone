@@ -291,7 +291,7 @@ class IOHExporter:
                                     "y": best_y,
                                 },
                                 "corvus_seed": run.seed,
-                                "corvus_run_id": run.run_id,
+                                "corvus_run_id": run.id,
                             }
                         )
 

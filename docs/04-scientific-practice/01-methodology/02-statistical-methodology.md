@@ -56,10 +56,11 @@ Post-hoc hypothesis selection — choosing what to test after seeing the data �
 | 2 | Confirmatory Analysis | Pre-registered hypotheses + Level 1 data | Formal accept/reject decisions with quantified uncertainty (p-values, confidence intervals) |
 | 3 | Practical Significance | Level 2 results | Effect sizes and practitioner-readable interpretation of whether differences matter |
 
-> **`TODO: REF-TASK-0019`** — Specify the exact required visualizations for Level 1 (box plots,
-> violin plots, ECDFs, performance curves) once the reporting module is designed. Owner: analysis
-> lead. Acceptance: system automatically generates all required Level 1 visualizations from
-> Run data with no additional configuration from the researcher.
+> **`REF-TASK-0019`** — Level 1 required visualizations specified. See
+> `docs/02-design/02-architecture/03-c4-leve2-containers/03-report-format-spec.md`
+> (§Mandatory Visualizations): VIZ-L1-01 box plot, VIZ-L1-02 convergence curves,
+> VIZ-L1-03 ECDF (`plt.step(where='post')`), VIZ-L1-04 violin (n > 50). All are
+> auto-generated from Run data with no researcher configuration.
 
 > **`TODO: REF-TASK-0020`** — Specify the statistical test selection procedure for Level 2
 > (decision tree: parametric vs non-parametric, paired vs unpaired, multiple testing correction).

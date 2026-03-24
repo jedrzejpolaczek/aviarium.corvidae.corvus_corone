@@ -73,7 +73,7 @@ Six milestones group all open documentation and design tasks.
 
 ### Architecture — post-implementation specs
 - [x] **[REF-TASK-0033] Specify CLI experience** — synopsis, arguments, example terminal output, exit codes for all `corvus` commands; document from working IMPL-017
-- [ ] **[REF-TASK-0034] Specify report output format** — Practitioner and Researcher report sections, mandatory visualizations, audience language; document from working IMPL-014/015
+- [x] **[REF-TASK-0034] Specify report output format** — Practitioner and Researcher report sections, mandatory visualizations, audience language; document from working IMPL-014/015
 - [ ] **[REF-TASK-0035] Add competitive differentiation statement to SRS §2** — 3–6 sentences grounded in MANIFESTO principles; frames Corvus Corone as complementary to COCO/Nevergrad/IOHprofiler
 
 ---
@@ -86,7 +86,7 @@ Six milestones group all open documentation and design tasks.
 - [ ] **[REF-TASK-0020] Statistical test selection procedure** — decision tree: Wilcoxon (2 algorithms) vs Kruskal-Wallis + Holm-Bonferroni (>2); document in `statistical-methodology.md §3`
 - [ ] **[REF-TASK-0021] Problem instance diversity minimum requirements** — quantitative floor (ADR-008 *(planned)* candidate: ≥5 instances, ≥2 dimensionality ranges, ≥1 noise + ≥1 deterministic)
 - [ ] **[REF-TASK-0022] Algorithm sensitivity documentation format** — `SensitivityReport` schema field in `AlgorithmInstance`; requires `data-format.md §2.2`
-- [ ] **[REF-TASK-0019] Level 1 required visualizations** — mandatory EDA set (boxplot, convergence curves, ECDF, violin); document in `statistical-methodology.md §2`
+- [x] **[REF-TASK-0019] Level 1 required visualizations** — mandatory EDA set (boxplot, convergence curves, ECDF, violin); document in `statistical-methodology.md §2`
 - [ ] **[REF-TASK-0015] Metric implementation references** — link each metric definition to `corvus_corone/analysis/metrics.py`; fulfilled as part of IMPL-011
 - [ ] **[REF-TASK-0014] Metric taxonomy extensions** *(Post-V1)* — new metrics after first real studies
 - [ ] **[REF-TASK-0018] Research question archetypes** *(Post-V1)* — Metric Selection Guide additions from real study patterns

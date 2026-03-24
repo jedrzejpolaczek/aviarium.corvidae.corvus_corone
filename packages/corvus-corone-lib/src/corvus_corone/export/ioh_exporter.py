@@ -24,6 +24,7 @@ Format version
 v0.3.3+ ("new" format): unquoted column headers, JSON sidecar.
 IOHanalyzer auto-detects this format when the .json sidecar is present.
 """
+
 from __future__ import annotations
 
 import json
@@ -31,7 +32,6 @@ import re
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
-
 
 # ---------------------------------------------------------------------------
 # Public dataclass for caller-supplied metadata
@@ -206,15 +206,11 @@ class IOHExporter:
         # Nested dict: alg_id → prob_id → list[RunRecord]
         grouped: dict[str, dict[str, list[Any]]] = {}
         for run in experiment.runs:
-            grouped.setdefault(run.algorithm_id, {}).setdefault(
-                run.problem_id, []
-            ).append(run)
+            grouped.setdefault(run.algorithm_id, {}).setdefault(run.problem_id, []).append(run)
 
         # ── write files ─────────────────────────────────────────────────────
         has_maximization = False
         has_missing_solution = False
-        has_scheduled_only = False
-        has_elapsed_time = False
         has_failed_runs = False
         has_cap_reached = False
 
@@ -267,27 +263,18 @@ class IOHExporter:
                             # Use best_so_far if available, fall back to objective_value
                             raw_y = getattr(rec, "best_so_far", rec.objective_value)
 
-                            if best_y is None or (
-                                pmeta.maximization and raw_y > best_y
-                            ) or (
-                                not pmeta.maximization and raw_y < best_y
+                            if (
+                                best_y is None
+                                or (pmeta.maximization and raw_y > best_y)
+                                or (not pmeta.maximization and raw_y < best_y)
                             ):
                                 best_y = raw_y
                                 best_eval = rec.evaluation_number
-
-                            if getattr(rec, "elapsed_time", 0.0) > 0.0:
-                                has_elapsed_time = True
 
                             fh.write(f"{rec.evaluation_number} {raw_y:.10f}\n")
 
                             if getattr(rec, "current_solution", None) is None:
                                 has_missing_solution = True
-
-                            trigger = getattr(rec, "trigger_reason", "")
-                            if trigger in ("scheduled",) and not getattr(
-                                rec, "is_improvement", True
-                            ):
-                                has_scheduled_only = True
 
                             if getattr(rec, "cap_reached_at_evaluation", None) is not None:
                                 has_cap_reached = True
@@ -311,9 +298,7 @@ class IOHExporter:
                 sidecar["scenarios"].append(
                     {
                         "dimension": dim,
-                        "path": str(
-                            dat_path.relative_to(alg_folder).as_posix()
-                        ),
+                        "path": str(dat_path.relative_to(alg_folder).as_posix()),
                         "runs": run_summaries,
                     }
                 )
@@ -324,10 +309,7 @@ class IOHExporter:
             for prob_id in prob_runs:
                 pmeta = _get_problem_meta(prob_id)
                 safe_name = _safe(pmeta.func_name)
-                sidecar_path = (
-                    alg_folder
-                    / f"IOHprofiler_f{pmeta.func_id}_{safe_name}.json"
-                )
+                sidecar_path = alg_folder / f"IOHprofiler_f{pmeta.func_id}_{safe_name}.json"
                 # Filter sidecar scenarios to this problem only
                 prob_sidecar = {
                     **sidecar,
@@ -337,14 +319,10 @@ class IOHExporter:
                     "scenarios": [
                         s
                         for s in sidecar["scenarios"]
-                        if s["path"].startswith(
-                            f"data_f{pmeta.func_id}_{safe_name}/"
-                        )
+                        if s["path"].startswith(f"data_f{pmeta.func_id}_{safe_name}/")
                     ],
                 }
-                sidecar_path.write_text(
-                    json.dumps(prob_sidecar, indent=2), encoding="utf-8"
-                )
+                sidecar_path.write_text(json.dumps(prob_sidecar, indent=2), encoding="utf-8")
 
         # ── build manifest ───────────────────────────────────────────────────
         manifest.insert(

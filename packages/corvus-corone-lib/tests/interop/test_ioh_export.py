@@ -16,14 +16,13 @@ Interface contract : docs/03-technical-contracts/01-data-format/11-interoperabil
 Exporter           : corvus_corone/export/ioh_exporter.py
 Stubs              : tests/e2e/_stubs.py
 """
+
 from __future__ import annotations
 
 import json
 from pathlib import Path
 
 import pytest
-
-from corvus_corone.export.ioh_exporter import AlgorithmMeta, IOHExporter, ProblemMeta
 from tests.e2e._stubs import (
     ExperimentRecord,
     MinimalRunner,
@@ -33,6 +32,7 @@ from tests.e2e._stubs import (
     create_study,
 )
 
+from corvus_corone.export.ioh_exporter import AlgorithmMeta, IOHExporter, ProblemMeta
 
 # ---------------------------------------------------------------------------
 # Fixtures
@@ -133,9 +133,7 @@ def _parse_dat(dat_path: Path) -> list[list[tuple[int, float]]]:
 
 
 class TestDatFileFormat:
-    def test_dat_file_exists(
-        self, small_experiment: ExperimentRecord, tmp_path: Path
-    ) -> None:
+    def test_dat_file_exists(self, small_experiment: ExperimentRecord, tmp_path: Path) -> None:
         """AC-2: .dat file is created at the expected path."""
         IOHExporter().export(
             small_experiment,
@@ -170,7 +168,7 @@ class TestDatFileFormat:
             if not tokens or tokens[0] == "evaluations":
                 continue
             assert len(tokens) == 2, f"Expected 2 columns, got {len(tokens)}: {line!r}"
-            int(tokens[0])   # must not raise
+            int(tokens[0])  # must not raise
             float(tokens[1])  # must not raise
 
     def test_dat_contains_correct_run_count(
@@ -219,9 +217,7 @@ class TestDatFileFormat:
 
 
 class TestJsonSidecar:
-    def test_sidecar_exists(
-        self, small_experiment: ExperimentRecord, tmp_path: Path
-    ) -> None:
+    def test_sidecar_exists(self, small_experiment: ExperimentRecord, tmp_path: Path) -> None:
         """AC-3: .json sidecar is created at the expected path."""
         IOHExporter().export(
             small_experiment, tmp_path, problem_meta=PROB_META, algorithm_meta=ALG_META
@@ -247,23 +243,24 @@ class TestJsonSidecar:
         IOHExporter().export(
             small_experiment, tmp_path, problem_meta=PROB_META, algorithm_meta=ALG_META
         )
-        data = json.loads(
-            (tmp_path / "alg-001" / "IOHprofiler_f1_NoisySphere2D.json").read_text()
-        )
-        for field in ("version", "function_id", "function_name", "maximization",
-                      "algorithm", "attributes", "scenarios"):
+        data = json.loads((tmp_path / "alg-001" / "IOHprofiler_f1_NoisySphere2D.json").read_text())
+        for field in (
+            "version",
+            "function_id",
+            "function_name",
+            "maximization",
+            "algorithm",
+            "attributes",
+            "scenarios",
+        ):
             assert field in data, f"Required field '{field}' missing from sidecar"
 
-    def test_sidecar_stores_seed(
-        self, small_experiment: ExperimentRecord, tmp_path: Path
-    ) -> None:
+    def test_sidecar_stores_seed(self, small_experiment: ExperimentRecord, tmp_path: Path) -> None:
         """AC-3: seed is stored in sidecar (not expressible in .dat format)."""
         IOHExporter().export(
             small_experiment, tmp_path, problem_meta=PROB_META, algorithm_meta=ALG_META
         )
-        data = json.loads(
-            (tmp_path / "alg-001" / "IOHprofiler_f1_NoisySphere2D.json").read_text()
-        )
+        data = json.loads((tmp_path / "alg-001" / "IOHprofiler_f1_NoisySphere2D.json").read_text())
         runs = data["scenarios"][0]["runs"]
         for run_entry in runs:
             assert "corvus_seed" in run_entry, "corvus_seed missing from sidecar run entry"
@@ -276,9 +273,7 @@ class TestJsonSidecar:
         IOHExporter().export(
             small_experiment, tmp_path, problem_meta=PROB_META, algorithm_meta=ALG_META
         )
-        data = json.loads(
-            (tmp_path / "alg-001" / "IOHprofiler_f1_NoisySphere2D.json").read_text()
-        )
+        data = json.loads((tmp_path / "alg-001" / "IOHprofiler_f1_NoisySphere2D.json").read_text())
         for run_entry in data["scenarios"][0]["runs"]:
             assert "corvus_run_id" in run_entry
 
@@ -289,9 +284,7 @@ class TestJsonSidecar:
         IOHExporter().export(
             small_experiment, tmp_path, problem_meta=PROB_META, algorithm_meta=ALG_META
         )
-        data = json.loads(
-            (tmp_path / "alg-001" / "IOHprofiler_f1_NoisySphere2D.json").read_text()
-        )
+        data = json.loads((tmp_path / "alg-001" / "IOHprofiler_f1_NoisySphere2D.json").read_text())
         assert data["algorithm"]["name"] == "RandomSearch"
 
     def test_sidecar_run_count_matches_experiment(
@@ -301,12 +294,8 @@ class TestJsonSidecar:
         IOHExporter().export(
             small_experiment, tmp_path, problem_meta=PROB_META, algorithm_meta=ALG_META
         )
-        data = json.loads(
-            (tmp_path / "alg-001" / "IOHprofiler_f1_NoisySphere2D.json").read_text()
-        )
-        completed = sum(
-            1 for r in small_experiment.runs if r.status != "failed"
-        )
+        data = json.loads((tmp_path / "alg-001" / "IOHprofiler_f1_NoisySphere2D.json").read_text())
+        completed = sum(1 for r in small_experiment.runs if r.status != "failed")
         assert len(data["scenarios"][0]["runs"]) == completed
 
 

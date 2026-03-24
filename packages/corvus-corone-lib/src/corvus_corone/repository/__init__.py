@@ -23,6 +23,7 @@ from corvus_corone.repository.interfaces import (
     RunRepository,
     StudyRepository,
 )
+from corvus_corone.repository.local_file import LocalFileRepository
 
 __all__ = [
     "ProblemRepository",
@@ -34,4 +35,5 @@ __all__ = [
     "ReportRepository",
     "RepositoryFactory",
     "InMemoryRepositoryFactory",
+    "LocalFileRepository",
 ]

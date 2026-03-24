@@ -15,6 +15,7 @@ Requires
 Nevergrad is an optional dependency. The import is deferred to initialize() so
 that importing this module does not fail when nevergrad is not installed.
 """
+
 from __future__ import annotations
 
 from collections import deque
@@ -98,8 +99,7 @@ class NevergradAdapter:
             import nevergrad as ng
         except ImportError as exc:
             raise ImportError(
-                "nevergrad is required for NevergradAdapter. "
-                "Install it with: pip install nevergrad"
+                "nevergrad is required for NevergradAdapter. Install it with: pip install nevergrad"
             ) from exc
 
         params: dict[str, Any] = {}
@@ -111,10 +111,7 @@ class NevergradAdapter:
                 params[name] = ng.p.Scalar(lower=float(lo), upper=float(hi))
             elif vtype == "integer":
                 lo, hi = var["bounds"]
-                params[name] = (
-                    ng.p.Scalar(lower=float(lo), upper=float(hi))
-                    .set_integer_casting()
-                )
+                params[name] = ng.p.Scalar(lower=float(lo), upper=float(hi)).set_integer_casting()
             elif vtype == "categorical":
                 params[name] = ng.p.Choice(var["choices"])
             else:
@@ -148,9 +145,7 @@ class NevergradAdapter:
         for _ in range(batch_size):
             candidate = self._optimizer.ask()
             self._pending.append(candidate)
-            solutions.append(
-                [candidate.kwargs[name] for name in self._variable_order]
-            )
+            solutions.append([candidate.kwargs[name] for name in self._variable_order])
         return solutions
 
     # ── Required: tell step ───────────────────────────────────────────────────
@@ -167,11 +162,7 @@ class NevergradAdapter:
         before the ``tell()`` call because Nevergrad always minimizes internally.
         """
         candidate = self._pending.popleft()
-        loss = (
-            result.objective_value
-            if self._objective == "minimize"
-            else -result.objective_value
-        )
+        loss = result.objective_value if self._objective == "minimize" else -result.objective_value
         self._optimizer.tell(candidate, float(loss))
 
     # ── Required: variable type declaration ──────────────────────────────────
@@ -186,15 +177,14 @@ class NevergradAdapter:
         """Return the Algorithm Instance record for registry storage."""
         try:
             import nevergrad
+
             ng_version = nevergrad.__version__
         except ImportError:
             ng_version = "unknown"
 
         assumptions = ["objective is real-valued scalar", "no gradient available"]
         if self._objective == "maximize":
-            assumptions.append(
-                "loss negated internally for maximization (Nevergrad minimizes)"
-            )
+            assumptions.append("loss negated internally for maximization (Nevergrad minimizes)")
 
         return {
             "id": self._id,

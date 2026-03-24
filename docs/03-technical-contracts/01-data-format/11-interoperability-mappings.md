@@ -121,4 +121,100 @@ differ slightly from runs collected natively via `cocoex`.
 
 ## §4.3 Nevergrad
 
-> TODO: REF-TASK-0007 — Nevergrad format mapping spike required before this section can be filled.
+**Direction:** Bidirectional.
+- **Corvus → Nevergrad (adapter):** Corvus runs Nevergrad optimizers via `NevergradAdapter`,
+  translating the Corvus ask-tell interface to Nevergrad's native `ask()` / `tell()` API.
+  Described in `corvus_corone/algorithms/adapters/nevergrad_adapter.py` and
+  `docs/06-tutorials/03-nevergrad-adapter.md`.
+- **Corvus → Nevergrad log format (export):** Corvus `PerformanceRecord`s can be serialized
+  to the Nevergrad `ParametersLogger` JSON-lines format for downstream analysis with
+  Nevergrad benchmark tooling.
+
+**Supported Nevergrad version:** 1.0.x (current stable as of 2026-03-24; `nevergrad==1.0.12`).
+Nevergrad uses PEP 440 semantic versioning. The ask-tell interface (`ask()`, `tell()`,
+`provide_recommendation()`) has been stable across the 0.x series and is not expected to
+break within 1.x.
+
+### §4.3.1 SearchSpace → Nevergrad parametrization mapping
+
+Nevergrad optimizers receive a `parametrization` object at construction time. `NevergradAdapter`
+builds a `ng.p.Dict` from the Corvus `SearchSpace`, mapping each variable type as follows:
+
+| Corvus variable type | Nevergrad class | Constructor call |
+|---|---|---|
+| `continuous` | `ng.p.Scalar` | `ng.p.Scalar(lower=float(lo), upper=float(hi))` |
+| `integer` | `ng.p.Scalar` + `.set_integer_casting()` | `ng.p.Scalar(lower=float(lo), upper=float(hi)).set_integer_casting()` |
+| `categorical` (unordered) | `ng.p.Choice` | `ng.p.Choice(choices)` |
+
+**Categorical ordering note:** All Corvus `categorical` variables are mapped to `ng.p.Choice`
+(non-deterministic softmax selection). If the variable is ordinally ordered (e.g., `[1, 2, 4, 8]`
+layer counts), `ng.p.TransitionChoice` would produce better optimization trajectories, but
+this distinction is not expressed in the Corvus `variables` schema — see **LOSS-NG-05**.
+
+**Seeding:** `parametrization.random_state.seed(seed)` is called with the Runner-injected seed
+before the optimizer is constructed. This satisfies the §6 randomness isolation contract.
+
+### §4.3.2 Corvus Algorithm Instance → Nevergrad optimizer fields
+
+| Corvus Field | Nevergrad concept | Notes |
+|---|---|---|
+| `AlgorithmInstance.algorithm_family` | `optimizer_name` key in `ng.optimizers.registry` | The registry key is the exact string passed to `NevergradAdapter(optimizer_name=...)`. |
+| `AlgorithmInstance.framework_version` | `nevergrad.__version__` | Retrieved at `get_metadata()` time. Version-pinned in `code_reference` as `nevergrad==<version>`. |
+| `AlgorithmInstance.hyperparameters["budget"]` | `budget` constructor arg | Must match Study budget so that budget-adaptive optimizers (e.g. NGOpt) can tune their internal strategy. |
+| `AlgorithmInstance.hyperparameters["optimizer_name"]` | `ng.optimizers.registry` key | Redundant with `algorithm_family`; stored for explicitness. |
+| `AlgorithmInstance.hyperparameters[*]` | Additional constructor kwargs | Any extra keys are forwarded to the optimizer constructor as `**hyperparameters`. |
+| `AlgorithmInstance.known_assumptions` | Not represented | Nevergrad does not have a concept of declared assumptions; stored in Corvus only. |
+
+### §4.3.3 Corvus → Nevergrad log format field mapping
+
+When exporting Corvus `PerformanceRecord`s to the Nevergrad `ParametersLogger` JSON-lines
+format (one JSON object per `tell()` call):
+
+| Corvus Field | Nevergrad JSON field | Notes / Losses |
+|---|---|---|
+| `PerformanceRecord.evaluation_number` | `#num-tell` | Approximate: Nevergrad counts tells since logger registration; Corvus evaluation_number is 1-indexed from Run start. Exact if logger registered before the first tell. |
+| `PerformanceRecord.objective_value` | `#loss` | For minimization: exact. For maximization: `#loss` is negated (`-objective_value`); see **LOSS-NG-01**. |
+| `PerformanceRecord.current_solution` | `{variable_name}` fields | Exported as named fields when `current_solution` is present. If `current_solution` is absent, variable fields are omitted — see **LOSS-NG-02**. |
+| `PerformanceRecord.elapsed_time` | Not represented | No equivalent in Nevergrad JSON-lines format. See **LOSS-NG-03**. |
+| `PerformanceRecord.is_improvement` | Not represented | Nevergrad does not annotate tell records with improvement status. See **LOSS-NG-04**. |
+| `Run.seed` | `#session` (proxy) | `#session` is the logger initialization timestamp, not a seed. The seed is not stored in the Nevergrad format. See **LOSS-NG-06**. |
+| `AlgorithmInstance.name` | `#optimizer` | Nevergrad writes the optimizer class name; `AlgorithmInstance.name` is a human-readable label that may differ. |
+| `AlgorithmInstance.algorithm_family` | `#parametrization` | Nevergrad writes the parametrization class name (`Dict`), not the optimizer family. **LOSS-NG-07**. |
+
+### §4.3.4 Information-loss manifest
+
+Each `export(experiment, "nevergrad")` call returns an `information_loss_manifest` list.
+
+| Manifest Key | Severity | Condition | Description |
+|---|---|---|---|
+| `LOSS-NG-01` | warning | `ProblemInstance.objective.type == "maximize"` | Nevergrad minimizes internally; exported `#loss` values are negated. Downstream Nevergrad benchmark tools that interpret `#loss` as the raw objective will read inverted values. |
+| `LOSS-NG-02` | informational | Any `PerformanceRecord.current_solution` is absent | Variable-value fields in the JSON-lines record are omitted. Nevergrad scatter-plot analyses of the decision space are unavailable for those records. |
+| `LOSS-NG-03` | informational | Always | `PerformanceRecord.elapsed_time` has no Nevergrad JSON-lines equivalent; not exported. |
+| `LOSS-NG-04` | informational | Always | `PerformanceRecord.is_improvement` has no Nevergrad JSON-lines equivalent; not exported. Improvement-annotated analyses using Nevergrad tooling are unavailable. |
+| `LOSS-NG-05` | informational | Any `categorical` variable that is ordinally ordered | Corvus `categorical` maps to `ng.p.Choice` (unordered). If the variable is ordinal, `ng.p.TransitionChoice` would yield better optimizer trajectories but cannot be inferred from Corvus schema alone. Re-run the adapter with a custom parametrization to capture this. |
+| `LOSS-NG-06` | informational | Always | Corvus `Run.seed` is not stored in the Nevergrad log format. The `#session` field records logger init time, not the seed. Reproducibility from the Nevergrad log alone is not possible without the Corvus Run record. |
+| `LOSS-NG-07` | informational | Always | `#parametrization` records the `ng.p.Dict` class name, not `AlgorithmInstance.algorithm_family`. Nevergrad benchmark grouping by algorithm family requires post-processing against the Corvus Algorithm Instance record. |
+
+### §4.3.5 Adapter → Corvus import direction
+
+Nevergrad results produced *natively* (i.e., outside Corvus) can be imported into Corvus
+`PerformanceRecord`s by reading the `ParametersLogger` JSON-lines file. The reverse mapping:
+
+| Nevergrad JSON field | Corvus Field | Notes |
+|---|---|---|
+| `#num-tell` | `PerformanceRecord.evaluation_number` | Direct. |
+| `#loss` | `PerformanceRecord.objective_value` | Negate if problem is `maximize`. |
+| `{variable_name}` | `PerformanceRecord.current_solution[variable_name]` | Reconstruct from named fields. |
+| `#optimizer` | `AlgorithmInstance.algorithm_family` (proxy) | Exact class name; may differ from human-readable family label. |
+
+Fields with no Nevergrad equivalent (`elapsed_time`, `is_improvement`, `trigger_reason`,
+`run_id`) are set to sensible defaults (`elapsed_time=0.0`, `is_improvement` recomputed
+from `best_so_far` sequence, `trigger_reason="tell"`, `run_id` assigned on import).
+
+### §4.3.6 Version compatibility
+
+| Nevergrad version | Supported | Notes |
+|---|---|---|
+| `nevergrad` ≥ 1.0 | Yes | Reference implementation; `ask()` / `tell()` API stable |
+| `nevergrad` 0.x | Yes (best-effort) | Ask-tell API present from early 0.x; `ng.p.Dict` available since 0.4.x |
+| `nevergrad` < 0.4 | No | Pre-`ng.p` parametrization API not supported |

@@ -12,6 +12,11 @@ dependencies = [
 	"matplotlib>=3.9",
 ]
 
+[project.optional-dependencies]
+# Install adapters for specific third-party optimizer libraries.
+# None of these are required for core Corvus functionality.
+nevergrad = ["nevergrad>=1.0"]
+
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"

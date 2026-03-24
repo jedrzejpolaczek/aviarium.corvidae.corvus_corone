@@ -62,10 +62,7 @@ Post-hoc hypothesis selection — choosing what to test after seeing the data �
 > VIZ-L1-03 ECDF (`plt.step(where='post')`), VIZ-L1-04 violin (n > 50). All are
 > auto-generated from Run data with no researcher configuration.
 
-> **`TODO: REF-TASK-0020`** — Specify the statistical test selection procedure for Level 2
-> (decision tree: parametric vs non-parametric, paired vs unpaired, multiple testing correction).
-> Owner: methodology lead. Acceptance: documented in §3 of this file with references to
-> Bartz-Beielstein et al. (2020) and implemented in the Analyzer interface.
+> **`REF-TASK-0020`** — Test selection procedure and multiple testing correction documented in §3.
 
 ---
 
@@ -104,50 +101,214 @@ Post-hoc hypothesis selection — choosing what to test after seeing the data �
 
 ## 3. Level 2: Confirmatory Analysis
 
-<!--
-  Purpose:
-    Formally test the pre-registered hypotheses using appropriate statistical tests.
-    Outputs of this level are DECISIONS (reject / fail to reject hypothesis) with quantified uncertainty.
+### 3.1 Preconditions
 
-  ### Test Selection
-  How to choose the right statistical test:
+Only hypotheses listed in `Study.pre_registered_hypotheses` (data-format.md §2.3) may be
+tested here. The test name, α, and correction method must be declared before data collection;
+they are locked with the Study record. Testing a hypothesis not in that list is a post-hoc
+observation (Pitfall 1) and is automatically labeled "exploratory" in the Analyzer output.
 
-  Decision criteria:
-    - Sample size: are there enough runs for parametric tests? (general guideline: n ≥ 30, but context-dependent)
-    - Distribution: is the data approximately normal? (check from Level 1)
-    - Data structure: are comparisons paired (same problem instances) or unpaired?
-    - Number of groups: two algorithms, or multiple?
+---
 
-  Provide a decision tree or table:
-    | Condition                          | Recommended test       | Alternative           |
-    |------------------------------------|------------------------|-----------------------|
-    | Two algorithms, paired, normal     | [test name]            | [non-parametric alt]  |
-    | Two algorithms, paired, non-normal | [non-parametric test]  | [bootstrap method]    |
-    | Multiple algorithms                | [omnibus test]         | [post-hoc adjustment] |
+### 3.2 Data structure in HPO benchmarking: always paired
 
-  Hint: in HPO benchmarking, distributions are often non-normal and sample sizes moderate.
-  Non-parametric tests (Wilcoxon signed-rank, Friedman) are commonly appropriate.
-  → Reference Bartz-Beielstein et al. (2020) for specific guidance.
+HPO benchmarking evaluates all Algorithm Instances on the same set of Problem Instances. This
+is a **paired (blocked) design**: for each Problem Instance $p$, both Algorithm A and
+Algorithm B produce a metric value, and the scientifically relevant quantity is the
+*difference* on that problem.
 
-  ### Multiple Testing Correction
-  When is correction required?
-    - When testing more than one hypothesis in a single study
-    - When selecting the "best" algorithm from k > 2 candidates
+Ignoring the pairing and using independent-samples tests discards the problem-level blocking,
+reduces statistical power, and inflates variance estimates. All test selection below assumes
+the default paired structure. The unpaired path is included for completeness but requires
+explicit justification if used.
 
-  Which correction method to use?
-    Hint: Bonferroni is conservative; Benjamini-Hochberg (BH/FDR) is less conservative.
-    When to prefer each? → this is a methodological decision; document it explicitly.
+---
 
-  ### Significance Threshold
-    What p-value threshold is used? (commonly α = 0.05, but justify your choice)
-    Is the threshold adjusted for multiple testing before or after the test?
-    → This must be declared in the Study's pre_registered_hypotheses before analysis.
+### 3.3 Test selection decision tree
 
-  Output format:
-    For each hypothesis: test name, test statistic, p-value, reject/fail-to-reject, correction applied.
-    Conclusion scope: explicitly state for which problems, algorithms, and budgets this holds.
-    → conclusion_scope field in StatisticalTestResult (specs/interface-contracts.md §4)
--->
+*Implements MANIFESTO Principle 15; reference: Bartz-Beielstein et al. (2020) §4.*
+
+```
+Is the distribution of per-problem metric differences approximately normal?
+(Use Q-Q plots and Shapiro-Wilk from Level 1 to check. n < 30 → assume non-normal.)
+│
+├── YES — and n ≥ 30 runs per algorithm:
+│   ├── 2 algorithms, paired  →  Paired t-test
+│   └── > 2 algorithms        →  Repeated-measures ANOVA
+│                                  → if omnibus p < α: Tukey HSD post-hoc (pairwise)
+│
+└── NO (non-normal) or unknown  [DEFAULT — use this path unless normality is confirmed]
+    ├── 2 algorithms, paired  →  Wilcoxon signed-rank test           [§3.4]
+    └── > 2 algorithms        →  Kruskal-Wallis test (omnibus)       [§3.5]
+                                   → if omnibus p < α: pairwise Wilcoxon signed-rank
+                                     with Holm-Bonferroni correction [§3.6]
+```
+
+**The default path is non-normal / non-parametric.** HPO metric distributions are
+frequently skewed or multi-modal (bounded objectives, success-rate proportions, ECDF areas
+near 0 or 1). Use the parametric path only when Level 1 provides positive evidence of
+normality — not as the default.
+
+---
+
+### 3.4 Wilcoxon signed-rank test (2 algorithms, paired)
+
+**When:** 2 Algorithm Instances, paired design (same Problem Instances), non-normal.
+
+**Null hypothesis H₀:** The distribution of differences $d_p = m_A(p) - m_B(p)$ is
+symmetric about zero, where $m_A(p)$ is the metric value of Algorithm A on Problem Instance
+$p$.
+
+**Procedure:**
+
+1. For each Problem Instance $p \in \{1, \ldots, P\}$, compute $d_p = m_A(p) - m_B(p)$.
+2. Exclude pairs where $d_p = 0$ (tied ranks); record the number excluded.
+3. Rank the absolute differences $|d_p|$; assign average ranks to ties.
+4. Compute $W^+$ (sum of ranks for positive differences) and $W^-$ (sum for negative).
+5. Test statistic: $W = \min(W^+, W^-)$; compare to the Wilcoxon signed-rank distribution
+   (exact for small $P$, normal approximation for $P \geq 25$).
+
+**Minimum sample:** $P \geq 5$ Problem Instances. Below 5, the test lacks sufficient power
+and the result must be labeled "exploratory" regardless of p-value.
+
+**Effect size:** Rank-biserial correlation $r = 1 - \frac{2W}{\frac{P(P+1)}{2}}$.
+Interpretation: $|r| < 0.1$ negligible, $0.1$–$0.3$ small, $0.3$–$0.5$ medium, $> 0.5$
+large (Cohen 1988 thresholds adapted for rank correlations).
+
+Report at Level 3 alongside the p-value.
+
+---
+
+### 3.5 Kruskal-Wallis test (> 2 algorithms, omnibus)
+
+**When:** More than 2 Algorithm Instances, any pairing structure, non-normal.
+
+**Null hypothesis H₀:** All $k$ algorithm metric distributions are identical.
+
+**Procedure:**
+
+1. Pool all $k \times P$ per-problem metric values into a single ranked list.
+2. Compute $H = \frac{12}{N(N+1)} \sum_{i=1}^{k} \frac{R_i^2}{n_i} - 3(N+1)$
+   where $N = kP$, $n_i = P$ (same number of problems per algorithm), $R_i$ is the rank sum
+   for algorithm $i$.
+3. Compare $H$ to $\chi^2$ with $k-1$ degrees of freedom.
+
+**The omnibus test answers: "are these distributions different at all?"** — not which pair
+differs. A non-significant omnibus result terminates Level 2 for that hypothesis set: do not
+proceed to pairwise comparisons.
+
+If omnibus $p < \alpha$: proceed to pairwise post-hoc tests (§3.5.1).
+
+**Effect size for omnibus:** $\eta^2 = \frac{H - k + 1}{N - k}$. Interpretation: $< 0.01$
+negligible, $0.01$–$0.06$ small, $0.06$–$0.14$ medium, $> 0.14$ large.
+
+#### 3.5.1 Post-hoc pairwise comparisons
+
+Conduct pairwise Wilcoxon signed-rank tests for all $\binom{k}{2}$ algorithm pairs. Apply
+**Holm-Bonferroni correction** (§3.6) to the resulting $m = \binom{k}{2}$ p-values.
+
+Report each pairwise result with: uncorrected p-value, corrected p-value, Holm step applied,
+reject/fail-to-reject at corrected α, rank-biserial correlation effect size.
+
+---
+
+### 3.6 Multiple testing correction: Holm-Bonferroni (preferred)
+
+**Required whenever $m > 1$ hypotheses are tested in the same study**, regardless of whether
+they arise from post-hoc pairwise comparisons or from a pre-registered set of distinct
+hypotheses.
+
+**Holm-Bonferroni procedure** (Holm 1979):
+
+1. Compute $m$ p-values $\{p_1, \ldots, p_m\}$. Sort ascending: $p_{(1)} \leq \cdots \leq p_{(m)}$.
+2. For step $i = 1, \ldots, m$: compare $p_{(i)}$ to $\alpha / (m - i + 1)$.
+   - If $p_{(i)} \leq \alpha / (m - i + 1)$: reject $H_{(i)}$ and continue.
+   - If $p_{(i)} > \alpha / (m - i + 1)$: **stop** — fail to reject $H_{(i)}$ and all
+     remaining hypotheses $H_{(i+1)}, \ldots, H_{(m)}$.
+
+**Why Holm over Bonferroni:** Holm-Bonferroni controls the family-wise error rate (FWER) at
+the same level as Bonferroni but is **uniformly more powerful** — it rejects at least as many
+hypotheses. Bonferroni applies the same correction $\alpha/m$ to every p-value regardless of
+rank; Holm relaxes the threshold for hypotheses tested after earlier rejections. The power
+advantage grows with $m$. Bonferroni is acceptable only as a conservative worst-case bound
+when $m$ is very small (2–3 hypotheses) and simplicity is paramount.
+
+**Benjamini-Hochberg (BH/FDR) is not used here.** BH controls the false discovery rate,
+not the family-wise error rate. For confirmatory analyses in this system — where each
+hypothesis corresponds to a specific, pre-registered scientific claim — a single false
+positive undermines a conclusion. FWER control is therefore the correct criterion. BH is
+appropriate for exploratory screening (many hypotheses, high tolerance for some false
+positives), which belongs in Level 1, not Level 2.
+
+---
+
+### 3.7 Significance threshold
+
+The default α is **0.05**. Researchers may declare a different threshold but must do so
+in `pre_registered_hypotheses` before data collection. Post-hoc threshold adjustment is
+a form of p-hacking (Pitfall 1).
+
+A result at $p = 0.048$ and a result at $p = 0.003$ are both "reject at α = 0.05" —
+the system does not distinguish degrees of significance from the binary reject/fail-to-reject
+decision. The effect size (§3.4, §3.5) carries the magnitude information.
+
+---
+
+### 3.8 Special cases
+
+#### RELIABILITY-SUCCESS_RATE (proportion data)
+
+`RELIABILITY-SUCCESS_RATE` is a proportion, not a continuous metric. The tests above do not
+apply directly. Use:
+
+- 2 algorithms: **McNemar's test** (paired binary outcomes per run)
+- > 2 algorithms: **Cochran's Q test** (generalization of McNemar to $k$ groups)
+- Effect size: Cohen's $h = 2 \arcsin\sqrt{p_A} - 2 \arcsin\sqrt{p_B}$
+
+#### TIME-EVALUATIONS_TO_TARGET (censored data)
+
+`TIME-EVALUATIONS_TO_TARGET` includes censored values ($B+1$ when target is never reached).
+Applying Wilcoxon to censored data may be invalid if censoring rate differs across algorithms.
+Use:
+
+- **Log-rank test** when censoring rates differ substantially between algorithms
+- Wilcoxon is valid when both algorithms have the same censoring pattern (all-or-none) or
+  the censoring rate is below 10%
+
+#### Small sample correction
+
+When $P < 10$ Problem Instances, use exact Wilcoxon (permutation-based) rather than the
+normal approximation. The `exact` option is available in standard scientific Python libraries.
+
+---
+
+### 3.9 Output format per hypothesis
+
+The Analyzer must produce for each tested hypothesis:
+
+| Field | Description |
+|---|---|
+| `hypothesis_id` | Matches `pre_registered_hypotheses` ID from Study record |
+| `test_name` | e.g., `wilcoxon_signed_rank`, `kruskal_wallis`, `mccnemar` |
+| `n_problems` | Number of Problem Instances used in the test |
+| `n_runs_per_algorithm` | Runs per algorithm (for within-cell aggregation if applicable) |
+| `test_statistic` | Raw test statistic value |
+| `p_value` | Uncorrected p-value |
+| `correction_method` | `holm_bonferroni`, `bonferroni`, or `none` |
+| `corrected_p_value` | After correction (equals `p_value` if `none`) |
+| `alpha` | Declared significance threshold |
+| `reject` | Boolean: `true` if `corrected_p_value ≤ alpha` |
+| `effect_size` | Value and measure name (e.g., `{"measure": "rank_biserial", "value": 0.42}`) |
+| `conclusion_scope` | Explicit scope: algorithm IDs, problem IDs, budget, metric ID |
+
+`conclusion_scope` is the primary mechanism preventing over-generalization (Pitfall 4). It
+must be populated for every result, not only significant ones.
+
+---
+
+*Reference: Bartz-Beielstein, T., Bossek, J., Lang, M., & Mersmann, O. (2020).
+"Benchmarking in Optimization: Best Practice and Open Issues."
+arXiv:2007.03488. §4 (Statistical Analysis of Benchmark Results).*
 
 ---
 
@@ -273,10 +434,7 @@ A catalogue of mistakes this methodology is designed to prevent. Each entry stat
 
 **MANIFESTO violation:** Principle 15 (appropriate statistical methods), Principle 29 (objectivity).
 
-**Prevention:** §3 Multiple Testing Correction — the system applies correction whenever more than one hypothesis is tested. The correction method must be declared in the Study plan.
-
-> **`TODO: REF-TASK-0020`** — Specify which correction methods (Bonferroni, BH/FDR, etc.) are
-> supported and when to prefer each. Reference §3 once filled.
+**Prevention:** §3.6 Holm-Bonferroni correction — applied whenever $m > 1$ hypotheses are tested. The correction method must be declared in the Study plan. Holm-Bonferroni is the default; Bonferroni is accepted as a conservative alternative; BH/FDR is excluded from confirmatory analysis (§3.6 explains why).
 
 ---
 

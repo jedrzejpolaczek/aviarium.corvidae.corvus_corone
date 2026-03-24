@@ -15,8 +15,8 @@ Generated: 2026-03-04. Updated: 2026-03-20. Update whenever a milestone closes o
 | Area | Tasks | Status |
 |---|---|---|
 | MANIFESTO | REF-TASK-0032 | ⚠️ Principles complete; anti-patterns section pending |
-| C1 System Context | — | ✅ Complete |
-| C2 Containers | — | ✅ Complete |
+| C1 System Context | — | ⚠️ Principles complete |
+| C2 Containers | — | ⚠️ Principles complete |
 | C3 Components | — | ⛔ Not started |
 | C4 Code | — | ⛔ Not started |
 | Architecture Decision Records | REF-TASK-0011, 0024 | ⚠️ ADR-001 decided; technical constraints and bulk storage format pending |
@@ -60,7 +60,7 @@ Six milestones group all open documentation and design tasks.
 - [x] **[REF-TASK-0008] §4/§5/§7/§8 complete** — FR-XX from working public methods (§4), measurable NFR criteria (§5), interface requirements (§7), acceptance test strategy (§8) ·
 - [x] **[REF-TASK-0010] §5 NFR measurable criteria** — testable pass/fail criteria for REPRO, STAT, INTEROP, OPEN, MODULAR, USABILITY ·
 - [x] **[REF-TASK-0011] §6 Technical constraints** — Python version, OS support, dependency licensing; record as ADR-006 ·
-- [ ] **[REF-TASK-0012] §7 Interface requirements** — per external system; requires REF-TASK-0005/0006/0007 ·
+- [x] **[REF-TASK-0012] §7 Interface requirements** — per external system; requires REF-TASK-0005/0006/0007 ·
 - [ ] **[REF-TASK-0013] §8 Acceptance test strategy** — every FR-XX maps to at least one test category ·
 
 ### Interface Contracts & Data Format

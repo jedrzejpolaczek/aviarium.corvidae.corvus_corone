@@ -433,8 +433,7 @@ class TestReproducibility:
         """UC-01 F4: no two Runs in the same Experiment may use the same seed."""
         seeds = [run.seed for run in completed_experiment.runs]
         assert len(seeds) == len(set(seeds)), (
-            f"Seed collision detected in experiment {completed_experiment.id}. "
-            f"Seeds: {seeds}"
+            f"Seed collision detected in experiment {completed_experiment.id}. Seeds: {seeds}"
         )
 
     def test_same_seed_produces_identical_records(self, locked_study: StudyRecord) -> None:

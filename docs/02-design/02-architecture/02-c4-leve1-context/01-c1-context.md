@@ -327,15 +327,20 @@ The choice of delivery form (Python library) and the server-ready data layer des
 
 ## Explicit Scope Exclusions
 
-The following are explicitly outside this system's scope. Each exclusion traces to a MANIFESTO anti-pattern:
+The following are explicitly outside this system's scope. Each exclusion traces to a MANIFESTO
+anti-pattern. Anti-patterns are **defined authoritatively** in
+`docs/01-manifesto/MANIFESTO.md` (Anti-patterns section); the table below is a design-level
+cross-reference, not a definition.
 
 | Excluded Capability | Anti-Pattern | Rationale |
 |---|---|---|
-| Algorithm ranking or leaderboards | Anti-pattern 1 | Rankings are scientifically invalid (No Free Lunch); they promote algorithms, not understanding |
-| Competition infrastructure | Anti-pattern 3 | The goal is understanding algorithm behavior, not determining a winner |
-| Automated algorithm selection / AutoML | Anti-pattern 7 | Results require researcher interpretation; the system does not make decisions on behalf of the user |
-| Opaque analysis pipelines | Anti-pattern 4 | All analysis steps must be transparent, inspectable, and reproducible |
-| Proprietary or closed data formats | Anti-pattern 5 | Isolation from the benchmarking ecosystem defeats the purpose |
-| Marketing-oriented result presentation | Anti-pattern 6 | Reports communicate limitations alongside results, not promotional summaries |
+| Algorithm ranking or leaderboards | AP-1 | Rankings are scientifically invalid (No Free Lunch); they promote algorithms, not understanding |
+| *(not a design exclusion — see note)* | AP-2 | Biased problem selection cannot be prevented by design; it is a scientific validity constraint stated in MANIFESTO and enforced through documentation and review, not by API restriction |
+| Competition infrastructure | AP-3 | The goal is understanding algorithm behavior, not determining a winner |
+| Opaque analysis pipelines | AP-4 | All analysis steps must be transparent, inspectable, and reproducible |
+| Proprietary or closed data formats | AP-5 | Isolation from the benchmarking ecosystem defeats the purpose |
+| Marketing-oriented result presentation | AP-6 | Reports communicate limitations alongside results, not promotional summaries |
+| Automated algorithm selection / AutoML | AP-7 | Results require researcher interpretation; the system does not make decisions on behalf of the user |
 
-> These exclusions become hard constraints in `docs/02-design/01-software-requirement-specification/SRS.md` §6.
+> These exclusions become hard constraints in
+> `docs/02-design/01-software-requirement-specification/05-constraints/02-const-scientific.md`.

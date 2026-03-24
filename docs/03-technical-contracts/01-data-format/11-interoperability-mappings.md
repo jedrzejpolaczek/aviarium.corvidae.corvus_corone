@@ -115,7 +115,101 @@ differ slightly from runs collected natively via `cocoex`.
 
 ## §4.2 IOHprofiler
 
-> TODO: REF-TASK-0006 — IOHprofiler format mapping spike required before this section can be filled.
+**Direction:** Export only (Corvus → IOHprofiler). Import from IOHprofiler is not supported in V1.
+
+**Supported IOHprofiler format version:** v0.3.3+ ("new" format) with JSON sidecar.
+IOHanalyzer auto-detects this format when `.json` sidecars are present. The legacy v0.3.2
+`.info` sidecar format is not produced.
+
+**Implementation:** `corvus_corone/export/ioh_exporter.py` (`IOHExporter` class).
+
+**IOHprofiler output layout per export call:**
+
+```
+<output_dir>/
+└── <algorithm_id>/
+    ├── IOHprofiler_f<func_id>_<func_name>.json      ← JSON sidecar (all dims for this problem)
+    └── data_f<func_id>_<func_name>/
+        └── IOHprofiler_f<func_id>_DIM<dim>.dat      ← performance log
+```
+
+One subfolder per algorithm. All runs for the same (algorithm, problem, dimension) are
+concatenated into one `.dat` file, separated by repeated header lines (the IOHanalyzer
+run-boundary marker).
+
+### §4.2.1 Field mapping
+
+#### `.dat` file — performance log
+
+The `.dat` format has two mandatory columns; all others are optional.
+
+| Corvus Field | `.dat` Column | Notes / Losses |
+|---|---|---|
+| `PerformanceRecord.evaluation_number` | `evaluations` (col 0, integer) | Exact. 1-indexed per Run. |
+| `PerformanceRecord.best_so_far` | `raw_y` (col 1, float `%.10f`) | Exact. IOHprofiler `raw_y` is best-so-far; maps directly. |
+| `PerformanceRecord.objective_value` | Not used | `objective_value` is the *current* eval value; `raw_y` requires *best-so-far*. `best_so_far` takes precedence. |
+| `PerformanceRecord.elapsed_time` | Not represented | No time column in IOHprofiler `.dat`. See **LOSS-IOH-03**. |
+| `PerformanceRecord.current_solution` | `x0`, `x1`, … (optional) | Exported only if `current_solution` is present. See **LOSS-IOH-02**. |
+| `PerformanceRecord.trigger_reason` | Not represented | All records exported (improvement + scheduled + end-of-run). See **LOSS-IOH-04**. |
+
+Run boundaries: the exporter writes the header line `evaluations raw_y` before every run.
+IOHanalyzer detects run boundaries by finding rows whose first column is non-numeric.
+
+#### `.json` sidecar — metadata and fields not in `.dat`
+
+| Corvus Field | JSON Sidecar Field | Notes / Losses |
+|---|---|---|
+| `ProblemInstance.name` | `function_name` | Supplied via `ProblemMeta.func_name`. |
+| `ProblemInstance.dimensions` | `scenarios[].dimension` | Supplied via `ProblemMeta.dimensions`. |
+| `ProblemInstance.objective.type` | `maximization` (boolean) | `minimize` → `false`, `maximize` → `true`. |
+| `AlgorithmInstance.name` | `algorithm.name` | Supplied via `AlgorithmMeta.name`. |
+| `AlgorithmInstance.algorithm_family` | `algorithm.info` (proxy) | No structured algorithm-family field in IOHprofiler. **LOSS-IOH-07**. |
+| `Run.seed` | `scenarios[].runs[].corvus_seed` | Non-standard extension field; no native seed field in IOHprofiler. **LOSS-IOH-08**. |
+| `Run.run_id` | `scenarios[].runs[].corvus_run_id` | Non-standard extension for Corvus traceability. |
+| `Run.budget_used` | `scenarios[].runs[].evals` | Exact. |
+| Best `PerformanceRecord.best_so_far` | `scenarios[].runs[].best.y` | Min (or max) `raw_y` across all records in the run. |
+| Evaluation at best | `scenarios[].runs[].best.evals` | `evaluation_number` of the record with `best.y`. |
+
+#### Problem and algorithm metadata resolution
+
+IOHprofiler requires integer `func_id` and `DIM` for filenames. Corvus uses string
+`problem_id`s. The caller supplies a `ProblemMeta` mapping (see `IOHExporter` docstring).
+If omitted, `func_id` is auto-assigned and `dimensions=0`, triggering **LOSS-IOH-06**.
+
+### §4.2.2 Information-loss manifest
+
+| Manifest Key | Severity | Condition | Description |
+|---|---|---|---|
+| `LOSS-IOH-01` | informational | `ProblemMeta.maximization=True` | Raw values stored as-is; `maximization` boolean in the JSON sidecar directs IOHanalyzer orientation. Verify before uploading. |
+| `LOSS-IOH-02` | informational | `PerformanceRecord.current_solution` absent | Decision variable columns (`x0`, `x1`, …) not exported. IOHanalyzer scatter plots unavailable. |
+| `LOSS-IOH-03` | informational | Always | `elapsed_time` has no `.dat` equivalent. IOHanalyzer does not support wall-clock time. |
+| `LOSS-IOH-04` | informational | Always | Corvus `scheduled` records included alongside improvement records. IOHanalyzer ERT is unaffected; extra rows are absorbed by the monotone `raw_y` analysis. |
+| `LOSS-IOH-05` | informational | `Run.status="failed"` | Failed runs excluded. Sidecar run count lower than `Study.experimental_design.repetitions`. |
+| `LOSS-IOH-06` | warning | `problem_id` not in `problem_meta` | `func_id` auto-assigned; `dimensions=0`. IOHanalyzer dimension grouping and filenames will be incorrect. |
+| `LOSS-IOH-07` | informational | Always | `AlgorithmInstance.algorithm_family` placed in `algorithm.info` (free-text only). |
+| `LOSS-IOH-08` | informational | Always | `Run.seed` stored as non-standard `corvus_seed` in sidecar. `.dat` has no seed column. Reproducibility requires the Corvus `ExperimentRecord`. |
+| `LOSS-IOH-09` | warning | `Run.cap_reached_at_evaluation` is not None | One or more runs hit `max_records_per_run`. `.dat` trace is truncated; ERT may be underestimated. |
+
+### §4.2.3 Trigger-model compatibility
+
+The `IOHExporter` writes **all** records (improvement + scheduled + end-of-run).
+IOHanalyzer processes the full trace correctly for ERT because it derives improvements
+from the monotone `raw_y` column regardless of how many rows appear between them.
+ECDF curves are equivalent to a native IOHprofiler run.
+
+### §4.2.4 Acceptance test
+
+`tests/interop/test_ioh_export.py` — no `ioh` package required, stdlib only:
+- **AC-2** `.dat` format parseable (header, numeric rows, monotone `raw_y`)
+- **AC-3** JSON sidecar has all required fields; stores `corvus_seed` and `corvus_run_id`
+- **AC-4** Round-trip: `evaluation_number` and `raw_y` match source `PerformanceRecord`s exactly
+
+### §4.2.5 Version compatibility
+
+| IOHprofiler version | Supported | Notes |
+|---|---|---|
+| `ioh` ≥ 0.3.3 (JSON sidecar, v2 format) | Yes | Reference implementation |
+| `ioh` ≤ 0.3.2 (`.info` sidecar, v1 format) | No | Legacy format not produced |
 
 ---
 

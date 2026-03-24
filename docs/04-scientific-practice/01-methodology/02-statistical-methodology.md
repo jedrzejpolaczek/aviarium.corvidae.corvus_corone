@@ -68,34 +68,156 @@ Post-hoc hypothesis selection — choosing what to test after seeing the data �
 
 ## 2. Level 1: Exploratory Data Analysis
 
-<!--
-  Purpose:
-    Understand the data before drawing conclusions.
-    Identify patterns, anomalies, and potential hypotheses.
-    Outputs of this level are OBSERVATIONS, not conclusions.
+*Implements MANIFESTO Principle 13 (three-level analysis). All visualizations are auto-generated
+by the Reporting Engine (`docs/02-design/02-architecture/03-c4-leve2-containers/03-report-format-spec.md`
+§Mandatory Visualizations) without researcher configuration.*
 
-  Required visualizations:
-    For each metric across all runs, produce:
-    - [Visualization type 1]: what does it show? when is it most useful?
-    - [Visualization type 2]: hint — box plots, violin plots, ECDFs are common choices
-    - Performance curves: evolution of best objective value over evaluations
-      → see specs/metric-taxonomy.md §2 ANYTIME metrics for curve-level metrics
+**Purpose:** Understand the data before drawing any conclusions. Identify patterns,
+anomalies, and observations that motivate hypotheses for future studies. The output of
+Level 1 is **observations, not conclusions**.
 
-  What to look for:
-    - Outlier runs: are there runs with anomalous performance? Are they meaningful or errors?
-    - Distribution shape: is the data symmetric, skewed, multimodal? (guides Level 2 test selection)
-    - Budget sensitivity: does relative performance change at different evaluation counts?
-    - Problem-level variation: do algorithms differ more within a problem or across problems?
+---
 
-  What NOT to do at this level:
-    - Do not compute p-values from exploratory visualizations
-    - Do not state conclusions — state observations that motivate hypotheses
-    - Do not select which algorithms to compare post-hoc based on who looks good
+### 2.1 Mandatory Visualizations
 
-  Output format:
-    Exploratory analysis produces a narrative: observations + candidate hypotheses.
-    → These become inputs to Level 2, where pre-registered hypotheses are tested.
--->
+The following four visualizations are generated for every completed Experiment. They are
+defined in the Report Output Format Specification and reproduced here for analysis guidance.
+
+---
+
+#### VIZ-L1-01: Box Plot of Final Quality
+
+**What it shows:** Distribution of `QUALITY-BEST_VALUE_AT_BUDGET` across repetitions, one
+box per (algorithm, problem) cell. Shows median, IQR, whiskers (1.5×IQR), and outliers as
+individual points.
+
+**When most useful:** Comparing endpoint quality across algorithms when repetitions are
+moderate (5–50). Immediately reveals spread and any extreme outlier Runs.
+
+**How to interpret:**
+- Box width = IQR; narrower box → more consistent results
+- Overlapping boxes → no clearly separable quality difference at this budget
+- An outlier point far from the box → investigate whether that Run failed or hit an unusual
+  basin; do not silently exclude it
+- The y-axis direction matters: for minimization, lower is better
+
+**Conditional replacement:** When `Study.repetitions > 50` or more than 6 algorithms are
+compared, VIZ-L1-04 (violin) replaces this plot.
+
+**Appears in:** Researcher report §Level 1 EDA only.
+
+---
+
+#### VIZ-L1-02: Convergence Curves
+
+**What it shows:** Best-so-far objective value vs. evaluation number for each algorithm.
+Solid line = median over repetitions; shaded band = IQR (25th–75th percentile). One figure
+per problem instance; all algorithms overlaid with distinct colors.
+
+**When most useful:** Diagnosing anytime behavior — when does each algorithm converge? Does
+one algorithm front-load improvement while another continues improving late?
+
+**How to interpret:**
+- A curve that reaches its minimum early and flattens has good early convergence; whether
+  this is an advantage depends on the practitioner's actual budget
+- Crossing curves — algorithm A better at low budget, B better at high budget — make
+  any global comparison invalid; conclusions must be budget-scoped (see §3.9 `conclusion_scope`)
+- A wide IQR band → high run-to-run variance; investigate whether this is structural or
+  due to a few outlier Runs (cross-reference VIZ-L1-01)
+- X-axis is log scale when `budget > 100` — gaps in the curve may be artefacts of the
+  log-scale schedule; interpolation is LOCF (ADR-003), not smoothing
+
+**Appears in:** Researcher report §Level 1 EDA; Practitioner report §Visualizations.
+
+---
+
+#### VIZ-L1-03: ECDF (Empirical Cumulative Distribution Function)
+
+**What it shows:** For each algorithm, the fraction of Runs that achieved a given quality
+target or better, plotted as a step function. Aggregated across all problem instances.
+
+**Implementation requirement:** `matplotlib.pyplot.step(x, y, where='post')` — the
+`where='post'` parameter is mandatory so the step fires at the exact quality threshold.
+
+**When most useful:** Summarizing anytime performance across the full quality range in a
+single figure. Especially informative when algorithms have different failure modes (one
+consistently mediocre vs. one bimodal — often or almost never succeeds).
+
+**How to interpret:**
+- A curve shifted **left and up** dominates — more Runs achieve better quality
+- A **flatter** curve → high variability; the algorithm's success depends heavily on
+  the specific run
+- A curve that never reaches fraction 1.0 → some Runs failed to reach any improvement;
+  cross-reference `RELIABILITY-SUCCESS_RATE`
+- The area under the ECDF curve over the normalized quality range corresponds directly to
+  the `ANYTIME-ECDF_AREA` metric (§7 of `07-anytime-ecdf-area.md`)
+
+**Appears in:** Researcher report §Level 1 EDA; Practitioner report §Visualizations.
+
+---
+
+#### VIZ-L1-04: Violin Plot [conditional]
+
+**When generated:** `Study.repetitions > 50`, or more than 6 algorithms are compared.
+Replaces VIZ-L1-01 in those cases.
+
+**What it shows:** Kernel density estimate of the `QUALITY-BEST_VALUE_AT_BUDGET`
+distribution per (algorithm, problem) cell. Inner box shows IQR; center line shows median.
+
+**When most useful:** Large-sample studies where distribution shape (multimodality, skew,
+heavy tails) carries scientific information that a box plot would suppress.
+
+**How to interpret:**
+- A narrow violin → concentrated results; the algorithm is reliable
+- A bimodal violin (two bumps) → two distinct performance regimes; the algorithm probably
+  has a structural failure mode on this problem; investigate Runs in each mode separately
+- Wide tails → some Runs do dramatically better or worse; check whether these correlate
+  with a specific seed or initialization
+
+**Appears in:** Researcher report §Level 1 EDA (conditional).
+
+---
+
+### 2.2 What to look for
+
+After generating the four visualizations, work through this checklist before proceeding
+to Level 2:
+
+| Question | Where to look | Why it matters |
+|---|---|---|
+| Are there outlier Runs with anomalous performance? | VIZ-L1-01 outlier points, VIZ-L1-02 wide IQR | Determine whether they are errors (exclude with disclosure) or informative (keep and note) |
+| Is the distribution shape approximately normal? | VIZ-L1-01 / VIZ-L1-04 symmetry | Determines whether parametric or non-parametric tests apply in Level 2 (§3.3) |
+| Do algorithms cross in performance at different budgets? | VIZ-L1-02 crossing curves | Conclusions must be budget-scoped; a single endpoint comparison is insufficient |
+| Does relative performance differ across problems? | VIZ-L1-01/VIZ-L1-02 per-problem plots | Algorithm × problem interactions require per-problem scoping in Level 2 |
+| Does any algorithm show a bimodal distribution? | VIZ-L1-04 (if generated) | Bimodality warrants investigation before aggregation; may indicate a structural failure mode |
+| Are success rates materially different? | VIZ-L1-03 max y-value | Low success rate on one algorithm changes the appropriate test (§3.8 McNemar) |
+
+---
+
+### 2.3 What NOT to do at Level 1
+
+- **Do not compute p-values** from exploratory visualizations — patterns in visualizations
+  are not conclusions.
+- **Do not state conclusions** — write observations ("CMA-ES shows higher variance on
+  problem P than Nelder-Mead") not claims ("CMA-ES is worse").
+- **Do not select which algorithms to compare** post-hoc based on who looks best in the
+  visualizations. All comparisons in Level 2 must come from `pre_registered_hypotheses`.
+- **Do not exclude Runs** without logging them. Every excluded Run must be counted in the
+  Run Summary and its exclusion reason stated in the Limitations section (FR-21).
+
+---
+
+### 2.4 Output of Level 1
+
+Level 1 produces two artifacts:
+
+1. **The four visualizations** (VIZ-L1-01 through VIZ-L1-04) embedded in the Researcher
+   report §Level 1 EDA.
+
+2. **An observations narrative** stored in `AnalysisReport.exploratory_observations`:
+   a bulleted list of what was observed (not concluded) and, separately, candidate
+   hypotheses that emerged from the exploration — for registration in **future** studies,
+   never retrofitted into the current Study's pre-registered hypotheses.
 
 ---
 

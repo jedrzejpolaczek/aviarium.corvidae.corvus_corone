@@ -202,9 +202,22 @@ For Algorithm Instances with important configuration parameters, a sensitivity c
 
 This sensitivity check is not part of the core Experiment but should be included in the study report. It makes the configuration justification defensible.
 
-> **`TODO: REF-TASK-0022`** — Define the sensitivity documentation format once interface contracts
-> are designed. Owner: methodology lead. Acceptance: the Algorithm Instance record schema includes
-> a `sensitivity_report` field or linked document.
+**Sensitivity documentation format (MANIFESTO Principle 11; REF-TASK-0022):**
+
+A sensitivity check is not part of the core Experiment but must accompany the Algorithm
+Instance record as a `sensitivity_report` field (data-format.md §2.2.1). The format requires:
+
+- `tested_on_problems`: Problem Instance IDs used for sensitivity testing (≥ 1)
+- `budget_used`: evaluation budget per sensitivity Run
+- `repetitions_per_config`: Runs per parameter configuration tested (minimum 10)
+- `parameters`: one `ParameterSensitivity` entry per varied parameter, each recording:
+  - `values_tested` (≥ 3 values), `metric_id`, `metric_values`, `sensitivity_level`
+    (`"low"` / `"moderate"` / `"high"`)
+- `overall_stability`: `"robust"` / `"moderate"` / `"sensitive"` with written `notes`
+
+An `overall_stability` of `"high"` (sensitive) requires additional justification for
+the chosen parameter value in `configuration_justification`. This is the mechanism by which
+Principle 11 produces actionable documentation rather than a checkbox.
 
 ---
 

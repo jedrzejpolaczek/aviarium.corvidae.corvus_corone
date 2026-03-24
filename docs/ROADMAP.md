@@ -74,7 +74,7 @@ Six milestones group all open documentation and design tasks.
 ### Architecture — post-implementation specs
 - [x] **[REF-TASK-0033] Specify CLI experience** — synopsis, arguments, example terminal output, exit codes for all `corvus` commands; document from working IMPL-017
 - [x] **[REF-TASK-0034] Specify report output format** — Practitioner and Researcher report sections, mandatory visualizations, audience language; document from working IMPL-014/015
-- [ ] **[REF-TASK-0035] Add competitive differentiation statement to SRS §2** — 3–6 sentences grounded in MANIFESTO principles; frames Corvus Corone as complementary to COCO/Nevergrad/IOHprofiler
+- [x] **[REF-TASK-0035] Add competitive differentiation statement to SRS §2** — 3–6 sentences grounded in MANIFESTO principles; frames Corvus Corone as complementary to COCO/Nevergrad/IOHprofiler
 
 ---
 

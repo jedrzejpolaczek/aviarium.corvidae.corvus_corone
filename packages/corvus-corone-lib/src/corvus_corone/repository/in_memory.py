@@ -116,10 +116,11 @@ class _InMemoryProblemRepository(ProblemRepository):
     def register_problem(self, problem: dict[str, Any]) -> str:
         _require(problem, "name", entity_type="ProblemInstance")
         record = deepcopy(problem)
-        record["id"] = _new_id()
+        new_id = _new_id()
+        record["id"] = new_id
         record.setdefault("deprecated", False)
-        self._store[record["id"]] = record
-        return record["id"]
+        self._store[new_id] = record
+        return new_id
 
     def deprecate_problem(
         self,
@@ -211,10 +212,11 @@ class _InMemoryAlgorithmRepository(AlgorithmRepository):
                 context={"code_reference": code_ref},
             )
         record = deepcopy(algorithm)
-        record["id"] = _new_id()
+        new_id = _new_id()
+        record["id"] = new_id
         record.setdefault("deprecated", False)
-        self._store[record["id"]] = record
-        return record["id"]
+        self._store[new_id] = record
+        return new_id
 
     def deprecate_algorithm(
         self,
@@ -301,10 +303,11 @@ class _InMemoryStudyRepository(StudyRepository):
     def create_study(self, study: dict[str, Any]) -> str:
         _require(study, "name", entity_type="Study")
         record = deepcopy(study)
-        record["id"] = _new_id()
+        new_id = _new_id()
+        record["id"] = new_id
         record["status"] = "draft"  # always starts as draft
-        self._store[record["id"]] = record
-        return record["id"]
+        self._store[new_id] = record
+        return new_id
 
     def lock_study(self, id: str) -> None:
         if id not in self._store:
@@ -362,10 +365,11 @@ class _InMemoryExperimentRepository(ExperimentRepository):
     def create_experiment(self, experiment: dict[str, Any]) -> str:
         _require(experiment, "study_id", entity_type="Experiment")
         record = deepcopy(experiment)
-        record["id"] = _new_id()
+        new_id = _new_id()
+        record["id"] = new_id
         record.setdefault("status", "running")
-        self._store[record["id"]] = record
-        return record["id"]
+        self._store[new_id] = record
+        return new_id
 
     def update_experiment(self, id: str, **fields: Any) -> None:
         if id not in self._store:
@@ -424,10 +428,11 @@ class _InMemoryRunRepository(RunRepository):
     def create_run(self, run: dict[str, Any]) -> str:
         _require(run, "experiment_id", entity_type="Run")
         record = deepcopy(run)
-        record["id"] = _new_id()
-        self._store[record["id"]] = record
-        self._records[record["id"]] = []
-        return record["id"]
+        new_id = _new_id()
+        record["id"] = new_id
+        self._store[new_id] = record
+        self._records[new_id] = []
+        return new_id
 
     def update_run(self, id: str, **fields: Any) -> None:
         if id not in self._store:
@@ -528,8 +533,9 @@ class _InMemoryResultAggregateRepository(ResultAggregateRepository):
                 entity_type="ResultAggregate",
             )
             record = deepcopy(agg)
-            record["id"] = _new_id()
-            self._store[record["id"]] = record
+            new_id = _new_id()
+            record["id"] = new_id
+            self._store[new_id] = record
 
 
 # ---------------------------------------------------------------------------
@@ -566,9 +572,10 @@ class _InMemoryReportRepository(ReportRepository):
             )
         _require(report, "artifact_reference", entity_type="Report")
         record = deepcopy(report)
-        record["id"] = _new_id()
-        self._store[record["id"]] = record
-        return record["id"]
+        new_id = _new_id()
+        record["id"] = new_id
+        self._store[new_id] = record
+        return new_id
 
 
 # ---------------------------------------------------------------------------

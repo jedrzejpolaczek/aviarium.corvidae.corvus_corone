@@ -52,60 +52,60 @@ Six milestones group all open documentation and design tasks.
 > Foundation tasks: SRS functional requirements, interface contracts, data format, GLOSSARY. Unblocked after Phases 1–2 implementation.
 
 ### GLOSSARY
-- [x] **[REF-TASK-0001] Extend GLOSSARY from interface-contracts and data-format** — all new terms from those documents added with precise definitions ·
-- [x] **[REF-TASK-0002] Verify Schema Version definition against data-format.md** — GLOSSARY entry must use identical terminology to versioning scheme in `data-format.md §6` ·
+- [x] **[REF-TASK-0001] Extend GLOSSARY from interface-contracts and data-format** — all new terms from those documents added with precise definitions
+- [x] **[REF-TASK-0002] Verify Schema Version definition against data-format.md** — GLOSSARY entry must use identical terminology to versioning scheme in `data-format.md §6`
 
 ### SRS
-- [x] **[REF-TASK-0009] Expand UC-01 and UC-02 into full use case descriptions** — main flow, preconditions, postconditions, failure scenarios, end-to-end tests ·
-- [x] **[REF-TASK-0008] §4/§5/§7/§8 complete** — FR-XX from working public methods (§4), measurable NFR criteria (§5), interface requirements (§7), acceptance test strategy (§8) ·
-- [x] **[REF-TASK-0010] §5 NFR measurable criteria** — testable pass/fail criteria for REPRO, STAT, INTEROP, OPEN, MODULAR, USABILITY ·
-- [x] **[REF-TASK-0011] §6 Technical constraints** — Python version, OS support, dependency licensing; record as ADR-006 ·
-- [x] **[REF-TASK-0012] §7 Interface requirements** — per external system; requires REF-TASK-0005/0006/0007 ·
-- [x] **[REF-TASK-0013] §8 Acceptance test strategy** — every FR-XX maps to at least one test category ·
+- [x] **[REF-TASK-0009] Expand UC-01 and UC-02 into full use case descriptions** — main flow, preconditions, postconditions, failure scenarios, end-to-end tests
+- [x] **[REF-TASK-0008] §4/§5/§7/§8 complete** — FR-XX from working public methods (§4), measurable NFR criteria (§5), interface requirements (§7), acceptance test strategy (§8)
+- [x] **[REF-TASK-0010] §5 NFR measurable criteria** — testable pass/fail criteria for REPRO, STAT, INTEROP, OPEN, MODULAR, USABILITY
+- [x] **[REF-TASK-0011] §6 Technical constraints** — Python version, OS support, dependency licensing; record as ADR-006
+- [x] **[REF-TASK-0012] §7 Interface requirements** — per external system; requires REF-TASK-0005/0006/0007
+- [x] **[REF-TASK-0013] §8 Acceptance test strategy** — every FR-XX maps to at least one test category
 
 ### Interface Contracts & Data Format
-- [ ] **[REF-TASK-0037] Define public API facade contract** — new `docs/03-technical-contracts/04-public-api-contract.md`
-- [ ] **[REF-TASK-0023] Repository storage abstraction interface** — `LocalFileRepository` spec satisfying ADR-001; document after IMPL-010 is merged ·
-- [ ] **[REF-TASK-0036] LocalFileRepository directory structure** — annotated directory tree for a completed study; notes that layout is an implementation detail, not part of the `Repository` interface; document after IMPL-010 ·
+- [x] **[REF-TASK-0037] Define public API facade contract** — new `docs/03-technical-contracts/04-public-api-contract.md`
+- [x] **[REF-TASK-0023] Repository storage abstraction interface** — `LocalFileRepository` spec satisfying ADR-001; document after IMPL-010 is merged
+- [ ] **[REF-TASK-0036] LocalFileRepository directory structure** — annotated directory tree for a completed study; notes that layout is an implementation detail, not part of the `Repository` interface; document after IMPL-010
 
 ### MANIFESTO
-- [ ] **[REF-TASK-0032] Reconcile anti-pattern numbering and add to MANIFESTO** — add Anti-patterns section; resolve missing AP-2; update SRS §6 references from C1 to MANIFESTO ·
+- [ ] **[REF-TASK-0032] Reconcile anti-pattern numbering and add to MANIFESTO** — add Anti-patterns section; resolve missing AP-2; update SRS §6 references from C1 to MANIFESTO
 
 ### Architecture — post-implementation specs
-- [ ] **[REF-TASK-0033] Specify CLI experience** — synopsis, arguments, example terminal output, exit codes for all `corvus` commands; document from working IMPL-017 ·
-- [ ] **[REF-TASK-0034] Specify report output format** — Practitioner and Researcher report sections, mandatory visualizations, audience language; document from working IMPL-014/015 ·
-- [ ] **[REF-TASK-0035] Add competitive differentiation statement to SRS §2** — 3–6 sentences grounded in MANIFESTO principles; frames Corvus Corone as complementary to COCO/Nevergrad/IOHprofiler ·
+- [ ] **[REF-TASK-0033] Specify CLI experience** — synopsis, arguments, example terminal output, exit codes for all `corvus` commands; document from working IMPL-017
+- [ ] **[REF-TASK-0034] Specify report output format** — Practitioner and Researcher report sections, mandatory visualizations, audience language; document from working IMPL-014/015
+- [ ] **[REF-TASK-0035] Add competitive differentiation statement to SRS §2** — 3–6 sentences grounded in MANIFESTO principles; frames Corvus Corone as complementary to COCO/Nevergrad/IOHprofiler
 
 ---
 
 ## Milestone: V1 Methodology — Statistics & Metrics
 > Scientific methodology: ECDF_AREA formalization, statistical test selection, diversity requirements, sensitivity documentation.
 
-- [ ] **[REF-TASK-0016] ANYTIME-ECDF_AREA computation procedure** — exact normalization (ADR-007 *(planned)*: empirical min/max) and aggregation across problems ·
-- [ ] **[REF-TASK-0017] TIME-EVALUATIONS_TO_TARGET Standard Reporting Set decision** — weigh pre-specification burden vs. efficiency metric value; create ADR ·
-- [ ] **[REF-TASK-0020] Statistical test selection procedure** — decision tree: Wilcoxon (2 algorithms) vs Kruskal-Wallis + Holm-Bonferroni (>2); document in `statistical-methodology.md §3` ·
-- [ ] **[REF-TASK-0021] Problem instance diversity minimum requirements** — quantitative floor (ADR-008 *(planned)* candidate: ≥5 instances, ≥2 dimensionality ranges, ≥1 noise + ≥1 deterministic) ·
-- [ ] **[REF-TASK-0022] Algorithm sensitivity documentation format** — `SensitivityReport` schema field in `AlgorithmInstance`; requires `data-format.md §2.2` ·
-- [ ] **[REF-TASK-0019] Level 1 required visualizations** — mandatory EDA set (boxplot, convergence curves, ECDF, violin); document in `statistical-methodology.md §2` ·
-- [ ] **[REF-TASK-0015] Metric implementation references** — link each metric definition to `corvus_corone/analysis/metrics.py`; fulfilled as part of IMPL-011 ·
-- [ ] **[REF-TASK-0014] Metric taxonomy extensions** *(Post-V1)* — new metrics after first real studies ·
-- [ ] **[REF-TASK-0018] Research question archetypes** *(Post-V1)* — Metric Selection Guide additions from real study patterns ·
+- [ ] **[REF-TASK-0016] ANYTIME-ECDF_AREA computation procedure** — exact normalization (ADR-007 *(planned)*: empirical min/max) and aggregation across problems
+- [ ] **[REF-TASK-0017] TIME-EVALUATIONS_TO_TARGET Standard Reporting Set decision** — weigh pre-specification burden vs. efficiency metric value; create ADR
+- [ ] **[REF-TASK-0020] Statistical test selection procedure** — decision tree: Wilcoxon (2 algorithms) vs Kruskal-Wallis + Holm-Bonferroni (>2); document in `statistical-methodology.md §3`
+- [ ] **[REF-TASK-0021] Problem instance diversity minimum requirements** — quantitative floor (ADR-008 *(planned)* candidate: ≥5 instances, ≥2 dimensionality ranges, ≥1 noise + ≥1 deterministic)
+- [ ] **[REF-TASK-0022] Algorithm sensitivity documentation format** — `SensitivityReport` schema field in `AlgorithmInstance`; requires `data-format.md §2.2`
+- [ ] **[REF-TASK-0019] Level 1 required visualizations** — mandatory EDA set (boxplot, convergence curves, ECDF, violin); document in `statistical-methodology.md §2`
+- [ ] **[REF-TASK-0015] Metric implementation references** — link each metric definition to `corvus_corone/analysis/metrics.py`; fulfilled as part of IMPL-011
+- [ ] **[REF-TASK-0014] Metric taxonomy extensions** *(Post-V1)* — new metrics after first real studies
+- [ ] **[REF-TASK-0018] Research question archetypes** *(Post-V1)* — Metric Selection Guide additions from real study patterns
 
 ---
 
 ## Milestone: V1 Interoperability — Ecosystem Integration
 > COCO, Nevergrad, IOHprofiler format mappings. Spike required before implementation.
 
-- [ ] **[REF-TASK-0004] Algorithm Author tutorial** — wrap Optuna sampler in ≤ 15 lines; interface acceptance test ·
-- [x] **[REF-TASK-0005] COCO format mapping** *(spike first)* — map Corvus entities to COCO `.info`/`.dat`/`.tdat`; document data loss; round-trip test ·
-- [x] **[REF-TASK-0006] Nevergrad adapter pattern** *(spike first)* — generic `NevergradAdapter`; tutorial; `data-format.md §3` mapping ·
-- [x] **[REF-TASK-0007] IOHprofiler export format mapping** — `.dat` export + `.meta.json` sidecar for unsupported fields; full spec + round-trip test ·
+- [ ] **[REF-TASK-0004] Algorithm Author tutorial** — wrap Optuna sampler in ≤ 15 lines; interface acceptance test
+- [x] **[REF-TASK-0005] COCO format mapping** *(spike first)* — map Corvus entities to COCO `.info`/`.dat`/`.tdat`; document data loss; round-trip test
+- [x] **[REF-TASK-0006] Nevergrad adapter pattern** *(spike first)* — generic `NevergradAdapter`; tutorial; `data-format.md §3` mapping
+- [x] **[REF-TASK-0007] IOHprofiler export format mapping** — `.dat` export + `.meta.json` sidecar for unsupported fields; full spec + round-trip test
 
 ---
 
 ## Milestone: V1 Infrastructure — ADRs & Technical Constraints
 
-- [ ] **[REF-TASK-0024] Bulk PerformanceRecord storage format decision** *(spike first)* — benchmark JSON vs Parquet vs HDF5 at 150 k records; create ADR-009 ·
+- [ ] **[REF-TASK-0024] Bulk PerformanceRecord storage format decision** *(spike first)* — benchmark JSON vs Parquet vs HDF5 at 150 k records; create ADR-009
 
 ---
 

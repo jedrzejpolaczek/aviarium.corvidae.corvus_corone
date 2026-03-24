@@ -99,7 +99,7 @@ flowchart TD
 | §2.6 Performance Record | [07-performance-record.md](07-performance-record.md) | ✅ Formal schema |
 | §2.7 Result Aggregate | [08-result-aggregate.md](08-result-aggregate.md) | ✅ Formal schema |
 | §2.8 Report | [09-report.md](09-report.md) | ✅ Formal schema |
-| §3 File Formats and Storage | [10-file-formats.md](10-file-formats.md) | 🚧 Pending |
+| §3 File Formats and Storage | [10-file-formats.md](10-file-formats.md) | ✅ §3.1 IOHprofiler export, §3.2 LocalFileRepository layout complete |
 | §4 Interoperability Mappings | [11-interoperability-mappings.md](11-interoperability-mappings.md) | ✅ §4.1 COCO, §4.2 IOHprofiler, §4.3 Nevergrad complete |
 | §5 Validation Rules (Cross-Entity) | [12-cross-entity-validation.md](12-cross-entity-validation.md) | 🚧 Pending |
 | §6 Schema Versioning | [13-schema-versioning.md](13-schema-versioning.md) | 🚧 Pending |

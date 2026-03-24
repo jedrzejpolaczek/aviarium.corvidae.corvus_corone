@@ -66,7 +66,7 @@ Six milestones group all open documentation and design tasks.
 ### Interface Contracts & Data Format
 - [x] **[REF-TASK-0037] Define public API facade contract** — new `docs/03-technical-contracts/04-public-api-contract.md`
 - [x] **[REF-TASK-0023] Repository storage abstraction interface** — `LocalFileRepository` spec satisfying ADR-001; document after IMPL-010 is merged
-- [ ] **[REF-TASK-0036] LocalFileRepository directory structure** — annotated directory tree for a completed study; notes that layout is an implementation detail, not part of the `Repository` interface; document after IMPL-010
+- [x] **[REF-TASK-0036] LocalFileRepository directory structure** — annotated directory tree for a completed study; notes that layout is an implementation detail, not part of the `Repository` interface; document after IMPL-010
 
 ### MANIFESTO
 - [ ] **[REF-TASK-0032] Reconcile anti-pattern numbering and add to MANIFESTO** — add Anti-patterns section; resolve missing AP-2; update SRS §6 references from C1 to MANIFESTO

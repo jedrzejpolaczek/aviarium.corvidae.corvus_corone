@@ -15,6 +15,19 @@ Every benchmarking study produced or exported by this system **MUST** include at
 
 **Connection to protocol:** `docs/04-scientific-practice/01-methodology/01-benchmarking-protocol.md` Step 5 references this set as the non-negotiable minimum when specifying measurements.
 
-> **`TODO: REF-TASK-0017`** — Consider whether TIME-EVALUATIONS_TO_TARGET should be added to the
-> Standard Reporting Set. It requires a pre-specified target $\tau$, which adds planning burden.
-> Owner: methodology lead. Acceptance: decision documented in an ADR with MANIFESTO principle rationale.
+---
+
+## Inclusion criterion
+
+A metric belongs in the Standard Reporting Set only if it can be computed from any completed
+Experiment record without any input beyond what the Study plan already mandates. All four
+metrics above satisfy this: they require only Budget, PerformanceRecords, and a
+threshold-free comparison of objective values.
+
+`TIME-EVALUATIONS_TO_TARGET(τ)` was considered for inclusion and **decided against** (ADR-008).
+It requires a domain-specific target τ that must be ecologically valid before data collection.
+Mandating τ would force researchers to either set it arbitrarily (scientifically meaningless)
+or post-hoc (confirmatory analysis violation). `ANYTIME-ECDF_AREA` covers the efficiency
+dimension in a target-free way for all studies; `TIME-EVALUATIONS_TO_TARGET` remains the
+**strongly recommended optional metric** when a researcher has a specific, ecologically valid
+target for their application.

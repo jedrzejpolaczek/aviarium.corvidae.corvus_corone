@@ -38,4 +38,4 @@ $$\text{QUALITY-BEST\_VALUE\_AT\_BUDGET} = \min_{i \in \{1,\ldots,B\}} f(x_i)$$
 - *Complements:* `ANYTIME-ECDF_AREA` (captures dynamics), `TIME-EVALUATIONS_TO_TARGET` (efficiency)
 - *Do not use alone:* Always report alongside at least one ANYTIME or TIME metric.
 
-> **`TODO: REF-TASK-0015`** — Add implementation reference once the analysis module is built.
+**Implementation reference:** Pending IMPL-011 — `corvus_corone/analysis/metrics.py` → `compute_quality_best_value_at_budget(performance_records)`

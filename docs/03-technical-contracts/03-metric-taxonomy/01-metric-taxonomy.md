@@ -48,6 +48,21 @@ MANIFESTO Principle 14 adds a sixth dimension:
 
 **Guidance on scope:** Each category should contain 2–5 defined metrics. More metrics dilute analytical focus; fewer miss important performance aspects. The current set reflects the minimum required by the MANIFESTO.
 
+**Implementation reference format (REF-TASK-0015):**
+
+Each metric definition file ends with an `**Implementation reference:**` field. Once
+`corvus_corone/analysis/metrics.py` (IMPL-011) is merged, each placeholder is replaced with:
+
+```
+**Implementation reference:** `corvus_corone/analysis/metrics.py` → `compute_<metric_id_lower_snake_case>(<signature>)`
+```
+
+Where `<metric_id_lower_snake_case>` replaces `-` with `_` and lowercases the metric ID
+(e.g., `QUALITY-BEST_VALUE_AT_BUDGET` → `compute_quality_best_value_at_budget`), and
+`<signature>` lists the required inputs matching the metric's **Required inputs** field.
+Any implementation PR that changes a compute function MUST update the corresponding
+implementation reference in this taxonomy as part of the same PR.
+
 > **`TODO: REF-TASK-0014`** — Review and extend metric definitions once the first real studies
 > are conducted. Add domain-specific metrics (e.g., for categorical/mixed search spaces) as they
 > are identified. Owner: methodology lead. Acceptance: each new metric follows the definition

@@ -32,3 +32,5 @@ $$\text{ROBUSTNESS-NOISE\_SENSITIVITY}(\sigma) = \frac{q_\sigma}{q_0}$$
 **Related metrics:**
 - *Complements:* `RELIABILITY-SUCCESS_RATE` (captures run-to-run variance from noise)
 - *Do not use alone:* Always report the noise level $\sigma$ used.
+
+**Implementation reference:** Pending IMPL-011 — `corvus_corone/analysis/metrics.py` → `compute_robustness_noise_sensitivity(noiseless_records, noisy_records)`

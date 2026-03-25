@@ -85,9 +85,9 @@ Six milestones group all open documentation and design tasks.
 - [x] **[REF-TASK-0017] TIME-EVALUATIONS_TO_TARGET Standard Reporting Set decision** — weigh pre-specification burden vs. efficiency metric value; create ADR
 - [x] **[REF-TASK-0020] Statistical test selection procedure** — decision tree: Wilcoxon (2 algorithms) vs Kruskal-Wallis + Holm-Bonferroni (>2); document in `statistical-methodology.md §3`
 - [x] **[REF-TASK-0021] Problem instance diversity minimum requirements** — quantitative floor (ADR-008 *(planned)* candidate: ≥5 instances, ≥2 dimensionality ranges, ≥1 noise + ≥1 deterministic)
-- [ ] **[REF-TASK-0022] Algorithm sensitivity documentation format** — `SensitivityReport` schema field in `AlgorithmInstance`; requires `data-format.md §2.2`
-- [ ] **[REF-TASK-0019] Level 1 required visualizations** — mandatory EDA set (boxplot, convergence curves, ECDF, violin); document in `statistical-methodology.md §2`
-- [ ] **[REF-TASK-0015] Metric implementation references** — link each metric definition to `corvus_corone/analysis/metrics.py`; fulfilled as part of IMPL-011
+- [x] **[REF-TASK-0022] Algorithm sensitivity documentation format** — `SensitivityReport` schema field in `AlgorithmInstance`; requires `data-format.md §2.2`
+- [x] **[REF-TASK-0019] Level 1 required visualizations** — mandatory EDA set (boxplot, convergence curves, ECDF, violin); document in `statistical-methodology.md §2`
+- [x] **[REF-TASK-0015] Metric implementation references** — link each metric definition to `corvus_corone/analysis/metrics.py`; fulfilled as part of IMPL-011
 - [ ] **[REF-TASK-0014] Metric taxonomy extensions** *(Post-V1)* — new metrics after first real studies
 - [ ] **[REF-TASK-0018] Research question archetypes** *(Post-V1)* — Metric Selection Guide additions from real study patterns
 

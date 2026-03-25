@@ -34,3 +34,5 @@ Note: `n_successful` is already a required top-level field in `AggregateValue` a
 **Related metrics:**
 - *Complements:* `QUALITY-BEST_VALUE_AT_BUDGET`, `TIME-EVALUATIONS_TO_TARGET`
 - *Do not use alone:* Always report the target $\tau$ value explicitly alongside this metric.
+
+**Implementation reference:** Pending IMPL-011 — `corvus_corone/analysis/metrics.py` → `compute_reliability_success_rate(performance_records, target)`

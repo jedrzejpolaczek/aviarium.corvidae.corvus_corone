@@ -37,3 +37,5 @@ If $\min_k f(x_k) > \tau$, the value is $B + 1$.
 **Related metrics:**
 - *Complements:* `RELIABILITY-SUCCESS_RATE` (whether target is reached), `ANYTIME-ECDF_AREA`
 - *Do not use alone:* Always report `RELIABILITY-SUCCESS_RATE` alongside this metric.
+
+**Implementation reference:** Pending IMPL-011 — `corvus_corone/analysis/metrics.py` → `compute_time_evaluations_to_target(performance_records, target)`

@@ -172,110 +172,128 @@ flowchart TB
 
 ## Containers
 
-### Public API + CLI
-
-**Responsibility:** Expose the complete researcher-facing surface of the library — the
-Python module API (`import corvus_corone as cc`) and the `corvus` terminal commands —
-as a single thin coordination layer that delegates to the Core Layer.
-
-**Technology:** Python · [Click](https://click.palletsprojects.com/) (CLI framework).
-Click was chosen because it integrates cleanly with Python packaging (`console_scripts`
-entry point), supports composable command groups, and generates `--help` output
-automatically from docstrings and parameter annotations. No separate build step is
-required.
-
-**Interfaces exposed:**
-
-| Surface | Form | Who uses it |
+| Container | Layer | File |
 |---|---|---|
-| Python API | Module functions: `cc.create_study()`, `cc.run()`, `cc.list_problems()`, `cc.generate_reports()`, `cc.export_raw_data()`, etc. | Researcher (scripts, notebooks), Algorithm Author |
-| CLI | `corvus run`, `corvus list-problems`, `corvus list-algorithms`, `corvus report`, `corvus verify`, `corvus export` | Researcher (terminal), CI scripts |
-
-Full Python API contract:
-`docs/03-technical-contracts/04-public-api-contract.md`
-
-Full CLI command reference and complete example session:
-[`02-cli-spec.md`](02-cli-spec.md)
-
-**Dependencies:**
-
-| Dependency | Reason |
-|---|---|
-| Study Orchestrator | `cc.create_study()` and `cc.run()` delegate orchestration to this component |
-| Algorithm Registry | `cc.list_algorithms()` / `cc.get_algorithm()` read from the registry |
-| Problem Repository | `cc.list_problems()` / `cc.get_problem()` read from the repository |
-| Results Store | `cc.get_experiment()`, `cc.get_runs()`, `cc.get_result_aggregates()`, `cc.export_raw_data()` read from the store |
-| Reporting Engine | `cc.generate_reports()` delegates report generation here |
-
-**Data owned:** None. This container holds no persistent state. All storage is
-delegated to the Data & Registry layer.
-
-**Actors served:** Researcher (primary), Algorithm Author (registry reads), Learner
-(future — visualisation commands).
-
-**Relevant SRS section:** FR-4.1 (problem registry reads), FR-4.2 (algorithm registry
-reads), FR-4.3 (study execution), FR-4.5 (reproducibility), FR-4.6 (reporting).
-
-### Reporting Engine
-
-**Responsibility:** Generate HTML analysis reports for a completed Experiment — one
-`researcher` report with full statistical detail and one `practitioner` report with
-plain-language findings.
-
-**Technology:** Python · Jinja2 (HTML templates) · Matplotlib (visualization).
-Jinja2 generates the HTML report structure; Matplotlib renders all four mandatory
-Level 1 visualizations as inline SVG embedded in the HTML.
-
-**Interfaces exposed:**
-
-| Surface | Form | Who uses it |
-|---|---|---|
-| Report generation | Called by Public API container via `cc.generate_reports()` | Researcher (via API or `corvus report`) |
-| Report files | Two HTML files on disk; paths returned via `Report.artifact_reference` | Researcher, Practitioner (read-only consumers) |
-
-Full report structure, section content, visualization specifications, and audience
-language rules:
-[`03-report-format-spec.md`](03-report-format-spec.md)
-
-**Dependencies:**
-
-| Dependency | Reason |
-|---|---|
-| Results Store | Reads `ResultAggregate`, `Run`, `PerformanceRecord`, and `Study` entities for the target Experiment |
-| Repository (reports sub-store) | Writes `Report` entity records and stores HTML artifacts |
-
-**Data owned:** Generated `Report` entity records and their HTML artifact files.
-The Reports directory within the `LocalFileRepository` root (`reports/<uuid>.json`
-and the HTML files written alongside it).
-
-**Actors served:** Researcher (primary, via full statistical report); Practitioner
-(via summary report, through `corvus report` or direct path).
-
-**Relevant SRS section:** FR-20 (two reports per experiment), FR-21 (mandatory
-limitations section, no rankings), FR-22 (raw data export alongside reports).
+| Public API + CLI | Entry Layer | [04-public-api-cli.md](04-public-api-cli.md) |
+| Study Orchestrator | Core Layer | [07-study-orchestrator.md](07-study-orchestrator.md) |
+| Experiment Runner | Core Layer | [08-experiment-runner.md](08-experiment-runner.md) |
+| Analysis Engine | Core Layer | [09-analysis-engine.md](09-analysis-engine.md) |
+| Reporting Engine | Core Layer | [05-reporting-engine.md](05-reporting-engine.md) |
+| Algorithm Visualization Engine | Core Layer | [06-algorithm-visualization-engine.md](06-algorithm-visualization-engine.md) |
+| Algorithm Registry | Data & Registry | [10-algorithm-registry.md](10-algorithm-registry.md) |
+| Problem Repository | Data & Registry | [11-problem-repository.md](11-problem-repository.md) |
+| Results Store | Data & Registry | [12-results-store.md](12-results-store.md) |
+| Ecosystem Bridge | Data & Registry | [13-ecosystem-bridge.md](13-ecosystem-bridge.md) |
 
 ---
 
 ## Key End-to-End Flows
 
-<!--
-  Describe the most architecturally significant flows — those that cross multiple containers.
-  These flows make the architecture "come alive" and reveal integration points.
+### Flow 1: Design and execute a benchmarking study
 
-  For each flow:
-    - Name: a short, human-readable label (e.g., "Run a benchmarking study")
-    - Trigger: what initiates this flow? (researcher action, scheduled job, API call)
-    - Steps: numbered sequence of container interactions
-    - Data exchanged at each step: reference specs/data-format.md entity names
-    - End state: what is different in the system after this flow completes?
+**Use case:** UC-01 · **Trigger:** Researcher calls `cc.create_study()` then `cc.run()`
 
-  Hint — flows to consider:
-    1. "Design and execute a benchmarking study" (main researcher workflow)
-    2. "Register a new benchmark problem" (contributor workflow)
-    3. "Register a new algorithm implementation" (algorithm author workflow)
-    4. "Generate a study report" (practitioner workflow)
-    5. "Export results to IOHprofiler / COCO" (interoperability workflow)
-    6. "Reproduce a published study" (reproducibility workflow)
+| # | From | To | Data exchanged |
+|---|---|---|---|
+| 1 | Researcher | Public API + CLI | Study definition: `research_question`, `problem_instance_ids`, `algorithm_instance_ids`, `experimental_design`, `pre_registered_hypotheses` |
+| 2 | Public API + CLI | Study Orchestrator | `Study` record (draft) → `StudyRepository.create_study()` |
+| 3 | Study Orchestrator | Results Store | `Study` locked — `StudyRepository.lock_study()` transitions status to `"locked"`; fields become immutable |
+| 4 | Study Orchestrator | Experiment Runner | `run_study(study)` — locked `Study` record |
+| 5 | Experiment Runner | Algorithm Registry | `get_algorithm(algorithm_instance_id)` per Run — returns `AlgorithmInstance` |
+| 6 | Experiment Runner | Problem Repository | `get_problem(problem_instance_id)` per Run — returns `ProblemInstance` |
+| 7 | Experiment Runner | Results Store | `create_run(run)` + `save_performance_records(run_id, records)` — `Run` + `PerformanceRecord[]` written after each trigger fires (ADR-002) |
+| 8 | Study Orchestrator | Analysis Engine | `analyze(experiment_id, config)` — triggered after all Runs reach `"completed"` or `"failed"` |
+| 9 | Analysis Engine | Results Store | Reads `PerformanceRecord[]` per Run; writes `ResultAggregate[]` via `save_result_aggregates()` |
+| 10 | Study Orchestrator | Reporting Engine | `generate_reports(experiment_id)` |
+| 11 | Reporting Engine | Results Store | Reads `ResultAggregate[]`, `Run[]`, `Study`; writes `Report` entity + two HTML artifacts |
+| 12 | Public API + CLI | Researcher | Report file paths + raw data export |
 
-  Each flow here should correspond to a use case in SRS §3.
--->
+**End state:** Completed `Experiment` record with `Run[]`, `PerformanceRecord[]`, `ResultAggregate[]`, and two `Report` HTML files on disk. All entities version-pinned and reproducible.
+
+---
+
+### Flow 2: Register a new benchmark problem
+
+**Use case:** UC-04 · **Trigger:** Community Contributor calls `corvus verify` or `cc.register_problem()` with a new `ProblemInstance` record
+
+| # | From | To | Data exchanged |
+|---|---|---|---|
+| 1 | Community Contributor | Public API + CLI | `ProblemInstance` record: `name`, `version`, search space descriptor, `landscape_characteristics`, `provenance`, `source_reference` |
+| 2 | Public API + CLI | Problem Repository | `register_problem(problem)` — full `ProblemInstance` |
+| 3 | Problem Repository | Problem Repository | Validation: required fields present; `dimensions == len(variables)`; variable bounds valid per type |
+| 4 | Problem Repository | Results Store | `ProblemInstance` persisted under `problems/<id>/` with assigned UUID |
+| 5 | Public API + CLI | Community Contributor | Registered ID or structured rejection with specific missing-field errors (F1) / duplicate warning (F2) |
+
+**End state:** `ProblemInstance` record published and available in `list_problems()` for Study design. Deprecated instances remain retrievable by exact ID for reproducibility.
+
+---
+
+### Flow 3: Register a new algorithm implementation
+
+**Use case:** UC-02 · **Trigger:** Algorithm Author calls `corvus verify` or `cc.register_algorithm()` with a new `AlgorithmInstance` record
+
+| # | From | To | Data exchanged |
+|---|---|---|---|
+| 1 | Algorithm Author | Public API + CLI | `AlgorithmInstance` record: `name`, `algorithm_family`, `code_reference` (version-pinned), `configuration_justification`, `hyperparameters`, `known_assumptions` |
+| 2 | Public API + CLI | Algorithm Registry | `register_algorithm(algorithm)` — full `AlgorithmInstance` |
+| 3 | Algorithm Registry | Algorithm Registry | Validation: `code_reference` resolvable and version-pinned; `configuration_justification` non-empty; hyperparameter schema matches declared names; Algorithm interface satisfied |
+| 4 | Algorithm Registry | Results Store | `AlgorithmInstance` persisted under `algorithms/<id>/` with assigned UUID |
+| 5 | Public API + CLI | Algorithm Author | Registered ID or structured rejection (F1–F4: interface missing, code unresolvable, no justification, schema mismatch) |
+
+**End state:** `AlgorithmInstance` record published and available in `list_algorithms()` for Study design. The implementation is version-pinned and independently reproducible.
+
+---
+
+### Flow 4: Generate a study report (practitioner workflow)
+
+**Use case:** UC-03 · **Trigger:** Practitioner accesses reports from a completed Experiment via `corvus report` or direct HTML path
+
+| # | From | To | Data exchanged |
+|---|---|---|---|
+| 1 | Practitioner | Public API + CLI | Query: problem characteristics matching their application domain |
+| 2 | Public API + CLI | Results Store | `ExperimentRepository.list_experiments()` + `StudyRepository.list_studies()` — returns `ExperimentSummary[]` with matched problem characteristic tags |
+| 3 | Practitioner | Public API + CLI | `get_report(experiment_id)` — requests Practitioner Report for a specific Experiment |
+| 4 | Public API + CLI | Results Store | `ReportRepository.list_reports(experiment_id)` — returns `Report` records with `artifact_reference` (HTML file path) |
+| 5 | Public API + CLI | Practitioner | Practitioner Report HTML: scoped summaries, explicit limitations section, no global rankings (FR-20, FR-21) |
+
+**End state:** Practitioner has read evidence scoped to matching problem characteristics, with explicit limitations and scope boundary. No new data is written; the Results Store is read-only in this flow.
+
+---
+
+### Flow 5: Export results to IOHprofiler / COCO
+
+**Use case:** UC-06 · **Trigger:** Researcher calls `corvus export` or `cc.export_raw_data()` with a target format
+
+| # | From | To | Data exchanged |
+|---|---|---|---|
+| 1 | Researcher | Public API + CLI | `experiment_id`, `format` (`"coco"` / `"ioh"` / `"nevergrad"`), `output_dir` |
+| 2 | Public API + CLI | Ecosystem Bridge | `export(experiment, format)` |
+| 3 | Ecosystem Bridge | Results Store | Reads `Study`, `Experiment`, `Run[]`, `PerformanceRecord[]`, `AlgorithmInstance[]`, `ProblemInstance[]` for the target Experiment |
+| 4 | Ecosystem Bridge | Ecosystem Bridge | Applies format mapping (→ `data-format.md §4`); identifies fields with no target equivalent; builds `information_loss_manifest` |
+| 5 | Ecosystem Bridge | Public API + CLI | Pre-export manifest listing `LOSS-*` items — critical items (e.g., `LOSS-COCO-01`) displayed before export proceeds |
+| 6 | Researcher | Public API + CLI | Confirms export |
+| 7 | Ecosystem Bridge | Researcher | Export files in target format (`*.info` + `*.dat` for COCO; JSON sidecar + `*.dat` for IOH; JSON-lines for Nevergrad) + `information_loss_manifest` |
+
+**End state:** Export files written to `output_dir`. `information_loss_manifest` documents every field dropped or approximated. No Corvus entities are modified.
+
+---
+
+### Flow 6: Reproduce a published study
+
+**Use case:** UC-05 · **Trigger:** Researcher retrieves archived Study artifacts and calls `cc.run()` using the archived Study plan and original seeds
+
+| # | From | To | Data exchanged |
+|---|---|---|---|
+| 1 | Researcher | External artifact repository | Retrieves archived `Study` record, `AlgorithmInstance` versions, `ProblemInstance` versions, `Run` seed assignments |
+| 2 | Researcher | Public API + CLI | Imports archived `Study` record (status `"locked"`) and pinned entity versions |
+| 3 | Public API + CLI | Algorithm Registry | `register_algorithm()` for each pinned `AlgorithmInstance` version (if not already present) |
+| 4 | Public API + CLI | Problem Repository | `register_problem()` for each pinned `ProblemInstance` version (if not already present) |
+| 5 | Public API + CLI | Study Orchestrator | `run_study(study)` — locked `Study` with seeds from archived `Run` records (not re-generated) |
+| 6 | Study Orchestrator | Experiment Runner | `run_study(study)` — seeds injected from archived records |
+| 7 | Experiment Runner | Algorithm Registry | `get_algorithm(id, version="<pinned>")` — exact archived version |
+| 8 | Experiment Runner | Problem Repository | `get_problem(id, version="<pinned>")` — exact archived version |
+| 9 | Experiment Runner | Results Store | Writes new `Experiment` record linked to original `Study.id`; `Run[]` + `PerformanceRecord[]` |
+| 10 | Study Orchestrator | Analysis Engine | `analyze(experiment_id, config)` on the new Experiment |
+| 11 | Public API + CLI | Researcher | New `ResultAggregate[]` for comparison against original published aggregates |
+
+**End state:** New `Experiment` record exists, linked to the original `Study` by `study_id`. Researcher can compare `ResultAggregate[]` between the original and verification Experiment. Agreement or divergence is documented — both are valid scientific outcomes.

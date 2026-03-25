@@ -196,8 +196,8 @@ Six milestones group all open documentation and design tasks.
 ## Learner Actor — Education Platform
 > New actor introduced after V1: Learner persona with Algorithm Visualization, Socratic guidance mode, algorithm history/evolution features. Requires C1, SRS, C2, GLOSSARY updates.
 
-- [ ] **[REF-TASK-0025] Add Learner actor to C1 context document** — role, goals, gives/gets, relationship to Researcher data flow, C1 diagram update ·
-- [ ] **[REF-TASK-0026] Add Learner use cases to SRS §3** — UC-06 (visualization), UC-07 (contextual help), UC-08 (Socratic), UC-09 (algorithm history), UC-10 (explore Researcher results) ·
+- [x] **[REF-TASK-0025] Add Learner actor to C1 context document** — role, goals, gives/gets, relationship to Researcher data flow, C1 diagram update ·
+- [x] **[REF-TASK-0026] Add Learner use cases to SRS §3** — UC-06 (visualization), UC-07 (contextual help), UC-08 (Socratic), UC-09 (algorithm history), UC-10 (explore Researcher results) ·
 - [ ] **[REF-TASK-0027] Add Algorithm Visualization Engine container to C2** — matplotlib/plotly/manim; ADR for technology choice; diagram update ·
 - [ ] **[REF-TASK-0028] Add Socratic Guide component to C2/C3** — LangGraph `--mode socratic`; guides toward understanding rather than answering ·
 - [ ] **[REF-TASK-0029] Add Learner terms to GLOSSARY.md** — Learner, Algorithm Visualization, Algorithm Genealogy, Socratic Mode ·

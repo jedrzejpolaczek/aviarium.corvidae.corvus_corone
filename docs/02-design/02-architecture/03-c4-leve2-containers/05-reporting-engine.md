@@ -1,6 +1,6 @@
 # Container: Reporting Engine
 
-> Index: [01-c2-containers.md](01-c2-containers.md)
+> Index: [01-index.md](01-index.md)
 
 **Responsibility:** Generate HTML analysis reports for a completed Experiment — one
 `researcher` report with full statistical detail and one `practitioner` report with

@@ -144,6 +144,8 @@ flowchart LR
 
 ## Actors
 
+> Individual actor descriptions: [actors/](actors/)
+
 ### Researcher
 
 **Role:** A scientist or engineer conducting comparative studies of HPO algorithm behavior.
@@ -247,6 +249,8 @@ The Learner does not modify, re-run, or extend any Study. They read completed Re
 ---
 
 ## External Systems
+
+> Individual external system descriptions: [external-systems/](external-systems/)
 
 ### COCO (Comparing Continuous Optimizers)
 

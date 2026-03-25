@@ -1,6 +1,6 @@
 # Container: Study Orchestrator
 
-> Index: [01-c2-containers.md](01-c2-containers.md)
+> Index: [01-index.md](01-index.md)
 
 **Responsibility:** Coordinate the full lifecycle of a Study — from creation and locking
 through execution and analysis to report generation. Acts as the top-level workflow engine:

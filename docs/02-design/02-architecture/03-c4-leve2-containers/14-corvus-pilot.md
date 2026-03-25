@@ -1,6 +1,6 @@
 # Container: Corvus Pilot (V2 Researcher Agent)
 
-> Index: [01-c2-containers.md](01-c2-containers.md)
+> Index: [01-index.md](01-index.md)
 
 **Responsibility:** Provide an LLM-powered interaction layer on top of the core Corvus Corone
 library — enabling conversational study design, guided algorithm understanding, and Socratic

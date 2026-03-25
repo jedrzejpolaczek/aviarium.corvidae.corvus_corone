@@ -1,6 +1,6 @@
 # Container: Algorithm Registry
 
-> Index: [01-c2-containers.md](01-c2-containers.md)
+> Index: [01-index.md](01-index.md)
 
 **Responsibility:** Store, version, and serve `AlgorithmInstance` records — the registry of
 all algorithm implementations available for benchmarking. Validates new registrations against

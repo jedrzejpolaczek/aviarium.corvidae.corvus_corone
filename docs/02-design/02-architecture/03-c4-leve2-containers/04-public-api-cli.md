@@ -1,6 +1,6 @@
 # Container: Public API + CLI
 
-> Index: [01-c2-containers.md](01-c2-containers.md)
+> Index: [01-index.md](01-index.md)
 
 **Responsibility:** Expose the complete researcher-facing surface of the library — the
 Python module API (`import corvus_corone as cc`) and the `corvus` terminal commands —

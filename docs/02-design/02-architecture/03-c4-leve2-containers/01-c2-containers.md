@@ -175,6 +175,7 @@ flowchart TB
 | Container | Layer | File |
 |---|---|---|
 | Public API + CLI | Entry Layer | [04-public-api-cli.md](04-public-api-cli.md) |
+| Corvus Pilot V2 | Entry Layer (Agent) | [14-corvus-pilot.md](14-corvus-pilot.md) |
 | Study Orchestrator | Core Layer | [07-study-orchestrator.md](07-study-orchestrator.md) |
 | Experiment Runner | Core Layer | [08-experiment-runner.md](08-experiment-runner.md) |
 | Analysis Engine | Core Layer | [09-analysis-engine.md](09-analysis-engine.md) |

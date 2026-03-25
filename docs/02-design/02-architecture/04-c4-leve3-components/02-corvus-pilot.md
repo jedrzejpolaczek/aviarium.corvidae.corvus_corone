@@ -11,7 +11,7 @@ Actors: Researcher (direct mode), Learner (Socratic mode, UC-08, UC-09).
 ---
 
 ## Component Diagram
-
+<!-- FIXME: diagram -->
 ```mermaid
 ---
 config:

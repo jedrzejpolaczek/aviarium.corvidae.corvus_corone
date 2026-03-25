@@ -560,3 +560,53 @@ Terms are listed alphabetically within sections.
 **Format:** `MAJOR.MINOR.PATCH` where MAJOR increments on breaking changes (removed/renamed fields, type changes), MINOR increments on non-breaking additions (new optional fields, new entity types), and PATCH increments on corrections only.
 
 **Used in:** `docs/03-technical-contracts/01-data-format/13-schema-versioning.md` §6.3–6.4, `docs/05-community/02-versioning-governance.md` §1–2; present in every entity record (Problem Instance, Algorithm Instance, Study, Experiment, Run, ResultAggregate, Report).
+
+---
+
+## Learner Actor & Education Platform
+
+### Algorithm Genealogy
+
+**Definition:** The historical lineage of an optimization method — what problem it was designed to solve, what methods preceded it, and what methods it inspired — presented as a directed graph from ancestor algorithms to descendants.
+
+**Distinguished from:** an algorithm's *mathematical specification* (which describes how it works, not where it came from) and from *Algorithm Visualization* (which depicts how an algorithm searches, not its historical context). Algorithm Genealogy answers "where did this algorithm come from?"; Algorithm Visualization answers "how does it behave?".
+
+**Used in:** `docs/02-design/01-software-requirement-specification/02-use-cases/11-uc-10.md` (UC-10: Algorithm History), `docs/02-design/02-architecture/04-c4-leve3-components/02-corvus-pilot.md`. IMPL-046.
+
+**Example:** The CMA-ES genealogy includes Evolution Strategies (1960s–1970s) as ancestors, CMA (1996) as the covariance-matrix refinement, and variants such as BIPOP-CMA-ES and separable CMA-ES as descendants. The genealogy records the design problem each step solved (e.g., "how to adapt step size without manual tuning").
+
+---
+
+### Algorithm Visualization
+
+**Definition:** A graphical representation of an HPO algorithm's mechanics designed to serve two audiences: mathematically precise (for the Researcher and Algorithm Author who need exact characterization) and intuitively understandable (for the Learner who needs geometric or animated intuition). May be static (PNG/SVG), animated (GIF), or interactive (HTML).
+
+**Distinguished from:** *Report visualizations* (the four Level 1 mandatory charts — VIZ-L1-01..04 — which compare algorithm *performance* across Runs). Algorithm Visualization depicts how an algorithm *searches* mechanically; Report visualizations compare how much *progress* different algorithms made. Algorithm Visualization is produced by the Algorithm Visualization Engine; Report visualizations are produced by the Reporting Engine.
+
+**Used in:** `docs/02-design/01-software-requirement-specification/02-use-cases/08-uc-07.md` (UC-07: Algorithm Visualisation), `docs/02-design/02-architecture/03-c4-leve2-containers/06-algorithm-visualization-engine.md`, `docs/02-design/02-architecture/01-adr/adr-011-visualization-technology.md`. IMPL-044.
+
+**Example:** A search trajectory scatter plot showing where TPE sampled candidates across a 2D search space is an Algorithm Visualization. A box-plot comparing QUALITY-BEST_VALUE_AT_BUDGET across three algorithms is a Report visualization.
+
+---
+
+### Learner
+
+**Definition:** A user who consumes Researcher study results and algorithm documentation for educational purposes — to understand HPO algorithm behavior, mechanics, and historical context — rather than to conduct primary research or make operational algorithm selection decisions.
+
+**Distinguished from:** *Researcher* (who conducts and reports Studies), *Practitioner* (who selects algorithms based on Study results for deployment), and *Algorithm Author* (who contributes implementations). The Learner is a **downstream read-only consumer** of artifacts produced by the Researcher. The Learner does not create or modify any Study, Experiment, or Report entity.
+
+**Used in:** `docs/02-design/02-architecture/02-c4-leve1-context/01-c1-context.md` (C1 actor definition), `docs/02-design/01-software-requirement-specification/02-use-cases/01-use-cases.md` (UC-07..UC-11), `docs/02-design/02-architecture/03-c4-leve2-containers/06-algorithm-visualization-engine.md`, `docs/02-design/02-architecture/03-c4-leve2-containers/14-corvus-pilot.md`.
+
+**Example:** A graduate student who has completed a benchmarking study with their supervisor and now wants to understand *why* CMA-ES outperformed random search on ill-conditioned problems is acting as a Learner. They read the Report produced by the Researcher, explore Algorithm Visualizations, and use Socratic mode to reason through the mechanism independently.
+
+---
+
+### Socratic Mode
+
+**Definition:** An interaction mode in Corvus Pilot where the system guides the Learner toward understanding through targeted bridging questions rather than providing direct answers. Named after the Socratic method of inquiry. The system identifies the Learner's current knowledge state, identifies the gap between that state and the target understanding, and generates one question per turn that moves the Learner one reasoning step forward.
+
+**Distinguished from:** *direct-answer mode* (the default Corvus Pilot mode, which answers factual and task queries immediately). Socratic Mode is explicitly opt-in: activated by the `--mode socratic` CLI flag or by `mode: "socratic"` in `PilotState`. The two modes differ in routing, output structure (question vs answer), and goal (maximise Learner's independent reasoning vs minimise turns to resolution). Socratic Mode is implemented as a separate LangGraph node (`socratic_guide`), not as a prompt modification of the direct-answer node.
+
+**Used in:** `docs/02-design/01-software-requirement-specification/02-use-cases/10-uc-09.md` (UC-09: Socratic Guided Deduction), `docs/02-design/02-architecture/03-c4-leve2-containers/14-corvus-pilot.md`, `docs/02-design/02-architecture/04-c4-leve3-components/02-corvus-pilot.md` (Socratic Guide Node, Query Router), `docs/06-tutorials/05-learner-socratic-mode.md`. IMPL-045.
+
+**Example:** Learner asks: "Why does CMA-ES use a covariance matrix?" Socratic Mode response: "What does the covariance matrix represent geometrically? Think about what information it encodes about the search space." The system does not answer the original question; it asks a question that helps the Learner derive the answer themselves.

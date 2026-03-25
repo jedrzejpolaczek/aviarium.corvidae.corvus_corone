@@ -40,7 +40,7 @@ This means every entity definition in §2 MUST satisfy all of the following:
 | **Cross-entity references by ID only** | No field may reference another entity by file path or local directory structure. All foreign keys are entity IDs. |
 | **No file system assumptions** | Entity schemas do not encode directory layout, file naming, or path separators. Storage layout is an implementation detail of the `Repository` (see `interface-contracts.md`). |
 
-Bulk data storage (e.g., high-volume Performance Records) may use efficient binary formats (Parquet, HDF5) as a secondary representation, but the primary schema remains JSON. This is a separate ADR decision (`TODO: REF-TASK-0024`).
+Bulk data storage (e.g., high-volume Performance Records) uses **Parquet with snappy compression** as a secondary representation for Runs exceeding 1,000 records (ADR-010). The primary JSON schema remains canonical and is never removed. See §3.3 for the operational specification.
 
 ```mermaid
 %%{init: {"look": "neo", "layout": "elk", "theme": "redux-dark", "themeVariables": {"background": "transparent"}}}%%
@@ -99,7 +99,7 @@ flowchart TD
 | §2.6 Performance Record | [07-performance-record.md](07-performance-record.md) | ✅ Formal schema |
 | §2.7 Result Aggregate | [08-result-aggregate.md](08-result-aggregate.md) | ✅ Formal schema |
 | §2.8 Report | [09-report.md](09-report.md) | ✅ Formal schema |
-| §3 File Formats and Storage | [10-file-formats.md](10-file-formats.md) | ✅ §3.1 IOHprofiler export, §3.2 LocalFileRepository layout complete |
+| §3 File Formats and Storage | [10-file-formats.md](10-file-formats.md) | ✅ §3.1 IOHprofiler export, §3.2 LocalFileRepository layout, §3.3 Parquet bulk format complete |
 | §4 Interoperability Mappings | [11-interoperability-mappings.md](11-interoperability-mappings.md) | ✅ §4.1 COCO, §4.2 IOHprofiler, §4.3 Nevergrad complete |
 | §5 Validation Rules (Cross-Entity) | [12-cross-entity-validation.md](12-cross-entity-validation.md) | 🚧 Pending |
 | §6 Schema Versioning | [13-schema-versioning.md](13-schema-versioning.md) | 🚧 Pending |

@@ -223,12 +223,66 @@ No field rewriting is needed. This is the ADR-001 guarantee in practice.
 
 ---
 
-## §3.3 Bulk performance data (future)
+## §3.3 Bulk performance data (Parquet secondary format)
 
-> **Status:** 🚧 Pending ADR decision (`TODO: REF-TASK-0024`)
+> **ADR-010** — benchmark evidence and decision rationale: `adr-010-bulk-performance-record-format.md`
 
-For studies with very large budgets (>10,000 evaluations per Run), JSON Lines
-may become a bottleneck. A future ADR will decide whether to add Parquet or
-HDF5 as an optional secondary format for `performance_records`. The primary
-`performance_records.jsonl` format remains canonical; any bulk format is an
-optimization layer, not a replacement.
+For Runs whose PerformanceRecord count reaches the `bulk_storage_threshold` (default:
+1,000 records per Run; configurable), the Repository writes a secondary Parquet file
+alongside the canonical JSON Lines file:
+
+```
+runs/<run-uuid>/
+├── run.json                     ← primary (always present; ADR-001)
+├── performance_records.jsonl    ← primary (always present; ADR-001)
+└── performance_records.parquet  ← secondary (present when threshold is reached)
+```
+
+The `.parquet` file is **read in preference to `.jsonl`** by `runs.get_performance_records()`
+when present, giving a **20× write and 59× query speedup** (ADR-010 benchmark,
+150,000 records). The `.jsonl` file is never deleted.
+
+### Secondary format specification
+
+| Property | Value |
+|---|---|
+| Format | Apache Parquet |
+| Compression | snappy |
+| Library | `pyarrow >= 13.0` (core dependency) |
+| Row group size | 500 rows (enables predicate pushdown on `run_id`) |
+| Written by | `runs.save_bulk_performance_records()` |
+| Read by | `runs.get_performance_records()` (transparent; same return type) |
+| Fallback | On `ArrowIOError`, falls back to `.jsonl` with a warning log entry |
+
+### Parquet column schema
+
+| Column | Arrow type | §2.6 field |
+|---|---|---|
+| `run_id` | `pa.string()` | `run_id` |
+| `evaluation_number` | `pa.int32()` | `evaluation_number` |
+| `elapsed_time` | `pa.float64()` | `elapsed_time` |
+| `objective_value` | `pa.float64()` | `objective_value` |
+| `is_improvement` | `pa.bool_()` | `is_improvement` |
+| `trigger_reason` | `pa.dictionary(pa.int8(), pa.string())` | `trigger_reason` (7-value enum; dictionary-encoded) |
+| `current_solution` | `pa.string()` | `current_solution` (JSON-serialised; null if not stored) |
+
+### Benchmark summary (150,000 records)
+
+| Format | Write time | File size | Query: run_id=X (100/150k) |
+|---|---|---|---|
+| JSON Lines | 3.41 s | 38.2 MB | 0.41 s |
+| Parquet / snappy | 0.17 s | 4.1 MB | 0.007 s |
+| HDF5 / gzip level 4 | 0.93 s | 6.8 MB | 0.19 s |
+
+Full benchmark method, alternative analysis, and HDF5 rejection rationale: ADR-010.
+
+### Invariants
+
+- The `.jsonl` file is the **source of truth** for V2 migration and for schema
+  version mismatch recovery. It is never removed.
+- If the stored Parquet schema version does not match the current §2.6 schema
+  version, `save_bulk_performance_records()` regenerates the Parquet file from
+  `.jsonl` before returning.
+- A round-trip test is required: records written via `save_bulk_performance_records()`
+  and read via `get_performance_records()` must be identical to records stored and
+  read via the JSON Lines path for the same Run.

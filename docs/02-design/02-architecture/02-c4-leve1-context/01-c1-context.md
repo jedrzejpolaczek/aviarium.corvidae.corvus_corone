@@ -184,10 +184,9 @@ flowchart LR
 
 **Relevant principles:** 8 (precision of description), 10 (configuration fairness), 11 (sensitivity documentation), 31 (fairness in comparisons).
 
-> **`TODO: REF-TASK-0004`** — Define the "10-line wrapper" onboarding experience for Algorithm Authors.
-> The contribution interface should require minimal boilerplate for wrapping existing optimizers.
-> Owner: library design lead. Acceptance: a tutorial exists in `docs/06_tutorials/` demonstrating
-> wrapping an Optuna sampler in under 15 lines of code.
+> **REF-TASK-0004 complete** — Onboarding tutorial exists at
+> `docs/06-tutorials/04-algorithm-author-onboarding.md`. Demonstrates wrapping an Optuna TPE
+> sampler in 15 lines of behavioral adapter code.
 
 ---
 
@@ -216,6 +215,34 @@ flowchart LR
 **Gets from the system:** *(operational role — no study outputs)*
 
 **Relevant principles:** 21 (artifact versioning), 22 (long-term availability), 26 (system interoperability).
+
+---
+
+### Learner
+
+**Role:** A student, practitioner, or researcher seeking to understand HPO algorithm behavior through interactive exploration and guided discovery — consuming existing study results as teaching material rather than producing new ones.
+
+**Goal:** Build deep understanding of optimization algorithms through visualizations of mathematical foundations, historical context, and Socratic guidance, without designing or running studies themselves.
+
+**Gives the system:** Learning queries, algorithm exploration requests, feedback on explanations.
+
+**Gets from the system:**
+- Algorithm visualizations (mathematical and intuitive, for general audiences — MANIFESTO Principle 25)
+- Historical context: where the method originated, what problem it was designed to solve
+- Socratic guidance: guided questions and counterexamples rather than direct answers (MANIFESTO Principle 28)
+- Access to Researcher study results as learning material — the Learner consumes Reports and ResultAggregates produced by the Researcher's Studies
+
+**Relationship to Researcher:**
+
+The Learner is a **downstream consumer** of the Researcher actor's output. The data flow is one-directional:
+
+```
+Researcher → [Study → Experiment → Report / ResultAggregates] → Learner
+```
+
+The Learner does not modify, re-run, or extend any Study. They read completed Reports and ResultAggregates to understand algorithm behavior. The Researcher's obligation to scope conclusions correctly (MANIFESTO Principle 3) is therefore the Learner's protection: a Report that overstates its conclusions misleads both the Practitioner and the Learner equally.
+
+**Relevant principles:** 3 (scoped conclusions — protects the Learner from over-generalisation), 25 (accessibility for different audiences), 28 (education and support).
 
 ---
 

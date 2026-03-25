@@ -30,3 +30,5 @@ $$\text{ROBUSTNESS-RESULT\_STABILITY} = Q_{75}(q_1,\ldots,q_N) - Q_{25}(q_1,\ldo
 **Related metrics:**
 - *Complements:* `QUALITY-BEST_VALUE_AT_BUDGET` (central tendency), `RELIABILITY-SUCCESS_RATE`
 - *Do not use alone:* Always report alongside the central tendency metric.
+
+**Implementation reference:** Pending IMPL-011 — `corvus_corone/analysis/metrics.py` → `compute_robustness_result_stability(performance_records)`

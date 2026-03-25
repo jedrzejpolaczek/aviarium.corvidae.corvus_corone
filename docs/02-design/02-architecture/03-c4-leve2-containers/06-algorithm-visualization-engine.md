@@ -1,6 +1,6 @@
 # Container: Algorithm Visualization Engine
 
-> Index: [01-c2-containers.md](01-c2-containers.md)
+> Index: [01-index.md](01-index.md)
 
 **Responsibility:** Generate algorithm-understanding visualizations for the Learner actor
 (UC-07..UC-11) — static and animated representations of how HPO algorithms work mechanically,

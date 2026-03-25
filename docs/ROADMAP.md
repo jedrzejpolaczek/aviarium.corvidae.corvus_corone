@@ -201,7 +201,7 @@ Six milestones group all open documentation and design tasks.
 - [x] **[REF-TASK-0027] Add Algorithm Visualization Engine container to C2** — matplotlib/plotly/manim; ADR for technology choice; diagram update ·
 - [x] **[REF-TASK-0028] Add Socratic Guide component to C2/C3** — LangGraph `--mode socratic`; guides toward understanding rather than answering ·
 - [x] **[REF-TASK-0029] Add Learner terms to GLOSSARY.md** — Learner, Algorithm Visualization, Algorithm Genealogy, Socratic Mode ·
-- [ ] **[REF-TASK-0030] Add Learner education tutorials** — visualization (`UC-06`), Socratic mode (`UC-08`), algorithm genealogy explorer (`UC-09`) ·
+- [x] **[REF-TASK-0030] Add Learner education tutorials** — visualization (`UC-06`), Socratic mode (`UC-08`), algorithm genealogy explorer (`UC-09`) ·
 
 ---
 

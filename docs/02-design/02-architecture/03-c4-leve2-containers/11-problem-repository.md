@@ -1,6 +1,6 @@
 # Container: Problem Repository
 
-> Index: [01-c2-containers.md](01-c2-containers.md)
+> Index: [01-index.md](01-index.md)
 
 **Responsibility:** Store, version, and serve `ProblemInstance` records — the catalogue of
 all benchmark problems available for use in Studies. Validates new registrations against the

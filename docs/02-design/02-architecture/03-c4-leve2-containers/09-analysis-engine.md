@@ -1,6 +1,6 @@
 # Container: Analysis Engine
 
-> Index: [01-c2-containers.md](01-c2-containers.md)
+> Index: [01-index.md](01-index.md)
 
 **Responsibility:** Compute metrics and statistical tests over completed Run data to produce
 `ResultAggregate` entities and `StatisticalTestResult` records. Implements the three-level

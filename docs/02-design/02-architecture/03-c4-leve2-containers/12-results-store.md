@@ -1,6 +1,6 @@
 # Container: Results Store
 
-> Index: [01-c2-containers.md](01-c2-containers.md)
+> Index: [01-index.md](01-index.md)
 
 **Responsibility:** Persist and serve all runtime entities produced during study execution
 and analysis: `Study`, `Experiment`, `Run`, `PerformanceRecord`, `ResultAggregate`, and

@@ -1,6 +1,6 @@
 # Container: Ecosystem Bridge
 
-> Index: [01-c2-containers.md](01-c2-containers.md)
+> Index: [01-index.md](01-index.md)
 
 **Responsibility:** Translate completed Corvus Corone study artifacts into the file formats
 expected by external benchmarking platforms (COCO/BBOB, IOHprofiler, Nevergrad), and publish

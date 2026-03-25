@@ -1,6 +1,6 @@
 # Container: Experiment Runner
 
-> Index: [01-c2-containers.md](01-c2-containers.md)
+> Index: [01-index.md](01-index.md)
 
 **Responsibility:** Execute individual Runs — the innermost evaluation loop. For each
 `(problem, algorithm, repetition)` triple: resolves instances from the registry and

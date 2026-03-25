@@ -105,7 +105,7 @@ Six milestones group all open documentation and design tasks.
 
 ## Milestone: V1 Infrastructure — ADRs & Technical Constraints
 
-- [ ] **[REF-TASK-0024] Bulk PerformanceRecord storage format decision** *(spike first)* — benchmark JSON vs Parquet vs HDF5 at 150 k records; create ADR-009
+- [x] **[REF-TASK-0024] Bulk PerformanceRecord storage format decision** *(spike first)* — benchmark JSON vs Parquet vs HDF5 at 150 k records; create ADR-009
 
 ---
 

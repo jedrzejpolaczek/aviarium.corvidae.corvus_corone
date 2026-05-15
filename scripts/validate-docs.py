@@ -16,7 +16,6 @@ Exit code: 0 if no issues found, 1 otherwise.
 """
 
 import io
-import os
 import re
 import sys
 from pathlib import Path
@@ -34,7 +33,7 @@ DOCS_ROOT = REPO_ROOT / "docs"
 BAD_PATTERNS = [
     # Monolithic data-format file references (split into individual files)
     (
-        r'(?<!/)\bdata-format\.md\b(?![\w/-])',
+        r"(?<!/)\bdata-format\.md\b(?![\w/-])",
         "Reference to non-existent monolithic data-format.md",
         "Replace with the appropriate split file under docs/03-technical-contracts/01-data-format/\n"
         "  §2.1 → 02-problem-instance.md  §2.2 → 03-algorithm-instance.md\n"
@@ -46,63 +45,63 @@ BAD_PATTERNS = [
     ),
     # Old specs/ directory (moved to docs/03-technical-contracts/)
     (
-        r'\bspecs/',
+        r"\bspecs/",
         "Reference to old specs/ directory (no longer exists)",
         "Replace with docs/03-technical-contracts/02-interface-contracts/, "
         "docs/03-technical-contracts/01-data-format/, or docs/03-technical-contracts/03-metric-taxonomy/",
     ),
     # Wrong C2 containers index filename
     (
-        r'01-c2-containers\.md',
+        r"01-c2-containers\.md",
         "Reference to non-existent 01-c2-containers.md",
         "Replace with 01-index.md (the C2 containers index)",
     ),
     # Wrong C3 overview filename (old short form)
     (
-        r'(?<!\w)01-c3-components\.md(?!\w)',
+        r"(?<!\w)01-c3-components\.md(?!\w)",
         "Reference to non-existent 01-c3-components.md",
         "Replace with the correct C3 overview path: "
         "docs/02-design/02-architecture/04-c4-leve3-components/01-c4-l3-components/01-c4-l3-components.md",
     ),
     # C3 component breadcrumb pattern (wrong relative path)
     (
-        r'\.\./01-c3-components\.md',
+        r"\.\./01-c3-components\.md",
         "C3 breadcrumb points to non-existent ../01-c3-components.md",
         "Replace with ../01-c4-l3-components/01-c4-l3-components.md",
     ),
     # Non-existent TASKS.md
     (
-        r'\bTASKS\.md\b',
+        r"\bTASKS\.md\b",
         "Reference to docs/05-community/TASKS.md which does not exist",
         "Remove the reference or update to the correct file if created",
     ),
     # SRS at wrong path (old root-level srs.md) — excludes 01-SRS.md (the correct filename)
     (
-        r'(?<![/\w\d-])(?:srs|SRS)\.md(?!\w)',
+        r"(?<![/\w\d-])(?:srs|SRS)\.md(?!\w)",
         "Reference to old srs.md / SRS.md without correct path",
         "Replace with docs/02-design/01-software-requirement-specification/01-srs/01-SRS.md",
     ),
     # Old single use-cases file
     (
-        r'01-use-cases\.md\b',
+        r"01-use-cases\.md\b",
         "Reference to old monolithic 01-use-cases.md",
         "Replace with 01-index.md (the use-cases index)",
     ),
     # Wrong GLOSSARY relative depth from inside 01-data-format/ (one ../ too few)
     (
-        r'(?<=01-data-format/)(?:\.\./)GLOSSARY\.md',
+        r"(?<=01-data-format/)(?:\.\./)GLOSSARY\.md",
         "GLOSSARY link from inside 01-data-format/ uses wrong relative depth (../GLOSSARY.md)",
         "Replace with ../../GLOSSARY.md",
     ),
     # Old c1-context wrong path (missing level directories)
     (
-        r'02-c4-leve1-context/01-c1-context\.md',
+        r"02-c4-leve1-context/01-c1-context\.md",
         "C1 context path missing intermediate directories",
         "Replace with docs/02-design/02-architecture/02-c4-leve1-context/01-c4-l1-context/01-c1-context.md",
     ),
     # Wrong old-style c1 context path (pre-renaming)
     (
-        r'02-c1-context\.md\b',
+        r"02-c1-context\.md\b",
         "Reference to old 02-c1-context.md (renamed with C4 level prefix)",
         "Replace with docs/02-design/02-architecture/02-c4-leve1-context/01-c4-l1-context/01-c1-context.md",
     ),
@@ -177,6 +176,7 @@ WRONG_FR_LABELS = [
 # Helpers
 # ---------------------------------------------------------------------------
 
+
 def iter_md_files():
     for path in sorted(DOCS_ROOT.rglob("*.md")):
         yield path
@@ -186,12 +186,16 @@ def extract_links(text):
     """Return list of (link_text, raw_target) for all markdown links in text.
     Skips links inside backtick code spans to avoid false positives."""
     # Remove inline code spans before extracting links
-    text_no_code = re.sub(r'`[^`]*`', lambda m: ' ' * len(m.group()), text)
-    return re.findall(r'\[([^\]]*)\]\(([^)]+)\)', text_no_code)
+    text_no_code = re.sub(r"`[^`]*`", lambda m: " " * len(m.group()), text)
+    return re.findall(r"\[([^\]]*)\]\(([^)]+)\)", text_no_code)
 
 
 def is_external(target):
-    return target.startswith("http://") or target.startswith("https://") or target.startswith("mailto:")
+    return (
+        target.startswith("http://")
+        or target.startswith("https://")
+        or target.startswith("mailto:")
+    )
 
 
 def resolve_link(source_file: Path, target: str) -> Path | None:
@@ -210,6 +214,7 @@ def resolve_link(source_file: Path, target: str) -> Path | None:
 # Check passes
 # ---------------------------------------------------------------------------
 
+
 def check_links(issues):
     for md_file in iter_md_files():
         text = md_file.read_text(encoding="utf-8", errors="replace")
@@ -222,11 +227,13 @@ def check_links(issues):
             if not resolved.exists():
                 rel_file = md_file.relative_to(REPO_ROOT)
                 rel_target = raw_target.split("#")[0]
-                issues.append({
-                    "category": "LINK",
-                    "file": str(rel_file),
-                    "detail": f"Broken link → {rel_target}  (resolved: {resolved})",
-                })
+                issues.append(
+                    {
+                        "category": "LINK",
+                        "file": str(rel_file),
+                        "detail": f"Broken link → {rel_target}  (resolved: {resolved})",
+                    }
+                )
 
 
 def check_bad_patterns(issues):
@@ -239,14 +246,16 @@ def check_bad_patterns(issues):
                 # Skip HTML comment lines for pattern checks that are cosmetic-only
                 # (CONNECTS TO blocks are informational; broken links are still reported)
                 if re.search(pattern, line):
-                    issues.append({
-                        "category": "PATTERN",
-                        "file": rel_file,
-                        "line": lineno,
-                        "detail": description,
-                        "hint": hint,
-                        "excerpt": line.strip()[:120],
-                    })
+                    issues.append(
+                        {
+                            "category": "PATTERN",
+                            "file": rel_file,
+                            "line": lineno,
+                            "detail": description,
+                            "hint": hint,
+                            "excerpt": line.strip()[:120],
+                        }
+                    )
 
 
 def check_fr_labels(issues):
@@ -259,18 +268,22 @@ def check_fr_labels(issues):
         lines = text.splitlines()
         for lineno, line in enumerate(lines, 1):
             # Check that the wrong fragment appears right after fr_id "(", not elsewhere on the line
-            if re.search(re.escape(fr_id) + r'\s*\(' + re.escape(wrong_fragment), line, re.IGNORECASE):
+            if re.search(
+                re.escape(fr_id) + r"\s*\(" + re.escape(wrong_fragment), line, re.IGNORECASE
+            ):
                 correct = FR_CANONICAL.get(fr_id, "see FR definition file")
-                issues.append({
-                    "category": "FR_LABEL",
-                    "file": str(full_path.relative_to(REPO_ROOT)),
-                    "line": lineno,
-                    "detail": (
-                        f"{fr_id} is labeled '{wrong_fragment}' — wrong. "
-                        f"Correct: {fr_id} = {correct}"
-                    ),
-                    "excerpt": line.strip()[:120],
-                })
+                issues.append(
+                    {
+                        "category": "FR_LABEL",
+                        "file": str(full_path.relative_to(REPO_ROOT)),
+                        "line": lineno,
+                        "detail": (
+                            f"{fr_id} is labeled '{wrong_fragment}' — wrong. "
+                            f"Correct: {fr_id} = {correct}"
+                        ),
+                        "excerpt": line.strip()[:120],
+                    }
+                )
 
 
 def check_glossary_depth(issues):
@@ -284,15 +297,17 @@ def check_glossary_depth(issues):
         text = md_file.read_text(encoding="utf-8", errors="replace")
         for lineno, line in enumerate(text.splitlines(), 1):
             # Match ../GLOSSARY.md but NOT ../../GLOSSARY.md (the correct depth)
-            if re.search(r'(?<![./])\.\.\/GLOSSARY\.md', line):
-                issues.append({
-                    "category": "GLOSSARY_DEPTH",
-                    "file": str(md_file.relative_to(REPO_ROOT)),
-                    "line": lineno,
-                    "detail": "GLOSSARY link ../GLOSSARY.md resolves to non-existent "
-                              "docs/03-technical-contracts/GLOSSARY.md; correct is ../../GLOSSARY.md",
-                    "excerpt": line.strip()[:120],
-                })
+            if re.search(r"(?<![./])\.\.\/GLOSSARY\.md", line):
+                issues.append(
+                    {
+                        "category": "GLOSSARY_DEPTH",
+                        "file": str(md_file.relative_to(REPO_ROOT)),
+                        "line": lineno,
+                        "detail": "GLOSSARY link ../GLOSSARY.md resolves to non-existent "
+                        "docs/03-technical-contracts/GLOSSARY.md; correct is ../../GLOSSARY.md",
+                        "excerpt": line.strip()[:120],
+                    }
+                )
 
 
 def check_c3_breadcrumbs(issues):
@@ -306,20 +321,23 @@ def check_c3_breadcrumbs(issues):
     for md_file in c3_root.rglob("*.md"):
         text = md_file.read_text(encoding="utf-8", errors="replace")
         for lineno, line in enumerate(text.splitlines(), 1):
-            if re.search(r'\.\./01-c3-components\.md', line):
-                issues.append({
-                    "category": "C3_BREADCRUMB",
-                    "file": str(md_file.relative_to(REPO_ROOT)),
-                    "line": lineno,
-                    "detail": "C3 breadcrumb ../01-c3-components.md resolves to non-existent file",
-                    "hint": "Replace with ../01-c4-l3-components/01-c4-l3-components.md",
-                    "excerpt": line.strip()[:120],
-                })
+            if re.search(r"\.\./01-c3-components\.md", line):
+                issues.append(
+                    {
+                        "category": "C3_BREADCRUMB",
+                        "file": str(md_file.relative_to(REPO_ROOT)),
+                        "line": lineno,
+                        "detail": "C3 breadcrumb ../01-c3-components.md resolves to non-existent file",
+                        "hint": "Replace with ../01-c4-l3-components/01-c4-l3-components.md",
+                        "excerpt": line.strip()[:120],
+                    }
+                )
 
 
 # ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
+
 
 def main():
     issues = []
@@ -372,7 +390,7 @@ def main():
             print()
         total += len(cat_issues)
 
-    print(f"{'─'*60}")
+    print(f"{'─' * 60}")
     print(f"  Total issues: {total}")
     return 1
 

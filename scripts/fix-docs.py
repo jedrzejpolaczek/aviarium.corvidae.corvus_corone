@@ -55,20 +55,20 @@ def report(path: Path, changed: bool, what: str = "") -> None:
 # ---------------------------------------------------------------------------
 # Ordered longest-match first so §2.2.1 matches before §2.2
 SECTION_MAP = [
-    ("§2.2.1",  "03-algorithm-instance.md"),
-    ("§2.1",    "02-problem-instance.md"),
-    ("§2.2",    "03-algorithm-instance.md"),
-    ("§2.3",    "04-study.md"),
-    ("§2.4",    "05-experiment.md"),
-    ("§2.5",    "06-run.md"),
-    ("§2.6",    "07-performance-record.md"),
-    ("§2.7",    "08-result-aggregate.md"),
-    ("§2.8",    "09-report.md"),
-    ("§3",      "10-file-formats.md"),
-    ("§4",      "11-interoperability-mappings.md"),
-    ("§5",      "12-cross-entity-validation.md"),
-    ("§6",      "13-schema-versioning.md"),
-    ("§1",      "01-index.md"),
+    ("§2.2.1", "03-algorithm-instance.md"),
+    ("§2.1", "02-problem-instance.md"),
+    ("§2.2", "03-algorithm-instance.md"),
+    ("§2.3", "04-study.md"),
+    ("§2.4", "05-experiment.md"),
+    ("§2.5", "06-run.md"),
+    ("§2.6", "07-performance-record.md"),
+    ("§2.7", "08-result-aggregate.md"),
+    ("§2.8", "09-report.md"),
+    ("§3", "10-file-formats.md"),
+    ("§4", "11-interoperability-mappings.md"),
+    ("§5", "12-cross-entity-validation.md"),
+    ("§6", "13-schema-versioning.md"),
+    ("§1", "01-index.md"),
 ]
 DATA_FORMAT_DIR = "docs/03-technical-contracts/01-data-format"
 
@@ -91,6 +91,7 @@ def replace_data_format_ref(text: str) -> str:
       - 'specs/data-format.md §X.Y'
     References without a section are replaced with the index file.
     """
+
     # Pattern: optional prefix + data-format.md + optional section
     # We build replacement text that includes the full data-format dir path
     def _replace(m: re.Match) -> str:
@@ -294,11 +295,19 @@ print("\n[12] Algorithm registry links in problem-repository")
 pr_dir = c3_root / "12-problem-repository"
 md = pr_dir / "03-version-manager.md"
 if md.exists():
-    changed = patch(md, "../11-algorithm-registry/version-manager.md", "../11-algorithm-registry/03-version-manager.md")
+    changed = patch(
+        md,
+        "../11-algorithm-registry/version-manager.md",
+        "../11-algorithm-registry/03-version-manager.md",
+    )
     report(md, changed, "algo-registry prefix")
 md = pr_dir / "04-entity-store.md"
 if md.exists():
-    changed = patch(md, "../11-algorithm-registry/entity-store.md", "../11-algorithm-registry/04-entity-store.md")
+    changed = patch(
+        md,
+        "../11-algorithm-registry/entity-store.md",
+        "../11-algorithm-registry/04-entity-store.md",
+    )
     report(md, changed, "algo-registry prefix")
 
 
@@ -307,7 +316,14 @@ if md.exists():
 #     File: 02-c4-leve1-context/01-c4-l1-context/01-c1-context.md
 # ---------------------------------------------------------------------------
 print("\n[13] C1 context directory links")
-md = DOCS_ROOT / "02-design" / "02-architecture" / "02-c4-leve1-context" / "01-c4-l1-context" / "01-c1-context.md"
+md = (
+    DOCS_ROOT
+    / "02-design"
+    / "02-architecture"
+    / "02-c4-leve1-context"
+    / "01-c4-l1-context"
+    / "01-c1-context.md"
+)
 if md.exists():
     changed = patch(md, "(actors/)", "(../02-actors/)")
     report(md, changed, "C1 actors dir")
@@ -324,8 +340,11 @@ if md.exists():
 # ---------------------------------------------------------------------------
 print("\n[14] specs/ old path replacements")
 SPECS_REPLACEMENTS = [
-    ("specs/interface-contracts.md", "docs/03-technical-contracts/02-interface-contracts/01-index.md"),
-    ("specs/metric-taxonomy.md",     "docs/03-technical-contracts/03-metric-taxonomy/01-index.md"),
+    (
+        "specs/interface-contracts.md",
+        "docs/03-technical-contracts/02-interface-contracts/01-index.md",
+    ),
+    ("specs/metric-taxonomy.md", "docs/03-technical-contracts/03-metric-taxonomy/01-index.md"),
     # specs/data-format.md is handled by the data-format replacer (step 15)
 ]
 for md in DOCS_ROOT.rglob("*.md"):
@@ -405,12 +424,12 @@ SRS_PAIRS = [
     ),
     # Short refs in text (e.g. MANIFESTO.md, SRS.md, ...)
     ("MANIFESTO.md, SRS.md,", "MANIFESTO.md, 01-srs/01-SRS.md,"),
-    ("] SRS.md",  "] 01-srs/01-SRS.md"),
-    ("/ SRS.md",  "/ 01-srs/01-SRS.md"),
+    ("] SRS.md", "] 01-srs/01-SRS.md"),
+    ("/ SRS.md", "/ 01-srs/01-SRS.md"),
     (" SRS.md §", " 01-srs/01-SRS.md §"),
     ("`SRS.md §", "`01-srs/01-SRS.md §"),
-    ("← SRS.md",  "← 01-srs/01-SRS.md"),
-    ("→ SRS.md",  "→ 01-srs/01-SRS.md"),
+    ("← SRS.md", "← 01-srs/01-SRS.md"),
+    ("→ SRS.md", "→ 01-srs/01-SRS.md"),
 ]
 for md in DOCS_ROOT.rglob("*.md"):
     # Skip the actual SRS file to avoid self-modification
@@ -475,14 +494,22 @@ md = c2_dir / "07-study-orchestrator.md"
 if md.exists():
     r = patch(md, "FR-10 (run isolation)", "FR-10 (execution environment recording)")
     report(md, r, "FR-10 label")
-    r = patch(md, "FR-17 (reproducibility — locking and immutability)", "FR-17 (UUID entity identification — no file paths as IDs)")
+    r = patch(
+        md,
+        "FR-17 (reproducibility — locking and immutability)",
+        "FR-17 (UUID entity identification — no file paths as IDs)",
+    )
     report(md, r, "FR-17 label")
     r = patch(md, "FR-18 (resume\ninterrupted experiments)", "FR-18 (Artifact archive production)")
     report(md, r, "FR-18 label multiline")
     # Also try single-line variant
     r = patch(md, "FR-18 (resume interrupted experiments)", "FR-18 (Artifact archive production)")
     report(md, r, "FR-18 label")
-    r = patch(md, "FR-19 (execution environment capture)", "FR-19 (entity ID cross-references — no file paths)")
+    r = patch(
+        md,
+        "FR-19 (execution environment capture)",
+        "FR-19 (entity ID cross-references — no file paths)",
+    )
     report(md, r, "FR-19 label")
 
 # 08-experiment-runner.md
@@ -492,31 +519,59 @@ if md.exists():
     report(md, r, "FR-10 label multiline")
     r = patch(md, "FR-10 (run isolation)", "FR-10 (execution environment recording)")
     report(md, r, "FR-10 label")
-    r = patch(md, "FR-11 (evaluation budget enforcement)", "FR-11 (Run isolation — no shared mutable state)")
+    r = patch(
+        md,
+        "FR-11 (evaluation budget enforcement)",
+        "FR-11 (Run isolation — no shared mutable state)",
+    )
     report(md, r, "FR-11 label")
-    r = patch(md, "FR-19 (execution environment capture)", "FR-19 (entity ID cross-references — no file paths)")
+    r = patch(
+        md,
+        "FR-19 (execution environment capture)",
+        "FR-19 (entity ID cross-references — no file paths)",
+    )
     report(md, r, "FR-19 label")
 
 # 09-analysis-engine.md
 md = c2_dir / "09-analysis-engine.md"
 if md.exists():
-    r = patch(md, "FR-14 (statistical\ntests — Wilcoxon, Kruskal-Wallis)", "FR-14 (PerformanceRecord log-scale recording)")
+    r = patch(
+        md,
+        "FR-14 (statistical\ntests — Wilcoxon, Kruskal-Wallis)",
+        "FR-14 (PerformanceRecord log-scale recording)",
+    )
     report(md, r, "FR-14 label multiline")
-    r = patch(md, "FR-14 (statistical tests — Wilcoxon, Kruskal-Wallis)", "FR-14 (PerformanceRecord log-scale recording)")
+    r = patch(
+        md,
+        "FR-14 (statistical tests — Wilcoxon, Kruskal-Wallis)",
+        "FR-14 (PerformanceRecord log-scale recording)",
+    )
     report(md, r, "FR-14 label")
-    r = patch(md, "FR-15 (scoped conclusions — no global rankings)", "FR-15 (three analysis levels — exploratory, confirmatory, practical significance)")
+    r = patch(
+        md,
+        "FR-15 (scoped conclusions — no global rankings)",
+        "FR-15 (three analysis levels — exploratory, confirmatory, practical significance)",
+    )
     report(md, r, "FR-15 label")
 
 # 12-results-store.md
 md = c2_dir / "12-results-store.md"
 if md.exists():
-    r = patch(md, "FR-17 (data immutability and locking)", "FR-17 (UUID entity identification — no file paths as IDs)")
+    r = patch(
+        md,
+        "FR-17 (data immutability and locking)",
+        "FR-17 (UUID entity identification — no file paths as IDs)",
+    )
     report(md, r, "FR-17 label")
     r = patch(md, "FR-18 (resume interrupted\nexperiments)", "FR-18 (Artifact archive production)")
     report(md, r, "FR-18 label multiline")
     r = patch(md, "FR-18 (resume interrupted experiments)", "FR-18 (Artifact archive production)")
     report(md, r, "FR-18 label")
-    r = patch(md, "FR-19 (execution environment capture and storage)", "FR-19 (entity ID cross-references — no file paths)")
+    r = patch(
+        md,
+        "FR-19 (execution environment capture and storage)",
+        "FR-19 (entity ID cross-references — no file paths)",
+    )
     report(md, r, "FR-19 label")
 
 
@@ -532,16 +587,24 @@ if roadmap.exists():
     r = patch(roadmap, "data-format.md update", f"{DATA_FORMAT_DIR}/01-index.md update")
     report(roadmap, r, "ROADMAP data-format update")
     # Interface-contracts.md ref that may remain
-    r = patch(roadmap, "interface-contracts.md,", "docs/03-technical-contracts/02-interface-contracts/01-index.md,")
+    r = patch(
+        roadmap,
+        "interface-contracts.md,",
+        "docs/03-technical-contracts/02-interface-contracts/01-index.md,",
+    )
     report(roadmap, r, "ROADMAP interface-contracts")
-    r = patch(roadmap, "metric-taxonomy.md,", "docs/03-technical-contracts/03-metric-taxonomy/01-index.md,")
+    r = patch(
+        roadmap,
+        "metric-taxonomy.md,",
+        "docs/03-technical-contracts/03-metric-taxonomy/01-index.md,",
+    )
     report(roadmap, r, "ROADMAP metric-taxonomy")
 
 
 # ---------------------------------------------------------------------------
 # Summary
 # ---------------------------------------------------------------------------
-print(f"\n{'='*60}")
+print(f"\n{'=' * 60}")
 print(f"  Total files modified: {changes}")
 if changes == 0:
     print("  No changes needed.")

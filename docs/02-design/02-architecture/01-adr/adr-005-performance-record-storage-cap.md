@@ -6,9 +6,9 @@ what is practical. This is an operational concern entirely separate from what tr
 a record (ADR-002) or what threshold defines improvement (ADR-004).
 
 CONNECTS TO:
-  → docs/03-technical-contracts/01-data-format.md §2.3 Study (max_records_per_run)
-  → docs/03-technical-contracts/01-data-format.md §2.5 Run (cap_reached_at_evaluation)
-  → docs/02-design/01-software-requirement-specification/04-non-functional-requirements/01-non-functional-requirements.md
+  → docs/03-technical-contracts/01-data-format/04-study.md (max_records_per_run)
+  → docs/03-technical-contracts/01-data-format/06-run.md (cap_reached_at_evaluation)
+  → docs/02-design/01-software-requirement-specification/04-non-functional-requirements/01-index.md
   → ADR-002-performance-recording-strategy.md : defines the records whose count this ADR limits
   → ADR-004-improvement-sensitivity-threshold.md : improvement trigger is the primary source of unbounded growth
 -->
@@ -225,7 +225,7 @@ that hard caps are never needed in practice.
 
 | Document | Relationship |
 |---|---|
-| `docs/03-technical-contracts/01-data-format.md §2.3` | Study — `max_records_per_run` field governed by this ADR |
-| `docs/03-technical-contracts/01-data-format.md §2.5` | Run — `cap_reached_at_evaluation` field governed by this ADR |
+| `docs/03-technical-contracts/01-data-format/04-study.md` | Study — `max_records_per_run` field governed by this ADR |
+| `docs/03-technical-contracts/01-data-format/06-run.md` | Run — `cap_reached_at_evaluation` field governed by this ADR |
 | `ADR-002-performance-recording-strategy.md` | Defines the three triggers whose records this ADR limits |
 | `ADR-004-improvement-sensitivity-threshold.md` | The primary mitigation for unbounded improvement-record growth; should be considered before setting a hard cap |

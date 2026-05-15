@@ -1,6 +1,6 @@
 # §3 Runner Interface
 
-> Index: [01-interface-contracts.md](01-interface-contracts.md)
+> Index: [01-index.md](01-index.md)
 
 The Runner orchestrates Problems and Algorithms to produce Runs. It owns the evaluation loop,
 injects seeds, invokes the `on_evaluation` callback after every objective evaluation, and
@@ -26,8 +26,8 @@ persists results via the Repository Interface (§5).
 ### run_study(study: Study) → Experiment
 
 **Signature:**
-- `study: Study` — a locked Study record (→ data-format.md §2.3)
-- returns: `Experiment` — completed or partially-completed Experiment record (→ data-format.md §2.4)
+- `study: Study` — a locked Study record (→ docs/03-technical-contracts/01-data-format/04-study.md)
+- returns: `Experiment` — completed or partially-completed Experiment record (→ docs/03-technical-contracts/01-data-format/05-experiment.md)
 
 **Semantics:**
 Executes all Runs defined by the Study plan. For each `(problem, algorithm, repetition)`
@@ -58,7 +58,7 @@ combination: resolves the instances from the Repository, generates a seed, calls
 - `problem_id: str`, `algorithm_id: str` — IDs resolvable from the Repository
 - `seed: int` — exact seed to use for this Run
 - `budget: int` — evaluation budget for this Run
-- returns: `Run` — completed or failed Run record (→ data-format.md §2.5)
+- returns: `Run` — completed or failed Run record (→ docs/03-technical-contracts/01-data-format/06-run.md)
 
 **Semantics:**
 Executes a single Run. Lower-level than `run_study()`.
@@ -117,7 +117,7 @@ Algorithm Authors do NOT call this method; it is wired by the framework.
 
 **Postconditions:**
 - if any trigger fires, a `PerformanceRecord` is written with the correct `trigger_reason`,
-  `is_improvement`, and `elapsed_time` fields (→ data-format.md §2.6, ADR-002)
+  `is_improvement`, and `elapsed_time` fields (→ docs/03-technical-contracts/01-data-format/07-performance-record.md, ADR-002)
 - the Runner's internal `best_so_far` is updated if `objective_value` improves
 
 **Extension point:**
@@ -125,7 +125,7 @@ Subclasses MAY override `on_evaluation()` to implement custom logging, but MUST 
 `super().on_evaluation()` to preserve the standard ADR-002 trigger logic, or populate
 `trigger_reason` manually per ADR-002.
 
-→ PerformanceRecord schema: data-format.md §2.6
+→ PerformanceRecord schema: docs/03-technical-contracts/01-data-format/07-performance-record.md
 → Recording strategy: [adr-002-performance-recording-strategy.md](../../02-design/02-architecture/01-adr/adr-002-performance-recording-strategy.md)
 
 ---
@@ -139,7 +139,7 @@ The following rules are MANDATORY for all Runner implementations:
 - The Runner calls `Problem.reset(seed)` and `Algorithm.initialize(search_space, seed)`
   before every Run, regardless of whether the instances are shared or per-Run
 - The Runner records the full execution environment in the Experiment record
-  (→ data-format.md §2.4 `execution_environment`)
+  (→ docs/03-technical-contracts/01-data-format/05-experiment.md `execution_environment`)
 
 → SRS NFR-REPRO; MANIFESTO Principle 18
 

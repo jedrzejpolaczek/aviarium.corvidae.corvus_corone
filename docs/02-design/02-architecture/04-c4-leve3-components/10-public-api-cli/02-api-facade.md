@@ -1,7 +1,7 @@
 # API Facade
 
 > Container: [Public API + CLI](../../03-c4-leve2-containers/04-public-api-cli.md)
-> C3 Index: [index.md](index.md)
+> C3 Index: [index.md](01-index.md)
 
 ---
 

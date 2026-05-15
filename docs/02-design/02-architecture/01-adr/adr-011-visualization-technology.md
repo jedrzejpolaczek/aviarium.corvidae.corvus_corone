@@ -6,7 +6,7 @@ and the Reporting Engine's visualization components. Prevents silent technology
 accumulation — every rendering library must have a stated purpose and scope.
 
 CONNECTS TO:
-  → docs/02-design/02-architecture/03-c4-leve2-containers/01-c2-containers.md : Algorithm Visualization Engine container
+  → docs/02-design/02-architecture/03-c4-leve2-containers/01-index.md : Algorithm Visualization Engine container
   → docs/02-design/01-software-requirement-specification/02-use-cases/08-uc-07.md : UC-07 (Algorithm Visualisation — VIZ-L1-01..04)
   → docs/04-scientific-practice/01-methodology/02-statistical-methodology.md §2 : VIZ-L1-01..04 mandatory visualizations
   → docs/02-design/02-architecture/01-adr/adr-006-python-version-and-platform-constraints.md : platform constraints consulted here
@@ -236,7 +236,7 @@ layer of abstraction without benefit.
 
 | Document | Relationship |
 |---|---|
-| `docs/02-design/02-architecture/03-c4-leve2-containers/01-c2-containers.md` | Algorithm Visualization Engine container specification |
+| `docs/02-design/02-architecture/03-c4-leve2-containers/01-index.md` | Algorithm Visualization Engine container specification |
 | `docs/04-scientific-practice/01-methodology/02-statistical-methodology.md §2` | VIZ-L1-01..04 visualization specifications that mandate matplotlib |
 | `docs/02-design/01-software-requirement-specification/02-use-cases/08-uc-07.md` | UC-07 Learner visualization use case |
 | `ADR-006-python-version-and-platform-constraints.md` | Platform constraints that exclude manim in V1 |

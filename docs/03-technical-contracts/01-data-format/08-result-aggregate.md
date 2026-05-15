@@ -2,7 +2,7 @@
 
 > Index: [01-index.md](01-index.md)
 
-> See GLOSSARY: [Result Aggregate](../GLOSSARY.md#result-aggregate)
+> See GLOSSARY: [Result Aggregate](../../GLOSSARY.md#result-aggregate)
 
 | Name | Type | Required | Notes |
 | --- | --- | --- | --- |

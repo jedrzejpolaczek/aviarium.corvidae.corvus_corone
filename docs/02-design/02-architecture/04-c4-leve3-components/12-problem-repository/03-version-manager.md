@@ -1,7 +1,7 @@
 # Version Manager
 
 > Container: [Problem Repository](../../03-c4-leve2-containers/11-problem-repository.md)
-> C3 Index: [index.md](index.md)
+> C3 Index: [index.md](01-index.md)
 
 ---
 
@@ -31,7 +31,7 @@ class ProblemVersionManager:
 
 ## Key Behaviors
 
-Identical architecture to [Algorithm Registry — Version Manager](../11-algorithm-registry/version-manager.md), applied to ProblemInstances:
+Identical architecture to [Algorithm Registry — Version Manager](../11-algorithm-registry/03-version-manager.md), applied to ProblemInstances:
 
 1. **Immutability enforcement** — duplicate `(id, version)` raises `ProblemAlreadyExistsError`.
 2. **Deprecation without deletion** — sets `deprecated=True` on the stored entity.

@@ -1,7 +1,7 @@
 # Instance Validator
 
 > Container: [Problem Repository](../../03-c4-leve2-containers/11-problem-repository.md)
-> C3 Index: [index.md](index.md)
+> C3 Index: [index.md](01-index.md)
 
 ---
 

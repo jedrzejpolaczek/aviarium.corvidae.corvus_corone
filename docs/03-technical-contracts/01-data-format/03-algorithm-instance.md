@@ -2,7 +2,7 @@
 
 > Index: [01-index.md](01-index.md)
 
-> See GLOSSARY: [Algorithm Instance](../GLOSSARY.md#algorithm-instance)
+> See GLOSSARY: [Algorithm Instance](../../GLOSSARY.md#algorithm-instance)
 
 | Name | Type | Required | Notes |
 | --- | --- | --- | --- |

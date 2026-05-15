@@ -1,6 +1,6 @@
 # §3 Standard Reporting Set
 
-> Index: [01-metric-taxonomy.md](01-metric-taxonomy.md)
+> Index: [01-index.md](01-index.md)
 
 Every benchmarking study produced or exported by this system **MUST** include at minimum the following metrics. A researcher may report additional metrics but cannot report fewer. This enforces MANIFESTO Principle 29 (Objectivity over promotion) by preventing metric cherry-picking.
 

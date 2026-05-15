@@ -1,6 +1,6 @@
 # TIME-EVALUATIONS_TO_TARGET
 
-> Index: [01-metric-taxonomy.md](01-metric-taxonomy.md)
+> Index: [01-index.md](01-index.md)
 
 **Display name:** Evaluations to Reach Target Value
 

@@ -1,6 +1,6 @@
 # §5 Deprecated Metrics
 
-> Index: [01-metric-taxonomy.md](01-metric-taxonomy.md)
+> Index: [01-index.md](01-index.md)
 
 *No deprecated metrics at this time. This section will be populated as the taxonomy evolves.*
 

@@ -11,7 +11,7 @@ NARRATIVE POSITION:
   → 04-public-api-contract.md : the Python API that the CLI delegates to
 
 CONNECTS TO:
-  ← docs/02-design/02-architecture/03-c4-leve2-containers/01-c2-containers.md (§ Public API + CLI)
+  ← docs/02-design/02-architecture/03-c4-leve2-containers/01-index.md (§ Public API + CLI)
   ← docs/03-technical-contracts/04-public-api-contract.md (§ CLI Command Surface) — the authoritative
       command table; the example session below is the primary addition over that document
   → docs/02-design/01-software-requirement-specification/05-constraints/02-const-scientific.md — AP-3,

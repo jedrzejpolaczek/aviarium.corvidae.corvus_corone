@@ -1,6 +1,6 @@
 # QUALITY-BEST_VALUE_AT_BUDGET
 
-> Index: [01-metric-taxonomy.md](01-metric-taxonomy.md)
+> Index: [01-index.md](01-index.md)
 
 **Display name:** Best Objective Value at Full Budget
 

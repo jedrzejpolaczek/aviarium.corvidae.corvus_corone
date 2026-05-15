@@ -11,7 +11,7 @@ NARRATIVE POSITION:
 
 CONNECTS TO:
   → methodology/benchmarking-protocol.md : each tutorial demonstrates one or more protocol steps
-  → specs/interface-contracts.md : tutorials show how to implement or use interfaces
+  → docs/03-technical-contracts/02-interface-contracts/01-index.md : tutorials show how to implement or use interfaces
   → docs/GLOSSARY.md             : use defined terms; hyperlink on first use per tutorial
   → SRS §3                       : each tutorial covers at least one use case end-to-end
 
@@ -151,7 +151,7 @@ not prerequisites (except the explicitly listed Prerequisites section).
   Example:
     - How to formulate a valid research question → methodology/benchmarking-protocol.md §Step 1
     - How pre-registration prevents p-hacking → methodology/statistical-methodology.md §3
-    - How the seed contract ensures reproducibility → specs/interface-contracts.md §6
+    - How the seed contract ensures reproducibility → docs/03-technical-contracts/02-interface-contracts/01-index.md §6
 -->
 
 ---

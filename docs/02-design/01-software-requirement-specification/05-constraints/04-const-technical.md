@@ -17,7 +17,7 @@
 **All entity schemas MUST be JSON-serializable in their primary representation; binary secondary representations (e.g., Parquet) are permitted for bulk data only.**
 
 - Source: ADR-001
-- Connects to: `docs/03-technical-contracts/01-data-format.md` §1
+- Connects to: `docs/03-technical-contracts/01-data-format/01-index.md` §1
 
 ## CONST-TECH-03
 
@@ -25,7 +25,7 @@
 
 - Source: ADR-001
 - Enforced by: FR-17 (UUID on every entity), FR-19 (cross-entity references use IDs only)
-- Connects to: `docs/03-technical-contracts/01-data-format.md` §1
+- Connects to: `docs/03-technical-contracts/01-data-format/01-index.md` §1
 
 ---
 

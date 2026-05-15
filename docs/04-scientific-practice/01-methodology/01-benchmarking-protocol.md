@@ -12,14 +12,13 @@ NARRATIVE POSITION:
 
 CONNECTS TO:
   ← docs/01-manifesto/MANIFESTO.md Principles 1–3, 4–7, 8–11, 16–18 : each step implements these principles
-  ← docs/02-design/01-software-requirement-specification/SRS.md §3   : use case UC-01 maps to this protocol
+  ← docs/02-design/01-software-requirement-specification/01-srs/01-SRS.md §3   : use case UC-01 maps to this protocol
   → docs/04_scientific_practice/methodology/statistical-methodology.md : Steps 7–8 (Analyze, Report) delegate to that guide
   → docs/03-technical-contracts/metric-taxonomy.md §4 : Step 5 (Specify metrics) uses the selection guide there
   → docs/03-technical-contracts/interface-contracts.md : Steps 3–4 (configure algorithms/problems) must follow contracts
   → docs/03-technical-contracts/data-format.md    : every step produces artifacts conforming to schemas there
   → docs/GLOSSARY.md        : exact terms used throughout — Algorithm Instance, Problem Instance, Study, Run, Budget
-  → docs/05-community/TASKS.md : each step in a real study should correspond to trackable tasks
-
+  
 USAGE NOTE: This protocol is not a rigid checklist but a structured guide.
 Steps may overlap in practice, but the sequence matters for scientific validity —
 particularly: hypotheses must be specified (Step 2) BEFORE data is collected (Step 4).
@@ -152,7 +151,7 @@ Observations from Level 1 analysis may suggest new hypotheses. These are valid a
 
 **The critical anti-pattern:** Selecting problems where the researcher's preferred algorithm is already known to perform well — and avoiding problems where it is known to perform poorly. This is a form of cherry-picking that violates Principle 29 (Objectivity over promotion). Even if unintentional, it produces biased conclusions.
 
-**Minimum diversity requirements (ADR-009; FR-05, FR-06):**
+**Minimum diversity requirements (ADR-009; FR-32, FR-33):**
 
 The system validates the following three rules before any Experiment begins. Failure raises
 `DiversityValidationError`. Studies declared `exploratory` in the `study_type` field are
@@ -205,7 +204,7 @@ This sensitivity check is not part of the core Experiment but should be included
 **Sensitivity documentation format (MANIFESTO Principle 11; REF-TASK-0022):**
 
 A sensitivity check is not part of the core Experiment but must accompany the Algorithm
-Instance record as a `sensitivity_report` field (data-format.md §2.2.1). The format requires:
+Instance record as a `sensitivity_report` field (docs/03-technical-contracts/01-data-format/03-algorithm-instance.md). The format requires:
 
 - `tested_on_problems`: Problem Instance IDs used for sensitivity testing (≥ 1)
 - `budget_used`: evaluation budget per sensitivity Run
@@ -251,8 +250,8 @@ The following fields must be set in the Study record at this step:
 - `log_scale_schedule` — base points and multiplier (default: `{1,2,5} × 10^i`)
 - `improvement_epsilon` — minimum improvement to trigger a record; `null` for strict inequality (see [ADR-004](../../02-design/02-architecture/01-adr/adr-004-improvement-sensitivity-threshold.md))
 
-→ Study schema: `docs/03-technical-contracts/01-data-format.md` §2.3
-→ PerformanceRecord schema: `docs/03-technical-contracts/01-data-format.md` §2.6
+→ Study schema: `docs/03-technical-contracts/01-data-format/01-index.md` §2.3
+→ PerformanceRecord schema: `docs/03-technical-contracts/01-data-format/01-index.md` §2.6
 
 **Budget specification:**
 
@@ -273,30 +272,30 @@ A completed and locked Study record containing:
 
 ## Step 6: Execute the Experiment
 
-<!--
-  At this point, the Study record is complete and locked.
-  No changes to problems, algorithms, metrics, or hypotheses after execution begins.
+*Implements MANIFESTO Principles 16, 17, 18.*
 
-  Execution checklist:
-    - Seeds are assigned by the Runner, not chosen by the researcher
-    - Each Run is executed independently (no shared state)
-    - The full execution environment is recorded → data-format.md §2.4 execution_environment
-    - Failures are logged, not silently ignored
-    - All PerformanceRecords are stored with the sampling frequency from Step 5
+At this point, the Study record is complete and locked. **No changes to problems, algorithms, metrics, or hypotheses are permitted after execution begins.** The system enforces this at the data format level — the Study record's `pre_registered_hypotheses`, `problem_instances`, `algorithm_instances`, and `sampling_strategy` fields are immutable once the Experiment transitions to `running` status.
 
-  What to do if runs fail:
-    - Investigate the cause — do not simply discard and rerun without documentation
-    - If a Run fails due to a bug, fix the bug and rerun ALL runs (not just the failed one)
-    - If failure is a known limitation of an algorithm on this problem type, document it
-    - Do not silently exclude failed runs from analysis without reporting the failure rate
+**Execution checklist:**
 
-  Checkpointing:
-    Long studies should use the Runner's resume capability
-    → specs/interface-contracts.md §3 resume()
+- [ ] Seeds are assigned by the Runner, not chosen by the researcher (Seed Strategy declared in the Study)
+- [ ] Each Run is executed independently — no shared state between Runs or Algorithm Instances
+- [ ] The full execution environment is recorded in the Experiment entity (`execution_environment`, `software_environment`, `reproducibility_hash`) — see `docs/03-technical-contracts/01-data-format/05-experiment.md`
+- [ ] Failures are logged, not silently ignored — a failed Run sets `Run.status = "failed"` with a recorded error
+- [ ] All PerformanceRecords are stored with the sampling strategy from Step 5
 
-  → MANIFESTO Principles 16, 17, 18
-  → SRS NFR-REPRO (full execution environment recorded)
--->
+**If Runs fail:**
+
+- Investigate the cause — do not simply discard and rerun without documentation
+- If a Run fails due to a bug: fix the bug and rerun **all** Runs (not just the failed ones); re-running only failed Runs introduces selection bias
+- If failure is a known limitation of an algorithm on this problem type: document it in the Run record and include it in the report's limitations section
+- Do not silently exclude failed Runs from analysis without reporting the failure rate
+
+**Checkpointing:**
+
+Long studies should use the Runner's resume capability to recover from infrastructure interruptions without restarting from scratch. See `docs/03-technical-contracts/02-interface-contracts/04-runner-interface.md` for the `resume()` contract. A resumed Experiment continues from the last successfully completed Run; no PerformanceRecords from completed Runs are re-generated.
+
+→ NFR-REPRO: the full execution environment must be recorded automatically (no researcher action required)
 
 ---
 

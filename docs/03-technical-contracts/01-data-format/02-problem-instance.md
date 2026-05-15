@@ -1,8 +1,8 @@
 # §2.1 Problem Instance
 
-> Index: [01-data-format.md](01-data-format.md)
+> Index: [01-index.md](01-index.md)
 
-> See GLOSSARY: [Problem Instance](../GLOSSARY.md#problem-instance)
+> See GLOSSARY: [Problem Instance](../../GLOSSARY.md#problem-instance)
 
 | Name | Type | Required | Notes |
 | --- | --- | --- | --- |

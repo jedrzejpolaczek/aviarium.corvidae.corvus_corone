@@ -1,7 +1,7 @@
 # C3: Components — Experiment Runner
 
 > C2 Container: [08-experiment-runner.md](../../03-c4-leve2-containers/08-experiment-runner.md)
-> C3 Index: [../01-c3-components.md](../01-c3-components.md)
+> C3 Index: [../01-c4-l3-components/01-c4-l3-components.md](../01-c4-l3-components/01-c4-l3-components.md)
 
 The Experiment Runner executes individual algorithm Runs in isolated subprocesses, injects reproducible seeds, drives the evaluation loop, and records performance observations to the Results Store.
 Actors: invoked by Study Orchestrator; writes PerformanceRecords to Results Store.

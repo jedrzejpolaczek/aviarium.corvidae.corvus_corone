@@ -1,7 +1,7 @@
 # C3: Components — Algorithm Registry
 
 > C2 Container: [10-algorithm-registry.md](../../03-c4-leve2-containers/10-algorithm-registry.md)
-> C3 Index: [../01-c3-components.md](../01-c3-components.md)
+> C3 Index: [../01-c4-l3-components/01-c4-l3-components.md](../01-c4-l3-components/01-c4-l3-components.md)
 
 The Algorithm Registry stores and serves AlgorithmInstance registrations. Each instance is validated on registration, immutable after registration, and versioned to support reproducibility across study executions.
 Actors: Study Orchestrator and Public API read from it; developers register new instances during library development.

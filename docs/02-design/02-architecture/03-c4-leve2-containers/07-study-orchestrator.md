@@ -32,5 +32,4 @@ Orchestrator only drives transitions.
 **Actors served:** Researcher (primary — drives the main study execution workflow, UC-01, UC-05).
 
 **Relevant SRS section:** FR-08 (study execution entry point), FR-09 (seed management),
-FR-10 (run isolation), FR-17 (reproducibility — locking and immutability), FR-18 (resume
-interrupted experiments), FR-19 (execution environment capture).
+FR-10 (execution environment recording), FR-17 (UUID entity identification — no file paths as IDs), FR-18 (Artifact archive production), FR-19 (entity ID cross-references — no file paths).

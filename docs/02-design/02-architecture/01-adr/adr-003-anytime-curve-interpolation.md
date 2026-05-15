@@ -8,9 +8,9 @@ values from identical input data — making reproducibility claims meaningless a
 analysis layer.
 
 CONNECTS TO:
-  → docs/03-technical-contracts/01-data-format.md §2.7 ResultAggregate (anytime_curves)
-  → docs/03-technical-contracts/02-interface-contracts.md : Analyzer, InterpolationStrategy
-  → docs/03-technical-contracts/03-metric-taxonomy.md : ANYTIME-ECDF_AREA computation
+  → docs/03-technical-contracts/01-data-format/08-result-aggregate.md (anytime_curves)
+  → docs/03-technical-contracts/02-interface-contracts/05-analyzer-interface.md : Analyzer, InterpolationStrategy
+  → docs/03-technical-contracts/03-metric-taxonomy/07-anytime-ecdf-area.md : ANYTIME-ECDF_AREA computation
   → ADR-002-performance-recording-strategy.md : produces the PerformanceRecords this ADR reads
 -->
 
@@ -199,7 +199,7 @@ authoritative.
 
 | Document | Relationship |
 |---|---|
-| `docs/03-technical-contracts/01-data-format.md §2.7` | ResultAggregate `anytime_curves` — populated using the rule defined here |
+| `docs/03-technical-contracts/01-data-format/08-result-aggregate.md` | ResultAggregate `anytime_curves` — populated using the rule defined here |
 | `docs/03-technical-contracts/02-interface-contracts.md` | `InterpolationStrategy` interface and `Analyzer` contract governed by this ADR |
 | `docs/03-technical-contracts/03-metric-taxonomy.md` | `ANYTIME-ECDF_AREA` computation depends on the interpolation rule and grid normalization defined here |
 | `ADR-002-performance-recording-strategy.md` | Produces the PerformanceRecords this ADR reads; eval-1 guarantee resolves the pre-first-record gap |

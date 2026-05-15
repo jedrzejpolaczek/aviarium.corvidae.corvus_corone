@@ -9,7 +9,7 @@ NARRATIVE POSITION:
   MANIFESTO (WHY) → SRS (index) → child documents (WHAT the system must do)
   C1 (actors) feeds §3 (stakeholders and use cases) → use-cases.md
   C2 (containers) feeds §4 (functional requirement grouping) → functional-requirements.md
-  interface-requirements.md feeds → docs/03-technical-contracts/interface-contracts.md and data-format.md (how)
+  interface-requirements.md feeds → docs/03-technical-contracts/interface-contracts.md and docs/03-technical-contracts/01-data-format/01-index.md (how)
   acceptance-test-strategy.md feeds → tasks/tickets (what to test and verify)
 
 FILE STRUCTURE — this SRS is an index document; detailed content lives in:
@@ -102,11 +102,11 @@ Requirements FR-01 through FR-26 are defined in **[`03-functional-requirements/0
 
 | Group | Container | Requirements | File |
 |---|---|---|---|
-| §4.1 | Problem Repository | FR-01 – FR-04 | [02-fr-4.1-problem-repository.md](../03-functional-requirements/02-fr-4.1-problem-repository.md) |
+| §4.1 | Problem Repository | FR-01 – FR-04, FR-32, FR-33 | [02-fr-4.1-problem-repository.md](../03-functional-requirements/02-fr-4.1-problem-repository.md) |
 | §4.2 | Algorithm Registry | FR-05 – FR-07 | [03-fr-4.2-algorithm-registry.md](../03-functional-requirements/03-fr-4.2-algorithm-registry.md) |
 | §4.3 | Experiment Runner | FR-08 – FR-12 | [04-fr-4.3-experiment-runner.md](../03-functional-requirements/04-fr-4.3-experiment-runner.md) |
 | §4.4 | Measurement & Analysis Engine | FR-13 – FR-16 | [05-fr-4.4-measurement-and-analysis.md](../03-functional-requirements/05-fr-4.4-measurement-and-analysis.md) |
-| §4.5 | Reproducibility Layer | FR-17 – FR-19 | [06-fr-4.5-reproducibility-layer.md](../03-functional-requirements/06-fr-4.5-reproducibility-layer.md) |
+| §4.5 | Results Store (cross-cutting) | FR-17 – FR-19 | [06-fr-4.5-reproducibility-layer.md](../03-functional-requirements/06-fr-4.5-reproducibility-layer.md) |
 | §4.6 | Reporting & Visualization | FR-20 – FR-22 | [07-fr-4.6-reporting-and-visualization.md](../03-functional-requirements/07-fr-4.6-reporting-and-visualization.md) |
 | §4.7 | Ecosystem Integration | FR-23 – FR-26 | [08-fr-4.7-ecosystem-integration.md](../03-functional-requirements/08-fr-4.7-ecosystem-integration.md) |
 | §4.8 *(DEFERRED — Phase 4)* | Learner Actor | FR-27 – FR-31 | [09-fr-4.8-learner-actor.md](../03-functional-requirements/09-fr-4.8-learner-actor.md) |

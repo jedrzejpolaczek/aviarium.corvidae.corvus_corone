@@ -1,6 +1,6 @@
 # §1 Problem Interface
 
-> Index: [01-interface-contracts.md](01-interface-contracts.md)
+> Index: [01-index.md](01-index.md)
 
 Any class that provides a benchmark problem MUST implement all methods in this section.
 The Problem Interface is the boundary between the benchmark objective and the Runner.
@@ -57,7 +57,7 @@ in the current Run. The Runner is responsible for calling `reset()` before each 
 ### get_search_space() → SearchSpace
 
 **Signature:**
-- returns: `SearchSpace` — → data-format.md §2.1 `variables` field
+- returns: `SearchSpace` — → docs/03-technical-contracts/01-data-format/02-problem-instance.md `variables` field
 
 **Semantics:**
 Returns the complete description of the search space for this problem.
@@ -72,14 +72,14 @@ The search space is fixed for the lifetime of the Problem instance.
 ### get_metadata() → ProblemInstance
 
 **Signature:**
-- returns: `ProblemInstance` — → data-format.md §2.1
+- returns: `ProblemInstance` — → docs/03-technical-contracts/01-data-format/02-problem-instance.md
 
 **Semantics:**
 Returns the full Problem Instance record for this problem, including provenance,
 landscape characteristics, and objective type.
 
 **Postconditions:**
-- returned record is complete and valid per data-format.md §2.1 validation rules
+- returned record is complete and valid per docs/03-technical-contracts/01-data-format/02-problem-instance.md validation rules
 - `objective.known_optimum` is populated for all synthetic problems
 
 ---

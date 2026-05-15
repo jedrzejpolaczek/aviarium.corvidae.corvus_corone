@@ -1,6 +1,6 @@
 # §4 Metric Selection Guide
 
-> Index: [01-metric-taxonomy.md](01-metric-taxonomy.md)
+> Index: [01-index.md](01-index.md)
 
 Use this guide when specifying measurements in Step 5 of the Benchmarking Protocol (`docs/04-scientific-practice/01-methodology/01-benchmarking-protocol.md`). Metric selection must happen **before** data collection (MANIFESTO Principle 16) to prevent post-hoc cherry-picking.
 

@@ -8,14 +8,14 @@ Without agreed-upon schemas, MANIFESTO Principles 19–22 (Reproducibility) are 
 
 NARRATIVE POSITION:
   SRS §7 (interface requirements) → Data Format Spec → (concrete schemas and formats)
-  → specs/interface-contracts.md : interfaces operate on the entities defined here
-  → specs/metric-taxonomy.md     : metric values are stored in Result Aggregate entities here
+  → docs/03-technical-contracts/02-interface-contracts/01-index.md : interfaces operate on the entities defined here
+  → docs/03-technical-contracts/03-metric-taxonomy/01-index.md     : metric values are stored in Result Aggregate entities here
 
 CONNECTS TO:
   ← SRS §4, §7             : requirements that drove these format decisions
   ← MANIFESTO Principles 7, 8, 19–22 : directly operationalized by this document
-  → specs/interface-contracts.md : method signatures use entity types from here
-  → specs/metric-taxonomy.md     : metric definitions must match Result Aggregate fields here
+  → docs/03-technical-contracts/02-interface-contracts/01-index.md : method signatures use entity types from here
+  → docs/03-technical-contracts/03-metric-taxonomy/01-index.md     : metric definitions must match Result Aggregate fields here
   → community/versioning-governance.md : how schema versions are managed and deprecated
   → architecture/adr/            : format choices (e.g., JSON vs HDF5) should have ADRs
 

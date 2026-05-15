@@ -16,8 +16,7 @@ CONNECTS TO:
   ← constraints.md                                            : CONST-XX constraints have enforcement tests
   ← use-cases.md                                              : every UC must have an end-to-end test
   → docs/02-design/02-architecture/c3-components.md           : test file paths aligned to C3 components
-  → docs/05-community/TASKS.md                                : REF-TASK-0013 delivered
-
+  
 NOTE ON TEST FILE PATHS:
   Paths under tests/unit/ and tests/e2e/test_uc03–06/ are planned; they will be created as
   the corresponding FR groups are implemented. Existing files are marked ✅.
@@ -32,7 +31,7 @@ A requirement is considered accepted when its designated test category passes.
 
 | Category | Purpose | Requirement IDs covered | UC coverage |
 |---|---|---|---|
-| Unit tests | Each C3 component behaves correctly in isolation | FR-01–FR-07, FR-14, FR-17, FR-19 | — |
+| Unit tests | Each C3 component behaves correctly in isolation | FR-01–FR-03, FR-05–FR-07, FR-14, FR-17, FR-19, FR-32, FR-33 | — |
 | Integration tests | C2 container interactions produce correct data flows | FR-04, FR-08–FR-13, FR-15–FR-16, FR-20 | UC-01 end-to-end |
 | Reproducibility tests | Same Study → identical Result Aggregates on re-execution from archived Artifacts | NFR-REPRO-01; FR-09, FR-10, FR-17, FR-18 | UC-05 |
 | Statistical validity tests | No report is produced if any analysis level is missing or bypassed | NFR-STAT-01; FR-15, FR-16 | UC-01 Step 8 |
@@ -57,6 +56,8 @@ and will be created as the corresponding feature is implemented.
 | FR-02 | Validate ProblemInstance completeness on registration | Validation rejection | 🚧 `tests/unit/test_problem_repository.py` |
 | FR-03 | Problem Instance versioning | Unit | 🚧 `tests/unit/test_problem_repository.py` |
 | FR-04 | Reject version mismatch before any Run begins | Integration | ✅ `tests/e2e/test_uc01_researcher_study.py` |
+| FR-32 | Validate Study has ≥ 5 Problem Instances before Experiment begins | Unit, Validation rejection | 🚧 `tests/unit/test_problem_repository.py` |
+| FR-33 | Validate Study Problem Instance set covers diversity rules (D-2, D-3) | Unit, Validation rejection | 🚧 `tests/unit/test_problem_repository.py` |
 | FR-05 | Store AlgorithmInstance with all required fields | Unit, Validation rejection | 🚧 `tests/unit/test_algorithm_registry.py` |
 | FR-06 | Reject unpinned code_reference | Validation rejection | ✅ `tests/e2e/test_uc02_contribute_algorithm.py` |
 | FR-07 | Require non-empty configuration_justification | Validation rejection | ✅ `tests/e2e/test_uc02_contribute_algorithm.py` |

@@ -49,7 +49,7 @@ Terms are listed alphabetically within sections.
 
 **Distinguished from:** *Algorithm Instance* (the same strategy with all hyperparameters fixed), *Implementation* (the executable code artifact).
 
-**Used in:** `docs/01-manifesto/MANIFESTO.md` Principle 8, `docs/02-design/01-software-requirement-specification/srs.md`, `docs/03-technical-contracts/02-interface-contracts/03-algorithm-interface.md`.
+**Used in:** `docs/01-manifesto/MANIFESTO.md` Principle 8, `docs/02-design/01-software-requirement-specification/01-srs/01-SRS.md`, `docs/03-technical-contracts/02-interface-contracts/03-algorithm-interface.md`.
 
 **Example:** "Tree-structured Parzen Estimator (TPE)" is an Algorithm. A specific instantiation of TPE with `n_startup_trials=10` and `gamma=0.25` is an Algorithm Instance.
 
@@ -95,7 +95,7 @@ Terms are listed alphabetically within sections.
 
 **Distinguished from:** *Problem Instance* (a fully specified, concrete parameterization of a Benchmark Problem with all characteristics fixed).
 
-**Used in:** `docs/01-manifesto/MANIFESTO.md` Principles 4–7, `docs/02-design/02-architecture/02-c1-context.md`, `docs/03-technical-contracts/01-data-format/02-problem-instance.md`.
+**Used in:** `docs/01-manifesto/MANIFESTO.md` Principles 4–7, `docs/02-design/02-architecture/02-c4-leve1-context/01-c4-l1-context/01-c1-context.md`, `docs/03-technical-contracts/01-data-format/02-problem-instance.md`.
 
 **Example:** "SVM hyperparameter tuning on a classification task" is a Benchmark Problem. That same problem with a fixed dataset, 5-dimensional search space, evaluation budget of 100, and Gaussian noise σ=0.01 is a Problem Instance.
 
@@ -395,7 +395,7 @@ Terms are listed alphabetically within sections.
 
 **Implication for this system:** Global algorithm rankings are scientifically invalid. Every conclusion about algorithm performance must be scoped to the specific Problem Instances tested. The goal of this system is to map which algorithms work well for which problem characteristics, not to crown a winner.
 
-**Used in:** `docs/01-manifesto/MANIFESTO.md` Principle 30, `docs/02-design/01-software-requirement-specification/SRS.md` §6 (Constraints).
+**Used in:** `docs/01-manifesto/MANIFESTO.md` Principle 30, `docs/02-design/01-software-requirement-specification/01-srs/01-SRS.md` §6 (Constraints).
 
 ---
 
@@ -427,7 +427,7 @@ Terms are listed alphabetically within sections.
 
 **Distinguished from:** *Replicability* (same team, different data), *Generalizability* (same method applied to new problems). This system targets Reproducibility as a hard requirement, not an aspiration.
 
-**Used in:** `docs/01-manifesto/MANIFESTO.md` Principles 19–22, `docs/02-design/01-software-requirement-specification/SRS.md` §5 NFR-REPRO, `docs/05-community/02-versioning-governance.md`.
+**Used in:** `docs/01-manifesto/MANIFESTO.md` Principles 19–22, `docs/02-design/01-software-requirement-specification/01-srs/01-SRS.md` §5 NFR-REPRO, `docs/05-community/02-versioning-governance.md`.
 
 ---
 
@@ -459,7 +459,7 @@ Terms are listed alphabetically within sections.
 
 **Definition:** Any versioned, stored product of the system — a Problem Instance specification, Algorithm Implementation, Experiment record, Results dataset, or Analysis output — subject to the versioning and governance policy in `docs/05-community/02-versioning-governance.md`.
 
-**Used in:** `docs/01-manifesto/MANIFESTO.md` Principle 21, `docs/05-community/02-versioning-governance.md`, `docs/03-technical-contracts/01-data-format/01-data-format.md`.
+**Used in:** `docs/01-manifesto/MANIFESTO.md` Principle 21, `docs/05-community/02-versioning-governance.md`, `docs/03-technical-contracts/01-data-format/01-index.md`.
 
 ---
 
@@ -595,7 +595,7 @@ Terms are listed alphabetically within sections.
 
 **Distinguished from:** *Researcher* (who conducts and reports Studies), *Practitioner* (who selects algorithms based on Study results for deployment), and *Algorithm Author* (who contributes implementations). The Learner is a **downstream read-only consumer** of artifacts produced by the Researcher. The Learner does not create or modify any Study, Experiment, or Report entity.
 
-**Used in:** `docs/02-design/02-architecture/02-c4-leve1-context/01-c1-context.md` (C1 actor definition), `docs/02-design/01-software-requirement-specification/02-use-cases/01-use-cases.md` (UC-07..UC-11), `docs/02-design/02-architecture/03-c4-leve2-containers/06-algorithm-visualization-engine.md`, `docs/02-design/02-architecture/03-c4-leve2-containers/14-corvus-pilot.md`.
+**Used in:** `docs/02-design/02-architecture/02-c4-leve1-context/01-c4-l1-context/01-c1-context.md` (C1 actor definition), `docs/02-design/01-software-requirement-specification/02-use-cases/01-index.md` (UC-07..UC-11), `docs/02-design/02-architecture/03-c4-leve2-containers/06-algorithm-visualization-engine.md`, `docs/02-design/02-architecture/03-c4-leve2-containers/14-corvus-pilot.md`.
 
 **Example:** A graduate student who has completed a benchmarking study with their supervisor and now wants to understand *why* CMA-ES outperformed random search on ill-conditioned problems is acting as a Learner. They read the Report produced by the Researcher, explore Algorithm Visualizations, and use Socratic mode to reason through the mechanism independently.
 

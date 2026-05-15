@@ -145,7 +145,7 @@ flowchart LR
 
 ## Actors
 
-> Individual actor descriptions: [actors/](actors/)
+> Individual actor descriptions: [actors/](../02-actors/)
 
 ### Researcher
 
@@ -251,7 +251,7 @@ The Learner does not modify, re-run, or extend any Study. They read completed Re
 
 ## External Systems
 
-> Individual external system descriptions: [external-systems/](external-systems/)
+> Individual external system descriptions: [external-systems/](../03-external-systems/)
 
 ### COCO (Comparing Continuous Optimizers)
 

@@ -60,7 +60,7 @@ Returns summaries of all non-deprecated Problem Instances matching the filter.
 #### register_problem(problem: ProblemInstance) → str
 Validates and persists a new Problem Instance. Returns the assigned ID.
 
-**Preconditions:** all data-format.md §2.1 validation rules pass
+**Preconditions:** all docs/03-technical-contracts/01-data-format/02-problem-instance.md validation rules pass
 **Exceptions:** `ValidationError`
 
 #### deprecate_problem(id: str, reason: str, superseded_by: str | None = None) → None
@@ -81,7 +81,7 @@ Marks a Problem Instance as deprecated. Deprecated instances are excluded from
 #### register_algorithm(algorithm: AlgorithmInstance) → str
 Validates and persists a new Algorithm Instance. Returns the assigned ID.
 
-**Preconditions:** all data-format.md §2.2 validation rules pass; `code_reference` is
+**Preconditions:** all docs/03-technical-contracts/01-data-format/03-algorithm-instance.md validation rules pass; `code_reference` is
 resolvable and version-pinned (UC-02 F2); `configuration_justification` is non-empty (UC-02 F3)
 **Exceptions:** `ValidationError`, `CodeReferenceError`
 
@@ -100,7 +100,7 @@ resolvable and version-pinned (UC-02 F2); `configuration_justification` is non-e
 #### create_study(study: Study) → str
 Persists a new Study in `"draft"` status. Returns the assigned ID.
 
-**Preconditions:** all data-format.md §2.3 validation rules pass
+**Preconditions:** all docs/03-technical-contracts/01-data-format/04-study.md validation rules pass
 
 #### lock_study(id: str) → None
 Transitions Study from `"draft"` to `"locked"`. After locking, `sampling_strategy`,
@@ -168,7 +168,7 @@ Returns all Performance Records for the given Run, sorted ascending by `evaluati
 #### save_result_aggregates(aggregates: list[ResultAggregate]) → None
 Persists a batch of Result Aggregates. All aggregates must reference the same Experiment.
 
-**Preconditions:** all data-format.md §2.7 validation rules pass; metric names in `metrics`
+**Preconditions:** all docs/03-technical-contracts/01-data-format/08-result-aggregate.md validation rules pass; metric names in `metrics`
 are valid entries in metric-taxonomy.md
 
 ---

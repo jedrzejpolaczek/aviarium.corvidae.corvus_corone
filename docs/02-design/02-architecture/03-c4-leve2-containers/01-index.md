@@ -13,7 +13,7 @@ CONNECTS TO:
   ← C1                    : the system boundary from there is decomposed here
   → C3                    : each container here is zoomed into in a C3 document
   → SRS §4                : each container maps to one or more functional requirement groups
-  → specs/data-format.md  : data flowing between containers must conform to schemas there
+  → docs/03-technical-contracts/01-data-format/01-index.md  : data flowing between containers must conform to schemas there
   → architecture/adr/     : technology choices for each container should have a corresponding ADR
 -->
 
@@ -270,7 +270,7 @@ flowchart TB
 | 1 | Researcher | Public API + CLI | `experiment_id`, `format` (`"coco"` / `"ioh"` / `"nevergrad"`), `output_dir` |
 | 2 | Public API + CLI | Ecosystem Bridge | `export(experiment, format)` |
 | 3 | Ecosystem Bridge | Results Store | Reads `Study`, `Experiment`, `Run[]`, `PerformanceRecord[]`, `AlgorithmInstance[]`, `ProblemInstance[]` for the target Experiment |
-| 4 | Ecosystem Bridge | Ecosystem Bridge | Applies format mapping (→ `data-format.md §4`); identifies fields with no target equivalent; builds `information_loss_manifest` |
+| 4 | Ecosystem Bridge | Ecosystem Bridge | Applies format mapping (→ `docs/03-technical-contracts/01-data-format/11-interoperability-mappings.md`); identifies fields with no target equivalent; builds `information_loss_manifest` |
 | 5 | Ecosystem Bridge | Public API + CLI | Pre-export manifest listing `LOSS-*` items — critical items (e.g., `LOSS-COCO-01`) displayed before export proceeds |
 | 6 | Researcher | Public API + CLI | Confirms export |
 | 7 | Ecosystem Bridge | Researcher | Export files in target format (`*.info` + `*.dat` for COCO; JSON sidecar + `*.dat` for IOH; JSON-lines for Nevergrad) + `information_loss_manifest` |

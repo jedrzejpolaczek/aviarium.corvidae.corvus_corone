@@ -1,9 +1,9 @@
 # Product Roadmap — Corvus Corone: HPO Algorithm Benchmarking Platform
 
 <!--
-Derived from: MANIFESTO.md, SRS.md, C1/C2 architecture, ADR-001,
-interface-contracts.md, data-format.md, metric-taxonomy.md,
-statistical-methodology.md, benchmarking-protocol.md, TASKS.md,
+Derived from: MANIFESTO.md, 01-srs/01-SRS.md, C1/C2 architecture, ADR-001,
+docs/03-technical-contracts/02-interface-contracts/01-index.md, docs/03-technical-contracts/01-data-format/01-index.md, docs/03-technical-contracts/03-metric-taxonomy/01-index.md,
+statistical-methodology.md, benchmarking-protocol.md,
 scripts/create_github_issues.py
 Generated: 2026-03-04. Updated: 2026-05-15. Update whenever a milestone closes or a new REF-TASK is created.
 -->
@@ -54,7 +54,7 @@ Six milestones group all open documentation and design tasks.
 
 ### GLOSSARY
 - [x] **[REF-TASK-0001] Extend GLOSSARY from interface-contracts and data-format** — all new terms from those documents added with precise definitions
-- [x] **[REF-TASK-0002] Verify Schema Version definition against data-format.md** — GLOSSARY entry must use identical terminology to versioning scheme in `data-format.md §6`
+- [x] **[REF-TASK-0002] Verify Schema Version definition against docs/03-technical-contracts/01-data-format/01-index.md** — GLOSSARY entry must use identical terminology to versioning scheme in `docs/03-technical-contracts/01-data-format/13-schema-versioning.md`
 
 ### SRS
 - [x] **[REF-TASK-0009] Expand UC-01 and UC-02 into full use case descriptions** — main flow, preconditions, postconditions, failure scenarios, end-to-end tests
@@ -86,7 +86,7 @@ Six milestones group all open documentation and design tasks.
 - [x] **[REF-TASK-0017] TIME-EVALUATIONS_TO_TARGET Standard Reporting Set decision** — weigh pre-specification burden vs. efficiency metric value; create ADR
 - [x] **[REF-TASK-0020] Statistical test selection procedure** — decision tree: Wilcoxon (2 algorithms) vs Kruskal-Wallis + Holm-Bonferroni (>2); document in `statistical-methodology.md §3`
 - [x] **[REF-TASK-0021] Problem instance diversity minimum requirements** — quantitative floor (ADR-008 *(planned)* candidate: ≥5 instances, ≥2 dimensionality ranges, ≥1 noise + ≥1 deterministic)
-- [x] **[REF-TASK-0022] Algorithm sensitivity documentation format** — `SensitivityReport` schema field in `AlgorithmInstance`; requires `data-format.md §2.2`
+- [x] **[REF-TASK-0022] Algorithm sensitivity documentation format** — `SensitivityReport` schema field in `AlgorithmInstance`; requires `docs/03-technical-contracts/01-data-format/03-algorithm-instance.md`
 - [x] **[REF-TASK-0019] Level 1 required visualizations** — mandatory EDA set (boxplot, convergence curves, ECDF, violin); document in `statistical-methodology.md §2`
 - [x] **[REF-TASK-0015] Metric implementation references** — link each metric definition to `corvus_corone/analysis/metrics.py`; fulfilled as part of IMPL-011
 - [ ] **[REF-TASK-0014] Metric taxonomy extensions** *(Post-V1)* — new metrics after first real studies
@@ -99,7 +99,7 @@ Six milestones group all open documentation and design tasks.
 
 - [x] **[REF-TASK-0004] Algorithm Author tutorial** — wrap Optuna sampler in ≤ 15 lines; interface acceptance test
 - [x] **[REF-TASK-0005] COCO format mapping** *(spike first)* — map Corvus entities to COCO `.info`/`.dat`/`.tdat`; document data loss; round-trip test
-- [x] **[REF-TASK-0006] Nevergrad adapter pattern** *(spike first)* — generic `NevergradAdapter`; tutorial; `data-format.md §3` mapping
+- [x] **[REF-TASK-0006] Nevergrad adapter pattern** *(spike first)* — generic `NevergradAdapter`; tutorial; `docs/03-technical-contracts/01-data-format/10-file-formats.md` mapping
 - [x] **[REF-TASK-0007] IOHprofiler export format mapping** — `.dat` export + `.meta.json` sidecar for unsupported fields; full spec + round-trip test
 
 ---
@@ -128,7 +128,7 @@ Six milestones group all open documentation and design tasks.
 - [ ] **`[IMPL-006]`** Optuna TPE adapter — `algorithms/adapters/optuna_adapter.py` in ≤ 15 lines; tutorial `docs/06-tutorials/01_wrap_optuna_sampler.md` · *Fulfills: REF-TASK-0004*
 - [ ] **`[IMPL-007]`** Experiment Runner — `runner/runner.py`: `deepcopy` isolation per run, determinism test, independence test · *Refs: MANIFESTO Principle 18*
 - [ ] **`[IMPL-008]`** Seed Manager — `runner/seed_manager.py`: `generate_seeds()` via `numpy.random.SeedSequence.spawn()`
-- [ ] **`[IMPL-009]`** Data entities — `storage/entities.py`: `RunRecord`, `PerformanceRecord`, `StudyRecord` (UUID IDs, JSON round-trip) · *Refs: data-format.md §2, ADR-001*
+- [ ] **`[IMPL-009]`** Data entities — `storage/entities.py`: `RunRecord`, `PerformanceRecord`, `StudyRecord` (UUID IDs, JSON round-trip) · *Refs: docs/03-technical-contracts/01-data-format/01-index.md, ADR-001*
 - [ ] **`[IMPL-010]`** Repository interface + LocalFileRepository — `storage/repository.py`: `Repository` ABC, `LocalFileRepository`, `RepositoryContractTest` · *Fulfills: REF-TASK-0023*
 - [ ] **`[IMPL-011]`** Metric taxonomy — `analysis/metrics.py`: `@metric` registry; `QUALITY-BEST_VALUE_AT_BUDGET`, `TIME-EVALUATIONS_TO_TARGET`, `RELIABILITY-SUCCESS_RATE`; implementation refs added to `metric-taxonomy.md` · *Fulfills: REF-TASK-0015*
 - [ ] **`[IMPL-012]`** Statistical analysis — `analysis/statistical.py`: three-level (exploratory summary, Wilcoxon/Kruskal-Wallis + Holm-Bonferroni, Cliff's delta); `ThreeLevelAnalysis.analyze()` requires all three levels · *Fulfills: REF-TASK-0020*
@@ -146,11 +146,11 @@ Six milestones group all open documentation and design tasks.
 - [ ] **`[IMPL-018]`** ADR-006: Technical constraints — `pyproject.toml` `requires-python = ">=3.10"`, MIT license, optional extras (`optuna`, `rag`, `all`), CI license check · *Fulfills: REF-TASK-0011*
 - [ ] **`[IMPL-019]`** ADR-007 + ADR-008: ECDF_AREA normalization (empirical min/max, limitations documented) + Standard Reporting Set definition; update `metric-taxonomy.md §3` · *Fulfills: REF-TASK-0016, REF-TASK-0017*
 - [ ] **`[IMPL-020]`** ADR-008 + statistical-methodology.md: diversity requirements (≥5 problems, ≥2 dimensionality ranges); Level 1 VIZ-L1-01..03 spec in §2; Wilcoxon/Kruskal decision tree in §3 · *Fulfills: REF-TASK-0019, REF-TASK-0020, REF-TASK-0021*
-- [ ] **`[IMPL-021]`** Sensitivity documentation — `SensitivityReport(BaseModel)` in `storage/entities.py`, `data-format.md §2.2`, `contribution-guide.md §2` · *Fulfills: REF-TASK-0022*
+- [ ] **`[IMPL-021]`** Sensitivity documentation — `SensitivityReport(BaseModel)` in `storage/entities.py`, `docs/03-technical-contracts/01-data-format/03-algorithm-instance.md`, `contribution-guide.md §2` · *Fulfills: REF-TASK-0022*
 - [ ] **`[IMPL-022]`** Bulk PerformanceRecord storage — **blocked on REF-TASK-0024 spike**; ADR-009 from benchmark evidence; `LocalFileRepository.save_bulk_records()`; round-trip test · *Fulfills: REF-TASK-0024*
-- [ ] **`[IMPL-023]`** IOHprofiler bridge — `bridge/iohprofiler.py`: full `.dat` export + `.meta.json` sidecar (seed, run_id, wall_time); round-trip test; `data-format.md §3` mapping table · *Fulfills: REF-TASK-0007*
-- [ ] **`[IMPL-024]`** COCO bridge — **blocked on REF-TASK-0005 spike**; `bridge/coco_exporter.py`; continuous-only warning; `data-format.md §3` mapping with documented data loss · *Fulfills: REF-TASK-0005*
-- [ ] **`[IMPL-025]`** Nevergrad adapter — **blocked on REF-TASK-0006 spike**; `algorithms/adapters/nevergrad_adapter.py`; `ng.p.Dict` → `SearchSpace`; tutorial; `data-format.md §3` mapping · *Fulfills: REF-TASK-0006*
+- [ ] **`[IMPL-023]`** IOHprofiler bridge — `bridge/iohprofiler.py`: full `.dat` export + `.meta.json` sidecar (seed, run_id, wall_time); round-trip test; `docs/03-technical-contracts/01-data-format/10-file-formats.md` mapping table · *Fulfills: REF-TASK-0007*
+- [ ] **`[IMPL-024]`** COCO bridge — **blocked on REF-TASK-0005 spike**; `bridge/coco_exporter.py`; continuous-only warning; `docs/03-technical-contracts/01-data-format/10-file-formats.md` mapping with documented data loss · *Fulfills: REF-TASK-0005*
+- [ ] **`[IMPL-025]`** Nevergrad adapter — **blocked on REF-TASK-0006 spike**; `algorithms/adapters/nevergrad_adapter.py`; `ng.p.Dict` → `SearchSpace`; tutorial; `docs/03-technical-contracts/01-data-format/10-file-formats.md` mapping · *Fulfills: REF-TASK-0006*
 - [ ] **`[IMPL-026]`** LLM-as-judge — `analysis/llm_judge.py`: `ManifestoReview` Pydantic model, `StudyDesignJudge.review()`, Ollama structured output; optional `corvus-corone[llm]` extra
 - [ ] **`[IMPL-027]`** RAG over `papers/` — `papers_rag.py`: FAISS index, `PapersRAG.why(metric_id)` via Ollama; optional `corvus-corone[rag]` extra; references Bartz-Beielstein 2020
 
@@ -225,7 +225,7 @@ Six milestones group all open documentation and design tasks.
 MANIFESTO ──► C1 ──► C2/C3/C4 (complete)
                            │
                            ├──► SRS §4/§8 (REF-TASK-0008, 0013) — unblocked after Phase 1
-                           ├──► data-format.md update (REF-TASK-0022) — after IMPL-021
+                           ├──► docs/03-technical-contracts/01-data-format/01-index.md update (REF-TASK-0022) — after IMPL-021
                            └──► interface-contracts.md (REF-TASK-0023) — after IMPL-010
 
 REF-TASK-0005/0006/0007 spikes ──► IMPL-024/025/023 bridges ──► SRS §7 (REF-TASK-0012)
@@ -287,7 +287,7 @@ Open documentation tasks (the only two remaining):
 | IMPL-018 — ADR-006 technical constraints | Phase 2 | ADR-006, pyproject.toml finalized |
 | IMPL-019 — ADR-007 + ADR-008 ECDF + SRS | Phase 2 | ADR-007/008, metric-taxonomy.md §3 |
 | IMPL-020 — ADR-008 + statistical-methodology | Phase 2 | ADR-008, statistical-methodology.md §2/§3 |
-| IMPL-021 — Sensitivity documentation | Phase 2 | SensitivityReport schema, data-format.md §2.2 |
+| IMPL-021 — Sensitivity documentation | Phase 2 | SensitivityReport schema, docs/03-technical-contracts/01-data-format/03-algorithm-instance.md |
 | IMPL-022 — Bulk PerformanceRecord storage | Phase 2 | ADR-009, `save_bulk_records()` (spike first) |
 | IMPL-023 — IOHprofiler bridge | Phase 2 | `bridge/iohprofiler.py`, .dat + .meta.json |
 | IMPL-024 — COCO bridge | Phase 2 | `bridge/coco_exporter.py` (spike first) |

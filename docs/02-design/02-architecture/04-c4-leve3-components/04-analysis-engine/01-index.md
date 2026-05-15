@@ -1,7 +1,7 @@
 # C3: Components — Analysis Engine
 
 > C2 Container: [09-analysis-engine.md](../../03-c4-leve2-containers/09-analysis-engine.md)
-> C3 Index: [../01-c3-components.md](../01-c3-components.md)
+> C3 Index: [../01-c4-l3-components/01-c4-l3-components.md](../01-c4-l3-components/01-c4-l3-components.md)
 
 The Analysis Engine computes benchmark metrics from raw PerformanceRecords, applies pre-registered statistical tests, annotates results with scope metadata, and interpolates missing data. It is batch-only in V1 — it runs after all Runs in a Study complete.
 Actors: invoked by Study Orchestrator; reads PerformanceRecords from Results Store; writes MetricResults back to Results Store.

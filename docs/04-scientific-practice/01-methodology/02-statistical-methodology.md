@@ -11,7 +11,7 @@ NARRATIVE POSITION:
 
 CONNECTS TO:
   ← docs/01-manifesto/MANIFESTO.md Principles 13, 15 : directly operationalized by this document
-  ← docs/02-design/01-software-requirement-specification/SRS.md NFR-STAT-01 : non-functional requirement for statistical validity
+  ← docs/02-design/01-software-requirement-specification/01-srs/01-SRS.md NFR-STAT-01 : non-functional requirement for statistical validity
   → docs/03-technical-contracts/metric-taxonomy.md    : metric properties (distribution, bounds) guide test selection here
   → docs/03-technical-contracts/interface-contracts.md §4 : Analyzer interface implements this methodology
   → docs/03-technical-contracts/data-format.md §2.7   : Result Aggregate fields store uncertainty information defined here
@@ -225,7 +225,7 @@ Level 1 produces two artifacts:
 
 ### 3.1 Preconditions
 
-Only hypotheses listed in `Study.pre_registered_hypotheses` (data-format.md §2.3) may be
+Only hypotheses listed in `Study.pre_registered_hypotheses` (docs/03-technical-contracts/01-data-format/04-study.md) may be
 tested here. The test name, α, and correction method must be declared before data collection;
 they are locked with the Study record. Testing a hypothesis not in that list is a post-hoc
 observation (Pitfall 1) and is automatically labeled "exploratory" in the Analyzer output.
@@ -488,7 +488,7 @@ arXiv:2007.03488. §4 (Statistical Analysis of Benchmark Results).*
 
   ### Budget-Sensitive Comparison
     How to compare algorithms at multiple budget checkpoints?
-    → requires PerformanceRecord data: data-format.md §2.6
+    → requires PerformanceRecord data: docs/03-technical-contracts/01-data-format/07-performance-record.md
     Statistical considerations: applying Level 2 tests at multiple budgets introduces
     multiple testing — how to handle?
 
@@ -512,7 +512,7 @@ arXiv:2007.03488. §4 (Statistical Analysis of Benchmark Results).*
     - Success rate (if applicable — how many runs completed successfully)
     - Confidence interval (specify level: 95%? 99?)
 
-  → These map directly to ResultAggregate fields in specs/data-format.md §2.7.
+  → These map directly to ResultAggregate fields in docs/03-technical-contracts/01-data-format/08-result-aggregate.md
   If a ResultAggregate is missing any of these, it fails validation.
 -->
 

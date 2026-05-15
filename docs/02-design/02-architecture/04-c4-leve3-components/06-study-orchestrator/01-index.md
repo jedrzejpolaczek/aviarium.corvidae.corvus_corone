@@ -1,7 +1,7 @@
 # C3: Components — Study Orchestrator
 
 > C2 Container: [07-study-orchestrator.md](../../03-c4-leve2-containers/07-study-orchestrator.md)
-> C3 Index: [../01-c3-components.md](../01-c3-components.md)
+> C3 Index: [../01-c4-l3-components/01-c4-l3-components.md](../01-c4-l3-components/01-c4-l3-components.md)
 
 The Study Orchestrator coordinates the full lifecycle of a Study execution: builds and validates the run plan, dispatches runs to the Experiment Runner, handles partial failures, and triggers the post-execution pipeline (Analysis Engine + Reporting Engine).
 Actors: invoked by the Public API + CLI; orchestrates Experiment Runner, Analysis Engine, and Reporting Engine.

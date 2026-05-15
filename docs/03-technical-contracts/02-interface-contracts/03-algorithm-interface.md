@@ -1,6 +1,6 @@
 # §2 Algorithm Interface
 
-> Index: [01-interface-contracts.md](01-interface-contracts.md)
+> Index: [01-index.md](01-index.md)
 
 Any class that provides an HPO algorithm MUST implement all methods in this section.
 The Algorithm Interface uses the **ask-tell** pattern: the Runner calls `suggest()` to request
@@ -62,14 +62,14 @@ This is the core "tell" step. **Implementation is required.** Non-adaptive algor
 
 **Preconditions:**
 - `solution` was returned by the most recent `suggest()` call
-- `result` is a valid `EvaluationResult` (→ data-format.md §2.6 output of Problem.evaluate())
+- `result` is a valid `EvaluationResult` (→ docs/03-technical-contracts/01-data-format/07-performance-record.md output of Problem.evaluate())
 
 ---
 
 ### initialize(search_space: SearchSpace, seed: int) → None
 
 **Signature:**
-- `search_space: SearchSpace` — the Problem's search space for this Run (→ data-format.md §2.1)
+- `search_space: SearchSpace` — the Problem's search space for this Run (→ docs/03-technical-contracts/01-data-format/02-problem-instance.md)
 - `seed: int` — run-specific seed injected by the Runner (never generated inside the algorithm)
 
 **Semantics:**
@@ -110,7 +110,7 @@ variables; the Registry rejects such pairings with a clear error message.
 ### get_metadata() → AlgorithmInstance
 
 **Signature:**
-- returns: `AlgorithmInstance` — → data-format.md §2.2
+- returns: `AlgorithmInstance` — → docs/03-technical-contracts/01-data-format/03-algorithm-instance.md
 
 **Semantics:**
 Returns the full Algorithm Instance record for this algorithm, including provenance,

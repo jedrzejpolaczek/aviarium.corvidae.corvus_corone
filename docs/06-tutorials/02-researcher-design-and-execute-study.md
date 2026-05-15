@@ -13,7 +13,7 @@ CONNECTS TO:
   → docs/02-design/01-software-requirement-specification/02-use-cases/02-uc-01.md
   → docs/04-scientific-practice/01-methodology/01-benchmarking-protocol.md : all 8 steps
   → docs/04-scientific-practice/01-methodology/02-statistical-methodology.md : Step 7 analysis
-  → docs/03-technical-contracts/01-data-format.md : Study, Experiment, Run, Report schemas
+  → docs/03-technical-contracts/01-data-format/01-index.md : Study, Experiment, Run, Report schemas
   → docs/03-technical-contracts/03-metric-taxonomy.md : Standard Reporting Set
   → docs/GLOSSARY.md : all entity names used here
 -->
@@ -304,7 +304,7 @@ researcher-chosen. This prevents seed selection that favours a preferred algorit
 ### Step 7: Inspect the Result Aggregates
 
 The system automatically computes the
-[Standard Reporting Set](../03-technical-contracts/03-metric-taxonomy.md) metrics
+[Standard Reporting Set](../03-technical-contracts/03-metric-taxonomy/01-index.md) metrics
 across all runs. Verify they exist before generating reports:
 
 ```python
@@ -454,4 +454,4 @@ corvus verify --experiment-id <experiment.id>
 | Understand the three-level statistical analysis in depth | [statistical-methodology.md](../04-scientific-practice/01-methodology/02-statistical-methodology.md) |
 | Export your results to IOHprofiler for visualization | `05-researcher-export-iohprofiler.md` *(coming soon)* |
 | Reproduce a study from a published archive | `06-researcher-reproduce-study.md` *(coming soon)* |
-| Understand what metrics are computed and why | [metric-taxonomy.md](../03-technical-contracts/03-metric-taxonomy.md) |
+| Understand what metrics are computed and why | [metric-taxonomy.md](../03-technical-contracts/03-metric-taxonomy/01-index.md) |

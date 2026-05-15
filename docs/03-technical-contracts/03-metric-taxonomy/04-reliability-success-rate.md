@@ -1,6 +1,6 @@
 # RELIABILITY-SUCCESS_RATE
 
-> Index: [01-metric-taxonomy.md](01-metric-taxonomy.md)
+> Index: [01-index.md](01-index.md)
 
 **Display name:** Success Rate at Target
 

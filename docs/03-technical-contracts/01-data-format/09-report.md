@@ -1,8 +1,8 @@
 # §2.8 Report
 
-> Index: [01-data-format.md](01-data-format.md)
+> Index: [01-index.md](01-index.md)
 
-> See GLOSSARY: [Report](../GLOSSARY.md#report)
+> See GLOSSARY: [Report](../../GLOSSARY.md#report)
 
 | Name | Type | Required | Notes |
 | --- | --- | --- | --- |

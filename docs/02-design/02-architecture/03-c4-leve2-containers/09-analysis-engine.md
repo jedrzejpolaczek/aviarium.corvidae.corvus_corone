@@ -44,6 +44,5 @@ by the Analysis Engine but owned by the store.
 **Actors served:** Researcher (primary — metric computation and statistical analysis,
 UC-01 steps 5-6).
 
-**Relevant SRS section:** FR-13 (metric computation from taxonomy), FR-14 (statistical
-tests — Wilcoxon, Kruskal-Wallis), FR-15 (scoped conclusions — no global rankings),
+**Relevant SRS section:** FR-13 (metric computation from taxonomy), FR-14 (PerformanceRecord log-scale recording), FR-15 (three analysis levels — exploratory, confirmatory, practical significance),
 FR-16 (pre-registration distinction in report).

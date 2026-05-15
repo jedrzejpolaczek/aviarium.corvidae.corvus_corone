@@ -6,21 +6,21 @@ system edge. Each interface requirement describes direction, format, behaviour, 
 
 NARRATIVE POSITION:
   C1 context (external systems) → Interface Requirements (what each boundary must support)
-  Interface Requirements → data-format.md §4 (field-level mappings)
+  Interface Requirements → docs/03-technical-contracts/01-data-format/11-interoperability-mappings.md (field-level mappings)
   Interface Requirements → interface-contracts.md (method signatures)
   Interface Requirements → Functional Requirements (FR-23 through FR-26)
 
 CONNECTS TO:
-  ← docs/02-design/02-architecture/02-c1-context.md                  : external system definitions
+  ← docs/02-design/02-architecture/02-c4-leve1-context/01-c4-l1-context/01-c1-context.md                  : external system definitions
   ← functional-requirements.md                                        : FR-23–FR-26 are implemented here
-  → docs/03-technical-contracts/01-data-format.md §4                 : field mappings for each platform
+  → docs/03-technical-contracts/01-data-format/11-interoperability-mappings.md                 : field mappings for each platform
   → docs/03-technical-contracts/02-interface-contracts.md            : method signatures for each adapter
   → non-functional-requirements.md                                    : NFR-INTEROP-01
   → use-cases.md                                                       : UC-06 exercises all export interfaces
   → docs/ROADMAP.md                                                    : V2 interfaces are V2 Horizon items
 
 NOTE ON MAPPING STATUS:
-  Field-level format mappings (data-format.md §4) are complete.
+  Field-level format mappings (docs/03-technical-contracts/01-data-format/11-interoperability-mappings.md) are complete.
   REF-TASK-0005 (COCO), REF-TASK-0006 (Nevergrad), REF-TASK-0007 (IOHprofiler) delivered.
   REF-TASK-0012 delivered — this document is now fully specified.
 -->

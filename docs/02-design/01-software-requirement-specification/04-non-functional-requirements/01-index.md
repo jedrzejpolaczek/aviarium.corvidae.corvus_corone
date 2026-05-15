@@ -18,7 +18,7 @@ CONNECTS TO:
   → docs/04-scientific-practice/01-methodology/02-statistical-methodology.md : NFR-STAT-01 operationalized
   → docs/05-community/02-versioning-governance.md                          : NFR-REPRO-01 and NFR-OPEN-01
   → docs/03-technical-contracts/02-interface-contracts.md                  : NFR-MODULAR-01 operationalized
-  → docs/03-technical-contracts/01-data-format.md §4                       : NFR-INTEROP-01 operationalized
+  → docs/03-technical-contracts/01-data-format/11-interoperability-mappings.md                       : NFR-INTEROP-01 operationalized
 
 NOTE ON MEASURABLE CRITERIA:
   All criteria marked TODO: REF-TASK-0010 are pending architectural decisions.

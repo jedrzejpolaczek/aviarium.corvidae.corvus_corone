@@ -88,7 +88,7 @@ The first seven categories derive from the paper's eight core aspects — Measur
 The following practices are explicitly rejected by this system. They represent the ways a benchmarking system most commonly undermines its own scientific purpose — each is the direct inverse of one or more Principles above.
 
 Anti-patterns AP-1 and AP-3 through AP-7 drive the design exclusions listed in
-`docs/02-design/02-architecture/02-c4-leve1-context/01-c1-context.md` (Explicit Scope Exclusions).
+`docs/02-design/02-architecture/02-c4-leve1-context/01-c4-l1-context/01-c1-context.md` (Explicit Scope Exclusions).
 AP-2 is a scientific validity constraint on problem selection; it does not map to a design exclusion
 (the system cannot prevent researchers from passing biased inputs) but must be stated here because
 CONST-SCI constraints reference it.

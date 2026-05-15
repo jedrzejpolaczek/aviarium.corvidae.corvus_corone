@@ -1,6 +1,6 @@
 # External System: Version Control / CI (e.g. GitHub)
 
-> C1 Context: [../01-c1-context.md](../01-c1-context.md)
+> C1 Context: [01-c1-context.md](../01-c4-l1-context/01-c1-context.md)
 
 **What it is:** The source code repository, issue tracker, and CI/CD pipeline for the library itself and for community contributions.
 

@@ -1,6 +1,6 @@
 # Actor: Researcher
 
-> C1 Context: [../01-c1-context.md](../01-c1-context.md)
+> C1 Context: [01-c1-context.md](../01-c4-l1-context/01-c1-context.md)
 
 **Role:** A scientist or engineer conducting comparative studies of HPO algorithm behavior.
 

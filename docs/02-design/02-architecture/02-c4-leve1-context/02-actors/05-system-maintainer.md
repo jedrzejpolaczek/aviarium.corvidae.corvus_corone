@@ -1,6 +1,6 @@
 # Actor: System Maintainer
 
-> C1 Context: [../01-c1-context.md](../01-c1-context.md)
+> C1 Context: [01-c1-context.md](../01-c4-l1-context/01-c1-context.md)
 
 **Role:** A trusted member responsible for the long-term health of the system — versioning governance, artifact archival, dependency management, CI/CD, and community moderation.
 

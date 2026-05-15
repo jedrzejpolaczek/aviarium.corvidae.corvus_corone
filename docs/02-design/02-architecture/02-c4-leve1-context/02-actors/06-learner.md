@@ -1,6 +1,6 @@
 # Actor: Learner
 
-> C1 Context: [../01-c1-context.md](../01-c1-context.md)
+> C1 Context: [01-c1-context.md](../01-c4-l1-context/01-c1-context.md)
 
 **Role:** A student, practitioner, or researcher seeking to understand HPO algorithm behavior through interactive exploration and guided discovery — consuming existing study results as teaching material rather than producing new ones.
 

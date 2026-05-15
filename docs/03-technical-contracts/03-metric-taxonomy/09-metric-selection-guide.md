@@ -29,5 +29,5 @@ Use this guide when specifying measurements in Step 5 of the Benchmarking Protoc
 - **Note:** This is the only question type where a single metric (`ANYTIME-ECDF_AREA`) is nearly self-sufficient
 
 > **`TODO: REF-TASK-0018`** — Add research question archetypes as they emerge from actual studies.
-> Each archetype should link to a tutorial in `docs/06_tutorials/` demonstrating it end-to-end.
+> Each archetype should link to a tutorial in `docs/06-tutorials/` demonstrating it end-to-end.
 > Owner: methodology lead. Acceptance: each new archetype has a corresponding tutorial.

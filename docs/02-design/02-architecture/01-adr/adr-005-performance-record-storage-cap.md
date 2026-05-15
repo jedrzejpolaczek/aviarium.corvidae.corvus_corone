@@ -195,6 +195,9 @@ that hard caps are never needed in practice.
   before the study completes
 - Optional cap provides a predictable storage bound for resource-constrained deployments
 - Automatic limitations disclosure (FR-21) ensures capped studies are never misrepresented
+- LOCF reconstruction (ADR-003) remains valid after the cap: scheduled records continue
+  uninterrupted and provide the anchor points from which `best_so_far` can be carried
+  forward — the anytime curve is never left without a prior anchor in the capped region
 - The end-of-run record guarantee is unaffected — `QUALITY-BEST_VALUE_AT_BUDGET`
   is always available
 

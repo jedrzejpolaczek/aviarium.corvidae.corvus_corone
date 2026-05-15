@@ -6,4 +6,4 @@
 
 > Deprecated metrics are never removed from this document — existing studies may reference them.
 > Deprecated metrics must not appear in the Standard Reporting Set (§3).
-> Versioning policy: `docs/05_community/versioning-governance.md` §3.
+> Versioning policy: `docs/05-community/versioning-governance.md` §3.

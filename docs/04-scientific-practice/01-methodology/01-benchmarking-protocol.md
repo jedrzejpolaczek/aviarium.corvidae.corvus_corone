@@ -18,7 +18,7 @@ CONNECTS TO:
   → docs/03-technical-contracts/interface-contracts.md : Steps 3–4 (configure algorithms/problems) must follow contracts
   → docs/03-technical-contracts/data-format.md    : every step produces artifacts conforming to schemas there
   → docs/GLOSSARY.md        : exact terms used throughout — Algorithm Instance, Problem Instance, Study, Run, Budget
-  → docs/05_community/TASKS.md : each step in a real study should correspond to trackable tasks
+  → docs/05-community/TASKS.md : each step in a real study should correspond to trackable tasks
 
 USAGE NOTE: This protocol is not a rigid checklist but a structured guide.
 Steps may overlap in practice, but the sequence matters for scientific validity —
@@ -105,9 +105,9 @@ Hypotheses selected after seeing data are observations, not predictions. They ar
 
 1. **H₀ (null hypothesis):** The statement to be tested formally — typically a statement of no difference (e.g., "There is no significant difference in `QUALITY-BEST_VALUE_AT_BUDGET` between Algorithm A and Algorithm B on problem class C")
 2. **H₁ (alternative hypothesis):** The directional or non-directional alternative (e.g., "Algorithm A achieves better `QUALITY-BEST_VALUE_AT_BUDGET` than Algorithm B")
-3. **Statistical test planned:** Which test will be used — to be filled using the test selection guide in `docs/04_scientific_practice/methodology/statistical-methodology.md` §3 (`TODO: REF-TASK-0020`)
+3. **Statistical test planned:** Which test will be used — use the decision tree in `docs/04-scientific-practice/01-methodology/02-statistical-methodology.md` §3 (Wilcoxon signed-rank for 2 algorithms; Kruskal-Wallis for >2)
 4. **Significance threshold α:** Typically 0.05, but must be stated explicitly
-5. **Multiple testing correction:** If more than one hypothesis is tested — state which correction method (`TODO: REF-TASK-0020`)
+5. **Multiple testing correction:** If more than one hypothesis is tested — state which correction method (Holm-Bonferroni is the default; see `statistical-methodology.md` §3)
 6. **Metrics involved:** Which metric IDs from `docs/03-technical-contracts/metric-taxonomy.md` are used to evaluate this hypothesis
 
 **System enforcement:**
@@ -370,6 +370,6 @@ This section is not optional or a gesture toward humility. It is the primary mec
 
 **Archival (Principles 19–22):**
 
-Archive the complete Study record + Experiment record + all Run data + analysis scripts under a versioned identifier. Publish to the long-term artifact repository configured in `docs/05_community/versioning-governance.md` §4.
+Archive the complete Study record + Experiment record + all Run data + analysis scripts under a versioned identifier. Publish to the long-term artifact repository configured in `docs/05-community/versioning-governance.md` §4.
 
 This archival is what makes the study reproducible by a different team years from now — the core scientific value of this system.

@@ -1,16 +1,16 @@
 # §2.6 Performance Record
 
-> Index: [01-data-format.md](01-data-format.md)
+> Index: [01-index.md](01-index.md)
 
 > See GLOSSARY: [Performance Record](../GLOSSARY.md#performance-record)
 
 | Name | Type | Required | Notes |
 | --- | --- | --- | --- |
-| id | int | yes | Performance Record ID |
-| run_id | int | yes | ID of the Run this record belongs to |
+| id | string | yes | Performance Record UUID (RFC 4122 v4) |
+| run_id | string | yes | UUID of the Run this record belongs to |
 | evaluation_number | int | yes | Number of objective evaluations completed so far in this Run |
 | elapsed_time | float | yes | Wall-clock seconds elapsed since Run start |
-| objective_value | float | yes | Current best objective value observed up to this evaluation |
+| objective_value | float | yes | **STORES `best_so_far`** — the best objective value observed across all evaluations up to and including this one, not the raw output of `Problem.evaluate()` at this step. See GLOSSARY entry `best_so_far`. |
 | current_solution | map[string, any] | no | The solution (hyperparameter configuration) achieving `objective_value`; may be omitted to reduce storage |
 | is_improvement | bool | yes | `true` if `objective_value` is strictly better than all previous records in this Run (subject to `Study.improvement_epsilon`) |
 | trigger_reason | string | yes | Why this record was written. One of: `scheduled`, `improvement`, `end_of_run`, `both` (scheduled + improvement), `scheduled_end_of_run`, `improvement_end_of_run`, `all` (all three). Populated automatically by the Runner base class; see [ADR-002](../02-design/02-architecture/01-adr/adr-002-performance-recording-strategy.md) |

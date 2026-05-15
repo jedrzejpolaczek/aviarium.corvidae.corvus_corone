@@ -11,9 +11,10 @@ NARRATIVE POSITION:
 
 CONNECTS TO:
   ← MANIFESTO                        : values/principles explain WHY these actors and integrations exist
-  → docs/02-design/01-software-requirement-specification/SRS.md : each actor here becomes a stakeholder (§3); each external system becomes an interface requirement (§7)
-  → docs/02-design/02-architecture/c2-containers.md             : the "System" black box here is decomposed into containers there
-  → docs/03-technical-contracts/data-format.md                  : data exchanged with external systems must conform to schemas defined there (§3 Interoperability Mappings)
+  → docs/02-design/01-software-requirement-specification/01-srs/01-SRS.md : each actor here becomes a stakeholder (§3); each external system becomes an interface requirement (§7)
+  → docs/02-design/02-architecture/03-c4-leve2-containers/01-index.md     : the "System" black box here is decomposed into containers there
+  → docs/03-technical-contracts/01-data-format/01-index.md                : data exchanged with external systems must conform to schemas defined there
+  → docs/03-technical-contracts/01-data-format/11-interoperability-mappings.md : interoperability mappings to COCO, IOH, Nevergrad
   → docs/GLOSSARY.md                 : all actor and system names used here are defined there
 -->
 
@@ -138,7 +139,7 @@ flowchart LR
   L_learner_system_0@{ animation: slow }
 ```
 
-> HPC/cloud distributed execution is **deferred to V2**. In V1, all Runs execute locally (sequentially or with Python multiprocessing). The decision is recorded in `docs/02-design/02-architecture/adr/ADR-001-library-with-server-ready-data-layer.md`. Runs are independent by design (MANIFESTO Principle 18), so the execution backend can be swapped via the Repository/Runner abstraction without changing the data format.
+> HPC/cloud distributed execution is **deferred to V2**. In V1, all Runs execute locally (sequentially or with Python multiprocessing). The decision is recorded in `docs/02-design/02-architecture/01-adr/adr-001-library-with-server-ready-data-layer.md`. Runs are independent by design (MANIFESTO Principle 18), so the execution backend can be swapped via the Repository/Runner abstraction without changing the data format.
 
 ---
 
@@ -260,11 +261,10 @@ The Learner does not modify, re-run, or extend any Study. They read completed Re
 
 **Direction:** Outbound export — our system produces data exportable to COCO's format. Import of COCO problem definitions is a secondary use case.
 
-**Risk:** COCO's data format evolves. If incompatible changes are made, the export mapping must be updated. Format mapping is documented in `docs/03-technical-contracts/data-format.md` §3.
+**Risk:** COCO's data format evolves. If incompatible changes are made, the export mapping must be updated. Format mapping is documented in `docs/03-technical-contracts/01-data-format/11-interoperability-mappings.md`.
 
-> **`TODO: REF-TASK-0005`** — Define the COCO format mapping in `data-format.md` §3 when the
-> internal data format is finalized. Owner: ecosystem integration lead. Acceptance: a study result
-> can be exported and loaded by COCO's analysis tools without data loss beyond documented mappings.
+> **REF-TASK-0005 ✅ Complete** — COCO format mapping is defined in
+> `docs/02-design/01-software-requirement-specification/06-interface-requirements/02-ir-7.1-coco-export.md`.
 
 ---
 
@@ -278,9 +278,8 @@ The Learner does not modify, re-run, or extend any Study. They read completed Re
 
 **Risk:** Nevergrad is actively developed; API changes may break wrapped implementations. Algorithm Instances must pin exact Nevergrad versions.
 
-> **`TODO: REF-TASK-0006`** — Define the Nevergrad adapter pattern: how to wrap a Nevergrad
-> optimizer as an Algorithm Instance with minimal code. Owner: library design lead.
-> Acceptance: example in `docs/06_tutorials/` and adapter utility in library.
+> **REF-TASK-0006 ✅ Complete** — Nevergrad adapter pattern is defined in
+> `docs/06-tutorials/03-nevergrad-adapter.md` with a working adapter utility in the library.
 
 ---
 
@@ -294,9 +293,8 @@ The Learner does not modify, re-run, or extend any Study. They read completed Re
 
 **Risk:** IOHprofiler's data format is well-documented but specific. Export mapping must be maintained as both systems evolve.
 
-> **`TODO: REF-TASK-0007`** — Define the IOHprofiler export format mapping in `data-format.md` §3.
-> Owner: ecosystem integration lead. Acceptance: Performance Records export to IOHprofiler `.dat`
-> format and load correctly in IOHanalyzer.
+> **REF-TASK-0007 ✅ Complete** — IOHprofiler export format mapping is defined in
+> `docs/02-design/01-software-requirement-specification/06-interface-requirements/03-ir-7.2-iohprofiler-export.md`.
 
 ---
 
@@ -320,9 +318,10 @@ The Learner does not modify, re-run, or extend any Study. They read completed Re
 
 **Direction:** Bidirectional — the library's `Repository` interface can be backed by this server in V2. Researchers store studies locally in V1; they can republish to the shared server in V2 without migrating their data because all entity schemas are server-compatible from V1.
 
-**V1 design constraint:** All entity schemas must use globally unique IDs (UUIDs), be JSON-serializable, and reference other entities by ID — not by local file path. This ensures V1-produced artifacts are valid V2 server artifacts without any migration step. This constraint is documented in `docs/03-technical-contracts/data-format.md §1` and enforced by `ADR-001`.
+**V1 design constraint:** All entity schemas must use globally unique IDs (UUIDs), be JSON-serializable, and reference other entities by ID — not by local file path. This ensures V1-produced artifacts are valid V2 server artifacts without any migration step. This constraint is documented in `docs/03-technical-contracts/01-data-format/01-index.md` and enforced by `ADR-001`.
 
-> **`TODO: REF-TASK-0023`** — Design the storage abstraction interface (`Repository`) that allows switching between `LocalFileRepository` (V1) and `ServerRepository` (V2) without modifying library code. Owner: library design lead. Acceptance: `docs/03-technical-contracts/interface-contracts.md` contains the `Repository` interface specification; a `LocalFileRepository` implementation passes the interface contract test suite.
+> **REF-TASK-0023 ✅ Complete** — The `Repository` interface is formally specified in
+> `docs/03-technical-contracts/02-interface-contracts/06-repository-interface.md`.
 
 ---
 
@@ -352,7 +351,7 @@ The Learner does not modify, re-run, or extend any Study. They read completed Re
 
 The choice of delivery form (Python library) and the server-ready data layer design are documented in:
 
-> `docs/02-design/02-architecture/adr/ADR-001-library-with-server-ready-data-layer.md`
+> `docs/02-design/02-architecture/01-adr/adr-001-library-with-server-ready-data-layer.md`
 
 ---
 

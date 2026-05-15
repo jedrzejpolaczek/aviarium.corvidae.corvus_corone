@@ -25,6 +25,11 @@ Use exact glossary terms — do not introduce synonyms.
 
 ---
 
+> **Current Schema Version: `1.0.0`**
+> Increment rules, breaking-change classification, and artifact handling are defined in [§6 Schema Versioning](13-schema-versioning.md).
+
+---
+
 ## 1. Entity Overview
 
 ### Server-Compatibility Design Constraint
@@ -102,4 +107,4 @@ flowchart TD
 | §3 File Formats and Storage | [10-file-formats.md](10-file-formats.md) | ✅ §3.1 IOHprofiler export, §3.2 LocalFileRepository layout, §3.3 Parquet bulk format complete |
 | §4 Interoperability Mappings | [11-interoperability-mappings.md](11-interoperability-mappings.md) | ✅ §4.1 COCO, §4.2 IOHprofiler, §4.3 Nevergrad complete |
 | §5 Validation Rules (Cross-Entity) | [12-cross-entity-validation.md](12-cross-entity-validation.md) | ✅ 17 rules across 8 entity pairs |
-| §6 Schema Versioning | [13-schema-versioning.md](13-schema-versioning.md) | 🚧 Pending |
+| §6 Schema Versioning | [13-schema-versioning.md](13-schema-versioning.md) | ✅ Complete (v1.0.0) |

@@ -67,9 +67,14 @@ The Run is persisted to the Repository before this method returns.
 
 **Postconditions:**
 - `run.seed` equals the provided `seed`
-- `run.status` is `"completed"` or `"failed"` (never left as `"running"` after return)
+- `run.status` is `"completed"`, `"failed"`, or `"budget_exhausted"` (never left as `"running"` after return).
+  `"budget_exhausted"` indicates the budget was consumed before all planned evaluations completed
+  (i.e. the algorithm did not converge or signal completion within the allocated budget). This is
+  a distinct terminal state from `"completed"` (algorithm signalled normal termination) and
+  `"failed"` (unexpected exception). A `PerformanceRecord` with `trigger_reason` containing
+  `end_of_run` is still written for `budget_exhausted` Runs.
 - one `PerformanceRecord` with `trigger_reason` containing `end_of_run` exists in storage
-  for every completed Run
+  for every completed or budget-exhausted Run
 
 ---
 

@@ -52,7 +52,7 @@ Each rule specifies:
 | ID | Rule summary | Entities | Check point | Response |
 |---|---|---|---|---|
 | [CV-001](#cv-001) | Run.problem_instance_id ∈ Study.problem_instance_ids | Run, Study | Write | Reject |
-| [CV-002](#cv-002) | Each id in Run.algorithm_instance_ids ∈ Study.algorithm_instance_ids | Run, Study | Write | Reject |
+| [CV-002](#cv-002) | Run.algorithm_instance_id ∈ Study.algorithm_instance_ids | Run, Study | Write | Reject |
 | [CV-003](#cv-003) | Run.study_id == Experiment.study_id | Run, Experiment | Write | Reject |
 | [CV-004](#cv-004) | Seed unique per (Experiment, problem_instance_id, algorithm_instance_id) | Run, Experiment | Write | Reject |
 | [CV-005](#cv-005) | Experiment.run_ids count == repetitions × \|problems\| × \|algorithms\| at completion | Experiment, Study | Status → completed | Reject |
@@ -104,7 +104,7 @@ collection).
 
 ### CV-002
 
-**Every algorithm id in Run.algorithm_instance_ids must be in the parent Study's algorithm scope**
+**Run.algorithm_instance_id must be in the parent Study's algorithm scope**
 
 | | |
 |---|---|
@@ -112,13 +112,12 @@ collection).
 | **Check point** | Write time — when a Run is created |
 | **Response** | Reject |
 
-Every id in `Run.algorithm_instance_ids` must be an element of the `algorithm_instance_ids`
+`Run.algorithm_instance_id` must be an element of the `algorithm_instance_ids`
 list of the Study that the Run's parent Experiment references.
 
 ```
 let study = Study[Experiment[run.experiment_id].study_id]
-for each alg_id in run.algorithm_instance_ids:
-    assert alg_id ∈ study.algorithm_instance_ids
+assert run.algorithm_instance_id ∈ study.algorithm_instance_ids
 ```
 
 **Rationale:** Symmetric to CV-001. Algorithms not declared in the Study design cannot be
@@ -170,7 +169,7 @@ No two Runs belonging to the same Experiment may share the same `seed` value for
 ```
 for each existing Run r' in Experiment[run.experiment_id]:
     if (r'.problem_instance_id == run.problem_instance_id and
-        r'.algorithm_instance_ids == run.algorithm_instance_ids):
+        r'.algorithm_instance_id == run.algorithm_instance_id):
         assert r'.seed != run.seed
 ```
 
@@ -301,15 +300,14 @@ assert agg.algorithm_instance_id ∈ study.algorithm_instance_ids
 | **Response** | Reject |
 
 ```
-let completed_runs = count of Runs where:
+let attempted_runs = count of Runs where:
     run.experiment_id == agg.experiment_id
     AND run.problem_instance_id == agg.problem_instance_id
-    AND agg.algorithm_instance_id ∈ run.algorithm_instance_ids
-    AND run.status == "completed"
-assert agg.n_runs == completed_runs
+    AND agg.algorithm_instance_id == run.algorithm_instance_id
+assert agg.n_runs == attempted_runs
 ```
 
-Note: `n_runs` counts all Runs for the cell (including those excluded due to failure), while
+Note: `n_runs` counts all attempted Runs for the cell (both `completed` and `failed`), while
 `AggregateValue.n_successful` counts only those that contributed to a specific metric.
 The relationship is: `agg.n_runs >= AggregateValue.n_successful` for every metric.
 

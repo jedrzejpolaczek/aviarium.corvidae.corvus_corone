@@ -1,6 +1,6 @@
 # §5 Repository Interface
 
-> Index: [01-interface-contracts.md](01-interface-contracts.md)
+> Index: [01-index.md](01-index.md)
 
 The Repository layer provides read/write access to all persistent entities. Storage layout
 and format are implementation details — callers interact only through these interfaces.
@@ -95,7 +95,7 @@ resolvable and version-pinned (UC-02 F2); `configuration_justification` is non-e
 **Exceptions:** `EntityNotFoundError`, `VersionNotFoundError`
 
 #### list_studies(filters: StudyFilter | None = None) → list[StudySummary]
-`StudyFilter` fields: `status` (`"draft"`, `"locked"`), `created_by`, `problem_ids` (overlap).
+`StudyFilter` fields: `status` (`"draft"`, `"locked"`), `created_by`, `problem_instance_ids` (overlap).
 
 #### create_study(study: Study) → str
 Persists a new Study in `"draft"` status. Returns the assigned ID.

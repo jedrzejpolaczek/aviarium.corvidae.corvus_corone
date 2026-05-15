@@ -5,7 +5,7 @@ Derived from: MANIFESTO.md, SRS.md, C1/C2 architecture, ADR-001,
 interface-contracts.md, data-format.md, metric-taxonomy.md,
 statistical-methodology.md, benchmarking-protocol.md, TASKS.md,
 scripts/create_github_issues.py
-Generated: 2026-03-04. Updated: 2026-03-20. Update whenever a milestone closes or a new REF-TASK is created.
+Generated: 2026-03-04. Updated: 2026-05-15. Update whenever a milestone closes or a new REF-TASK is created.
 -->
 
 ---
@@ -14,22 +14,23 @@ Generated: 2026-03-04. Updated: 2026-03-20. Update whenever a milestone closes o
 
 | Area | Tasks | Status |
 |---|---|---|
-| MANIFESTO | REF-TASK-0032 | ⚠️ Principles complete; anti-patterns section pending |
-| C1 System Context | — | ⚠️ Principles complete |
-| C2 Containers | — | ⚠️ Principles complete |
-| C3 Components | — | ⛔ Not started |
-| C4 Code | — | ⛔ Not started |
-| Architecture Decision Records | REF-TASK-0011, 0024 | ⚠️ ADR-001 decided; technical constraints and bulk storage format pending |
-| SRS | REF-TASK-0008..0013, 0033..0035 | ⚠️ Use cases and FR-01..26 drafted; NFRs, interface requirements, acceptance tests, CLI spec, report format, competitive differentiation open |
-| Statistical methodology | REF-TASK-0016..0021 | ⚠️ 3-level framework drafted; ECDF, test selection, diversity requirements open |
-| Metric taxonomy | REF-TASK-0014, 0015 | ⚠️ Drafted; implementation references pending |
-| Interface contracts | REF-TASK-0023, 0036 | ⚠️ Drafted; LocalFileRepository structure and post-implementation update pending |
-| Data format | REF-TASK-0022 | ⚠️ Drafted; post-implementation update pending |
-| Ecosystem integration | REF-TASK-0004..0007 | ⛔ Not started (spikes required) |
-| Implementation — Core Library | IMPL-000..027 | ⛔ Not started |
+| MANIFESTO | REF-TASK-0032 | ✅ Complete |
+| C1 System Context | REF-TASK-0025 | ✅ Complete |
+| C2 Containers | REF-TASK-0026, 0027 | ✅ Complete |
+| C3 Components | REF-TASK-0028 | ✅ Complete (11 containers documented) |
+| C4 Code | — | ⚠️ Partial (6 of 11 containers have L4 specs) |
+| Architecture Decision Records | REF-TASK-0011, 0024 | ✅ Complete (ADR-001 through ADR-011) |
+| SRS | REF-TASK-0008..0013, 0033..0035 | ✅ Complete (v0.5) |
+| Statistical methodology | REF-TASK-0016..0021 | ✅ Complete |
+| Metric taxonomy | REF-TASK-0014, 0015 | ✅ Complete (REF-TASK-0014, 0018 deferred post-V1) |
+| Interface contracts | REF-TASK-0023, 0036, 0037 | ✅ Complete |
+| Data format | REF-TASK-0022 | ✅ Complete (schema v1.0.0) |
+| Ecosystem integration | REF-TASK-0004..0007 | ✅ Documentation complete; implementation pending |
+| Learner Actor — documentation | REF-TASK-0025..0030 | ✅ Complete |
+| Implementation — Core Library | IMPL-001..027 | ⛔ Not started |
 | Implementation — Researcher Agent (Pilot V2) | IMPL-028..036 | ⛔ Not started |
 | Implementation — Autonomous (Pilot V3) | IMPL-037..047 | ⛔ Not started |
-| Learner Actor | REF-TASK-0025..0030, IMPL-044..046 | ⛔ Not started |
+| Implementation — Learner Actor | IMPL-044..046 | ⛔ Not started |
 
 ---
 
@@ -124,7 +125,7 @@ Six milestones group all open documentation and design tasks.
 - [ ] **`[IMPL-003]`** SearchSpace types — `problems/search_space.py`: `ContinuousVariable`, `IntegerVariable`, `CategoricalVariable` with Pydantic v2
 - [ ] **`[IMPL-004]`** Algorithm Interface — `algorithms/base.py`: `Algorithm` ABC (ask-tell: `suggest`, `observe`, `reset`), `AlgorithmInstanceRecord`, `RunContext`
 - [ ] **`[IMPL-005]`** Algorithm Registry + RandomSearch — `algorithms/registry.py`, `algorithms/random_search.py`; `numpy.random.default_rng` seed handling
-- [ ] **`[IMPL-006]`** Optuna TPE adapter — `algorithms/adapters/optuna_adapter.py` in ≤ 15 lines; tutorial `docs/06_tutorials/01_wrap_optuna_sampler.md` · *Fulfills: REF-TASK-0004*
+- [ ] **`[IMPL-006]`** Optuna TPE adapter — `algorithms/adapters/optuna_adapter.py` in ≤ 15 lines; tutorial `docs/06-tutorials/01_wrap_optuna_sampler.md` · *Fulfills: REF-TASK-0004*
 - [ ] **`[IMPL-007]`** Experiment Runner — `runner/runner.py`: `deepcopy` isolation per run, determinism test, independence test · *Refs: MANIFESTO Principle 18*
 - [ ] **`[IMPL-008]`** Seed Manager — `runner/seed_manager.py`: `generate_seeds()` via `numpy.random.SeedSequence.spawn()`
 - [ ] **`[IMPL-009]`** Data entities — `storage/entities.py`: `RunRecord`, `PerformanceRecord`, `StudyRecord` (UUID IDs, JSON round-trip) · *Refs: data-format.md §2, ADR-001*
@@ -189,7 +190,7 @@ Six milestones group all open documentation and design tasks.
 
 - [ ] **`[IMPL-044]`** Algorithm Visualization Engine — `learner/visualization_engine.py`: convergence animation, parameter sensitivity heatmap, search trajectory, Pareto front, algorithm genealogy timeline · *Refs: REF-TASK-0027, UC-06*
 - [ ] **`[IMPL-045]`** Socratic Guide — `v2_researcher/agents/socratic_guide.py`: LangGraph node activated by `state["interaction_mode"] == "socratic"`, generates bridging questions, never direct answers; CLI `--mode socratic` · *Fulfills: REF-TASK-0028, UC-08*
-- [ ] **`[IMPL-046]`** Algorithm Genealogy — `learner/genealogy.py` + `learner/data/genealogy_data.json`: `AlgorithmNode`, `Genealogy` directed graph, lineage (MAB 1933 → BayesOpt 1998 → TPE 2011) and CMA-ES/NSGA-II history; tutorial `docs/06_tutorials/06_algorithm_genealogy_explorer.md` · *Refs: REF-TASK-0030, UC-09*
+- [ ] **`[IMPL-046]`** Algorithm Genealogy — `learner/genealogy.py` + `learner/data/genealogy_data.json`: `AlgorithmNode`, `Genealogy` directed graph, lineage (MAB 1933 → BayesOpt 1998 → TPE 2011) and CMA-ES/NSGA-II history; tutorial `docs/06-tutorials/06_algorithm_genealogy_explorer.md` · *Refs: REF-TASK-0030, UC-09*
 
 ---
 
@@ -254,43 +255,12 @@ REF-TASK-0025 ──► 0026 ──► 0027 ──► 0028 ──► 0029 ──
 
 ### Documentation Tasks (REF-TASK)
 
-| Task | Milestone | Status |
-|---|---|---|
-| REF-TASK-0001 — Extend GLOSSARY from interface-contracts and data-format | V1 Core | Blocked on contracts |
-| REF-TASK-0002 — Verify Schema Version definition against data-format.md | V1 Core | Blocked on data-format.md §6 |
-| REF-TASK-0004 — Define Algorithm Author onboarding tutorial (15-line wrapper) | V1 Interoperability | Blocked on interface-contracts.md §2 |
-| REF-TASK-0005 — COCO format mapping in data-format.md §3 | V1 Interoperability | Open (spike first) |
-| REF-TASK-0006 — Nevergrad adapter pattern and tutorial | V1 Interoperability | Open (spike first) |
-| REF-TASK-0007 — IOHprofiler export format mapping — full spec + round-trip test | V1 Interoperability | Open |
-| REF-TASK-0008 — Complete SRS §4, §5, §7, §8 after C2 architecture design | V1 Core | Unblocked |
-| REF-TASK-0009 — Expand UC-01 and UC-02 into full use case descriptions | V1 Core | Open |
-| REF-TASK-0010 — Add measurable criteria to all NFRs | V1 Core | Open |
-| REF-TASK-0011 — Define technical constraints (Python version, OS, dependencies) | V1 Core | Open (fulfilled by IMPL-018) |
-| REF-TASK-0012 — Fill SRS §7 Interface Requirements from interop mappings | V1 Core | Blocked on REF-TASK-0005/0006/0007 |
-| REF-TASK-0013 — Fill SRS §8 Acceptance Test Strategy | V1 Core | Open |
-| REF-TASK-0014 — Review and extend metric definitions after first studies | Post-V1 | Deferred |
-| REF-TASK-0015 — Add implementation references to all metric definitions | V1 Methodology | Blocked on analysis module (IMPL-011) |
-| REF-TASK-0016 — Formalize ANYTIME-ECDF_AREA computation procedure | V1 Methodology | Open |
-| REF-TASK-0017 — Decide whether TIME-EVALUATIONS_TO_TARGET joins Standard Reporting Set | V1 Methodology | Open |
-| REF-TASK-0018 — Add research question archetypes to Metric Selection Guide | Post-V1 | Deferred |
-| REF-TASK-0019 — Specify required Level 1 visualizations in statistical-methodology.md | V1 Methodology | Blocked on reporting module |
-| REF-TASK-0020 — Specify statistical test selection procedure and correction methods | V1 Methodology | Open |
-| REF-TASK-0021 — Define minimum diversity requirements for Problem Instance selection | V1 Methodology | Open |
-| REF-TASK-0022 — Define sensitivity documentation format in Algorithm Instance schema | V1 Methodology | Blocked on data-format.md §2.2 |
-| REF-TASK-0023 — Design the Repository storage abstraction interface | V1 Core | Open (fulfilled by IMPL-010) |
-| REF-TASK-0024 — Decide bulk PerformanceRecord storage format (Parquet vs HDF5) | V1 Infrastructure | Open (spike first) |
-| REF-TASK-0025 — Add Learner actor to C1 context document | Learner Actor | Open |
-| REF-TASK-0026 — Add Learner use cases to SRS §3 (UC-06..UC-10) | Learner Actor | Blocked on REF-TASK-0025 |
-| REF-TASK-0027 — Add Algorithm Visualization container to C2 | Learner Actor | Blocked on REF-TASK-0025/0026 |
-| REF-TASK-0028 — Add Socratic Guide component to C2/C3 (Pilot V2 extension) | Learner Actor | Blocked on REF-TASK-0025/0026/0027 |
-| REF-TASK-0029 — Add Learner terms to GLOSSARY.md | Learner Actor | Blocked on REF-TASK-0025..0028 |
-| REF-TASK-0030 — Add Learner education tutorials to docs/06_tutorials/ | Learner Actor | Blocked on REF-TASK-0025..0029 |
-| REF-TASK-0032 — Reconcile anti-pattern numbering and add anti-patterns to MANIFESTO | V1 Core | Open (author decision on AP-2 required) |
-| REF-TASK-0033 — Specify CLI experience — commands, arguments, terminal output | V1 Core | Blocked on IMPL-017 |
-| REF-TASK-0034 — Specify report output format — sections, visualizations, audience language | V1 Core | Blocked on IMPL-014/015 |
-| REF-TASK-0035 — Add competitive differentiation statement to SRS §2 | V1 Core | Open |
-| REF-TASK-0036 — Document LocalFileRepository directory structure | V1 Core | Blocked on IMPL-010 |
-| REF-TASK-0037 — Define public API facade contract (`cc.*` functions, response objects, exceptions) | V1 Core | Open; blocks IMPL-017 |
+All documentation REF-TASKs are tracked by the milestone sections above (✅ = complete, [ ] = pending).
+The authoritative status for each task is the checkbox in the relevant milestone section — not this index.
+
+Open documentation tasks (the only two remaining):
+- [ ] **REF-TASK-0014** — Metric taxonomy extensions *(Post-V1, deferred — requires real study data)*
+- [ ] **REF-TASK-0018** — Research question archetypes *(Post-V1, deferred — requires real study data)*
 
 ### Implementation Tasks (IMPL)
 

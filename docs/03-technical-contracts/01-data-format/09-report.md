@@ -6,8 +6,8 @@
 
 | Name | Type | Required | Notes |
 | --- | --- | --- | --- |
-| id | int | yes | Report ID |
-| experiment_id | int | yes | ID of the Experiment this Report was generated from |
+| id | string | yes | Report UUID (RFC 4122 v4) |
+| experiment_id | string | yes | UUID of the Experiment this Report was generated from |
 | type | string | yes | `researcher` or `practitioner` |
 | generated_at | datetime | yes | ISO 8601 UTC timestamp when the Report was produced |
 | generated_by | string | yes | System version or component that produced this Report |

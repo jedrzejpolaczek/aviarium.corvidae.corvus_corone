@@ -19,8 +19,8 @@ Schema versions follow **semantic versioning** `MAJOR.MINOR.PATCH`:
 | `MINOR` | A **non-breaking addition** — new optional fields or new entity types; old artifacts remain valid | `1.0.0` → `1.1.0` |
 | `PATCH` | A **correction** — typo fixes, clarifying text, no structural change | `1.0.0` → `1.0.1` |
 
-The current schema version is declared at the top of
-[`01-data-format.md`](01-data-format.md).
+The current schema version is declared in the callout block at the top of
+[`01-index.md`](01-index.md) (immediately before §1 Entity Overview).
 
 ---
 
@@ -114,7 +114,7 @@ explicit, operator-initiated action — the system never silently mutates stored
   library code. A schema MAJOR version bump is always accompanied by a library MAJOR version bump.
 - **No separate schema registry** is used in V1. The repository is the registry.
 
-> **`TODO: REF-TASK-0005`** — Decide whether a separate machine-readable schema registry
-> (e.g., JSON Schema files under `schemas/`) is needed for V1, or whether the narrative
-> tables in this document tree are sufficient. Owner: technical lead.
-> Acceptance: decision documented in an ADR.
+> **Decision:** The narrative tables in this document tree are the canonical schema definition for V1.
+> Machine-readable JSON Schema files under `schemas/` are a post-V1 enhancement — they would
+> enable tooling (IDE validation, automated round-trip tests) but are not required for V1
+> correctness. No separate schema registry is introduced in V1.

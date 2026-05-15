@@ -15,11 +15,7 @@ CONNECTS TO:
   ← non-functional-requirements.md                 : NFR rows
   ← constraints.md                                 : CONST rows
   ← acceptance-test-strategy.md                    : test category column
-  → docs/02-design/02-architecture/c2-containers.md : C2 Container column (pending REF-TASK-0026)
-
-NOTE ON C2 CONTAINER COLUMN:
-  Container assignments will be completed when REF-TASK-0026 (C2 container descriptions) is done.
-  The container names used here are from the C2 diagram; descriptions are pending.
+  → docs/02-design/02-architecture/03-c4-leve2-containers/01-index.md : C2 Container column
 -->
 
 ---
@@ -34,6 +30,11 @@ NOTE ON C2 CONTAINER COLUMN:
 | UC-04 | 4, 5, 6, 7, 27 | `use-cases.md` | Problem Repository, Public API | Plugin, Validation rejection | Expanded |
 | UC-05 | 19, 20, 21, 22 | `use-cases.md` | Experiment Runner, Results Store | Reproducibility | Expanded |
 | UC-06 | 26 | `use-cases.md` | Ecosystem Bridge | Interoperability | Expanded |
+| UC-07 | 25, 28 | `02-use-cases/08-uc-07.md` | Algorithm Visualization Engine, Corvus Pilot | Usability | Expanded |
+| UC-08 | 25, 28 | `02-use-cases/09-uc-08.md` | Corvus Pilot | Usability | Expanded |
+| UC-09 | 28 | `02-use-cases/10-uc-09.md` | Corvus Pilot | Usability | Expanded |
+| UC-10 | 25, 28 | `02-use-cases/11-uc-10.md` | Corvus Pilot | Usability | Expanded |
+| UC-11 | 3, 21, 23–25, 28 | `02-use-cases/12-uc-11.md` | Corvus Pilot, Reporting Engine, Results Store | Usability, Integration | Expanded |
 
 ---
 
@@ -67,6 +68,11 @@ NOTE ON C2 CONTAINER COLUMN:
 | FR-24 | 26 | `functional-requirements.md` §4.7 | Ecosystem Bridge | UC-06 | Interoperability | Defined |
 | FR-25 | 26 | `functional-requirements.md` §4.7 | Ecosystem Bridge, Algorithm Registry | UC-02, UC-06 | Interoperability, Plugin | Defined |
 | FR-26 | 24 | `functional-requirements.md` §4.7 | Ecosystem Bridge | UC-06 | Interoperability | Defined |
+| FR-27 *(DEFERRED)* | 25, 28 | `09-fr-4.8-learner-actor.md` | Algorithm Visualization Engine | UC-07 | Usability | Deferred — Phase 4 |
+| FR-28 *(DEFERRED)* | 25, 28 | `09-fr-4.8-learner-actor.md` | Corvus Pilot | UC-08 | Usability | Deferred — Phase 4 |
+| FR-29 *(DEFERRED)* | 28 | `09-fr-4.8-learner-actor.md` | Corvus Pilot | UC-09 | Usability | Deferred — Phase 4 |
+| FR-30 *(DEFERRED)* | 25, 28 | `09-fr-4.8-learner-actor.md` | Algorithm Visualization Engine | UC-10 | Usability | Deferred — Phase 4 |
+| FR-31 *(DEFERRED)* | 3, 23–25, 28 | `09-fr-4.8-learner-actor.md` | Corvus Pilot, Reporting Engine, Results Store | UC-11 | Usability, Constraint enforcement | Deferred — Phase 4 |
 
 ---
 

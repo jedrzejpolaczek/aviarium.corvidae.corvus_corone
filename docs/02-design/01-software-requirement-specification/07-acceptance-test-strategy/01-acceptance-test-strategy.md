@@ -16,7 +16,7 @@ CONNECTS TO:
   ← constraints.md                                            : CONST-XX constraints have enforcement tests
   ← use-cases.md                                              : every UC must have an end-to-end test
   → docs/02-design/02-architecture/c3-components.md           : test file paths aligned to C3 components
-  → docs/05_community/TASKS.md                                : REF-TASK-0013 delivered
+  → docs/05-community/TASKS.md                                : REF-TASK-0013 delivered
 
 NOTE ON TEST FILE PATHS:
   Paths under tests/unit/ and tests/e2e/test_uc03–06/ are planned; they will be created as
@@ -91,7 +91,7 @@ and will be created as the corresponding feature is implemented.
 | NFR-INTEROP-01 | Ecosystem interoperability | Interoperability | ✅ `tests/interop/test_ioh_export.py` — manifest non-empty assertion on every `export()` call |
 | NFR-OPEN-01 | Open data and code | Open format compliance | 🚧 `tests/unit/test_reporting.py` — assert export parseable by `json`/`csv` stdlib only |
 | NFR-MODULAR-01 | Extensibility | Plugin | ✅ `tests/e2e/test_uc02_contribute_algorithm.py`; 🚧 `tests/e2e/test_uc04_contribute_problem.py` — register and use a third-party adapter without modifying core |
-| NFR-USABILITY-01 | Minimal onboarding friction | Usability | Manual: `docs/06-tutorials/01-first-study.md` completable in ≤30 min; `NevergradAdapter` in ≤14 boilerplate lines (line-count asserted in 🚧 `tests/interop/test_nevergrad_adapter.py`) |
+| NFR-USABILITY-01 | Minimal onboarding friction | Usability | Manual: `docs/06-tutorials/01-cmd-first-study.md` completable in ≤30 min; `NevergradAdapter` in ≤14 boilerplate lines (line-count asserted in 🚧 `tests/interop/test_nevergrad_adapter.py`) |
 
 ---
 
@@ -161,10 +161,10 @@ silently succeeds.
 
 ### Non-Functional Requirements (NFR-XX)
 
-Accepted when the NFR-specific test category passes at the defined threshold. Thresholds are to be
-set when `REF-TASK-0010` is resolved. Until then, the test category is established but the
-pass/fail line is not drawn — except for NFR-REPRO-01, whose pass condition is the
-bit-identical Result Aggregates assertion defined in the Reproducibility Test Procedure above.
+Accepted when the NFR-specific test category passes at the defined threshold. Measurable
+pass/fail criteria for each NFR are in the individual NFR documents
+(`04-non-functional-requirements/02-nfr-repro-01.md` through `07-nfr-usability-01.md`).
+NFR-REPRO-01 additionally requires the bit-identical Result Aggregates procedure defined above.
 
 ### Constraints (CONST-XX)
 
@@ -178,3 +178,24 @@ Accepted when all three of the following hold:
 1. All Main Flow steps produce their expected postconditions in an automated end-to-end integration test
 2. Each named Failure Scenario is exercised and the system produces the expected rejection or warning (not a silent failure or an incorrect success)
 3. A corresponding tutorial in `docs/06-tutorials/` demonstrates the UC for a human user and a representative user can complete it within the stated time target
+
+---
+
+## Pending Use Cases — Learner Actor (UC-07 through UC-11)
+
+UC-07 through UC-11 (Learner actor use cases) are fully expanded with main flows, preconditions, and failure scenarios. Their functional requirements (FR-27..FR-31) are defined in
+[`09-fr-4.8-learner-actor.md`](../03-functional-requirements/09-fr-4.8-learner-actor.md) and are
+**DEFERRED to Phase 4** (IMPL-044..IMPL-046). They cannot be accepted until implementation is complete.
+
+| UC | Title | FR | Planned test category | ROADMAP ref |
+|---|---|---|---|---|
+| UC-07 | Algorithm Visualisation | FR-27 | Usability, visualisation rendering tests | IMPL-044 |
+| UC-08 | Contextual Algorithm Help | FR-28 | Usability, contextual explanation tests | IMPL-045 |
+| UC-09 | Socratic Guided Deduction | FR-29 | Usability, LLM-as-judge Socratic scoring | IMPL-045 |
+| UC-10 | Algorithm History and Evolution | FR-30 | Usability, genealogy graph tests | IMPL-046 |
+| UC-11 | Learner Explores Study Results | FR-31 | Usability, constraint enforcement, read-only access tests | IMPL-044..046 |
+
+These use cases will be accepted once:
+1. FR-27..FR-31 are implemented (Phase 4)
+2. The planned test categories above pass
+3. Tutorials in `docs/06-tutorials/05` through `07` are verified as completable

@@ -85,7 +85,7 @@ Terms are listed alphabetically within sections.
 
 **Distinguished from:** direct optimization APIs (such as `scipy.optimize.minimize`) that receive the objective function directly and manage their own evaluation loop. In the Ask-Tell pattern the Runner owns the evaluation loop; the Algorithm only proposes candidates and receives feedback.
 
-**Used in:** `docs/03-technical-contracts/02-interface-contracts/03-algorithm-interface.md`, `docs/06_tutorials/uc-02-contribute-algorithm.md`.
+**Used in:** `docs/03-technical-contracts/02-interface-contracts/03-algorithm-interface.md`, `docs/06-tutorials/uc-02-contribute-algorithm.md`.
 
 ---
 
@@ -479,7 +479,7 @@ Terms are listed alphabetically within sections.
 
 **Distinguished from:** parallelism (running multiple evaluations simultaneously). `batch_size` controls how many solutions are requested in one ask step; it does not imply concurrent evaluation in V1.
 
-**Used in:** `docs/03-technical-contracts/02-interface-contracts/03-algorithm-interface.md`, `docs/06_tutorials/uc-02-contribute-algorithm.md`.
+**Used in:** `docs/03-technical-contracts/02-interface-contracts/03-algorithm-interface.md`, `docs/06-tutorials/uc-02-contribute-algorithm.md`.
 
 ---
 

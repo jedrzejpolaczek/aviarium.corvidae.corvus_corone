@@ -1,12 +1,12 @@
 # §2.2 Algorithm Instance
 
-> Index: [01-data-format.md](01-data-format.md)
+> Index: [01-index.md](01-index.md)
 
 > See GLOSSARY: [Algorithm Instance](../GLOSSARY.md#algorithm-instance)
 
 | Name | Type | Required | Notes |
 | --- | --- | --- | --- |
-| id | int | yes | Algorithm Instance ID |
+| id | string | yes | Algorithm Instance UUID (RFC 4122 v4) |
 | name | string | yes | Human-readable name for this specific configuration eg. `NSGANet`, `Grid vs Random` |
 | version | string | yes | Version of this record. Structure is described in validation rules |
 | algorithm_family | string | yes | The abstract Algorithm this is an instance of (e.g., `Random Search`, `TPE`, `CMA-ES`) |

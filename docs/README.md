@@ -104,6 +104,7 @@ docs/
     ├── 02-researcher-design-and-execute-study.md
     ├── 03-nevergrad-adapter.md
     ├── 04-algorithm-author-onboarding.md
+    ├── uc-02-contribute-algorithm.md
     ├── 05-learner-socratic-mode.md
     ├── 06-learner-algorithm-visualization.md
     └── 07-learner-algorithm-genealogy.md

@@ -1,6 +1,6 @@
 # External System: Nevergrad
 
-> C1 Context: [../01-c1-context.md](../01-c1-context.md)
+> C1 Context: [../01-c4-l1-context/01-c1-context.md](../01-c4-l1-context/01-c1-context.md)
 
 **What it is:** Facebook Research's gradient-free optimization platform providing a large portfolio of algorithms and benchmark functions, with Python-first design.
 
@@ -10,6 +10,5 @@
 
 **Risk:** Nevergrad is actively developed; API changes may break wrapped implementations. Algorithm Instances must pin exact Nevergrad versions.
 
-> **`TODO: REF-TASK-0006`** — Define the Nevergrad adapter pattern: how to wrap a Nevergrad
-> optimizer as an Algorithm Instance with minimal code. Owner: library design lead.
-> Acceptance: example in `docs/06_tutorials/` and adapter utility in library.
+> **REF-TASK-0006 ✅ Complete** — Nevergrad adapter pattern is defined in
+> `docs/06-tutorials/03-nevergrad-adapter.md` with a working adapter utility in the library.

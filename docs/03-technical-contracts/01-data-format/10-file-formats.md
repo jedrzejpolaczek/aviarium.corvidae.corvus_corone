@@ -1,6 +1,6 @@
 # §3 File Formats and Storage
 
-> Index: [01-data-format.md](01-data-format.md)
+> Index: [01-index.md](01-index.md)
 
 <!--
 CONNECTS TO:
@@ -46,7 +46,7 @@ evaluations raw_y
 | Column | Source | Notes |
 |---|---|---|
 | `evaluations` | `PerformanceRecord.evaluation_number` | 1-based integer |
-| `raw_y` | `PerformanceRecord.best_so_far` (or `objective_value` if absent) | Best-so-far value at this evaluation |
+| `raw_y` | `PerformanceRecord.objective_value` | Best-so-far value at this evaluation (§2.6: `objective_value` stores the best-so-far, not the raw evaluation output) |
 
 ### JSON sidecar
 
@@ -177,10 +177,10 @@ object matching the §2.6 schema.
 
 Example `performance_records.jsonl`:
 ```jsonl
-{"evaluation_number": 1, "objective_value": 4.2346, "best_so_far": 4.2346, "trigger_reason": "scheduled"}
-{"evaluation_number": 2, "objective_value": 3.1416, "best_so_far": 3.1416, "trigger_reason": "both"}
-{"evaluation_number": 5, "objective_value": 1.8743, "best_so_far": 1.8743, "trigger_reason": "scheduled"}
-{"evaluation_number": 50, "objective_value": 0.9012, "best_so_far": 0.9012, "trigger_reason": "scheduled_end_of_run"}
+{"id": "a1b2c3d4-...", "run_id": "e5f6...", "evaluation_number": 1, "elapsed_time": 0.012, "objective_value": 4.2346, "is_improvement": true, "trigger_reason": "scheduled"}
+{"id": "a1b2c3d5-...", "run_id": "e5f6...", "evaluation_number": 2, "elapsed_time": 0.023, "objective_value": 3.1416, "is_improvement": true, "trigger_reason": "both"}
+{"id": "a1b2c3d6-...", "run_id": "e5f6...", "evaluation_number": 5, "elapsed_time": 0.051, "objective_value": 1.8743, "is_improvement": true, "trigger_reason": "scheduled"}
+{"id": "a1b2c3d7-...", "run_id": "e5f6...", "evaluation_number": 50, "elapsed_time": 0.502, "objective_value": 0.9012, "is_improvement": false, "trigger_reason": "scheduled_end_of_run"}
 ```
 
 Records are always returned by `runs.get_performance_records()` sorted
@@ -258,6 +258,7 @@ when present, giving a **20× write and 59× query speedup** (ADR-010 benchmark,
 
 | Column | Arrow type | §2.6 field |
 |---|---|---|
+| `id` | `pa.string()` | `id` (UUID; primary key; enables row-level matching to the canonical JSONL record) |
 | `run_id` | `pa.string()` | `run_id` |
 | `evaluation_number` | `pa.int32()` | `evaluation_number` |
 | `elapsed_time` | `pa.float64()` | `elapsed_time` |

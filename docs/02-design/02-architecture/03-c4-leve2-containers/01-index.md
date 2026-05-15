@@ -52,7 +52,7 @@ flowchart TB
   subgraph DataLayer["Data & Registry"]
     registry["Algorithm Registry\nPython"]
     problems["Problem Repository\nPython"]
-    store[("Results Store\nPython · SQLite")]
+    store[("Results Store\nPython · JSON/JSONL + Parquet")]
     bridge["Ecosystem Bridge\nPython"]
   end
 

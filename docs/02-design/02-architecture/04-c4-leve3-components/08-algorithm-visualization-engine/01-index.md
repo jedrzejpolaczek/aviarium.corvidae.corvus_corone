@@ -1,7 +1,7 @@
 # C3: Components — Algorithm Visualization Engine
 
 > C2 Container: [06-algorithm-visualization-engine.md](../../03-c4-leve2-containers/06-algorithm-visualization-engine.md)
-> C3 Index: [../01-c3-components.md](../01-c3-components.md)
+> C3 Index: [../01-c4-l3-components/01-c4-l3-components.md](../01-c4-l3-components/01-c4-l3-components.md)
 
 The Algorithm Visualization Engine generates four visualization types for HPO algorithms: convergence animation (GIF), search trajectory scatter (PNG), parameter sensitivity heatmap (PNG/HTML), and genealogy timeline (SVG). All types can use a mathematical-only fallback when no study data exists. matplotlib is the core rendering library; plotly is optional for interactive HTML output.
 Actors: called by Reporting Engine for mandatory report visualizations; called directly via Public API for Learner education (UC-07, UC-10).

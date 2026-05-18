@@ -40,6 +40,5 @@ Critical errors (seed collision, storage unavailable) abort the entire Experimen
 **Actors served:** Researcher (indirectly, via Study Orchestrator — UC-01 main execution
 workflow, UC-05 reproducibility).
 
-**Relevant SRS section:** FR-08 (study execution), FR-09 (seed injection), FR-10 (run
-isolation), FR-11 (evaluation budget enforcement), FR-12 (failure handling — skip vs abort),
-FR-19 (execution environment capture).
+**Relevant SRS section:** FR-08 (study execution), FR-09 (seed injection), FR-10 (execution environment recording), FR-11 (Run isolation — no shared mutable state), FR-12 (failure handling — skip vs abort),
+FR-19 (entity ID cross-references — no file paths).

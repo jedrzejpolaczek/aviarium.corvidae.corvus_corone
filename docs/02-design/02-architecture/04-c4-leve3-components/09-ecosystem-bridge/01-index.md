@@ -1,7 +1,7 @@
 # C3: Components — Ecosystem Bridge
 
 > C2 Container: [13-ecosystem-bridge.md](../../03-c4-leve2-containers/13-ecosystem-bridge.md)
-> C3 Index: [../01-c3-components.md](../01-c3-components.md)
+> C3 Index: [../01-c4-l3-components/01-c4-l3-components.md](../01-c4-l3-components/01-c4-l3-components.md)
 
 The Ecosystem Bridge exports Study results to external benchmarking ecosystems (COCO BBOB, IOHprofiler) and wraps Nevergrad optimizers for use within Corvus studies (and vice versa). Every export produces an information-loss manifest documenting what data could not be faithfully represented in the target format.
 Actors: called by Public API + CLI; reads from Results Store; writes to external format files.

@@ -1,7 +1,7 @@
 # C3: Components — Reporting Engine
 
 > C2 Container: [05-reporting-engine.md](../../03-c4-leve2-containers/05-reporting-engine.md)
-> C3 Index: [../01-c3-components.md](../01-c3-components.md)
+> C3 Index: [../01-c4-l3-components/01-c4-l3-components.md](../01-c4-l3-components/01-c4-l3-components.md)
 
 The Reporting Engine assembles an HTML benchmark report from Study results, mandatory visualizations, statistical summaries, and an explicit limitations section. It enforces completeness: the Limitations Enforcer blocks report generation if any required section is absent.
 Actors: triggered by Study Orchestrator; reads from Results Store; delegates visualization rendering to Algorithm Visualization Engine.

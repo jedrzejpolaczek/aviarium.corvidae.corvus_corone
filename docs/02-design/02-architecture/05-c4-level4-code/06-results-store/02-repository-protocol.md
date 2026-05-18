@@ -3,7 +3,7 @@
 > C4 Index: [../01-index.md](../01-index.md)
 > C3 Component (Local File Repository): [../../04-c4-leve3-components/05-results-store/02-local-file-repository.md](../../04-c4-leve3-components/05-results-store/02-local-file-repository.md)
 > C3 Index (Results Store): [../../04-c4-leve3-components/05-results-store/01-index.md](../../04-c4-leve3-components/05-results-store/01-index.md)
-> ADR: [../../adr/ADR-001-library-with-server-ready-data-layer.md](../../adr/ADR-001-library-with-server-ready-data-layer.md)
+> ADR: [../../01-adr/adr-001-library-with-server-ready-data-layer.md](../../01-adr/adr-001-library-with-server-ready-data-layer.md)
 
 ---
 
@@ -64,8 +64,8 @@ constructs paths independently.
   runs/{run_id}/
     run.json
     seed.json
-    performance.jsonl
-    performance.parquet
+    performance_records.jsonl
+    performance_records.parquet
     run.log
 ```
 

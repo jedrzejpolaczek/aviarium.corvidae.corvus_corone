@@ -1,7 +1,7 @@
 # C3: Components — Public API + CLI
 
 > C2 Container: [04-public-api-cli.md](../../03-c4-leve2-containers/04-public-api-cli.md)
-> C3 Index: [../01-c3-components.md](../01-c3-components.md)
+> C3 Index: [../01-c4-l3-components/01-c4-l3-components.md](../01-c4-l3-components/01-c4-l3-components.md)
 
 The Public API + CLI is the user-facing entry point for the library. It exposes `cc.*` Python functions and a Click-based CLI, validates inputs at the system boundary, and delegates to internal containers. The Response Mapper transforms internal return types to stable, versioned API objects.
 Actors: Researcher, Learner (Python or CLI); Corvus Pilot V2 (via MCP server which calls `cc.*` functions).

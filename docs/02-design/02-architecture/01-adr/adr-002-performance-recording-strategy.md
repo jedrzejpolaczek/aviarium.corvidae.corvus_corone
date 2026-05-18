@@ -7,10 +7,10 @@ that followed this strategy. Without this ADR, different Runner implementations
 would produce incomparable data, and anytime analysis would be undefined.
 
 CONNECTS TO:
-  → docs/03-technical-contracts/01-data-format.md §2.6 PerformanceRecord
-  → docs/03-technical-contracts/01-data-format.md §2.3 Study (sampling_strategy, log_scale_schedule)
-  → docs/03-technical-contracts/02-interface-contracts.md : Runner.on_evaluation() contract
-  → docs/03-technical-contracts/03-metric-taxonomy.md : ANYTIME-ECDF_AREA, TIME-EVALUATIONS_TO_TARGET
+  → docs/03-technical-contracts/01-data-format/07-performance-record.md : PerformanceRecord schema
+  → docs/03-technical-contracts/01-data-format/04-study.md : Study (sampling_strategy, log_scale_schedule)
+  → docs/03-technical-contracts/02-interface-contracts/04-runner-interface.md : Runner.on_evaluation() contract
+  → docs/03-technical-contracts/03-metric-taxonomy/01-index.md : ANYTIME-ECDF_AREA, TIME-EVALUATIONS_TO_TARGET
   → docs/04-scientific-practice/01-methodology/01-benchmarking-protocol.md Step 5
   → ADR-001-library-with-server-ready-data-layer.md
   → ADR-003-anytime-curve-interpolation.md : what the Analysis Engine does with records produced here
@@ -251,10 +251,10 @@ making it the system default.
 
 | Document | Relationship |
 |---|---|
-| `docs/03-technical-contracts/01-data-format.md §2.6` | PerformanceRecord — `trigger_reason` field added by this ADR |
-| `docs/03-technical-contracts/01-data-format.md §2.3` | Study — `sampling_strategy`, `log_scale_schedule` fields governed by this ADR |
-| `docs/03-technical-contracts/02-interface-contracts.md` | Runner `on_evaluation()` contract governed by this ADR |
-| `docs/03-technical-contracts/03-metric-taxonomy.md` | `ANYTIME-ECDF_AREA` and `TIME-EVALUATIONS_TO_TARGET` depend on the records produced here |
+| `docs/03-technical-contracts/01-data-format/07-performance-record.md` | PerformanceRecord — `trigger_reason` field added by this ADR |
+| `docs/03-technical-contracts/01-data-format/04-study.md` | Study — `sampling_strategy`, `log_scale_schedule` fields governed by this ADR |
+| `docs/03-technical-contracts/02-interface-contracts/04-runner-interface.md` | Runner `on_evaluation()` contract governed by this ADR |
+| `docs/03-technical-contracts/03-metric-taxonomy/01-index.md` | `ANYTIME-ECDF_AREA` and `TIME-EVALUATIONS_TO_TARGET` depend on the records produced here |
 | `docs/04-scientific-practice/01-methodology/01-benchmarking-protocol.md Step 5` | Requires the sampling schedule to be specified before execution |
 | `ADR-001-library-with-server-ready-data-layer.md` | Bulk storage format for high-volume PerformanceRecords deferred to `REF-TASK-0024` |
 | `ADR-003-anytime-curve-interpolation.md` | How the Analyzer reconstructs best-so-far at unlogged evaluation counts |

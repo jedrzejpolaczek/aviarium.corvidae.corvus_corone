@@ -1,6 +1,6 @@
 # Actor: Algorithm Author
 
-> C1 Context: [../01-c1-context.md](../01-c1-context.md)
+> C1 Context: [01-c1-context.md](../01-c4-l1-context/01-c1-context.md)
 
 **Role:** A researcher publishing a new HPO algorithm, or an ML engineer wrapping an existing optimization library (Optuna, SMAC, HyperOpt, etc.) for evaluation.
 
@@ -11,7 +11,3 @@
 **Gets from the system:** Fair, reproducible comparison against other algorithms; analysis results for their algorithm's performance profile.
 
 **Relevant principles:** 8 (precision of description), 10 (configuration fairness), 11 (sensitivity documentation), 31 (fairness in comparisons).
-
-> **REF-TASK-0004 complete** — Onboarding tutorial exists at
-> `docs/06-tutorials/04-algorithm-author-onboarding.md`. Demonstrates wrapping an Optuna TPE
-> sampler in 15 lines of behavioral adapter code.

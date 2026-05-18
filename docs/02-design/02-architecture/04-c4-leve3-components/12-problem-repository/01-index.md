@@ -1,7 +1,7 @@
 # C3: Components — Problem Repository
 
 > C2 Container: [11-problem-repository.md](../../03-c4-leve2-containers/11-problem-repository.md)
-> C3 Index: [../01-c3-components.md](../01-c3-components.md)
+> C3 Index: [../01-c4-l3-components/01-c4-l3-components.md](../01-c4-l3-components/01-c4-l3-components.md)
 
 The Problem Repository stores and serves ProblemInstance registrations with the same versioning and deprecation architecture as the Algorithm Registry. Each problem instance is validated on registration and immutable thereafter.
 Actors: Study Orchestrator and Public API read from it; developers register new problem instances during library development or benchmarking suite expansion.

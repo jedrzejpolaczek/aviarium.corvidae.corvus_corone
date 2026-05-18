@@ -25,7 +25,7 @@ Lives in the `corvus_corone_pilot` package within the monorepo.
 | Session history | `corvus-pilot history [--thread-id]` — MLflow-tracked session logs | Researcher, Learner (session review) |
 
 Full C3 component breakdown (including Socratic Guide internal design):
-[`../04-c4-leve3-components/02-corvus-pilot.md`](../04-c4-leve3-components/02-corvus-pilot.md)
+[`../04-c4-leve3-components/02-corvus-pilot/01-index.md`](../04-c4-leve3-components/02-corvus-pilot/01-index.md)
 
 **Dependencies:**
 

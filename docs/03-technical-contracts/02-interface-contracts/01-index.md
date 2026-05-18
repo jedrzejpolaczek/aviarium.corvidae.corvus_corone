@@ -14,8 +14,8 @@ NARRATIVE POSITION:
 CONNECTS TO:
   ← C3                          : each component boundary visible there is formalized here
   ← SRS §4, §7                  : requirements for interoperability and modularity
-  → specs/data-format.md        : all input/output types reference entities defined there
-  → specs/metric-taxonomy.md    : metric-related return types reference taxonomy names
+  → docs/03-technical-contracts/01-data-format/01-index.md        : all input/output types reference entities defined there
+  → docs/03-technical-contracts/03-metric-taxonomy/01-index.md    : metric-related return types reference taxonomy names
   → community/contribution-guide.md : all contribution types must implement a contract here
   → C4                          : code-level abstractions implement these contracts
   → Docstrings                  : every public method must have docstrings that document
@@ -24,7 +24,7 @@ CONNECTS TO:
 GLOSSARY: All terms from docs/GLOSSARY.md apply. Use exact glossary terms.
 
 CONTRACT FORMAT for each method (applies to all section files):
-  - Signature: parameter names and types (reference data-format.md for complex types)
+  - Signature: parameter names and types (reference docs/03-technical-contracts/01-data-format/01-index.md for complex types)
   - Semantics: what does this method DO? (not how — that is implementation detail)
   - Preconditions: what must be true BEFORE calling this method?
   - Postconditions: what is guaranteed to be true AFTER a successful call?

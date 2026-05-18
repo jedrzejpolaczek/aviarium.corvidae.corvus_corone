@@ -3,7 +3,7 @@
 *Hard guards against the most common ways benchmarking systems become scientifically invalid.*
 *Source: MANIFESTO anti-patterns AP-1, AP-3, AP-4, AP-6, AP-7; Principle 3.*
 *Anti-patterns are defined authoritatively in `docs/01-manifesto/MANIFESTO.md` (Anti-patterns section).*
-*Design-level exclusions are listed in `docs/02-design/02-architecture/02-c4-leve1-context/01-c1-context.md` (Explicit Scope Exclusions).*
+*Design-level exclusions are listed in `docs/02-design/02-architecture/02-c4-leve1-context/01-c4-l1-context/01-c1-context.md` (Explicit Scope Exclusions).*
 
 ---
 
@@ -57,6 +57,6 @@
 
 **Connects to:**
 - `docs/01-manifesto/MANIFESTO.md` — Anti-patterns section (AP-1 through AP-7) and Principle 3 (authoritative source)
-- `docs/02-design/02-architecture/02-c4-leve1-context/01-c1-context.md` — Explicit Scope Exclusions (design-level cross-reference)
+- `docs/02-design/02-architecture/02-c4-leve1-context/01-c4-l1-context/01-c1-context.md` — Explicit Scope Exclusions (design-level cross-reference)
 - `docs/02-design/01-software-requirement-specification/03-functional-requirements/07-fr-4.6-reporting-and-visualization.md` — FR-21 enforces CONST-SCI-05 and CONST-SCI-06
 - `docs/02-design/01-software-requirement-specification/02-use-cases/04-uc-03.md` — UC-03 Step 6 enforces CONST-SCI-03

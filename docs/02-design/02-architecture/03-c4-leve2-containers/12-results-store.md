@@ -6,10 +6,9 @@
 and analysis: `Study`, `Experiment`, `Run`, `PerformanceRecord`, `ResultAggregate`, and
 `Report` records. Provides the seven domain repositories (via `RepositoryFactory`) through
 which all other containers read and write persistent state. In V1, backed by a local file
-system with SQLite-compatible structured storage and Parquet for bulk `PerformanceRecord`
-data (ADR-010).
+system with JSON entity files and Parquet for bulk `PerformanceRecord` data (ADR-010).
 
-**Technology:** Python · SQLite (structured entity records) · Parquet/snappy via `pyarrow >= 13.0`
+**Technology:** Python · local filesystem (JSON/JSONL entity files) · Parquet/snappy via `pyarrow >= 13.0`
 (bulk `PerformanceRecord` secondary format, ADR-010).
 
 **Interfaces exposed:**
@@ -41,6 +40,5 @@ upstream container dependencies.
 **Actors served:** All actors indirectly — the Results Store is the shared persistence layer
 for every container in the system.
 
-**Relevant SRS section:** FR-17 (data immutability and locking), FR-18 (resume interrupted
-experiments), FR-19 (execution environment capture and storage), FR-22 (raw data export
+**Relevant SRS section:** FR-17 (UUID entity identification — no file paths as IDs), FR-18 (Artifact archive production), FR-19 (entity ID cross-references — no file paths), FR-22 (raw data export
 alongside reports).

@@ -145,7 +145,7 @@ To reverse a decision, write a new ADR that supersedes the old one.
   | Document                                  | Relationship                                |
   |-------------------------------------------|---------------------------------------------|
   | docs/architecture/c2-containers.md        | Container [X] reflects this decision        |
-  | docs/specs/data-format.md §[N]            | Entity [Y] format governed by this decision |
-  | docs/specs/interface-contracts.md §[N]    | Interface [Z] shaped by this decision       |
+  | docs/03-technical-contracts/01-data-format/01-index.md §[N]            | Entity [Y] format governed by this decision |
+  | docs/docs/03-technical-contracts/02-interface-contracts/01-index.md §[N]    | Interface [Z] shaped by this decision       |
   | ADR-[NUMBER]-[other-decision].md          | Supersedes / is related to                  |
 -->

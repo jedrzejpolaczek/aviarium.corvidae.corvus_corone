@@ -1,6 +1,6 @@
 # Actor: Community Contributor
 
-> C1 Context: [../01-c1-context.md](../01-c1-context.md)
+> C1 Context: [01-c1-context.md](../01-c4-l1-context/01-c1-context.md)
 
 **Role:** A member of the benchmarking community who extends the system without being an algorithm author — by contributing new Problem Instances, analysis tools, visualizations, documentation improvements, or bug reports.
 

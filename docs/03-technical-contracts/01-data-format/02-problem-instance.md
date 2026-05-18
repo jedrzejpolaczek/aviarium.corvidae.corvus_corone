@@ -1,12 +1,12 @@
 # §2.1 Problem Instance
 
-> Index: [01-data-format.md](01-data-format.md)
+> Index: [01-index.md](01-index.md)
 
-> See GLOSSARY: [Problem Instance](../GLOSSARY.md#problem-instance)
+> See GLOSSARY: [Problem Instance](../../GLOSSARY.md#problem-instance)
 
 | Name | Type | Required | Notes |
 | --- | --- | --- | --- |
-| id | int | yes | Problem Instance ID |
+| id | string | yes | Problem Instance UUID (RFC 4122 v4) |
 | name | string | yes | Human-readable name |
 | version | string | yes | Version of this record. Structure is described in validation rules |
 | provenance | string | yes | Source of this problem (e.g., `real_ml_task`, `synthetic`, `adapted_from_coco`) |

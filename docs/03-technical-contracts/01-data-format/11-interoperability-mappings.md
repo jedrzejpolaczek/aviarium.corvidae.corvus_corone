@@ -1,6 +1,6 @@
 # §4 Interoperability Mappings
 
-> Index: [01-data-format.md](01-data-format.md)
+> Index: [01-index.md](01-index.md)
 
 This section defines how Corvus Corone entities map to external platform formats. Each subsection
 covers one platform: direction, field-level mapping, information-loss manifest items, and version
@@ -146,8 +146,7 @@ The `.dat` format has two mandatory columns; all others are optional.
 | Corvus Field | `.dat` Column | Notes / Losses |
 |---|---|---|
 | `PerformanceRecord.evaluation_number` | `evaluations` (col 0, integer) | Exact. 1-indexed per Run. |
-| `PerformanceRecord.best_so_far` | `raw_y` (col 1, float `%.10f`) | Exact. IOHprofiler `raw_y` is best-so-far; maps directly. |
-| `PerformanceRecord.objective_value` | Not used | `objective_value` is the *current* eval value; `raw_y` requires *best-so-far*. `best_so_far` takes precedence. |
+| `PerformanceRecord.objective_value` | `raw_y` (col 1, float `%.10f`) | Exact. `objective_value` stores the best-so-far value (per schema definition — not the raw per-evaluation output); IOHprofiler `raw_y` is also best-so-far, so the mapping is direct with no approximation. |
 | `PerformanceRecord.elapsed_time` | Not represented | No time column in IOHprofiler `.dat`. See **LOSS-IOH-03**. |
 | `PerformanceRecord.current_solution` | `x0`, `x1`, … (optional) | Exported only if `current_solution` is present. See **LOSS-IOH-02**. |
 | `PerformanceRecord.trigger_reason` | Not represented | All records exported (improvement + scheduled + end-of-run). See **LOSS-IOH-04**. |

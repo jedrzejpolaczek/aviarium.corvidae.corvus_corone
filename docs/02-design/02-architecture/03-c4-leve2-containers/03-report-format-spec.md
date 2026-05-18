@@ -16,7 +16,7 @@ NARRATIVE POSITION:
   → 07-fr-4.6-reporting-and-visualization.md : FR-20, FR-21, FR-22 — report requirements
 
 CONNECTS TO:
-  ← docs/02-design/02-architecture/03-c4-leve2-containers/01-c2-containers.md (§ Reporting Engine)
+  ← docs/02-design/02-architecture/03-c4-leve2-containers/01-index.md (§ Reporting Engine)
   ← docs/03-technical-contracts/04-public-api-contract.md §CLI Command Surface corvus report
   → docs/04-scientific-practice/01-methodology/02-statistical-methodology.md §1–§4 (three-level)
   → docs/03-technical-contracts/03-metric-taxonomy/08-standard-reporting-set.md (mandatory metrics)

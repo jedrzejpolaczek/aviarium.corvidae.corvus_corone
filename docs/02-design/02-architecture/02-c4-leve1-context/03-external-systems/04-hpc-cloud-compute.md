@@ -1,6 +1,6 @@
 # External System: HPC / Cloud Compute
 
-> C1 Context: [../01-c1-context.md](../01-c1-context.md)
+> C1 Context: [01-c1-context.md](../01-c4-l1-context/01-c1-context.md)
 
 **What it is:** Distributed computing infrastructure (SLURM clusters, cloud VMs, etc.) used to execute parallel Runs when local compute is insufficient.
 

@@ -1,7 +1,7 @@
 # Entity Store
 
 > Container: [Problem Repository](../../03-c4-leve2-containers/11-problem-repository.md)
-> C3 Index: [index.md](index.md)
+> C3 Index: [index.md](01-index.md)
 
 ---
 
@@ -33,7 +33,7 @@ class ProblemEntityStore:
 
 ## Key Behaviors
 
-Identical architecture to [Algorithm Registry — Entity Store](../11-algorithm-registry/entity-store.md), applied to ProblemInstances:
+Identical architecture to [Algorithm Registry — Entity Store](../11-algorithm-registry/04-entity-store.md), applied to ProblemInstances:
 
 1. **Storage layout** — `{repo_dir}/{problem_id}/{version}.json`.
 2. **ID resolution** — `get(problem_id)` returns latest non-deprecated version; `get(problem_id, version)` returns exact version.

@@ -1,6 +1,6 @@
 # ROBUSTNESS-NOISE_SENSITIVITY
 
-> Index: [01-metric-taxonomy.md](01-metric-taxonomy.md)
+> Index: [01-index.md](01-index.md)
 
 **Display name:** Performance Degradation Under Noise
 

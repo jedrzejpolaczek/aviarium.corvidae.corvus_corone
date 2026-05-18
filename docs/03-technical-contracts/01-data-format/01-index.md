@@ -8,20 +8,25 @@ Without agreed-upon schemas, MANIFESTO Principles 19–22 (Reproducibility) are 
 
 NARRATIVE POSITION:
   SRS §7 (interface requirements) → Data Format Spec → (concrete schemas and formats)
-  → specs/interface-contracts.md : interfaces operate on the entities defined here
-  → specs/metric-taxonomy.md     : metric values are stored in Result Aggregate entities here
+  → docs/03-technical-contracts/02-interface-contracts/01-index.md : interfaces operate on the entities defined here
+  → docs/03-technical-contracts/03-metric-taxonomy/01-index.md     : metric values are stored in Result Aggregate entities here
 
 CONNECTS TO:
   ← SRS §4, §7             : requirements that drove these format decisions
   ← MANIFESTO Principles 7, 8, 19–22 : directly operationalized by this document
-  → specs/interface-contracts.md : method signatures use entity types from here
-  → specs/metric-taxonomy.md     : metric definitions must match Result Aggregate fields here
+  → docs/03-technical-contracts/02-interface-contracts/01-index.md : method signatures use entity types from here
+  → docs/03-technical-contracts/03-metric-taxonomy/01-index.md     : metric definitions must match Result Aggregate fields here
   → community/versioning-governance.md : how schema versions are managed and deprecated
   → architecture/adr/            : format choices (e.g., JSON vs HDF5) should have ADRs
 
 GLOSSARY: All entity names used here are defined in docs/GLOSSARY.md.
 Use exact glossary terms — do not introduce synonyms.
 -->
+
+---
+
+> **Current Schema Version: `1.0.0`**
+> Increment rules, breaking-change classification, and artifact handling are defined in [§6 Schema Versioning](13-schema-versioning.md).
 
 ---
 
@@ -101,5 +106,5 @@ flowchart TD
 | §2.8 Report | [09-report.md](09-report.md) | ✅ Formal schema |
 | §3 File Formats and Storage | [10-file-formats.md](10-file-formats.md) | ✅ §3.1 IOHprofiler export, §3.2 LocalFileRepository layout, §3.3 Parquet bulk format complete |
 | §4 Interoperability Mappings | [11-interoperability-mappings.md](11-interoperability-mappings.md) | ✅ §4.1 COCO, §4.2 IOHprofiler, §4.3 Nevergrad complete |
-| §5 Validation Rules (Cross-Entity) | [12-cross-entity-validation.md](12-cross-entity-validation.md) | 🚧 Pending |
-| §6 Schema Versioning | [13-schema-versioning.md](13-schema-versioning.md) | 🚧 Pending |
+| §5 Validation Rules (Cross-Entity) | [12-cross-entity-validation.md](12-cross-entity-validation.md) | ✅ 17 rules across 8 entity pairs |
+| §6 Schema Versioning | [13-schema-versioning.md](13-schema-versioning.md) | ✅ Complete (v1.0.0) |

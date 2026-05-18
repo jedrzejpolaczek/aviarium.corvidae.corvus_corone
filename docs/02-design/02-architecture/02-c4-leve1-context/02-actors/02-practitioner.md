@@ -1,6 +1,6 @@
 # Actor: Practitioner
 
-> C1 Context: [../01-c1-context.md](../01-c1-context.md)
+> C1 Context: [01-c1-context.md](../01-c4-l1-context/01-c1-context.md)
 
 **Role:** An ML engineer or data scientist who needs to select an HPO algorithm for a specific application but is not conducting primary research.
 

@@ -3,7 +3,7 @@
 > C4 Index: [../01-index.md](../01-index.md)
 > C3 Component: [../../04-c4-leve3-components/10-public-api-cli/02-api-facade.md](../../04-c4-leve3-components/10-public-api-cli/02-api-facade.md)
 > C3 Index (Public API + CLI): [../../04-c4-leve3-components/10-public-api-cli/01-index.md](../../04-c4-leve3-components/10-public-api-cli/01-index.md)
-> Public API Contract: [../../../03-technical-contracts/04-public-api-contract.md](../../../03-technical-contracts/04-public-api-contract.md)
+> Public API Contract: [../../../../03-technical-contracts/04-public-api-contract.md](../../../../03-technical-contracts/04-public-api-contract.md)
 
 ---
 

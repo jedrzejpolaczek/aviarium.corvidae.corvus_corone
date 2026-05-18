@@ -24,7 +24,7 @@
 **All data formats used for archival MUST be open, well-documented, and readable without proprietary tools.**
 
 - Source: MANIFESTO Principle 22
-- Operationalized in: `docs/03-technical-contracts/01-data-format.md` §3
+- Operationalized in: `docs/03-technical-contracts/01-data-format/01-index.md` §3
 - Enforced by: FR-22 (Raw Data export format must comply with this constraint)
 
 **Connects to:**

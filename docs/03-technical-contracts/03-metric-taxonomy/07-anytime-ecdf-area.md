@@ -1,6 +1,6 @@
 # ANYTIME-ECDF_AREA
 
-> Index: [01-metric-taxonomy.md](01-metric-taxonomy.md)
+> Index: [01-index.md](01-index.md)
 
 **Display name:** Area Under the ECDF Curve
 
@@ -12,7 +12,7 @@
 
 **Interpretation:** Higher is better. An algorithm with high ANYTIME-ECDF_AREA reaches good solutions early and consistently across many budget levels.
 
-**Required inputs:** Full sequence of Performance Records (`evaluation_number` and `objective_value`) for all Runs. This is the primary reason Performance Records must be stored at every evaluation, not just at the endpoint.
+**Required inputs:** The logged Performance Records (`evaluation_number` and `objective_value`) for all Runs. Performance Records do not need to be stored at every evaluation — LOCF interpolation (ADR-003) reconstructs the best-so-far value at any evaluation from the logged checkpoints (scheduled + improvement + end-of-run triggers per ADR-002). Coarser sampling reduces storage but the ECDF_AREA computation remains exact on the resulting LOCF step function. The mandatory ADR-002 record at evaluation 1 ensures LOCF is defined from the start.
 
 **Statistical treatment:** Distribution depends on normalization; non-parametric tests generally appropriate. See `docs/04-scientific-practice/01-methodology/02-statistical-methodology.md` §5 (Anytime Analysis).
 

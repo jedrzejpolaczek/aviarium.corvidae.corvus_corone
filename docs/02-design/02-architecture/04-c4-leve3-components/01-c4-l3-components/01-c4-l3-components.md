@@ -292,14 +292,14 @@ flowchart TD
 
 | Container | C3 Folder |
 |---|---|
-| Corvus Pilot V2 | [02-corvus-pilot/index.md](02-corvus-pilot/index.md) |
-| Experiment Runner | [03-experiment-runner/index.md](03-experiment-runner/index.md) |
-| Analysis Engine | [04-analysis-engine/index.md](04-analysis-engine/index.md) |
-| Results Store | [05-results-store/index.md](05-results-store/index.md) |
-| Study Orchestrator | [06-study-orchestrator/index.md](06-study-orchestrator/index.md) |
-| Reporting Engine | [07-reporting-engine/index.md](07-reporting-engine/index.md) |
-| Algorithm Visualization Engine | [08-algorithm-visualization-engine/index.md](08-algorithm-visualization-engine/index.md) |
-| Ecosystem Bridge | [09-ecosystem-bridge/index.md](09-ecosystem-bridge/index.md) |
-| Public API + CLI | [10-public-api-cli/index.md](10-public-api-cli/index.md) |
-| Algorithm Registry | [11-algorithm-registry/index.md](11-algorithm-registry/index.md) |
-| Problem Repository | [12-problem-repository/index.md](12-problem-repository/index.md) |
+| Corvus Pilot V2 | [02-corvus-pilot/01-index.md](../02-corvus-pilot/01-index.md) |
+| Experiment Runner | [03-experiment-runner/01-index.md](../03-experiment-runner/01-index.md) |
+| Analysis Engine | [04-analysis-engine/01-index.md](../04-analysis-engine/01-index.md) |
+| Results Store | [05-results-store/01-index.md](../05-results-store/01-index.md) |
+| Study Orchestrator | [06-study-orchestrator/01-index.md](../06-study-orchestrator/01-index.md) |
+| Reporting Engine | [07-reporting-engine/01-index.md](../07-reporting-engine/01-index.md) |
+| Algorithm Visualization Engine | [08-algorithm-visualization-engine/01-index.md](../08-algorithm-visualization-engine/01-index.md) |
+| Ecosystem Bridge | [09-ecosystem-bridge/01-index.md](../09-ecosystem-bridge/01-index.md) |
+| Public API + CLI | [10-public-api-cli/01-index.md](../10-public-api-cli/01-index.md) |
+| Algorithm Registry | [11-algorithm-registry/01-index.md](../11-algorithm-registry/01-index.md) |
+| Problem Repository | [12-problem-repository/01-index.md](../12-problem-repository/01-index.md) |

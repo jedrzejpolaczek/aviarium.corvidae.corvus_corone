@@ -13,7 +13,7 @@ NARRATIVE POSITION:
 
 CONNECTS TO:
   ← docs/01-manifesto/MANIFESTO.md Principle 12 : "multiple aspects of performance" — this document is the inventory
-  ← docs/02-design/01-software-requirement-specification/SRS.md §4.4 : Measurement & Analysis Engine requirements
+  ← docs/02-design/01-software-requirement-specification/01-srs/01-SRS.md §4.4 : Measurement & Analysis Engine requirements
   → docs/03-technical-contracts/01-data-format/08-result-aggregate.md §2.7 : ResultAggregate.metrics keys must be valid metric IDs from here
   → docs/03-technical-contracts/02-interface-contracts/05-analyzer-interface.md §4 : Analyzer.compute_metrics() validates against this taxonomy
   → docs/04-scientific-practice/01-methodology/02-statistical-methodology.md : statistical treatment varies by metric type

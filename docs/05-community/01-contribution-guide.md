@@ -7,14 +7,14 @@ A contributor reads this BEFORE making any changes.
 
 NARRATIVE POSITION:
   MANIFESTO (community values) → Contribution Guide → (how to contribute correctly)
-  This document is an entry point; it delegates technical detail to specs/ documents.
+  This document is an entry point; it delegates technical detail to docs/03-technical-contracts/ documents.
 
 CONNECTS TO:
   ← MANIFESTO Principles 27, 28 : community development and education motivate this document
   ← SRS §5 NFR-OPEN, NFR-MODULAR : contribution process must align with these requirements
-  → specs/interface-contracts.md : all code contributions must implement contracts there
-  → specs/data-format.md         : all data contributions must conform to schemas there
-  → specs/metric-taxonomy.md     : metric contributions follow the taxonomy format there
+  → docs/03-technical-contracts/02-interface-contracts/01-index.md : all code contributions must implement contracts there
+  → docs/03-technical-contracts/01-data-format/01-index.md         : all data contributions must conform to schemas there
+  → docs/03-technical-contracts/03-metric-taxonomy/01-index.md     : metric contributions follow the taxonomy format there
   → community/versioning-governance.md : accepted contributions enter the versioning pipeline
   → docs/GLOSSARY.md             : all contributions use precise glossary terms
   → architecture/adr/            : contributions requiring design decisions need an ADR
@@ -34,9 +34,9 @@ The specs define the "what"; this guide describes the "how and who".
 
   | Type                        | Start here                                      | Key contract                      |
   |-----------------------------|-------------------------------------------------|-----------------------------------|
-  | New benchmark problem       | §1 below                                        | specs/interface-contracts.md §1   |
-  | New algorithm implementation | §2 below                                       | specs/interface-contracts.md §2   |
-  | New analysis tool / metric  | §3 below                                        | specs/metric-taxonomy.md          |
+  | New benchmark problem       | §1 below                                        | docs/03-technical-contracts/02-interface-contracts/01-index.md §1   |
+  | New algorithm implementation | §2 below                                       | docs/03-technical-contracts/02-interface-contracts/01-index.md §2   |
+  | New analysis tool / metric  | §3 below                                        | docs/03-technical-contracts/03-metric-taxonomy/01-index.md          |
   | Documentation               | §4 below                                        | Style guide in §4                 |
   | Bug fix                     | §5 below                                        | (depends on area)                 |
   | Architecture change         | Must open an ADR first: architecture/adr/TEMPLATE.md | SRS + C2/C3 impact analysis  |
@@ -70,9 +70,9 @@ etc.
     - You have access to complete metadata required by the Problem Instance schema
 
   Requirements — your contribution MUST:
-    - Implement the Problem Interface: specs/interface-contracts.md §1
+    - Implement the Problem Interface: docs/03-technical-contracts/02-interface-contracts/01-index.md §1
       (all methods, all contracts, all cross-cutting requirements in §6)
-    - Provide a complete Problem Instance record: specs/data-format.md §2.1
+    - Provide a complete Problem Instance record: docs/03-technical-contracts/01-data-format/02-problem-instance.md
       (all required fields, including landscape_characteristics if known)
     - Include a written justification of representativeness
       (which real HPO challenges does this problem reflect?)
@@ -82,7 +82,7 @@ etc.
 
   Review criteria:
     - Interface compliance (automated check)
-    - Metadata completeness (automated validation against data-format.md §2.1 schema)
+    - Metadata completeness (automated validation against docs/03-technical-contracts/01-data-format/02-problem-instance.md schema)
     - Representativeness justification quality (human review)
     - Diversity: does this problem add characteristics not already covered?
       → reviewers check against the current problem set's characteristic coverage
@@ -116,7 +116,7 @@ etc.
 3. Document the default configuration and justify why it is "best reasonable"
    (MANIFESTO Principle 10) — not "library defaults" or "what I tried first".
 
-4. **Include a `sensitivity_report`** (data-format.md §2.2.1) documenting how performance
+4. **Include a `sensitivity_report`** (docs/03-technical-contracts/01-data-format/03-algorithm-instance.md) documenting how performance
    changes when key configuration parameters are varied — this is a mandatory review criterion,
    not optional. Minimum requirements:
    - At least 1 Problem Instance used for sensitivity testing
@@ -137,7 +137,7 @@ etc.
 | Criterion | Check type | Notes |
 |---|---|---|
 | Interface compliance | Automated | Fails CI if any interface method missing or contract violated |
-| Algorithm Instance record completeness | Automated | Schema validation against data-format.md §2.2 |
+| Algorithm Instance record completeness | Automated | Schema validation against docs/03-technical-contracts/01-data-format/03-algorithm-instance.md |
 | `sensitivity_report` present and valid | Automated | Rejected if absent or fails §2.2.1 validation |
 | Configuration justification quality | Human review | "Default settings" is not an acceptable justification |
 | `known_assumptions` honest and complete | Human review | An algorithm that assumes continuous space must declare it; reviewers check against tested problems |
@@ -160,10 +160,10 @@ etc.
     - It has a clear use case: for which research questions is this metric appropriate?
 
   Requirements:
-    - Add the metric to specs/metric-taxonomy.md using the template format there
+    - Add the metric to docs/03-technical-contracts/03-metric-taxonomy/01-index.md using the template format there
     - Implement the metric in the analysis codebase, implementing the Analyzer interface
-      → specs/interface-contracts.md §4
-    - Update specs/metric-taxonomy.md §4 (Metric Selection Guide) with when to use this metric
+      → docs/03-technical-contracts/02-interface-contracts/01-index.md §4
+    - Update docs/03-technical-contracts/03-metric-taxonomy/01-index.md §4 (Metric Selection Guide) with when to use this metric
     - If the metric should be added to the Standard Reporting Set, make the case in a discussion
       before submitting — this is a significant change requiring broader review
 
@@ -210,8 +210,8 @@ etc.
   For all bug fixes:
     - Reference the issue / task that describes the bug
     - Include a test that reproduces the bug (before the fix) and passes (after the fix)
-    - If the bug reveals a gap in interface contract documentation, update specs/interface-contracts.md
-    - If the bug was caused by an ambiguity in data-format.md, fix the spec alongside the code
+    - If the bug reveals a gap in interface contract documentation, update docs/03-technical-contracts/02-interface-contracts/01-index.md
+    - If the bug was caused by an ambiguity in docs/03-technical-contracts/01-data-format/01-index.md, fix the spec alongside the code
 
   For reproducibility-affecting bugs:
     - This is a high-severity class — flag it explicitly
@@ -270,19 +270,19 @@ etc.
     [ ] Cross-references in any documents I modified are still accurate
 
   For code contributions:
-    [ ] I implement the relevant interface from specs/interface-contracts.md completely
+    [ ] I implement the relevant interface from docs/03-technical-contracts/02-interface-contracts/01-index.md completely
     [ ] I have read and comply with the cross-cutting contracts (§6 of interface-contracts.md)
     [ ] My code contains no uncontrolled randomness (seeds are always injected)
     [ ] All public methods have docstrings meeting the requirements in C4 for this component
     [ ] I have written tests covering: normal usage, edge cases, and error conditions
 
   For problem contributions:
-    [ ] Problem Instance record is complete (all required fields in data-format.md §2.1)
+    [ ] Problem Instance record is complete (all required fields in docs/03-technical-contracts/01-data-format/02-problem-instance.md)
     [ ] Representativeness justification is written
     [ ] Diversity analysis completed (which characteristics does this problem add?)
 
   For algorithm contributions:
-    [ ] Algorithm Instance record is complete (data-format.md §2.2)
+    [ ] Algorithm Instance record is complete (docs/03-technical-contracts/01-data-format/03-algorithm-instance.md)
     [ ] Default configuration is documented with justification (not "library defaults")
     [ ] known_assumptions are honest and complete
     [ ] sensitivity_report present and passes §2.2.1 validation (min 10 reps/config, min 3 values/param)

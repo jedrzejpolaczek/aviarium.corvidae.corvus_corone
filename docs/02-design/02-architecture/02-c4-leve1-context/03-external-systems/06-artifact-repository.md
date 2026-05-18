@@ -1,6 +1,6 @@
 # External System: Artifact Repository (e.g. Zenodo)
 
-> C1 Context: [../01-c1-context.md](../01-c1-context.md)
+> C1 Context: [01-c1-context.md](../01-c4-l1-context/01-c1-context.md)
 
 **What it is:** A long-term open data repository for archiving versioned datasets, code snapshots, and study results under persistent identifiers (DOIs).
 

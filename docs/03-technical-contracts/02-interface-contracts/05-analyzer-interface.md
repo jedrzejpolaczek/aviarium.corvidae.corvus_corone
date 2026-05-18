@@ -1,6 +1,6 @@
 # §4 Analyzer Interface
 
-> Index: [01-interface-contracts.md](01-interface-contracts.md)
+> Index: [01-index.md](01-index.md)
 
 The Analyzer consumes completed Run data and produces Result Aggregates, statistical test
 results, and scoped conclusions. It is separate from the Runner — analysis runs after all

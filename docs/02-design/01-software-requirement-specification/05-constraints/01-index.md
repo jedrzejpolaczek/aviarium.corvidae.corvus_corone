@@ -13,7 +13,7 @@ NARRATIVE POSITION:
 
 CONNECTS TO:
   ← docs/01-manifesto/MANIFESTO.md                                          : anti-patterns and principles
-  ← docs/02-design/02-architecture/02-c1-context.md                        : anti-pattern definitions in Scope Exclusions
+  ← docs/02-design/02-architecture/02-c4-leve1-context/01-c4-l1-context/01-c1-context.md                        : anti-pattern definitions in Scope Exclusions
   ← docs/02-design/02-architecture/01-adr/adr-001-library-with-server-ready-data-layer.md : CONST-TECH-01–03
   → functional-requirements.md                                              : FRs that enforce each constraint
   → non-functional-requirements.md                                          : NFR-OPEN-01 operationalizes community constraints
@@ -29,4 +29,4 @@ CONNECTS TO:
 |---|---|---|---|
 | Scientific | CONST-SCI-01..06 | MANIFESTO anti-patterns | [02-const-scientific.md](02-const-scientific.md) |
 | Community | CONST-COM-01..03 | MANIFESTO 20, 22 | [03-const-community.md](03-const-community.md) |
-| Technical | CONST-TECH-01..03 + pending | ADR-001 | [04-const-technical.md](04-const-technical.md) |
+| Technical | CONST-TECH-01..07 | ADR-001, ADR-006 | [04-const-technical.md](04-const-technical.md) |

@@ -13,6 +13,10 @@ Software version: 0.1.0
 
 Repository Purpose: Python library and AI-powered pilot for reproducible, statistically rigorous benchmarking of hyperparameter optimization (HPO) algorithms. The system enforces scientific best practices — pre-registration of research questions, seed management, run independence, scoped conclusions — derived from the benchmarking methodology in *Benchmarking in Optimization: Best Practice and Open Issues* (Bartz-Beielstein et al., 2020).
 
+<img src="https://upload.wikimedia.org/wikipedia/commons/f/fe/Carrion_Crow_%28Corvus_corone%29_%2825932479036%29.jpg" alt="Corvus corone — carrion crow" width="480">
+
+*Photo: Bernard DUPONT, [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Carrion_Crow_(Corvus_corone)_(25932479036).jpg), [CC BY-SA 2.0](https://creativecommons.org/licenses/by-sa/2.0/)*
+
 # Table of Contents
 1. [Project Data](#project-data)
 2. [Project Task Board](#project-task-board)

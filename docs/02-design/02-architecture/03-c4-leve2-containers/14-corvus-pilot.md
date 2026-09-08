@@ -1,5 +1,10 @@
 # Container: Corvus Pilot (V2 Researcher Agent)
 
+> **V1 scope: Deferred.** This container is not part of the V1 release. Release scope is
+> defined in `docs/02-design/01-software-requirement-specification/01-srs/01-SRS.md`
+> §1 V1 Release Scope.
+
+
 > Index: [01-index.md](01-index.md)
 
 **Responsibility:** Provide an LLM-powered interaction layer on top of the core Corvus Corone

@@ -13,19 +13,19 @@ NARRATIVE POSITION:
   acceptance-test-strategy.md feeds → tasks/tickets (what to test and verify)
 
 FILE STRUCTURE — this SRS is an index document; detailed content lives in:
-  ../02-use-cases/01-use-cases.md                     : UC-01 through UC-06
-  ../03-functional-requirements/01-functional-requirements.md : FR-01 through FR-26
-  ../04-non-functional-requirements/01-non-functional-requirements.md : NFR-REPRO-01 through NFR-USABILITY-01
-  ../05-constraints/01-constraints.md                 : CONST-SCI-XX, CONST-COM-XX, CONST-TECH-XX
-  ../06-interface-requirements/01-interface-requirements.md : per-external-system interface specifications
+  ../02-use-cases/01-index.md                          : UC-01 through UC-11 (UC-07..UC-11 are post-V1)
+  ../03-functional-requirements/01-index.md            : FR-01 through FR-26
+  ../04-non-functional-requirements/01-index.md        : NFR-REPRO-01 through NFR-USABILITY-01
+  ../05-constraints/01-index.md                        : CONST-SCI-XX, CONST-COM-XX, CONST-TECH-XX
+  ../06-interface-requirements/01-index.md             : per-external-system interface specifications
   ../07-acceptance-test-strategy/01-acceptance-test-strategy.md : test categories and FR→test mapping
   ../08-traceability-matrix/01-traceability-matrix.md : full cross-reference (MANIFESTO ↔ UC ↔ FR ↔ NFR ↔ test)
 
 CONNECTS TO:
   ← docs/01-manifesto/MANIFESTO.md                              : principles are the source of requirements
-  ← docs/02-design/02-architecture/02-c1-context.md            : actors become stakeholders; external systems become interface requirements
-  ← docs/02-design/02-architecture/03-c4-leve2-containers/01-c2-containers.md : container grouping organizes functional-requirements.md
-  → docs/03-technical-contracts/01-data-format/01-data-format.md : interface-requirements.md data requirements are detailed there
+  ← docs/02-design/02-architecture/02-c4-leve1-context/01-c4-l1-context/01-c1-context.md : actors become stakeholders; external systems become interface requirements
+  ← docs/02-design/02-architecture/03-c4-leve2-containers/01-index.md : container grouping organizes the functional requirements
+  → docs/03-technical-contracts/01-data-format/01-index.md : interface requirement data is detailed there
   → docs/03-technical-contracts/02-interface-contracts/         : interface-requirements.md specifications are formalized there
   → docs/04-scientific-practice/01-methodology/02-statistical-methodology.md : NFR-STAT-01 operationalized there
   → docs/05-community/02-versioning-governance.md               : NFR-REPRO-01 and CONST-COM-XX operationalized there
@@ -50,7 +50,74 @@ This document specifies the software requirements for the Corvus Corone: HPO Alg
 
 The system is a **Python library** that a user integrates by providing an algorithm Implementation; the library then handles Study execution, measurement, statistical analysis, and report generation automatically. The core value proposition is: *wrap your algorithm, get rigorous benchmarking*.
 
-What is explicitly out of scope is defined in `docs/02-design/02-architecture/02-c1-context.md` — Explicit Scope Exclusions. The most important exclusion: this system does not produce algorithm rankings.
+What is explicitly out of scope is defined in `docs/02-design/02-architecture/02-c4-leve1-context/01-c4-l1-context/01-c1-context.md` — Explicit Scope Exclusions. The most important exclusion: this system does not produce algorithm rankings.
+
+### V1 Release Scope
+
+**This section is the authority on what belongs to the V1 release.** `docs/ROADMAP.md` sequences
+the work; it does not define the scope. Any architecture document that describes a component,
+actor, or capability listed below as post-V1 must carry a `V1 scope: Deferred` note, following
+the convention already used in the C1 context document for HPC/Cloud Compute and the V2 Platform
+Server.
+
+**Containers**
+
+| Container | V1 | Note |
+|---|---|---|
+| Public API + CLI | ✅ | |
+| Study Orchestrator | ✅ | |
+| Experiment Runner | ✅ | Local, sequential execution only |
+| Analysis Engine | ✅ | Batch-only |
+| Reporting Engine | ✅ | HTML output only |
+| Algorithm Registry | ✅ | |
+| Problem Repository | ✅ | |
+| Results Store | ✅ | `LocalFileRepository` is the only backend |
+| Ecosystem Bridge | ✅ | Export only |
+| Algorithm Visualization Engine | ⛔ Deferred | Serves the Learner actor; see ROADMAP IMPL Phase 4 |
+| Corvus Pilot | ⛔ Deferred | V2 Researcher agent and V3 autonomous; see ROADMAP IMPL Phases 3a/3b |
+
+**Actors and Use Cases**
+
+| Actor | V1 | Use Cases |
+|---|---|---|
+| Researcher | ✅ | UC-01, UC-05, UC-06 |
+| Algorithm Author | ✅ | UC-02 |
+| Practitioner | ✅ | UC-03 |
+| Community Contributor | ✅ | UC-04 |
+| System Maintainer | ✅ | operational role, no use case |
+| Learner | ⛔ Deferred | UC-07 – UC-11 |
+
+**External Systems**
+
+| System | V1 | Direction |
+|---|---|---|
+| COCO | ✅ | Export only; import not supported in V1 |
+| IOHprofiler | ✅ | Export only; import not supported in V1 |
+| Nevergrad | ✅ | Import of optimizers; result export |
+| Version Control / CI | ✅ | |
+| Artifact Repository | ✅ | V1 produces the archive; automated publication is deferred |
+| HPC / Cloud Compute | ⛔ Deferred | |
+| V2 Platform Server | ⛔ Deferred | |
+
+**Capability boundaries of V1**
+
+These constraints are stated once here and are binding on every other document. Prior to this
+section they appeared only as incidental remarks scattered across the architecture and contract
+documents, which is why the V1 boundary was not legible from any single place.
+
+| # | Boundary | Consequence |
+|---|---|---|
+| B-01 | Execution is local and sequential | No distributed or parallel Runner; `max_workers` is reserved for V2 |
+| B-02 | Analysis is batch-only | `analyze()` requires `experiment.status == "completed"`; no streaming |
+| B-03 | Reports are HTML | PDF rendering is deferred |
+| B-04 | Ecosystem integration is export-only | No import of COCO or IOHprofiler archives |
+| B-05 | Optimization is single-objective | `objective.type` is `minimize` or `maximize`; no Pareto front support |
+| B-06 | Budget is evaluation count or wall time | No multi-fidelity or resource-dimension budgets |
+| B-07 | Storage backend is `LocalFileRepository` | `ServerRepository` is a V2 concern; ADR-001 keeps the schema compatible |
+| B-08 | No constraint handling | COCO exports write `0` in the constraint-evaluation column |
+
+Extending V1 beyond any of these boundaries requires an ADR, because each one is load-bearing
+for at least one entity schema or interface contract.
 
 ### Relationship to MANIFESTO
 
@@ -70,13 +137,13 @@ The system prioritizes scientific validity over convenience: it enforces pre-reg
 
 Corvus Corone occupies a distinct position in the benchmarking ecosystem from the tools it interoperates with: COCO provides a standardized problem suite and archive format; Nevergrad provides a large portfolio of algorithm implementations; IOHprofiler provides anytime performance visualization — each addresses one phase of the pipeline. Corvus Corone is the study-level orchestration layer that enforces the scientific protocol surrounding benchmark execution: it requires hypotheses to be pre-registered before data collection begins (Principle 16; NFR-REPRO-01); it mandates a three-level analysis framework — exploratory, confirmatory, and practical significance — rather than a single statistical test (Principle 13; NFR-STAT-01); and it produces multi-audience reports that scope every conclusion explicitly to the tested conditions (Principle 25; FR-20). Crucially, it refuses to produce global algorithm rankings, treating them as scientifically invalid under No Free Lunch (Principle 30; AP-1; CONST-SCI-01). These properties make Corvus Corone complementary to rather than competitive with the existing ecosystem: it exports results to COCO and IOHprofiler formats (FR-23–FR-26) so that its outputs can be cross-compared using those platforms' established analysis tools.
 
-For context on who uses the system and what surrounds it, see `docs/02-design/02-architecture/02-c1-context.md`. For the values that shaped these design choices, see `docs/01-manifesto/MANIFESTO.md`.
+For context on who uses the system and what surrounds it, see `docs/02-design/02-architecture/02-c4-leve1-context/01-c4-l1-context/01-c1-context.md`. For the values that shaped these design choices, see `docs/01-manifesto/MANIFESTO.md`.
 
 ---
 
 ## 3. Stakeholders and Use Cases
 
-Full use case descriptions — main flow, preconditions, postconditions, failure scenarios, and cross-document connections — are in **[`02-use-cases/01-use-cases.md`](../02-use-cases/01-use-cases.md)**.
+Full use case descriptions — main flow, preconditions, postconditions, failure scenarios, and cross-document connections — are in **[`02-use-cases/01-index.md`](../02-use-cases/01-index.md)**.
 
 ### Use Case Summary
 
@@ -88,12 +155,21 @@ Full use case descriptions — main flow, preconditions, postconditions, failure
 | UC-04 | Community Contributor | Discovers a missing Problem Instance type | Contribute a new Problem Instance to the benchmark set |
 | UC-05 | Researcher | Wants to verify a published study | Reproduce an existing Experiment from its archived Artifacts |
 | UC-06 | Researcher | Has completed a Study | Export results to IOHprofiler / COCO format for cross-platform comparison |
+| UC-07 | Learner | Wants to understand how an algorithm works | Receive mathematical and visual representations of the algorithm — **V1 scope: Deferred** |
+| UC-08 | Learner | Wants to understand how, why and where an algorithm works | Receive contextual explanations with theoretical and practical examples — **V1 scope: Deferred** |
+| UC-09 | Learner | Wants to deepen understanding of an algorithm or experimental design | Be challenged with guided questions rather than given direct answers — **V1 scope: Deferred** |
+| UC-10 | Learner | Wants to understand the historical development of an algorithm | Receive the algorithm's genealogy and design-choice rationale — **V1 scope: Deferred** |
+| UC-11 | Learner | Wants to explore completed Researcher study results as educational material | Consume benchmarking results with interpretive support — **V1 scope: Deferred** |
+
+UC-07 through UC-11 belong to the Learner actor and are outside the V1 release (see §1 V1 Release
+Scope). They are listed here so that the use case inventory in this document matches
+`02-use-cases/01-index.md`, which is the authority on use case numbering.
 
 ---
 
 ## 4. Functional Requirements
 
-Requirements FR-01 through FR-26 are defined in **[`03-functional-requirements/01-functional-requirements.md`](../03-functional-requirements/01-functional-requirements.md)**, grouped by C2 container:
+Requirements FR-01 through FR-26 are defined in **[`03-functional-requirements/01-index.md`](../03-functional-requirements/01-index.md)**, grouped by C2 container:
 
 | Group | Container | Requirements | File |
 |---|---|---|---|
@@ -109,7 +185,7 @@ Requirements FR-01 through FR-26 are defined in **[`03-functional-requirements/0
 
 ## 5. Non-Functional Requirements
 
-NFR-REPRO-01 through NFR-USABILITY-01 are defined in **[`04-non-functional-requirements/01-non-functional-requirements.md`](../04-non-functional-requirements/01-non-functional-requirements.md)**.
+NFR-REPRO-01 through NFR-USABILITY-01 are defined in **[`04-non-functional-requirements/01-index.md`](../04-non-functional-requirements/01-index.md)**.
 
 | ID | Quality attribute | Source | File |
 |---|---|---|---|
@@ -126,7 +202,7 @@ NFR-REPRO-01 through NFR-USABILITY-01 are defined in **[`04-non-functional-requi
 
 ## 6. Constraints
 
-CONST-SCI-XX, CONST-COM-XX, and CONST-TECH-XX are defined in **[`05-constraints/01-constraints.md`](../05-constraints/01-constraints.md)**.
+CONST-SCI-XX, CONST-COM-XX, and CONST-TECH-XX are defined in **[`05-constraints/01-index.md`](../05-constraints/01-index.md)**.
 
 | Group | Count | Source | File |
 |---|---|---|---|
@@ -138,7 +214,7 @@ CONST-SCI-XX, CONST-COM-XX, and CONST-TECH-XX are defined in **[`05-constraints/
 
 ## 7. Interface Requirements
 
-Per-interface specifications for all 5 external systems are in **[`06-interface-requirements/01-interface-requirements.md`](../06-interface-requirements/01-interface-requirements.md)**.
+Per-interface specifications for all 5 external systems are in **[`06-interface-requirements/01-index.md`](../06-interface-requirements/01-index.md)**.
 
 | Interface | Direction | Status | File |
 |---|---|---|---|

@@ -1,5 +1,10 @@
 # C3: Components — Algorithm Visualization Engine
 
+> **V1 scope: Deferred.** The components in this group are not part of the V1 release.
+> Release scope is defined in
+> `docs/02-design/01-software-requirement-specification/01-srs/01-SRS.md` §1 V1 Release Scope.
+
+
 > C2 Container: [06-algorithm-visualization-engine.md](../../03-c4-leve2-containers/06-algorithm-visualization-engine.md)
 > C3 Index: [../01-c3-components.md](../01-c3-components.md)
 

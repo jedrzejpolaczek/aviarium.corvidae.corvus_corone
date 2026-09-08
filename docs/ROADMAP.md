@@ -10,15 +10,20 @@ Generated: 2026-03-04. Updated: 2026-03-20. Update whenever a milestone closes o
 
 ---
 
+> **Scope authority.** This document sequences the work. It does not define the V1 release
+> scope. That is defined in
+> `docs/02-design/01-software-requirement-specification/01-srs/01-SRS.md` §1 V1 Release Scope.
+> Corvus Pilot (IMPL Phases 3a and 3b) and the Learner actor (IMPL Phase 4) are outside V1.
+
 ## Current State
 
 | Area | Tasks | Status |
 |---|---|---|
-| MANIFESTO | REF-TASK-0032 | ⚠️ Principles complete; anti-patterns section pending |
+| MANIFESTO | — | ✅ Principles and anti-patterns AP-1..AP-7 complete |
 | C1 System Context | — | ⚠️ Principles complete |
 | C2 Containers | — | ⚠️ Principles complete |
-| C3 Components | — | ⛔ Not started |
-| C4 Code | — | ⛔ Not started |
+| C3 Components | — | ✅ 11 component groups documented |
+| C4 Code | — | ⚠️ 7 groups drafted; descriptive layer only (ADR-012) |
 | Architecture Decision Records | REF-TASK-0011, 0024 | ⚠️ ADR-001 decided; technical constraints and bulk storage format pending |
 | SRS | REF-TASK-0008..0013, 0033..0035 | ⚠️ Use cases and FR-01..26 drafted; NFRs, interface requirements, acceptance tests, CLI spec, report format, competitive differentiation open |
 | Statistical methodology | REF-TASK-0016..0021 | ⚠️ 3-level framework drafted; ECDF, test selection, diversity requirements open |
@@ -27,9 +32,9 @@ Generated: 2026-03-04. Updated: 2026-03-20. Update whenever a milestone closes o
 | Data format | REF-TASK-0022 | ⚠️ Drafted; post-implementation update pending |
 | Ecosystem integration | REF-TASK-0004..0007 | ⛔ Not started (spikes required) |
 | Implementation — Core Library | IMPL-000..027 | ⛔ Not started |
-| Implementation — Researcher Agent (Pilot V2) | IMPL-028..036 | ⛔ Not started |
-| Implementation — Autonomous (Pilot V3) | IMPL-037..047 | ⛔ Not started |
-| Learner Actor | REF-TASK-0025..0030, IMPL-044..046 | ⛔ Not started |
+| Implementation — Researcher Agent (Pilot V2) | IMPL-028..036 | ⛔ Not started *(post-V1)* |
+| Implementation — Autonomous (Pilot V3) | IMPL-037..047 | ⛔ Not started *(post-V1)* |
+| Learner Actor | REF-TASK-0025..0030, IMPL-044..046 | ⛔ Not started *(post-V1)* |
 
 ---
 
@@ -44,7 +49,7 @@ Six milestones group all open documentation and design tasks.
 | V1 Interoperability — Ecosystem Integration | COCO, Nevergrad, IOHprofiler format mappings and tutorials |
 | V1 Infrastructure — ADRs & Technical Constraints | Python version, OS support, bulk storage format decision |
 | Post-V1 — Continuous Improvement | Tasks requiring empirical data from real studies before they can be completed |
-| Learner Actor — Education Platform | New actor: C1/SRS/C2 updates, GLOSSARY, tutorials |
+| Learner Actor — Education Platform *(post-V1)* | New actor: C1/SRS/C2 updates, GLOSSARY, tutorials |
 
 ---
 
@@ -128,7 +133,7 @@ Six milestones group all open documentation and design tasks.
 - [ ] **`[IMPL-007]`** Experiment Runner — `runner/runner.py`: `deepcopy` isolation per run, determinism test, independence test · *Refs: MANIFESTO Principle 18*
 - [ ] **`[IMPL-008]`** Seed Manager — `runner/seed_manager.py`: `generate_seeds()` via `numpy.random.SeedSequence.spawn()`
 - [ ] **`[IMPL-009]`** Data entities — `storage/entities.py`: `RunRecord`, `PerformanceRecord`, `StudyRecord` (UUID IDs, JSON round-trip) · *Refs: data-format.md §2, ADR-001*
-- [ ] **`[IMPL-010]`** Repository interface + LocalFileRepository — `storage/repository.py`: `Repository` ABC, `LocalFileRepository`, `RepositoryContractTest` · *Fulfills: REF-TASK-0023*
+- [x] **`[IMPL-010]`** Repository interface + LocalFileRepository — `storage/repository.py`: `Repository` ABC, `LocalFileRepository`, `RepositoryContractTest` · *Fulfills: REF-TASK-0023*
 - [ ] **`[IMPL-011]`** Metric taxonomy — `analysis/metrics.py`: `@metric` registry; `QUALITY-BEST_VALUE_AT_BUDGET`, `TIME-EVALUATIONS_TO_TARGET`, `RELIABILITY-SUCCESS_RATE`; implementation refs added to `metric-taxonomy.md` · *Fulfills: REF-TASK-0015*
 - [ ] **`[IMPL-012]`** Statistical analysis — `analysis/statistical.py`: three-level (exploratory summary, Wilcoxon/Kruskal-Wallis + Holm-Bonferroni, Cliff's delta); `ThreeLevelAnalysis.analyze()` requires all three levels · *Fulfills: REF-TASK-0020*
 - [ ] **`[IMPL-013]`** Anytime performance — `analysis/anytime.py`: `compute_anytime_curve`, `compute_ecdf`, `compute_ecdf_area` (empirical normalization per ADR-007 *(planned)*; LOCF per ADR-003); basic IOHprofiler `.dat` export · *Fulfills: REF-TASK-0016*
@@ -147,9 +152,9 @@ Six milestones group all open documentation and design tasks.
 - [ ] **`[IMPL-020]`** ADR-008 + statistical-methodology.md: diversity requirements (≥5 problems, ≥2 dimensionality ranges); Level 1 VIZ-L1-01..03 spec in §2; Wilcoxon/Kruskal decision tree in §3 · *Fulfills: REF-TASK-0019, REF-TASK-0020, REF-TASK-0021*
 - [ ] **`[IMPL-021]`** Sensitivity documentation — `SensitivityReport(BaseModel)` in `storage/entities.py`, `data-format.md §2.2`, `contribution-guide.md §2` · *Fulfills: REF-TASK-0022*
 - [ ] **`[IMPL-022]`** Bulk PerformanceRecord storage — **blocked on REF-TASK-0024 spike**; ADR-009 from benchmark evidence; `LocalFileRepository.save_bulk_records()`; round-trip test · *Fulfills: REF-TASK-0024*
-- [ ] **`[IMPL-023]`** IOHprofiler bridge — `bridge/iohprofiler.py`: full `.dat` export + `.meta.json` sidecar (seed, run_id, wall_time); round-trip test; `data-format.md §3` mapping table · *Fulfills: REF-TASK-0007*
+- [x] **`[IMPL-023]`** IOHprofiler bridge — `bridge/iohprofiler.py`: full `.dat` export + `.meta.json` sidecar (seed, run_id, wall_time); round-trip test; `data-format.md §3` mapping table · *Fulfills: REF-TASK-0007*
 - [ ] **`[IMPL-024]`** COCO bridge — **blocked on REF-TASK-0005 spike**; `bridge/coco_exporter.py`; continuous-only warning; `data-format.md §3` mapping with documented data loss · *Fulfills: REF-TASK-0005*
-- [ ] **`[IMPL-025]`** Nevergrad adapter — **blocked on REF-TASK-0006 spike**; `algorithms/adapters/nevergrad_adapter.py`; `ng.p.Dict` → `SearchSpace`; tutorial; `data-format.md §3` mapping · *Fulfills: REF-TASK-0006*
+- [x] **`[IMPL-025]`** Nevergrad adapter — **blocked on REF-TASK-0006 spike**; `algorithms/adapters/nevergrad_adapter.py`; `ng.p.Dict` → `SearchSpace`; tutorial; `data-format.md §3` mapping · *Fulfills: REF-TASK-0006*
 - [ ] **`[IMPL-026]`** LLM-as-judge — `analysis/llm_judge.py`: `ManifestoReview` Pydantic model, `StudyDesignJudge.review()`, Ollama structured output; optional `corvus-corone[llm]` extra
 - [ ] **`[IMPL-027]`** RAG over `papers/` — `papers_rag.py`: FAISS index, `PapersRAG.why(metric_id)` via Ollama; optional `corvus-corone[rag]` extra; references Bartz-Beielstein 2020
 

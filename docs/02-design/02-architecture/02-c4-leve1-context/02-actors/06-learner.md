@@ -1,6 +1,11 @@
 # Actor: Learner
 
-> C1 Context: [../01-c1-context.md](../01-c1-context.md)
+> C1 Context: [../01-c4-l1-context/01-c1-context.md](../01-c4-l1-context/01-c1-context.md)
+
+> **V1 scope: Deferred.** The Learner actor is not part of the V1 release. V1 serves the
+> Researcher, Practitioner, Algorithm Author, Community Contributor and System Maintainer.
+> See `docs/02-design/01-software-requirement-specification/01-srs/01-SRS.md` §1 V1 Release Scope,
+> which is the authority on release scope.
 
 **Role:** A student, practitioner, or researcher seeking to understand HPO algorithm behavior through interactive exploration and guided discovery — consuming existing study results as teaching material rather than producing new ones.
 

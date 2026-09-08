@@ -172,15 +172,20 @@ flowchart TB
 
 ## Containers
 
+> Two containers below are outside the V1 release: the Algorithm Visualization Engine and
+> Corvus Pilot. They are shown in the diagram because they are part of the target architecture.
+> Release scope is defined in
+> `docs/02-design/01-software-requirement-specification/01-srs/01-SRS.md` §1 V1 Release Scope.
+
 | Container | Layer | File |
 |---|---|---|
 | Public API + CLI | Entry Layer | [04-public-api-cli.md](04-public-api-cli.md) |
-| Corvus Pilot V2 | Entry Layer (Agent) | [14-corvus-pilot.md](14-corvus-pilot.md) |
+| Corvus Pilot | Entry Layer (Agent) | [14-corvus-pilot.md](14-corvus-pilot.md) — **V1 scope: Deferred** |
 | Study Orchestrator | Core Layer | [07-study-orchestrator.md](07-study-orchestrator.md) |
 | Experiment Runner | Core Layer | [08-experiment-runner.md](08-experiment-runner.md) |
 | Analysis Engine | Core Layer | [09-analysis-engine.md](09-analysis-engine.md) |
 | Reporting Engine | Core Layer | [05-reporting-engine.md](05-reporting-engine.md) |
-| Algorithm Visualization Engine | Core Layer | [06-algorithm-visualization-engine.md](06-algorithm-visualization-engine.md) |
+| Algorithm Visualization Engine | Core Layer | [06-algorithm-visualization-engine.md](06-algorithm-visualization-engine.md) — **V1 scope: Deferred** |
 | Algorithm Registry | Data & Registry | [10-algorithm-registry.md](10-algorithm-registry.md) |
 | Problem Repository | Data & Registry | [11-problem-repository.md](11-problem-repository.md) |
 | Results Store | Data & Registry | [12-results-store.md](12-results-store.md) |

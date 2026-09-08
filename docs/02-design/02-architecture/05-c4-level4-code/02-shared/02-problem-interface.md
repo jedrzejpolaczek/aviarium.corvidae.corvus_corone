@@ -47,7 +47,7 @@ an external suite.
   Isolator's isolation guarantee depends on this.
 - `bounds()` and `dimension()` MUST be consistent: `len(bounds()) == dimension()`.
 - `optimum()` MAY return `None` for real-world problems with unknown optima. The Analysis
-  Engine handles `None` by skipping target-value metrics (e.g., ERT).
+  Engine handles `None` by skipping target-value metrics (e.g., `TIME-EVALUATIONS_TO_TARGET`).
 
 **Extension points:**
 

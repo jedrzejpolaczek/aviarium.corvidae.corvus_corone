@@ -12,8 +12,12 @@ and format are implementation details — callers interact only through these in
   This avoids a bloated monolithic interface and allows independent versioning and testing
   of each domain. A `RepositoryFactory` groups all domain repositories and is the single
   object passed to components that need cross-entity access.
-- **Versioning semantics (all repositories).** `get_*(id, version=None)` returns the latest
-  non-deprecated version. `get_*(id, version="X.Y.Z")` returns exactly that version —
+- **Entity immutability (all repositories, ADR-020).** Registered entities are never modified.
+  A revision is a **new entity with a new UUID**; the old entity records `deprecated`,
+  `deprecation_reason` and `superseded_by`. `get_*(id)` therefore returns the same content for
+  the lifetime of the store, which is what makes a Run's inputs reproducible. There is no
+  version-addressed retrieval and no `version` parameter. The `version` field on an entity is
+  human-readable metadata for display and citation, never an addressing key —
   required for reproducibility (MANIFESTO Principle 19).
   → versioning policy: [versioning-governance.md §1](../../05-community/02-versioning-governance.md)
 - **Server-compatible IDs.** All entity IDs are UUIDs. No file paths in method signatures.
@@ -46,11 +50,11 @@ independently without changing the factory contract.
 
 ### ProblemRepository
 
-#### get_problem(id: str, version: str | None = None) → ProblemInstance
-Returns the Problem Instance with the given ID. `version=None` returns the latest
-non-deprecated version; a pinned version string returns exactly that version.
+#### get_problem(id: str) → ProblemInstance
+Returns the Problem Instance with the given ID. Content is immutable, so the same ID always
+returns the same record, including for deprecated entities (ADR-020).
 
-**Exceptions:** `EntityNotFoundError`, `VersionNotFoundError`
+**Exceptions:** `EntityNotFoundError`, `EntityNotFoundError`
 
 #### list_problems(filters: ProblemFilter | None = None) → list[ProblemInstanceSummary]
 Returns summaries of all non-deprecated Problem Instances matching the filter.
@@ -65,14 +69,14 @@ Validates and persists a new Problem Instance. Returns the assigned ID.
 
 #### deprecate_problem(id: str, reason: str, superseded_by: str | None = None) → None
 Marks a Problem Instance as deprecated. Deprecated instances are excluded from
-`list_problems()` but remain retrievable by exact ID and version for reproducibility.
+`list_problems()` but remain retrievable by exact ID for reproducibility.
 
 ---
 
 ### AlgorithmRepository
 
-#### get_algorithm(id: str, version: str | None = None) → AlgorithmInstance
-**Exceptions:** `EntityNotFoundError`, `VersionNotFoundError`
+#### get_algorithm(id: str) → AlgorithmInstance
+**Exceptions:** `EntityNotFoundError`, `EntityNotFoundError`
 
 #### list_algorithms(filters: AlgorithmFilter | None = None) → list[AlgorithmInstanceSummary]
 `AlgorithmFilter` fields: `algorithm_family`, `supported_variable_types` (subset match),
@@ -91,8 +95,8 @@ resolvable and version-pinned (UC-02 F2); `configuration_justification` is non-e
 
 ### StudyRepository
 
-#### get_study(id: str, version: str | None = None) → Study
-**Exceptions:** `EntityNotFoundError`, `VersionNotFoundError`
+#### get_study(id: str) → Study
+**Exceptions:** `EntityNotFoundError`, `EntityNotFoundError`
 
 #### list_studies(filters: StudyFilter | None = None) → list[StudySummary]
 `StudyFilter` fields: `status` (`"draft"`, `"locked"`), `created_by`, `problem_ids` (overlap).

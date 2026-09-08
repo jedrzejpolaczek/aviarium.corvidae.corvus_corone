@@ -13,20 +13,20 @@ Manage the filesystem path hierarchy and directory structure for all study artif
 
 ## Interface
 
-```python
-class LocalFileRepository:
-    def __init__(self, results_dir: Path) -> None: ...
+> **Descriptive document (ADR-012).** The authoritative definition is the contract cited
+> below. This page explains only how that contract is grouped into a component and why the
+> boundary falls where it does. It does not define signatures.
 
-    def study_dir(self, study_id: str) -> Path: ...
-    def experiment_dir(self, study_id: str, experiment_id: str) -> Path: ...
-    def run_dir(self, study_id: str, experiment_id: str, run_id: str) -> Path: ...
-    def ensure_dirs(self, path: Path) -> None: ...
-    def entity_path(self, entity_type: str, entity_id: str) -> Path: ...
-    def jsonl_path(self, run_id: str) -> Path: ...
-    def parquet_path(self, run_id: str) -> Path: ...
-```
+`LocalFileRepository` implements the `RepositoryFactory` contract defined in
+[`06-repository-interface.md`](../../../../../03-technical-contracts/02-interface-contracts/06-repository-interface.md):
+the seven domain repository properties and their methods. That is the whole of its public
+surface.
 
----
+The on-disk layout it produces is specified in
+[`10-file-formats.md`](../../../../../03-technical-contracts/01-data-format/10-file-formats.md)
+3.2. Per ADR-001 that layout is an implementation detail of this component: no path-resolution
+method is exposed, and no other component may construct a path into the store or traverse it.
+Components that need artifacts obtain them through the repository properties.
 
 ## Dependencies
 

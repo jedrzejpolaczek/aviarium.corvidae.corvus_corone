@@ -6,11 +6,11 @@
 
 | Name | Type | Required | Notes |
 | --- | --- | --- | --- |
-| id | int | yes | Run ID |
-| experiment_id | int | yes | ID of the Experiment this Run belongs to |
-| study_id | int | yes | ID of the Study this Run belongs to (denormalized for query convenience) |
-| problem_instance_id | int | yes | ID of the Problem Instance executed in this Run |
-| algorithm_instance_ids | list[int] | yes | IDs of the Algorithm Instance executed in this Run |
+| id | string | yes | Run ID |
+| experiment_id | string | yes | ID of the Experiment this Run belongs to |
+| study_id | string | yes | ID of the Study this Run belongs to (denormalized for query convenience) |
+| problem_instance_id | string | yes | ID of the Problem Instance executed in this Run |
+| algorithm_instance_id | string | yes | ID of the Algorithm Instance executed in this Run |
 | seed | int | yes | Exact integer seed used; must be reproducible |
 | budget_used | float | yes | Actual evaluations or time consumed, in units of `Study.experimental_design.budget_type` |
 | status | string | yes | `completed`, `failed`, or `budget_exhausted` |

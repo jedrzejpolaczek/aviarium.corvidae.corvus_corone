@@ -37,7 +37,7 @@ class MetricDispatcher:
 - **Results Store — Performance Record Reader** — loads PerformanceRecords for the experiment
 - **LOCF Interpolator** — called before metric computation to fill missing data
 - **Statistical Tester** — receives `RawMetricResult` list for significance testing
-- `scipy.stats` — used for ERT computation (empirical CDF)
+- `scipy.stats` — used for the ECDF computation behind `ANYTIME-ECDF_AREA` (ADR-007)
 
 ---
 
@@ -47,8 +47,8 @@ class MetricDispatcher:
 
 2. **Metric computation** — computes each configured metric across all Runs for each algorithm/problem combination:
    - `QUALITY-BEST_VALUE_AT_BUDGET`: `best_so_far` value at the final evaluation for each Run.
-   - `ERT` (Expected Running Time): number of evaluations to reach a target value, averaged across Runs that hit the target.
-   - `AUC-CONVERGENCE`: area under the convergence curve (trapezoidal integration of `best_so_far` over evaluations).
+   - `TIME-EVALUATIONS_TO_TARGET`: evaluations to reach a pre-specified target, censored at budget + 1.
+   - `ANYTIME-ECDF_AREA`: normalised area under the ECDF of best-so-far values (ADR-007). The metric taxonomy is the only source of metric identifiers (ADR-012); a metric absent from it cannot be dispatched.
 
 3. **Missing data handling** — calls the LOCF Interpolator on PerformanceRecords before metric computation. Runs with zero records are excluded and flagged.
 

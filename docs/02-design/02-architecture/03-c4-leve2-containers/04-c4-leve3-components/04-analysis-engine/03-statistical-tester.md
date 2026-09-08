@@ -7,7 +7,7 @@
 
 ## Responsibility
 
-Apply pre-registered statistical tests (Wilcoxon signed-rank, Mann-Whitney U, Kruskal-Wallis) to raw metric distributions, returning test statistics and p-values with effect size estimates.
+Apply pre-registered statistical tests (Wilcoxon signed-rank for two algorithms, Kruskal-Wallis with Holm-Bonferroni correction for more than two) to raw metric distributions, returning test statistics and p-values with effect size estimates.
 
 ---
 
@@ -52,10 +52,10 @@ class StatisticalTester:
 
 3. **Precondition validation** — before applying any test, validates sample size requirements:
    - Wilcoxon: requires ≥ 6 paired observations. If fewer, records `test_result=null, reason="insufficient_samples"`.
-   - Mann-Whitney U: requires ≥ 3 observations per group.
+   - Kruskal-Wallis: requires ≥ 3 observations per group and ≥ 3 groups.
    - Kruskal: requires ≥ 2 observations per group and ≥ 3 groups.
 
-4. **Effect size computation** — computes rank-biserial correlation (for Wilcoxon/Mann-Whitney) or epsilon-squared (for Kruskal) as the effect size estimate. If `pingouin` is not installed, effect size is `null` (not an error).
+4. **Effect size computation** — computes Cliff's delta, as required by `02-statistical-methodology.md` 4, as the effect size estimate. If `pingouin` is not installed, effect size is `null` (not an error).
 
 5. **Multiple comparison correction** — if `test_config.multiple_comparison_correction` is set (e.g., Bonferroni, Holm-Sidak), applies the correction to the p-values before setting the `significant` flag.
 

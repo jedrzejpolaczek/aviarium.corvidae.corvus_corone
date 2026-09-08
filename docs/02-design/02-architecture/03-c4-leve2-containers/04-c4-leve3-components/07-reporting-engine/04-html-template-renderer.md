@@ -7,7 +7,7 @@
 
 ## Responsibility
 
-Assemble the final self-contained HTML report from `ReportData` and visualization paths using Jinja2 templates, embedding all visualizations inline as base64 data URIs.
+Assemble the two self-contained HTML reports, one for the `researcher` audience and one for the `practitioner` audience, from `ReportData` and visualization paths using Jinja2 templates, embedding all visualizations inline as base64 data URIs. Every completed Experiment yields exactly two Reports (ADR-019); their section content per audience is specified in `03-report-format-spec.md`.
 
 ---
 

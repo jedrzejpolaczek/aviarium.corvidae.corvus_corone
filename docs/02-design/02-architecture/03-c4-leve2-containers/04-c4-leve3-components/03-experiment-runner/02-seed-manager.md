@@ -13,24 +13,28 @@ Generate a unique, deterministic seed for each Run, persist it to the Results St
 
 ## Interface
 
-Called by the Run Isolator at subprocess startup:
+> **Descriptive document (ADR-012).** The authoritative definition is the contract cited
+> below. This page explains only how that contract is grouped into a component and why the
+> boundary falls where it does. It does not define signatures.
 
-```python
-class SeedManager:
-    def generate_seed(self, run_id: str, base_seed: int) -> int:
-        """Deterministic: hash(run_id + base_seed) → int in [0, 2^32)"""
+Seed derivation is defined by
+[ADR-017](../../../01-adr/adr-017-seed-derivation-and-collision-detection.md): the Study
+records one `root_seed`, and the Runner spawns one child `numpy.random.SeedSequence` per Run
+in run-plan order, taking the first 32-bit word as that Run's seed.
 
-    def inject_seeds(self, seed: int) -> None:
-        """Sets random, numpy.random, torch (if available) to seed."""
+Two obligations follow, both stated in
+[`04-runner-interface.md`](../../../../../03-technical-contracts/02-interface-contracts/04-runner-interface.md):
 
-    def persist_seed(self, run_id: str, seed: int, results_dir: Path) -> None:
-        """Writes seed to {results_dir}/{run_id}/seed.json"""
+1. **Collision detection is explicit.** The Runner holds the set of seeds already assigned in
+   the Experiment and raises `SeedCollisionError` before executing a Run whose seed is already
+   present for the same problem and algorithm pair. The check does not rely on the derivation
+   being collision-free.
+2. **Seeds are persisted through the repository.** `Run.seed` is a field of the Run record.
+   This component writes no file and constructs no path into the Results Store, which ADR-001
+   forbids. Resuming a Run reads `Run.seed` through `RunRepository.get_run()`.
 
-    def load_seed(self, run_id: str, results_dir: Path) -> int:
-        """Reads seed from {results_dir}/{run_id}/seed.json for resume."""
-```
-
----
+Seed injection into the Run process sets the seeded generators required by
+`07-cross-cutting-contracts.md` 6: unseeded global random calls are forbidden.
 
 ## Dependencies
 

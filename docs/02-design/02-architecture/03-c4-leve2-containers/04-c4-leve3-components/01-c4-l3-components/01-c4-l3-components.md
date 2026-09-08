@@ -46,7 +46,7 @@ flowchart TD
     end
     subgraph AESG["Analysis Engine"]
       md["Metric Dispatcher\nRoutes metrics to\ncorrect calculator"]
-      stat["Statistical Tester\nWilcoxon · Mann-Whitney\nKruskal via SciPy"]
+      stat["Statistical Tester\nWilcoxon · Kruskal-Wallis\nHolm-Bonferroni via SciPy"]
       sa["Scope Annotator\nAttaches run / study\nscope metadata"]
       locf["LOCF Interpolator\nFills missing budget\npoints (last-obs carry-fwd)"]
     end

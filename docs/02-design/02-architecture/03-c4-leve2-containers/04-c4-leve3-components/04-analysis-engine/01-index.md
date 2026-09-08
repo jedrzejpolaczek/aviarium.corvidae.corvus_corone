@@ -23,7 +23,7 @@ flowchart LR
 
   subgraph ae["Analysis Engine"]
     md["Metric Dispatcher\nRoutes metrics to tests"]
-    st["Statistical Tester\nWilcoxon / Mann-Whitney\nKruskal-Wallis"]
+    st["Statistical Tester\nWilcoxon (2 algorithms)\nKruskal-Wallis"]
     sa["Scope Annotator\nTags results with\nproblem+algorithm+budget"]
     li["LOCF Interpolator\nFills missing convergence\ndata"]
   end
@@ -56,7 +56,7 @@ flowchart LR
 | Component | File | Responsibility |
 |---|---|---|
 | Metric Dispatcher | [metric-dispatcher.md](02-metric-dispatcher.md) | Loads PerformanceRecords, computes configured metrics, and routes to Statistical Tester |
-| Statistical Tester | [statistical-tester.md](03-statistical-tester.md) | Applies pre-registered statistical tests (Wilcoxon, Mann-Whitney U, Kruskal-Wallis) via SciPy |
+| Statistical Tester | [statistical-tester.md](03-statistical-tester.md) | Applies pre-registered statistical tests (Wilcoxon signed-rank for 2 algorithms, Kruskal-Wallis with Holm-Bonferroni for more) via SciPy |
 | Scope Annotator | [scope-annotator.md](04-scope-annotator.md) | Tags every MetricResult with problem+algorithm+budget scope for downstream filtering |
 | LOCF Interpolator | [locf-interpolator.md](05-locf-interpolator.md) | Fills missing convergence observations using Last Observation Carried Forward |
 
@@ -90,7 +90,7 @@ No random state consumed by this container. Statistical tests use deterministic 
 
 ### Testing Strategy
 
-- **Metric Dispatcher**: unit-tested with synthetic PerformanceRecord fixtures; verifies correct metric computation for `QUALITY-BEST_VALUE_AT_BUDGET` and `ERT`.
+- **Metric Dispatcher**: unit-tested with synthetic PerformanceRecord fixtures; verifies correct metric computation for `QUALITY-BEST_VALUE_AT_BUDGET` and `ANYTIME-ECDF_AREA`.
 - **Statistical Tester**: unit-tested with known input distributions and known expected p-values from literature.
 - **Scope Annotator**: unit-tested; verifies all scope fields are populated and correct.
 - **LOCF Interpolator**: unit-tested with time-series fixtures containing deliberate gaps; verifies gap-filling fidelity.

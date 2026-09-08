@@ -13,24 +13,20 @@ Provide a Click-based command-line interface that maps `corvus` subcommands to A
 
 ## Interface
 
-CLI commands exposed under the `corvus` entry point:
+> **Descriptive document (ADR-012).** The authoritative definition is the contract cited
+> below. This page explains only how that contract is grouped into a component and why the
+> boundary falls where it does. It does not define signatures.
 
-```
-corvus run    --config <path>          Run a Study from a YAML/JSON config file
-corvus resume --study-id <id>          Resume a partially completed Study
-corvus list   algorithms [--filter]    List registered algorithms
-corvus list   problems   [--filter]    List registered problems
-corvus export --experiment-id <id>     Export results to COCO/IOH/Nevergrad
-              --format coco|ioh|ng
-              --output-dir <path>
-corvus report --experiment-id <id>     View the generated HTML report
-corvus viz    --algorithm-id <id>      Generate algorithm visualizations
-              --viz-type all|...
-              --format png|gif|svg|html
-              --experiment-id <id>     (optional)
-```
+The command surface, argument forms, terminal output and exit codes are defined in
+[`02-cli-spec.md`](../../02-cli-spec.md), which ADR-016 makes authoritative.
 
----
+The CLI mirrors the Python facade: a command exists only where a facade function exists, takes
+the same subject in the same position, and carries the same name modulo hyphenation. Study
+authoring functions have no CLI equivalent in V1.
+
+This component is responsible for argument parsing with Click, output formatting, and mapping
+the exception taxonomy of ADR-015 onto the exit codes in the CLI specification. It does not
+decide what the commands are.
 
 ## Dependencies
 

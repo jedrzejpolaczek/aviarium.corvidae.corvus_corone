@@ -6,10 +6,10 @@
 
 | Name | Type | Required | Notes |
 | --- | --- | --- | --- |
-| id | int | yes | Result Aggregate ID |
-| experiment_id | int | yes | ID of the Experiment this aggregate belongs to |
-| problem_instance_id | int | yes | ID of the Problem Instance being aggregated over |
-| algorithm_instance_id | int | yes | ID of the Algorithm Instance being aggregated over |
+| id | string | yes | Result Aggregate ID |
+| experiment_id | string | yes | ID of the Experiment this aggregate belongs to |
+| problem_instance_id | string | yes | ID of the Problem Instance being aggregated over |
+| algorithm_instance_id | string | yes | ID of the Algorithm Instance being aggregated over |
 | n_runs | int | yes | Number of Runs aggregated; must equal the count of `completed` Runs for this `(experiment, problem, algorithm)` combination |
 | metrics | map[string, object] | yes | Map of `metric_name → AggregateValue`; metric names must exactly match names in `docs/03-technical-contracts/03-metric-taxonomy/01-metric-taxonomy.md` |
 | anytime_curves | list[object] | yes | Summarized performance curves: mean ± spread of `objective_value` at each `evaluation_number` across all aggregated Runs |

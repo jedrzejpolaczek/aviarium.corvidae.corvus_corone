@@ -6,8 +6,8 @@
 
 | Name | Type | Required | Notes |
 | --- | --- | --- | --- |
-| id | int | yes | Performance Record ID |
-| run_id | int | yes | ID of the Run this record belongs to |
+| id | string | yes | Performance Record ID |
+| run_id | string | yes | ID of the Run this record belongs to |
 | evaluation_number | int | yes | Number of objective evaluations completed so far in this Run |
 | elapsed_time | float | yes | Wall-clock seconds elapsed since Run start |
 | objective_value | float | yes | Current best objective value observed up to this evaluation |

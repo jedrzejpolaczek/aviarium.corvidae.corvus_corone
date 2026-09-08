@@ -18,12 +18,16 @@ class LimitationsEnforcer:
     REQUIRED_SECTIONS = [
         "study_metadata",
         "algorithm_comparison_table",
-        "convergence_plots",
-        "trajectory_plots",
-        "sensitivity_heatmaps",
+        "VIZ-L1-01",              # box plot of final quality
+        "VIZ-L1-02",              # convergence curves
+        "VIZ-L1-03",              # ECDF
         "statistical_test_results",
         "limitations",
     ]
+    # VIZ-L1-04 (violin) is required only for cells contributing more than 50 Runs,
+    # where it replaces VIZ-L1-01. Trajectory and sensitivity plots are NOT report
+    # sections: they belong to the Algorithm Visualization Engine, which is outside
+    # V1. See ADR-018 and statistical-methodology.md 2.1.
 
     def validate(
         self,

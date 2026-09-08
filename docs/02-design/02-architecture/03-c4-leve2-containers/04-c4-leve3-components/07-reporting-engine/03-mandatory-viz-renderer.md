@@ -29,12 +29,12 @@ class MandatoryVizRenderer:
 ```
 
 Mandatory visualization set (always required):
-- `convergence` (per algorithm, GIF or PNG)
-- `trajectory` (per algorithm, PNG)
-- `sensitivity` (per algorithm, PNG)
+- `VIZ-L1-01` box plot of final quality (per problem, PNG)
+- `VIZ-L1-02` convergence curves (per problem, PNG)
+- `VIZ-L1-03` ECDF, drawn with step interpolation (per problem, PNG)
 
 Optional visualizations (generated if `include_algorithm_viz=True` and data available):
-- `pareto_front` (only for multi-objective studies)
+- `VIZ-L1-04` violin plot, which replaces `VIZ-L1-01` when a cell contributes more than 50 Runs
 - `genealogy` (always available from registry metadata)
 
 ---
@@ -48,7 +48,7 @@ Optional visualizations (generated if `include_algorithm_viz=True` and data avai
 
 ## Key Behaviors
 
-1. **Mandatory set enforcement** — generates `convergence`, `trajectory`, and `sensitivity` for every algorithm in the Study. These are non-negotiable; failure to generate any of them raises `MandatoryVizError`.
+1. **Mandatory set enforcement** — generates VIZ-L1-01, VIZ-L1-02 and VIZ-L1-03 for every problem in the Study, plus VIZ-L1-04 where the Run count requires it. These are non-negotiable; failure to generate any of them raises `MandatoryVizError`. Trajectory and sensitivity plots are Algorithm Visualization Engine output and are outside V1 (ADR-018).
 
 2. **Per-algorithm generation** — for each algorithm in the report, calls `viz_engine.visualize(algorithm_id, viz_type, experiment_id, output_dir)` for each mandatory type.
 
@@ -74,5 +74,6 @@ No persistent state.
 
 ## SRS Traceability
 
-- FR-P-02 (mandatory visualizations): convergence, trajectory, and sensitivity must appear in every report.
+- Mandatory visualizations VIZ-L1-01..04 must appear in every Report, as required by
+  `docs/04-scientific-practice/01-methodology/02-statistical-methodology.md` 2.1 and ADR-018.
 - UC-06 step 3 (generate visualizations): visualization generation is triggered here.

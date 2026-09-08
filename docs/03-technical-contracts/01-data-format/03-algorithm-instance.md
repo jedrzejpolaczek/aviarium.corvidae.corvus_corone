@@ -6,7 +6,7 @@
 
 | Name | Type | Required | Notes |
 | --- | --- | --- | --- |
-| id | int | yes | Algorithm Instance ID |
+| id | string | yes | Algorithm Instance ID |
 | name | string | yes | Human-readable name for this specific configuration eg. `NSGANet`, `Grid vs Random` |
 | version | string | yes | Version of this record. Structure is described in validation rules |
 | algorithm_family | string | yes | The abstract Algorithm this is an instance of (e.g., `Random Search`, `TPE`, `CMA-ES`) |

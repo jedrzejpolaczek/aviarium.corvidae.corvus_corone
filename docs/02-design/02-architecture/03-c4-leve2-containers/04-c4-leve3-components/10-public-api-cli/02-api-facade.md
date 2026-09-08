@@ -13,46 +13,27 @@ Expose the Corvus Corone library as a set of stable `cc.*` Python functions, val
 
 ## Interface
 
-Primary public API surface:
+> **Descriptive document (ADR-012).** The authoritative definition is the contract cited
+> below. This page explains only how that contract is grouped into a component and why the
+> boundary falls where it does. It does not define signatures.
 
-```python
-# Study execution
-cc.run(study_config: dict | StudyConfig) -> StudyResult
-cc.resume(study_id: str) -> StudyResult
+The public function surface is defined in
+[`docs/03-technical-contracts/04-public-api-contract.md`](../../../../../03-technical-contracts/04-public-api-contract.md),
+which is normative for signatures, parameter names, defaults, return types and exceptions.
+The facade implements every function listed there and adds none.
 
-# Entity queries
-cc.list_algorithms(filters: dict = {}) -> list[AlgorithmSummary]
-cc.get_algorithm(algorithm_id: str) -> AlgorithmDetail
-cc.list_problems(filters: dict = {}) -> list[ProblemSummary]
-cc.get_problem(problem_id: str) -> ProblemDetail
+For the V1 release the surface is: `cc.list_problems`, `cc.list_algorithms`, `cc.get_problem`,
+`cc.get_algorithm`, `cc.create_study`, `cc.lock_study`, `cc.update_study`, `cc.run`,
+`cc.get_experiment`, `cc.get_runs`, `cc.get_result_aggregates`, `cc.generate_reports` and
+`cc.export_raw_data`.
 
-# Results
-cc.get_result_aggregates(experiment_id: str) -> ResultAggregates
-cc.get_run_results(run_id: str) -> RunResults
-
-# Visualization
-cc.visualize(
-    algorithm_id: str,
-    viz_type: str,
-    experiment_id: str | None = None,
-    format: str = "png",
-    output_path: str | None = None,
-    output_dir: str | None = None,
-) -> VisualizationResult | list[VisualizationResult]
-
-# Genealogy
-cc.get_algorithm_genealogy(algorithm_id: str) -> AlgorithmGenealogy
-cc.get_algorithm_lineage(algorithm_id: str) -> AlgorithmLineage
-
-# Export
-cc.export(experiment_id: str, format: str, output_dir: str) -> ExportResult
-```
-
----
+`cc.visualize`, `cc.get_algorithm_genealogy` and `cc.get_algorithm_lineage` belong to the
+Algorithm Visualization Engine and are outside V1 (SRS 1, V1 Release Scope). `cc.resume` has
+no counterpart in the contract and is not part of the surface.
 
 ## Dependencies
 
-- **Study Orchestrator** — `cc.run()`, `cc.resume()`
+- **Study Orchestrator** — `cc.create_study()`, `cc.lock_study()`, `cc.run()`
 - **Algorithm Registry** — `cc.list_algorithms()`, `cc.get_algorithm()`
 - **Problem Repository** — `cc.list_problems()`, `cc.get_problem()`
 - **Results Store** — `cc.get_result_aggregates()`, `cc.get_run_results()`

@@ -71,4 +71,4 @@ No persistent state.
 ## SRS Traceability
 
 - UC-05 variant (export results): COCO export path.
-- FR-B-01 (COCO compatibility): output readable by `cocopp` post-processor.
+- FR-23 (COCO compatibility): output readable by `cocopp` post-processor.

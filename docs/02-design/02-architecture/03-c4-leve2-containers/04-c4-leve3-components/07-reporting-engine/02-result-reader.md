@@ -67,4 +67,4 @@ No persistent state.
 ## SRS Traceability
 
 - UC-06 (view report): report data loading is the first step of report generation.
-- FR-P-01 (report completeness): all required data must be present before rendering begins.
+- FR-20 (report completeness): all required data must be present before rendering begins.

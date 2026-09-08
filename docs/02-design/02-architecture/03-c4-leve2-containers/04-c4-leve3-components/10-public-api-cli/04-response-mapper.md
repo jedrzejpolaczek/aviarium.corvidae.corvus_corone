@@ -61,4 +61,4 @@ Stateless.
 
 ## SRS Traceability
 
-- FR-API-01 (stable public API): the Response Mapper is the enforcement mechanism for API stability.
+- FR-28 (stable public API): the Response Mapper is the enforcement mechanism for API stability.

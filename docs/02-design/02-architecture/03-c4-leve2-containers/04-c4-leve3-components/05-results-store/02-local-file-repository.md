@@ -74,5 +74,5 @@ Components that need artifacts obtain them through the repository properties.
 
 ## SRS Traceability
 
-- FR-S-02 (filesystem storage): all artifacts stored on local filesystem under `results_dir`.
+- FR-19 (filesystem storage): all artifacts stored on local filesystem under `results_dir`.
 - Supports all use cases that read or write study data.

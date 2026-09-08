@@ -59,5 +59,5 @@ No in-memory cache. All reads hit the filesystem. (A read cache may be added in 
 
 ## SRS Traceability
 
-- FR-R-05 (persistent registry): registry must survive process restart.
+- FR-05 (persistent registry): registry must survive process restart.
 - UC-10 (algorithm genealogy): genealogy data loaded from JSON alongside instance.

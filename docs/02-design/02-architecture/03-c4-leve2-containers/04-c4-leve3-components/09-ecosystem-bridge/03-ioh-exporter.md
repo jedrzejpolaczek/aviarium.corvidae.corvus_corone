@@ -69,4 +69,4 @@ No persistent state.
 
 ## SRS Traceability
 
-- FR-B-02 (IOH compatibility): output readable by IOH Analyzer.
+- FR-23 (IOH compatibility): output readable by IOH Analyzer.

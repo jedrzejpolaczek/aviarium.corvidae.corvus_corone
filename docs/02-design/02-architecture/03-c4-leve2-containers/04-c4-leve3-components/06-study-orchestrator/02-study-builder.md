@@ -73,4 +73,4 @@ No persistent in-memory state. All persistent data written to Results Store.
 ## SRS Traceability
 
 - UC-01 (create study): Study Builder is the implementation of the study creation step.
-- FR-O-01 (study validation): all StudyConfig fields must be validated before execution begins.
+- FR-08 (study validation): all StudyConfig fields must be validated before execution begins.

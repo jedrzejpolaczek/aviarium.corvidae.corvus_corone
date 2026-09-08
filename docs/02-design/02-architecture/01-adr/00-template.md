@@ -1,5 +1,7 @@
 # ADR-[NUMBER]: [Decision Title]
 
+<!-- check-docs: allow-undefined -->
+
 <!--
 STORY ROLE: ADRs are the "how we got here" chapters. They explain WHY the system
 looks the way it does. Without them, future contributors face a black box of

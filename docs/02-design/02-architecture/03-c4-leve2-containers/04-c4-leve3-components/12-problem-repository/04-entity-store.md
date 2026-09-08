@@ -57,4 +57,4 @@ No in-memory cache.
 
 ## SRS Traceability
 
-- FR-R-08 (persistent problem repository): repository must survive process restart.
+- FR-01 (persistent problem repository): repository must survive process restart.

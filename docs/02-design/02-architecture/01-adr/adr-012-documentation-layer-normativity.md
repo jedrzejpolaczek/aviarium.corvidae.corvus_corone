@@ -1,5 +1,7 @@
 # ADR-012: Documentation Layer Normativity and Precedence
 
+<!-- check-docs: allow-undefined -->
+
 <!--
 STORY ROLE: Establishes which documentation layer wins when two documents disagree.
 Without this rule, every layer is free to define the same thing differently, and the

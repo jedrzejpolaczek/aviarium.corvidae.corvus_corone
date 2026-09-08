@@ -73,4 +73,4 @@ Stateless. No instance variables.
 ## SRS Traceability
 
 - Entry point for all user-facing use cases (UC-01 through UC-10).
-- FR-API-01 (stable public API): the facade is the versioned API surface — internal refactors do not break callers.
+- FR-28 (stable public API): the facade is the versioned API surface — internal refactors do not break callers.

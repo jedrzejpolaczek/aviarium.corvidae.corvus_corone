@@ -70,5 +70,5 @@ No persistent state.
 ## SRS Traceability
 
 - UC-07 steps 3–5 (trajectory, sensitivity, genealogy visualizations).
-- FR-V-01 (static visualization output): PNG and SVG formats required.
+- no functional requirement yet: the Algorithm Visualization Engine is outside V1 (SRS 1, V1 Release Scope) and its requirements are written when the Learner actor enters scope (static visualization output): PNG and SVG formats required.
 - ADR-011: matplotlib is the core rendering library for all static output.

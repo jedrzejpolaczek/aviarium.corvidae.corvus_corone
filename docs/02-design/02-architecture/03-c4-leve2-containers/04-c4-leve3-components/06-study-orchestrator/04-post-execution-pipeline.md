@@ -76,4 +76,4 @@ No persistent in-memory state. All status is written to the Results Store via th
 ## SRS Traceability
 
 - UC-02 step 6 (post-execution pipeline): triggered automatically after all Runs complete.
-- FR-O-04 (automatic analysis and reporting): pipeline runs without user intervention after execution.
+- FR-15 (automatic analysis and reporting): pipeline runs without user intervention after execution.

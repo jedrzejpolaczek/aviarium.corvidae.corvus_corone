@@ -70,5 +70,5 @@ Transient in-process state: the set of active futures and their run_id mappings.
 ## SRS Traceability
 
 - UC-02 (run study): the Execution Coordinator drives the actual execution.
-- FR-O-02 (parallel execution): Runs execute in parallel up to `max_workers`.
-- FR-O-03 (failure policy): `on_failure` behaviour is enforced here.
+- FR-11 (parallel execution): Runs execute in parallel up to `max_workers`.
+- FR-12 (failure policy): `on_failure` behaviour is enforced here.

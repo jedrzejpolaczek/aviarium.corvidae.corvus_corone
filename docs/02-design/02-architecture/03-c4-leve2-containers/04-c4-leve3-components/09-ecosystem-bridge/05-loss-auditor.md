@@ -68,5 +68,5 @@ No persistent state.
 
 ## SRS Traceability
 
-- FR-B-04 (information-loss manifest): every export must produce a manifest.
+- FR-24 (information-loss manifest): every export must produce a manifest.
 - MANIFESTO Principle 3 (no silent omissions): the loss manifest is the enforcement mechanism for ecosystem exports.

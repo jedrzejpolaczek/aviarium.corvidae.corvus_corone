@@ -70,5 +70,5 @@ No persistent state. All data is fetched from the registry/repository and embedd
 
 ## SRS Traceability
 
-- FR-A-03 (scope annotation): every stored result must be queryable by problem, algorithm, and budget without joins.
+- FR-21 (scope annotation): every stored result must be queryable by problem, algorithm, and budget without joins.
 - UC-05 (filter and explore results): scope annotation enables the filtering use case.

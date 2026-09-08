@@ -55,5 +55,5 @@ No in-memory state.
 
 ## SRS Traceability
 
-- FR-R-07 (versioned problem repository): problem versions must be immutable and historically preserved.
+- FR-03 (versioned problem repository): problem versions must be immutable and historically preserved.
 - MANIFESTO Principle 18 (reproducibility): old Studies must be re-executable with the same problem version.

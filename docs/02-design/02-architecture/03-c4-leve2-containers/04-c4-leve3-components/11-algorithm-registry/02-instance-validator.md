@@ -59,4 +59,4 @@ Stateless.
 
 ## SRS Traceability
 
-- FR-R-03 (algorithm validation): instances must be validated before registration.
+- FR-06 (algorithm validation): instances must be validated before registration.

@@ -77,5 +77,5 @@ Stateless. `REQUIRED_SECTIONS` is a class-level constant.
 
 ## SRS Traceability
 
-- FR-P-04 (limitations section): every report must include an explicit limitations section.
+- FR-21 (limitations section): every report must include an explicit limitations section.
 - MANIFESTO Principle 3 (no silent omissions): the Enforcer implements this principle for reporting.

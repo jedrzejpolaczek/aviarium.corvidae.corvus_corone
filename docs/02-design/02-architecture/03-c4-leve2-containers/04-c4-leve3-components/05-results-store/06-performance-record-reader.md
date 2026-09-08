@@ -77,6 +77,6 @@ No persistent state.
 
 ## SRS Traceability
 
-- FR-S-05 (unified read interface): callers must not need to know the storage format.
+- FR-18 (unified read interface): callers must not need to know the storage format.
 - ADR-010: the reader abstracts the dual-format decision from all consumers.
 - UC-05 (explore results): the reader enables filtered result queries.

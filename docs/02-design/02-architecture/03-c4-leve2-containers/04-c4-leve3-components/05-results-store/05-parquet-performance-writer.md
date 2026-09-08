@@ -68,4 +68,4 @@ No persistent state. The Parquet file on disk is the output artifact.
 ## SRS Traceability
 
 - ADR-010: Parquet/snappy is the secondary performance storage format for ≥1000 records.
-- FR-S-04 (query performance): bulk queries over large Run datasets require Parquet.
+- FR-18 (query performance): bulk queries over large Run datasets require Parquet.

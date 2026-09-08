@@ -32,7 +32,7 @@ NOTE ON CONTAINER MAPPING:
 
 | Group | Container | FRs | File |
 |---|---|---|---|
-| 4.1 Problem Repository | Problem Repository | FR-01..FR-04 | [02-fr-4.1-problem-repository.md](02-fr-4.1-problem-repository.md) |
+| 4.1 Problem Repository | Problem Repository | FR-01..FR-04, FR-32..FR-33 | [02-fr-4.1-problem-repository.md](02-fr-4.1-problem-repository.md) |
 | 4.2 Algorithm Registry | Algorithm Registry | FR-05..FR-07 | [03-fr-4.2-algorithm-registry.md](03-fr-4.2-algorithm-registry.md) |
 | 4.3 Experiment Runner | Experiment Runner | FR-08..FR-12 | [04-fr-4.3-experiment-runner.md](04-fr-4.3-experiment-runner.md) |
 | 4.4 Measurement & Analysis Engine | Analysis Engine | FR-13..FR-16 | [05-fr-4.4-measurement-and-analysis.md](05-fr-4.4-measurement-and-analysis.md) |

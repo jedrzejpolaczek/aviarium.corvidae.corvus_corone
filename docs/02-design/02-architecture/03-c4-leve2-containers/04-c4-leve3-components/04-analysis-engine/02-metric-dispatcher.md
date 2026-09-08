@@ -72,5 +72,5 @@ No persistent state. All computation is in-memory per Study analysis invocation.
 
 ## SRS Traceability
 
-- FR-A-01 (compute benchmark metrics): dispatcher computes all configured metrics.
+- FR-13 (compute benchmark metrics): dispatcher computes all configured metrics.
 - UC-03 step 3 (analyse results): metrics computed after Run completion.

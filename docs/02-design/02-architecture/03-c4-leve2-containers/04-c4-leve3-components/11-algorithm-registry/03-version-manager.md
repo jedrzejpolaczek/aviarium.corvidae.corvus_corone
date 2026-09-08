@@ -64,5 +64,5 @@ No in-memory state. All state is in the Entity Store.
 
 ## SRS Traceability
 
-- FR-R-04 (versioned registry): algorithm versions must be immutable and historically preserved.
+- FR-05 (versioned registry): algorithm versions must be immutable and historically preserved.
 - MANIFESTO Principle 18 (reproducibility): old Studies must be re-executable with the same algorithm version.

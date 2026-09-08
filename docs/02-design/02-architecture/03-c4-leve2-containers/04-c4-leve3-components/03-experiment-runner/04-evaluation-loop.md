@@ -77,5 +77,5 @@ Transient in-process state: `best_value`, `best_candidate`, `iteration_count`. A
 
 ## SRS Traceability
 
-- FR-E-01 (evaluation loop): the loop must complete exactly `budget` evaluations unless the algorithm signals early convergence.
+- FR-12 (evaluation loop): the loop must complete exactly `budget` evaluations unless the algorithm signals early convergence.
 - UC-02 step 4 (execute run): each evaluation produces a PerformanceRecord.

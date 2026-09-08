@@ -75,5 +75,5 @@ No in-memory state after initialization. Seed values are persisted at `{results_
 ## SRS Traceability
 
 Reproducibility requirement — MANIFESTO Principle 18. Required for:
-- FR-R-01 (reproducible runs): a run re-executed with the same seed must produce the same sequence of objective function evaluations.
+- FR-09 (reproducible runs): a run re-executed with the same seed must produce the same sequence of objective function evaluations.
 - UC-02 (run study): each Run in a Study receives a unique, reproducible seed.

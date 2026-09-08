@@ -72,5 +72,5 @@ No persistent state. Each `execute_run()` call is fully self-contained. The subp
 
 ## SRS Traceability
 
-- FR-R-02 (run isolation): each Run's random state and memory must not affect other Runs.
+- FR-11 (run isolation): each Run's random state and memory must not affect other Runs.
 - UC-02 step 4 (execute run): runs are isolated and failures are handled per `on_failure` policy.

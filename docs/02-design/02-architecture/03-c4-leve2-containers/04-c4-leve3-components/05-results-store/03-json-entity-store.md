@@ -62,5 +62,5 @@ No in-memory state. All state is on the filesystem.
 
 ## SRS Traceability
 
-- FR-S-03 (entity persistence): Study, Experiment, Run metadata must survive process restart.
+- FR-17 (entity persistence): Study, Experiment, Run metadata must survive process restart.
 - UC-01 (create study): Study entity is created and persisted here.

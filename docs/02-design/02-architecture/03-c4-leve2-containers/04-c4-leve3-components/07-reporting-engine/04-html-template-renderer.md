@@ -70,4 +70,4 @@ No persistent state.
 ## SRS Traceability
 
 - UC-06 (view report): the HTML report is the primary artifact of the reporting pipeline.
-- FR-P-03 (self-contained report): report must open in a browser without an internet connection.
+- FR-20 (self-contained report): report must open in a browser without an internet connection.

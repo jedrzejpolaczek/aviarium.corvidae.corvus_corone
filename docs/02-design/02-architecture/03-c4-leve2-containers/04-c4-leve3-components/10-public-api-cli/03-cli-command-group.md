@@ -66,4 +66,4 @@ No persistent state.
 ## SRS Traceability
 
 - All use cases are accessible via CLI equivalents of the Python API.
-- FR-API-02 (CLI access): all core operations must be accessible from the command line.
+- FR-29 (CLI access): all core operations must be accessible from the command line.

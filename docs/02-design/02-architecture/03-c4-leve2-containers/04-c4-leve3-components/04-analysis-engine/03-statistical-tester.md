@@ -75,5 +75,5 @@ No persistent state. Stateless per invocation.
 
 ## SRS Traceability
 
-- FR-A-02 (statistical significance testing): applies the correct test based on pre-registration.
+- FR-15 (statistical significance testing): applies the correct test based on pre-registration.
 - UC-04 (compare algorithms): p-values and effect sizes enable statistically grounded comparison.

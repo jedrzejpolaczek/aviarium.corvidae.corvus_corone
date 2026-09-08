@@ -173,7 +173,7 @@ Requirements FR-01 through FR-31 are defined in **[`03-functional-requirements/0
 
 | Group | Container | Requirements | File |
 |---|---|---|---|
-| §4.1 | Problem Repository | FR-01 – FR-04 | [02-fr-4.1-problem-repository.md](../03-functional-requirements/02-fr-4.1-problem-repository.md) |
+| §4.1 | Problem Repository | FR-01 – FR-04, FR-32 – FR-33 | [02-fr-4.1-problem-repository.md](../03-functional-requirements/02-fr-4.1-problem-repository.md) |
 | §4.2 | Algorithm Registry | FR-05 – FR-07 | [03-fr-4.2-algorithm-registry.md](../03-functional-requirements/03-fr-4.2-algorithm-registry.md) |
 | §4.3 | Experiment Runner | FR-08 – FR-12 | [04-fr-4.3-experiment-runner.md](../03-functional-requirements/04-fr-4.3-experiment-runner.md) |
 | §4.4 | Measurement & Analysis Engine | FR-13 – FR-16 | [05-fr-4.4-measurement-and-analysis.md](../03-functional-requirements/05-fr-4.4-measurement-and-analysis.md) |

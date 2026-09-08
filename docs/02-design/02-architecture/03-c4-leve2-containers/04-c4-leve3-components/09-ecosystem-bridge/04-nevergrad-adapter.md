@@ -73,4 +73,4 @@ The `AlgorithmInstance` wrapper holds a live Nevergrad optimizer object during a
 
 ## SRS Traceability
 
-- FR-B-03 (Nevergrad integration): bidirectional Nevergrad bridge.
+- FR-25 (Nevergrad integration): bidirectional Nevergrad bridge.

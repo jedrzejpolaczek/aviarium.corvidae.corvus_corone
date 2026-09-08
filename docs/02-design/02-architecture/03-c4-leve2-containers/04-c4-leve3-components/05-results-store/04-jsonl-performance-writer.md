@@ -61,5 +61,5 @@ Open file handle to `performance.jsonl` for the run_id. Closed on `close()`.
 
 ## SRS Traceability
 
-- FR-S-01 (stream performance records): every evaluation observation must be persisted with minimal overhead.
+- FR-14 (stream performance records): every evaluation observation must be persisted with minimal overhead.
 - ADR-010: JSONL is the primary write format; chosen for streaming write performance (20× faster than SQLite).

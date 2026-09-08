@@ -69,6 +69,6 @@ Holds an open file handle to the JSONL writer for the duration of the Run subpro
 
 ## SRS Traceability
 
-- FR-S-01 (store performance records): every evaluation observation must be persisted.
+- FR-14 (store performance records): every evaluation observation must be persisted.
 - UC-02 step 5 (record results): each tell() call produces a stored PerformanceRecord.
 - ADR-010 (dual-format storage): the Recorder writes JSONL; the Parquet conversion happens in the Results Store post-write.

@@ -230,19 +230,31 @@ study = cc.create_study(
 )
 
 print(f"Study created: {study.id}")
-print(f"Status: {study.status}")   # → "locked"
+print(f"Status: {study.status}")   # -> "draft"
 ```
 
-**Checkpoint 1 — verify the lock:**
+**Checkpoint 1 — revise while the Study is still a draft, then lock it:**
 
 ```python
-# Attempting to modify a locked study raises StudyLockedError
+# A draft is still yours to change.
+cc.update_study(study.id, repetitions=20)
+
+# Locking is the pre-registration moment (ADR-013). It is a deliberate call,
+# not a side effect of construction: after it returns, the design is fixed.
+study = cc.lock_study(study.id)
+print(f"Status: {study.status}")   # -> "locked"
+
+# From here, modification is refused.
 try:
-    cc.update_study(study.id, repetitions=20)
-except cc.StudyLockedError as e:
+    cc.update_study(study.id, repetitions=30)
+except cc.StudyAlreadyLockedError as e:
     print(f"Correctly rejected: {e}")
-# Output: Correctly rejected: Study <id> is locked. Modification attempt recorded.
+# Output: Correctly rejected: Study <id> is locked and cannot be modified.
 ```
+
+If the design is incomplete, `lock_study()` refuses and names every unresolved
+decision at once, with the consequence of each, rather than the first missing
+field (FR-27).
 
 The lock is permanent. If you discover a problem with your design at this point,
 you must start a new study — not edit this one. This is intentional.
@@ -268,7 +280,7 @@ experiment = cc.run(study.id)
 Or from the CLI:
 
 ```bash
-corvus run --study-id <study.id>
+corvus run <study_id>
 ```
 
 **What happens inside each Run:**
@@ -304,7 +316,7 @@ researcher-chosen. This prevents seed selection that favours a preferred algorit
 ### Step 7: Inspect the Result Aggregates
 
 The system automatically computes the
-[Standard Reporting Set](../03-technical-contracts/03-metric-taxonomy.md) metrics
+[Standard Reporting Set](../03-technical-contracts/03-metric-taxonomy/01-index.md) metrics
 across all runs. Verify they exist before generating reports:
 
 ```python
@@ -350,7 +362,7 @@ print(f"Practitioner report: {practitioner_report.artifact_reference}")
 Or from the CLI:
 
 ```bash
-corvus report --experiment-id <experiment.id> --open
+corvus report <experiment_id> --open
 # Opens both reports in your browser
 ```
 
@@ -414,7 +426,7 @@ After completing this tutorial, you have:
 **Verification:** Run the following — it should exit with code 0:
 
 ```bash
-corvus verify --experiment-id <experiment.id>
+corvus verify <experiment_id>
 # ✓ All 60 runs completed
 # ✓ All Standard Reporting Set metrics present
 # ✓ Both reports generated with non-empty limitations sections
@@ -454,4 +466,4 @@ corvus verify --experiment-id <experiment.id>
 | Understand the three-level statistical analysis in depth | [statistical-methodology.md](../04-scientific-practice/01-methodology/02-statistical-methodology.md) |
 | Export your results to IOHprofiler for visualization | `05-researcher-export-iohprofiler.md` *(coming soon)* |
 | Reproduce a study from a published archive | `06-researcher-reproduce-study.md` *(coming soon)* |
-| Understand what metrics are computed and why | [metric-taxonomy.md](../03-technical-contracts/03-metric-taxonomy.md) |
+| Understand what metrics are computed and why | [metric-taxonomy.md](../03-technical-contracts/03-metric-taxonomy/01-index.md) |

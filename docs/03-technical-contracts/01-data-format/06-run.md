@@ -1,16 +1,17 @@
 # §2.5 Run
 
-> Index: [01-data-format.md](01-data-format.md)
+> Index: [01-data-format.md](01-index.md)
 
-> See GLOSSARY: [Run](../GLOSSARY.md#run)
+> See GLOSSARY: [Run](../../GLOSSARY.md#run)
 
 | Name | Type | Required | Notes |
 | --- | --- | --- | --- |
-| id | int | yes | Run ID |
-| experiment_id | int | yes | ID of the Experiment this Run belongs to |
-| study_id | int | yes | ID of the Study this Run belongs to (denormalized for query convenience) |
-| problem_instance_id | int | yes | ID of the Problem Instance executed in this Run |
-| algorithm_instance_ids | list[int] | yes | IDs of the Algorithm Instance executed in this Run |
+| id | string | yes | Run ID |
+| schema_version | string | yes | Version of the entity schema this record conforms to, e.g. `0.0.1`. Governs the shape of the record, not the identity of the entity. See [13-schema-versioning.md](13-schema-versioning.md) |
+| experiment_id | string | yes | ID of the Experiment this Run belongs to |
+| study_id | string | yes | ID of the Study this Run belongs to (denormalized for query convenience) |
+| problem_instance_id | string | yes | ID of the Problem Instance executed in this Run |
+| algorithm_instance_id | string | yes | ID of the Algorithm Instance executed in this Run |
 | seed | int | yes | Exact integer seed used; must be reproducible |
 | budget_used | float | yes | Actual evaluations or time consumed, in units of `Study.experimental_design.budget_type` |
 | status | string | yes | `completed`, `failed`, or `budget_exhausted` |

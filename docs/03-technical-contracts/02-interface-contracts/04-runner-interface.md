@@ -1,6 +1,6 @@
 # §3 Runner Interface
 
-> Index: [01-interface-contracts.md](01-interface-contracts.md)
+> Index: [01-interface-contracts.md](01-index.md)
 
 The Runner orchestrates Problems and Algorithms to produce Runs. It owns the evaluation loop,
 injects seeds, invokes the `on_evaluation` callback after every objective evaluation, and

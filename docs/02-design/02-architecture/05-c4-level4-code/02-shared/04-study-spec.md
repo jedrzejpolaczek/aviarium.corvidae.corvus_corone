@@ -1,8 +1,8 @@
 # C4: Code — StudyConfig & RunConfig
 
 > C4 Index: [../01-index.md](../01-index.md)
-> C3 Component (Study Builder): [../../04-c4-leve3-components/06-study-orchestrator/02-study-builder.md](../../04-c4-leve3-components/06-study-orchestrator/02-study-builder.md)
-> C3 Component (Run Isolator): [../../04-c4-leve3-components/03-experiment-runner/03-run-isolator.md](../../04-c4-leve3-components/03-experiment-runner/03-run-isolator.md)
+> C3 Component (Study Builder): [../../04-c4-leve3-components/06-study-orchestrator/02-study-builder.md](../../03-c4-leve2-containers/04-c4-leve3-components/06-study-orchestrator/02-study-builder.md)
+> C3 Component (Run Isolator): [../../04-c4-leve3-components/03-experiment-runner/03-run-isolator.md](../../03-c4-leve2-containers/04-c4-leve3-components/03-experiment-runner/03-run-isolator.md)
 
 ---
 

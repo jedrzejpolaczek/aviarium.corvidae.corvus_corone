@@ -129,10 +129,10 @@ the repository internally. This is consistent with every other function: `cc.run
 strings. Passing a `Study` object would require the caller to retain and pass stale objects,
 creating a category of "stale object" bugs that do not exist with the ID-based API.
 
-Note: In V1, `update_study()` **always raises `StudyLockedError`** because studies are
-immediately locked upon creation. The function exists in the public surface to allow callers
-to write future-compatible code and to make the locking policy explicit via a named
-exception.
+Note: `update_study()` modifies a Study in `"draft"` status and raises
+`StudyAlreadyLockedError` once `cc.lock_study()` has been called. The two-phase lifecycle is
+recorded in ADR-013: locking is the moment pre-registration takes effect, and it is a
+deliberate call rather than a side effect of construction.
 
 ---
 
@@ -196,7 +196,7 @@ ambiguous in code that also uses `report.type`). The attribute name `report_type
 unambiguous and consistent with the naming pattern used in this codebase.
 
 **Question (exception namespace):** Should callers be required to write
-`from corvus_corone.exceptions import StudyLockedError` or should `cc.StudyLockedError`
+`from corvus_corone.exceptions import StudyAlreadyLockedError` or should `cc.StudyAlreadyLockedError`
 work after `import corvus_corone as cc`?
 
 **Decision: Module-level re-export** — both forms work.
@@ -208,13 +208,13 @@ Exceptions are defined in `corvus_corone.exceptions` and re-exported from
 import corvus_corone as cc
 try:
     cc.update_study(study_id, name="New Name")
-except cc.StudyLockedError:
+except cc.StudyAlreadyLockedError:
     ...
 ```
 
 The explicit import also works:
 ```python
-from corvus_corone.exceptions import StudyLockedError
+from corvus_corone.exceptions import StudyAlreadyLockedError
 ```
 
 **Rationale:** Researchers use `import corvus_corone as cc`; requiring a separate import
@@ -351,19 +351,20 @@ class Study:
 | `seed_strategy` | `str` | How seeds are generated and assigned across Runs (e.g., `"sequential"`, `"random"`, `"latin-hypercube"`). |
 | `sampling_strategy` | `str` | Identifier of the PerformanceRecord sampling strategy (e.g., `"log_scale_plus_improvement"`). |
 | `improvement_epsilon` | `float \| None` | Minimum improvement required to trigger an improvement PerformanceRecord. `None` means strict inequality (any improvement is recorded). |
-| `pre_registered_hypotheses` | `list[dict]` | Hypotheses declared before data collection. Each dict has at least `"hypothesis"` (str) and `"test_type"` (str) keys. Empty list if none were provided. |
-| `status` | `str` | Always `"locked"` after `create_study()`. Studies are immutable once created in V1. |
+| `pre_registered_hypotheses` | `list[dict]` | Hypotheses declared before data collection. Each dict has `"hypothesis"` (str), `"test_type"` (str) and `"metric_id"` (str) keys. Never empty (ADR-021). |
+| `status` | `str` | `"draft"` after `create_study()`, `"locked"` after `cc.lock_study()`. Pre-registration fields are immutable once locked (ADR-013). |
 
 **Notes:**
 
-- `status` is always `"locked"` in V1. The field exists so that callers can assert this
+- `status` is `"draft"` until `cc.lock_study()` is called. The field exists so that callers can assert this
   and so that future versions can introduce a `"draft"` pre-lock status without removing
   the field.
 - The `budget` field corresponds to `experimental_design.budget_allocation` in the storage
   schema but is presented as a plain integer at the public API level, because V1 supports
   only uniform budget allocation.
-- `pre_registered_hypotheses` is never `None`; it is an empty list when no hypotheses
-  were provided. This avoids a `None`-check pattern in caller code.
+- `pre_registered_hypotheses` is never `None` and never empty (ADR-021). Every Study carries at
+  least one hypothesis; an exploratory Study declares one with `"test_type": "none"`. Callers
+  therefore never need a `None`-check or an empty-list branch.
 
 **Distinction from storage entity:** The storage entity `Study` (defined in
 `docs/03-technical-contracts/01-data-format/04-study.md`) additionally contains `version`,
@@ -698,7 +699,7 @@ def get_problem(problem_id: str) -> ProblemInstanceSummary:
 
 | Exception | When |
 |---|---|
-| `cc.NotFoundError` | No problem instance with `problem_id` exists in the registry. |
+| `cc.EntityNotFoundError` | No problem instance with `problem_id` exists in the registry. |
 
 **Example:**
 
@@ -710,7 +711,7 @@ try:
     print(f"Name: {problem.name}")
     print(f"Dimensions: {problem.dimensions}")
     print(f"Noise: {problem.noise_level}")
-except cc.NotFoundError as e:
+except cc.EntityNotFoundError as e:
     print(f"Problem not found: {e}")
 ```
 
@@ -738,7 +739,7 @@ def get_algorithm(algorithm_id: str) -> AlgorithmInstanceSummary:
 
 | Exception | When |
 |---|---|
-| `cc.NotFoundError` | No algorithm instance with `algorithm_id` exists in the registry. |
+| `cc.EntityNotFoundError` | No algorithm instance with `algorithm_id` exists in the registry. |
 
 **Example:**
 
@@ -750,7 +751,7 @@ try:
     print(f"Name: {alg.name}")
     print(f"Family: {alg.algorithm_family}")
     print(f"Justification: {alg.configuration_justification}")
-except cc.NotFoundError as e:
+except cc.EntityNotFoundError as e:
     print(f"Algorithm not found: {e}")
 ```
 
@@ -776,7 +777,7 @@ def create_study(
     sampling_strategy: str = "log_scale_plus_improvement",
     log_scale_schedule: dict | None = None,
     improvement_epsilon: float | None = None,
-    pre_registered_hypotheses: list[dict] | None = None,
+    pre_registered_hypotheses: list[dict],
     max_records_per_run: int | None = None,
 ) -> Study:
 ```
@@ -797,7 +798,7 @@ All parameters are keyword-only (enforced by the leading `*`).
 | `sampling_strategy` | `str` | No | `"log_scale_plus_improvement"` | Identifier of the PerformanceRecord sampling strategy. Valid values: `"log_scale_plus_improvement"` (default), `"log_scale_only"`, `"every_evaluation"`. See `docs/02-design/02-architecture/01-adr/adr-002-performance-recording-strategy.md`. |
 | `log_scale_schedule` | `dict \| None` | No | `None` | Parameters for the log-scale trigger. Fields: `base_points: list[int]` (default `[1, 2, 5]`), `multiplier_base: int` (default `10`). If `None`, the defaults are used. Ignored when `sampling_strategy="every_evaluation"`. |
 | `improvement_epsilon` | `float \| None` | No | `None` | Minimum improvement required to trigger an improvement PerformanceRecord. `None` means any strictly better value triggers a record. Non-null values must be scientifically justified and are noted in the Report limitations section automatically. Must be ≥ 0.0 if non-null. |
-| `pre_registered_hypotheses` | `list[dict] \| None` | No | `None` | Hypotheses declared before data collection. Each dict must have at least `"hypothesis"` (str) and `"test_type"` (str) keys. If `None`, treated as an empty list in the returned `Study`. |
+| `pre_registered_hypotheses` | `list[dict]` | **Yes** | — | Hypotheses declared before data collection. Each dict must have `"hypothesis"` (str), `"test_type"` (str) and `"metric_id"` (str) keys. Must contain at least one entry; `cc.lock_study()` refuses an empty list (ADR-021). For an exploratory Study, declare one hypothesis with `"test_type": "none"`. |
 | `max_records_per_run` | `int \| None` | No | `None` | Optional hard cap on PerformanceRecords per Run. `None` means no cap. If set, must be ≥ 1. A cap triggers a limitations note in all generated Reports. |
 
 **Returns:** `Study` — the newly created and locked study. `study.status` is always
@@ -841,11 +842,57 @@ except cc.ValidationError as e:
 
 ---
 
+### cc.lock_study()
+
+Transitions a Study from `"draft"` to `"locked"`. This is the moment pre-registration takes
+effect: after it returns, `problem_ids`, `algorithm_ids`, `repetitions`, `budget`,
+`pre_registered_hypotheses`, `sampling_strategy`, `log_scale_schedule`, `improvement_epsilon`
+and `root_seed` are immutable, and the Study becomes runnable (ADR-013, FR-08).
+
+**Signature:**
+
+```python
+def lock_study(study_id: str) -> Study:
+```
+
+**Parameters:**
+
+| Parameter | Type | Required | Description |
+|---|---|---|---|
+| `study_id` | `str` | Yes | The ID of the draft Study to lock. |
+
+**Returns:** the `Study` view object with `status == "locked"`.
+
+**Raises:**
+
+| Exception | When |
+|---|---|
+| `cc.EntityNotFoundError` | No Study with `study_id` exists. |
+| `cc.StudyAlreadyLockedError` | The Study is already locked. |
+| `cc.ValidationError` | The Study is not ready to lock. The message lists every unresolved design decision, not only the first, and states why each is required. An empty `pre_registered_hypotheses` list is reported here (ADR-021). |
+
+**Example:**
+
+```python
+import corvus_corone as cc
+
+study = cc.create_study(...)
+try:
+    study = cc.lock_study(study.id)
+except cc.ValidationError as e:
+    print(e)   # names every missing decision and the reason it is required
+```
+
+**No CLI equivalent in V1.** Study authoring happens in Python; the CLI executes and reports
+(ADR-016).
+
+---
+
 ### cc.update_study()
 
-Attempts to update fields of an existing study. In V1, this function always raises
-`StudyLockedError` because all studies are locked upon creation. The function exists to
-make the locking policy explicit and to allow future-compatible code.
+Updates fields of an existing Study that is still in `"draft"` status. Once
+`cc.lock_study()` has been called the Study is immutable and this function raises
+`StudyAlreadyLockedError` (ADR-013).
 
 **Signature:**
 
@@ -866,8 +913,8 @@ def update_study(study_id: str, **fields) -> None:
 
 | Exception | When |
 |---|---|
-| `cc.StudyLockedError` | Always in V1. Studies are locked immediately upon creation and cannot be modified. |
-| `cc.NotFoundError` | If `study_id` does not correspond to any existing study (checked before the lock check). |
+| `cc.StudyAlreadyLockedError` | The Study has already been locked by `cc.lock_study()` and cannot be modified. |
+| `cc.EntityNotFoundError` | If `study_id` does not correspond to any existing study (checked before the lock check). |
 
 **Example:**
 
@@ -885,7 +932,7 @@ study = cc.create_study(
 
 try:
     cc.update_study(study.id, name="Updated Name")
-except cc.StudyLockedError:
+except cc.StudyAlreadyLockedError:
     print("Cannot update: study is locked.")
     # Expected in V1 — handle gracefully
 ```
@@ -918,7 +965,7 @@ Run IDs that were created.
 
 | Exception | When |
 |---|---|
-| `cc.NotFoundError` | `study_id` does not correspond to any existing Study. |
+| `cc.EntityNotFoundError` | `study_id` does not correspond to any existing Study. |
 | `cc.SeedCollisionError` | A duplicate seed would be assigned to two Runs within the same Experiment. This is a configuration error in the seed strategy; it should not occur with the default `"sequential"` strategy. |
 
 **Notes:**
@@ -950,7 +997,7 @@ try:
     experiment = cc.run(study.id)
     print(f"Experiment {experiment.id}: {experiment.status}")
     print(f"Runs: {len(experiment.run_ids)}")
-except cc.NotFoundError:
+except cc.EntityNotFoundError:
     print("Study not found.")
 except cc.SeedCollisionError as e:
     print(f"Seed collision detected: {e}")
@@ -980,7 +1027,7 @@ def get_experiment(experiment_id: str) -> Experiment:
 
 | Exception | When |
 |---|---|
-| `cc.NotFoundError` | No Experiment with `experiment_id` exists. |
+| `cc.EntityNotFoundError` | No Experiment with `experiment_id` exists. |
 
 **Example:**
 
@@ -991,7 +1038,7 @@ try:
     experiment = cc.get_experiment("3f2e1a00-...")
     print(f"Status: {experiment.status}")
     print(f"Runs: {len(experiment.run_ids)}")
-except cc.NotFoundError:
+except cc.EntityNotFoundError:
     print("Experiment not found.")
 ```
 
@@ -1021,7 +1068,7 @@ if the Experiment has no Runs (e.g., execution has not started); never returns `
 
 | Exception | When |
 |---|---|
-| `cc.NotFoundError` | No Experiment with `experiment_id` exists. |
+| `cc.EntityNotFoundError` | No Experiment with `experiment_id` exists. |
 
 **Example:**
 
@@ -1065,7 +1112,7 @@ been computed yet; never returns `None`.
 
 | Exception | When |
 |---|---|
-| `cc.NotFoundError` | No Experiment with `experiment_id` exists. |
+| `cc.EntityNotFoundError` | No Experiment with `experiment_id` exists. |
 
 **Example:**
 
@@ -1111,7 +1158,7 @@ to reference existing files at the time the function returns.
 
 | Exception | When |
 |---|---|
-| `cc.NotFoundError` | No Experiment with `experiment_id` exists, or the Experiment exists but has no ResultAggregates (i.e., analysis has not been run). |
+| `cc.EntityNotFoundError` | No Experiment with `experiment_id` exists, or the Experiment exists but has no ResultAggregates (i.e., analysis has not been run). |
 
 **Notes:**
 
@@ -1164,7 +1211,7 @@ at this path at the time the function returns.
 
 | Exception | When |
 |---|---|
-| `cc.NotFoundError` | No Experiment with `experiment_id` exists. |
+| `cc.EntityNotFoundError` | No Experiment with `experiment_id` exists. |
 | `cc.UnsupportedFormatError` | `format` is not one of the recognised values (`"json"`, `"csv"`). |
 | `cc.ExportValidationError` | The exported data is missing mandatory fields (e.g., `eval_number`, `objective_value`, `run_id`). This indicates a data integrity problem in the repository. |
 
@@ -1197,18 +1244,18 @@ All exceptions are defined in `corvus_corone.exceptions` and re-exported from
 
 ```python
 import corvus_corone as cc
-cc.StudyLockedError          # works
+cc.StudyAlreadyLockedError          # works
 
-from corvus_corone.exceptions import StudyLockedError  # also works
+from corvus_corone.exceptions import StudyAlreadyLockedError  # also works
 ```
 
-All exceptions inherit from `corvus_corone.exceptions.CorvusCoroneError`, which is the
+All exceptions inherit from `corvus_corone.exceptions.CorvusError`, which is the
 base class for all library-specific errors. This allows callers to catch all library errors
-with a single `except cc.CorvusCoroneError` if needed.
+with a single `except cc.CorvusError` if needed.
 
 ```
-corvus_corone.exceptions.CorvusCoroneError   (base class)
-├── StudyLockedError
+corvus_corone.exceptions.CorvusError   (base class)
+├── StudyAlreadyLockedError
 ├── SeedCollisionError
 ├── BudgetExhaustedError
 ├── NotFoundError
@@ -1219,9 +1266,9 @@ corvus_corone.exceptions.CorvusCoroneError   (base class)
 
 ---
 
-### StudyLockedError
+### StudyAlreadyLockedError
 
-**Inherits from:** `CorvusCoroneError`
+**Inherits from:** `CorvusError`
 
 **Raised by:** `cc.update_study()`
 
@@ -1239,7 +1286,7 @@ configuration, they must call `cc.create_study()` with the desired parameters.
 
 ### SeedCollisionError
 
-**Inherits from:** `CorvusCoroneError`
+**Inherits from:** `CorvusError`
 
 **Raised by:** `cc.run()`
 
@@ -1258,7 +1305,7 @@ the probability of collision is negligible for any realistic repetition count.
 
 ### BudgetExhaustedError
 
-**Inherits from:** `CorvusCoroneError`
+**Inherits from:** `CorvusError`
 
 **Raised by:** `Problem.evaluate()` internally (the interface method defined in
 `docs/03-technical-contracts/02-interface-contracts/02-problem-interface.md`).
@@ -1280,7 +1327,7 @@ documented for the benefit of Problem implementors and Runner implementors.
 
 ### NotFoundError
 
-**Inherits from:** `CorvusCoroneError`
+**Inherits from:** `CorvusError`
 
 **Raised by:** `cc.get_problem()`, `cc.get_algorithm()`, `cc.get_experiment()`,
 `cc.get_runs()`, `cc.get_result_aggregates()`, `cc.generate_reports()`,
@@ -1300,7 +1347,7 @@ confirm it was not truncated or modified.
 
 ### ValidationError
 
-**Inherits from:** `CorvusCoroneError`
+**Inherits from:** `CorvusError`
 
 **Raised by:** `cc.create_study()`
 
@@ -1317,8 +1364,11 @@ confirm it was not truncated or modified.
 - `improvement_epsilon` is non-null and `< 0.0`.
 - `max_records_per_run` is non-null and `< 1`.
 - `log_scale_schedule` contains unrecognised keys or has values of the wrong type.
-- Any entry in `pre_registered_hypotheses` is missing the required `"hypothesis"` or
-  `"test_type"` keys.
+- `pre_registered_hypotheses` is empty (ADR-021).
+- Any entry in `pre_registered_hypotheses` is missing the required `"hypothesis"`,
+  `"test_type"` or `"metric_id"` keys.
+- Any entry names a `"test_type"` that is not in `statistical-methodology.md` §3 and is not
+  `"none"`, or a `"metric_id"` that is not in the metric taxonomy.
 
 **Message format:** `"Validation error in create_study(): <field>: <reason>."`
 (e.g., `"Validation error in create_study(): problem_ids: unknown problem id 'foo-bar'."`)
@@ -1331,7 +1381,7 @@ parameter value and retry. If the error mentions an unknown problem or algorithm
 
 ### UnsupportedFormatError
 
-**Inherits from:** `CorvusCoroneError`
+**Inherits from:** `CorvusError`
 
 **Raised by:** `cc.export_raw_data()`
 
@@ -1346,7 +1396,7 @@ strings dynamically from user input without validation.
 
 ### ExportValidationError
 
-**Inherits from:** `CorvusCoroneError`
+**Inherits from:** `CorvusError`
 
 **Raised by:** `cc.export_raw_data()`
 
@@ -1376,8 +1426,8 @@ Unix conventions: 0 for success, non-zero for error.
 |---|---|
 | `0` | Command completed successfully. |
 | `1` | General error (invalid arguments, validation failure). |
-| `2` | Entity not found (equivalent to `NotFoundError`). |
-| `3` | Locked entity error (equivalent to `StudyLockedError`). |
+| `2` | Entity not found (equivalent to `EntityNotFoundError`). |
+| `3` | Locked entity error (equivalent to `StudyAlreadyLockedError`). |
 | `4` | Unsupported format (equivalent to `UnsupportedFormatError`). |
 | `5` | Export validation failure (equivalent to `ExportValidationError`). |
 | `10` | Seed collision error (equivalent to `SeedCollisionError`). |

@@ -67,6 +67,13 @@ NOTE ON C2 CONTAINER COLUMN:
 | FR-24 | 26 | `functional-requirements.md` §4.7 | Ecosystem Bridge | UC-06 | Interoperability | Defined |
 | FR-25 | 26 | `functional-requirements.md` §4.7 | Ecosystem Bridge, Algorithm Registry | UC-02, UC-06 | Interoperability, Plugin | Defined |
 | FR-26 | 24 | `functional-requirements.md` §4.7 | Ecosystem Bridge | UC-06 | Interoperability | Defined |
+| FR-27 | 16, 28 | `functional-requirements.md` §4.8 | Study Orchestrator, Public API + CLI | UC-01 | Usability, Validation rejection | Defined |
+| FR-28 | 16, 19 | `functional-requirements.md` §4.8 | Public API + CLI | UC-01 | Validation rejection | Defined |
+| FR-29 | 28 | `functional-requirements.md` §4.8 | All | UC-01, UC-02, UC-04 | Usability | Defined |
+| FR-30 | 4, 5 | `functional-requirements.md` §4.8 | Study Orchestrator | UC-01 | Statistical validity | Defined |
+| FR-31 | 3, 13 | `functional-requirements.md` §4.8 | Study Orchestrator, Reporting Engine | UC-01 | Constraint enforcement | Defined |
+| FR-32 | 4, 5 | `functional-requirements.md` §4.1 | Problem Repository, Study Orchestrator | UC-01 | Statistical validity | Defined |
+| FR-33 | 5 | `functional-requirements.md` §4.1 | Problem Repository, Study Orchestrator | UC-01 | Statistical validity | Defined |
 
 ---
 

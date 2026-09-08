@@ -144,7 +144,7 @@ flowchart LR
 
 ## Actors
 
-> Individual actor descriptions: [actors/](actors/)
+> Individual actor descriptions: [actors/](../02-actors/)
 
 ### Researcher
 
@@ -246,11 +246,17 @@ The Learner does not modify, re-run, or extend any Study. They read completed Re
 
 **Relevant principles:** 3 (scoped conclusions — protects the Learner from over-generalisation), 25 (accessibility for different audiences), 28 (education and support).
 
+> **V1 scope: Deferred.** The Learner actor is not part of the V1 release. V1 serves the
+> Researcher, Practitioner, Algorithm Author, Community Contributor and System Maintainer.
+> See `docs/02-design/01-software-requirement-specification/01-srs/01-SRS.md` §1 V1 Release Scope,
+> which is the authority on release scope.
+
+
 ---
 
 ## External Systems
 
-> Individual external system descriptions: [external-systems/](external-systems/)
+> Individual external system descriptions: [external-systems/](../03-external-systems/)
 
 ### COCO (Comparing Continuous Optimizers)
 

@@ -162,7 +162,7 @@ silently succeeds.
 ### Non-Functional Requirements (NFR-XX)
 
 Accepted when the NFR-specific test category passes at the defined threshold. Thresholds are to be
-set when `REF-TASK-0010` is resolved. Until then, the test category is established but the
+set by the measurable criterion on each NFR (REF-TASK-0010, complete). The test category and the
 pass/fail line is not drawn — except for NFR-REPRO-01, whose pass condition is the
 bit-identical Result Aggregates assertion defined in the Reproducibility Test Procedure above.
 
@@ -178,3 +178,122 @@ Accepted when all three of the following hold:
 1. All Main Flow steps produce their expected postconditions in an automated end-to-end integration test
 2. Each named Failure Scenario is exercised and the system produces the expected rejection or warning (not a silent failure or an incorrect success)
 3. A corresponding tutorial in `docs/06-tutorials/` demonstrates the UC for a human user and a representative user can complete it within the stated time target
+
+---
+
+## Acceptance Scenarios for UC-01 and UC-02
+
+These scenarios were originally expressed as executable assertions against a set of interface
+stubs under `packages/corvus-corone-lib/tests/e2e/`. Those stubs were a temporary instrument for
+testing whether the contracts were implementable, not production code, and they encoded a Study
+lifecycle and seed strategy that ADR-013 and ADR-017 have since replaced. The scenarios are
+recorded here in the form the corrected contracts require, so that they survive the removal of
+the instrument and can be reimplemented against the real library.
+
+Each numbered scenario is one acceptance obligation. A scenario is met when an automated test
+asserts it against the production implementation.
+
+### UC-01 — Design and execute a reproducible benchmarking Study
+
+**Study lifecycle (ADR-013, ADR-021, FR-08)**
+
+1. `create_study()` returns a Study whose `status` is `"draft"`.
+2. `update_study()` on a draft applies the change; the returned Study reflects it.
+3. `lock_study()` transitions `status` to `"locked"`.
+4. `update_study()` on a locked Study raises `StudyAlreadyLockedError` and leaves the stored
+   Study byte-identical.
+5. `lock_study()` on a Study with an empty `pre_registered_hypotheses` list raises
+   `ValidationError` naming that field and the reason it is required.
+6. `run()` on a draft Study raises `StudyNotLockedError`.
+7. `research_question` and `pre_registered_hypotheses` are preserved verbatim through the lock
+   transition.
+
+**PerformanceRecord strategy (ADR-002, ADR-004, ADR-005)**
+
+8. Every Run produces at least one PerformanceRecord.
+9. Exactly one record per Run carries a `trigger_reason` containing `end_of_run`, and its
+   `evaluation_number` equals `Run.budget_used`.
+10. Every scheduled checkpoint in `Study.log_scale_schedule` up to the budget has a
+    corresponding record.
+11. `evaluation_number` is strictly increasing within a Run; no duplicates.
+12. Every `trigger_reason` value is one of the seven defined in `01-data-format/07-performance-record.md`.
+13. A record whose `trigger_reason` contains `improvement` has `is_improvement` true; a record
+    whose reason is `scheduled` or `end_of_run` alone may have it false.
+14. `best_so_far` is non-increasing across the record sequence of a minimisation Run.
+15. An evaluation that is both a scheduled checkpoint and an improvement produces exactly one
+    record whose `trigger_reason` is `both`, not two records.
+
+**Improvement epsilon (ADR-004)**
+
+16. With `improvement_epsilon` null, every strict improvement produces an improvement record.
+17. With `improvement_epsilon` set to a value larger than the observed improvements, no
+    improvement-only records are written.
+18. A non-null `improvement_epsilon` appears in the limitations section of both generated
+    Reports.
+
+**Storage cap (ADR-005)**
+
+19. Once `max_records_per_run` is reached, no further improvement-only records are written.
+20. Scheduled records continue after the cap.
+21. The end-of-run record is written regardless of the cap.
+22. `Run.cap_reached_at_evaluation` is set to the evaluation at which improvement-only logging
+    stopped, and is null when no cap was configured.
+23. The cap appears in the limitations section of both generated Reports.
+
+**Reproducibility (ADR-017, MANIFESTO Principle 18)**
+
+24. All Run seeds within an Experiment are unique for a given problem and algorithm pair; a
+    duplicate raises `SeedCollisionError`.
+25. Two Runs with the same seed, Problem Instance and Algorithm Instance produce identical
+    PerformanceRecord sequences.
+26. Two Runs differing only in seed produce different objective sequences.
+27. Every Run seed is reproducible from `Study.root_seed` alone, by spawning the
+    `SeedSequence` in run-plan order.
+
+**Postconditions (FR-09, FR-13, FR-20)**
+
+28. `Experiment.status` is `"completed"` after a successful execution.
+29. The number of Runs equals problems x algorithms x repetitions.
+30. A ResultAggregate exists for every problem and algorithm pair, with `n_runs` equal to the
+    repetition count.
+31. Every ResultAggregate carries the four Standard Reporting Set metrics.
+32. Exactly two Reports are generated, one `researcher` and one `practitioner` (ADR-019).
+33. Both Reports have a non-empty limitations section, and the scope statement names the
+    Problem Instances actually tested.
+34. Every Run references its Experiment, and every Experiment references its Study.
+
+### UC-02 — Contribute an Algorithm Implementation
+
+**Interface compliance (FR-05, `03-algorithm-interface.md`)**
+
+35. A conforming adapter exposes `initialize`, `suggest`, `observe`,
+    `get_supported_variable_types` and `get_metadata`.
+36. `suggest()` returns a list of solutions whose length equals `batch_size`, for
+    `batch_size` of 1 and greater.
+37. Every suggested solution lies within the declared search space bounds.
+38. `observe()` returns `None` and does not raise, including for algorithms that ignore
+    feedback.
+39. `get_supported_variable_types()` returns a non-empty list drawn from `continuous`,
+    `integer`, `categorical`, and is stable across calls.
+
+**Registration validation (FR-06, FR-07)**
+
+40. An adapter missing `observe` or `suggest` is rejected with `InterfaceViolationError`
+    (UC-02 F1).
+41. A `code_reference` that is not version-pinned is rejected with `CodeReferenceError`
+    (UC-02 F2).
+42. An empty `configuration_justification` is rejected with `ValidationError` (UC-02 F3).
+43. A missing required metadata field is rejected with `ValidationError` naming the field
+    (UC-02 F4).
+44. `supported_variable_types` in the metadata matches the value returned by the method.
+
+**Smoke run and isolation**
+
+45. A registered adapter completes a single Run within budget and produces at least one
+    PerformanceRecord, including the end-of-run record.
+46. The first record of every Run has `is_improvement` true.
+47. The adapter runs on a higher-dimensional Problem Instance without modification.
+48. `initialize()` discards all state from a previous Run: the internal generator and any
+    cached best solution are reset, and two consecutive Runs with the same seed produce
+    identical records.
+49. The adapter creates no randomness before `initialize()` is called.

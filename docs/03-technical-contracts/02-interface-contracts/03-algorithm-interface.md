@@ -1,6 +1,6 @@
 # §2 Algorithm Interface
 
-> Index: [01-interface-contracts.md](01-interface-contracts.md)
+> Index: [01-interface-contracts.md](01-index.md)
 
 Any class that provides an HPO algorithm MUST implement all methods in this section.
 The Algorithm Interface uses the **ask-tell** pattern: the Runner calls `suggest()` to request

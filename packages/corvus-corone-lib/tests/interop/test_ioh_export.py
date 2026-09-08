@@ -14,7 +14,7 @@ References
 ----------
 Interface contract : docs/03-technical-contracts/01-data-format/11-interoperability-mappings.md §4.2
 Exporter           : corvus_corone/export/ioh_exporter.py
-Stubs              : tests/e2e/_stubs.py
+Fixtures           : tests/interop/_fixtures.py
 """
 
 from __future__ import annotations
@@ -23,14 +23,7 @@ import json
 from pathlib import Path
 
 import pytest
-from tests.e2e._stubs import (
-    ExperimentRecord,
-    MinimalRunner,
-    StubGreedyAlgorithm,
-    StubNoisySphereProblem,
-    StubRandomSearchAlgorithm,
-    create_study,
-)
+from tests.interop._fixtures import ExperimentRecord, make_experiment
 
 from corvus_corone.export.ioh_exporter import AlgorithmMeta, IOHExporter, ProblemMeta
 
@@ -41,45 +34,27 @@ from corvus_corone.export.ioh_exporter import AlgorithmMeta, IOHExporter, Proble
 
 @pytest.fixture
 def small_experiment() -> ExperimentRecord:
-    """1 problem × 1 algorithm × 3 repetitions, budget=20."""
-    study = create_study(
+    """1 problem x 1 algorithm x 3 repetitions, budget=20."""
+    return make_experiment(
+        experiment_id="exp-ioh-test",
         study_id="study-ioh-test",
-        name="IOH export test",
-        research_question="Test fixture for IOH export.",
         problem_ids=["prob-001"],
         algorithm_ids=["alg-001"],
         repetitions=3,
         budget=20,
     )
-    sphere = StubNoisySphereProblem("prob-001", dim=2, budget=20, noise_std=0.05)
-    alg = StubRandomSearchAlgorithm("alg-001")
-    runner = MinimalRunner(study)
-    return runner.run_study(
-        problems={"prob-001": sphere},
-        algorithms={"alg-001": alg},
-    )
 
 
 @pytest.fixture
 def two_alg_experiment() -> ExperimentRecord:
-    """1 problem × 2 algorithms × 2 repetitions."""
-    study = create_study(
+    """1 problem x 2 algorithms x 2 repetitions."""
+    return make_experiment(
+        experiment_id="exp-ioh-two-alg",
         study_id="study-ioh-two-alg",
-        name="Two-algorithm IOH export test",
-        research_question="Test fixture for multi-algorithm IOH export.",
         problem_ids=["prob-001"],
         algorithm_ids=["alg-001", "alg-002"],
         repetitions=2,
         budget=20,
-    )
-    sphere = StubNoisySphereProblem("prob-001", dim=2, budget=20, noise_std=0.05)
-    runner = MinimalRunner(study)
-    return runner.run_study(
-        problems={"prob-001": sphere},
-        algorithms={
-            "alg-001": StubRandomSearchAlgorithm("alg-001"),
-            "alg-002": StubGreedyAlgorithm("alg-002"),
-        },
     )
 
 

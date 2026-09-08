@@ -41,5 +41,5 @@ delegated to the Data & Registry layer.
 **Actors served:** Researcher (primary), Algorithm Author (registry reads), Learner
 (visualisation commands via `cc.visualize()`).
 
-**Relevant SRS section:** FR-4.1 (problem registry reads), FR-4.2 (algorithm registry
-reads), FR-4.3 (study execution), FR-4.5 (reproducibility), FR-4.6 (reporting).
+**Relevant SRS section:** §4.1 FR-01..FR-04 (problem registry reads), §4.2 FR-05..FR-07 (algorithm registry
+reads), §4.3 FR-08..FR-12 (study execution), §4.5 FR-17..FR-19 (reproducibility), §4.6 FR-20..FR-22 (reporting), §4.8 FR-27..FR-31 (study design guidance).

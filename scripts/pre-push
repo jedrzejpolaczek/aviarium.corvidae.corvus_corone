@@ -4,6 +4,9 @@
 
 set -euo pipefail
 
+echo ">>> [pre-push] check_docs..."
+python scripts/check_docs.py
+
 echo ">>> [pre-push] ruff check..."
 uv run ruff check .
 

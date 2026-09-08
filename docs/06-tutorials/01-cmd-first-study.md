@@ -94,21 +94,91 @@ not prerequisites (except the explicitly listed Prerequisites section).
 ---
 
 ## Steps
-### The researcher opens a terminal and types:
-corvus study new --question "Does TPE outperform Random Search on noisy, high-dimensional spaces?"
 
-### The system asks:
-> Select problems (from registry or path to custom):
-> Select dataset:
-> Select algorithms:
-> How many repetitions?
-> 
+The study is authored in Python and executed from the terminal. There is no interactive
+`corvus study new` wizard: study authoring functions have no CLI equivalent in V1, because a
+Study is a scientific commitment and the framework needs to tell you what it requires before you
+make it (ADR-016, FR-27).
 
-### Then:
-corvus run my_study.yaml
-### ... progress bar, logs ...
-corvus report my_study/ --audience researcher
-### Opens report.html in browser
+### Step 1: Author the Study
+
+```python
+import corvus_corone as cc
+
+study = cc.create_study(
+    name="TPE vs Random Search under noise",
+    research_question=(
+        "Does TPE outperform Random Search on noisy, high-dimensional spaces?"
+    ),
+    problem_ids=[p.id for p in cc.list_problems(tags=["noisy", "continuous"])],
+    algorithm_ids=["<tpe-id>", "<random-search-id>"],
+    repetitions=10,
+    budget=200,
+    seed_strategy="sequential",
+    sampling_strategy="log_scale_plus_improvement",
+    pre_registered_hypotheses=[
+        {
+            "hypothesis": "TPE reaches a lower final objective than Random Search "
+                          "on noisy problems of dimension 10 and above.",
+            "test_type": "wilcoxon",
+            "metric_id": "QUALITY-BEST_VALUE_AT_BUDGET",
+        },
+    ],
+)
+print(study.status)   # draft
+```
+
+`create_study()` returns a **draft**. Nothing is committed yet, and you can still change your
+mind with `cc.update_study(study.id, repetitions=20)`.
+
+### Step 2: Lock the Study
+
+```python
+study = cc.lock_study(study.id)
+print(study.status)   # locked
+```
+
+This is the pre-registration moment (ADR-013, ADR-021). From here the problem set, algorithm
+set, experimental design and hypotheses are immutable, and the Study can run.
+
+If something is unresolved, `lock_study()` refuses and names **every** unresolved decision at
+once, with the consequence of each, rather than the first missing field (FR-27):
+
+```
+ValidationError: Study cannot be locked. 2 decisions are unresolved:
+  - pre_registered_hypotheses is empty. A Study without a declared hypothesis cannot
+    distinguish a confirmed result from one found by looking. Declare at least one
+    hypothesis, or declare the Study exploratory with test_type "none".
+    (MANIFESTO Principle 16, ADR-021)
+  - problem_instance_ids covers 1 dimensionality range; the diversity floor asks for 2.
+    Conclusions will be scoped to that single range in the Report.
+    (ADR-009, FR-33)
+```
+
+### Step 3: Run it
+
+```bash
+corvus run <study_id>
+```
+
+Progress is written to the terminal, one line per completed Run.
+
+### Step 4: Read the reports
+
+```bash
+corvus report <experiment_id> --open
+```
+
+Every completed Experiment produces **two** reports, one for a researcher and one for a
+practitioner (ADR-019). Both carry a limitations section; neither ranks the algorithms.
+
+### Step 5: Export, if you want to cross-check elsewhere
+
+```bash
+corvus export <experiment_id> --format ioh --output ./ioh-out
+```
+
+The export prints an information-loss manifest before it writes anything (FR-24).
 
 <!--
   Each step follows this format:

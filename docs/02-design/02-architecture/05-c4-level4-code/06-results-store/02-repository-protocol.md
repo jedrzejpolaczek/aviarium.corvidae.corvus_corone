@@ -1,9 +1,9 @@
 # C4: Code — Repository Protocol
 
 > C4 Index: [../01-index.md](../01-index.md)
-> C3 Component (Local File Repository): [../../04-c4-leve3-components/05-results-store/02-local-file-repository.md](../../04-c4-leve3-components/05-results-store/02-local-file-repository.md)
-> C3 Index (Results Store): [../../04-c4-leve3-components/05-results-store/01-index.md](../../04-c4-leve3-components/05-results-store/01-index.md)
-> ADR: [../../adr/ADR-001-library-with-server-ready-data-layer.md](../../adr/ADR-001-library-with-server-ready-data-layer.md)
+> C3 Component (Local File Repository): [../../04-c4-leve3-components/05-results-store/02-local-file-repository.md](../../03-c4-leve2-containers/04-c4-leve3-components/05-results-store/02-local-file-repository.md)
+> C3 Index (Results Store): [../../04-c4-leve3-components/05-results-store/01-index.md](../../03-c4-leve2-containers/04-c4-leve3-components/05-results-store/01-index.md)
+> ADR: [../../adr/ADR-001-library-with-server-ready-data-layer.md](../../01-adr/adr-001-library-with-server-ready-data-layer.md)
 
 ---
 
@@ -18,88 +18,34 @@ component. Every component that reads or writes study artifacts depends on this 
 
 ## Key Abstractions
 
-### `Repository`
+> **Descriptive document (ADR-012).** The authoritative definition is the contract cited
+> below. This page explains only how that contract is grouped into a component and why the
+> boundary falls where it does. It does not define signatures.
 
-**Type:** Protocol (PEP 544 structural subtyping)
+### `RepositoryFactory`
 
-**Why Protocol:** The V1→V2 migration requirement (ADR-001) demands that the storage backend
-be swappable without modifying library code. Protocol achieves this without forcing a shared
-base class onto implementations that may live in separate packages (e.g., a `corvus-server`
-package providing `ServerRepository`).
+**Type:** Abstract base class, defined in
+[`06-repository-interface.md`](../../../../03-technical-contracts/02-interface-contracts/06-repository-interface.md).
 
-**Purpose:** Provide canonical path resolution for all study artifacts — study directories,
-run directories, JSONL files, Parquet files, entity JSON files — so that no component
-constructs paths independently.
+**Purpose:** group the seven domain repositories behind one object so that components needing
+cross-entity access receive a single dependency. It is the V1 to V2 swap point:
+`LocalFileRepository` backs storage in V1, and a `ServerRepository` can replace it without
+changing any consumer.
 
-**Key elements:**
-
-| Method | Semantics |
-|---|---|
-| `study_dir(study_id)` | Canonical root directory for a study's artifacts |
-| `experiment_dir(study_id, experiment_id)` | Canonical directory for an experiment's artifacts |
-| `run_dir(study_id, experiment_id, run_id)` | Canonical directory for a single run's artifacts |
-| `entity_path(entity_type, entity_id)` | Canonical path for a JSON entity file |
-| `jsonl_path(run_id)` | Canonical path for a run's JSONL performance log |
-| `parquet_path(run_id)` | Canonical path for a run's Parquet performance file |
-| `ensure_dirs(path)` | Create all intermediate directories; idempotent |
+**Surface:** the properties `problems`, `algorithms`, `studies`, `experiments`, `runs`,
+`aggregates` and `reports`, each returning the corresponding domain repository. Method
+signatures for those repositories are in the contract and are not restated here.
 
 **Constraints / invariants:**
 
-- All returned paths must be absolute. Relative paths would break if the working directory
-  changes between calls.
-- `ensure_dirs()` must be idempotent — calling it on an already-existing path must not raise.
-- `jsonl_path(run_id)` and `parquet_path(run_id)` must refer to the same logical dataset
-  in two formats. The JSONL is the write-time format; the Parquet is the post-run conversion.
-  Their parent directory must be the same `run_dir`.
-- The path hierarchy must be stable across library versions. Changing it breaks all
-  previously written studies. Any change requires a migration entry in the data format
-  contract.
-
-**The canonical V1 directory structure (normative):**
-
-```
-{results_dir}/
-  studies/{study_id}/study.json
-  experiments/{experiment_id}/experiment.json
-  runs/{run_id}/
-    run.json
-    seed.json
-    performance.jsonl
-    performance.parquet
-    run.log
-```
-
-**Extension points:**
-
-`ServerRepository` (V2) must satisfy all method signatures above. It may return URI-based
-paths (e.g., `s3://bucket/runs/{run_id}/performance.jsonl`) as long as the calling components
-handle URI-based paths. If URI handling requires changes in callers, that is a design
-violation — callers must not need to know which backend is in use.
-
----
-
-### `LocalFileRepository`
-
-**Type:** Class implementing `Repository`
-
-**Purpose:** V1 implementation of `Repository` backed by the local filesystem. Constructed
-with a `results_dir: Path` root; all paths are computed relative to it.
-
-**Key elements:**
-
-| Attribute | Semantics |
-|---|---|
-| `results_dir` | Root directory for all study artifacts — set at construction, immutable |
-
-**Constraints / invariants:**
-
-- `results_dir` must be an absolute path. Relative paths are rejected at construction with
-  `ValueError`.
-- `LocalFileRepository` holds no open file handles. It is a pure path-computation service.
-- Callers are responsible for checking path existence before writing. The repository does
-  not guard against overwrites.
-
----
+- No method accepts or returns a filesystem path. ADR-001 makes the on-disk layout an
+  implementation detail of `LocalFileRepository`; a path-resolution interface would promote
+  that layout into the contract and make the V2 swap impossible, which is the opposite of what
+  ADR-001 exists to guarantee.
+- Entities are addressed by UUID string only (ADR-014). There is no version parameter:
+  entities are immutable and a revision is a new entity linked by `superseded_by` (ADR-020).
+- Consumer code never traverses the store. Anything a component needs, it obtains through a
+  repository property.
 
 ## Class / Module Diagram
 

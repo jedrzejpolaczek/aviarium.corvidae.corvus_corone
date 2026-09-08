@@ -1,6 +1,6 @@
 # §6 Cross-Cutting Contracts
 
-> Index: [01-interface-contracts.md](01-interface-contracts.md)
+> Index: [01-interface-contracts.md](01-index.md)
 
 Contracts that apply to **all** interface implementations in this system.
 These are the system-wide rules that make the whole greater than the sum of its parts.
@@ -79,6 +79,7 @@ Every exception MUST carry: `error_code` (string), `message` (human-readable), `
 CorvusError (base)
 ├── ValidationError       — input does not conform to contract
 │   ├── InvalidSolutionError     (§1 Problem)
+│   ├── InterfaceViolationError  (§2 Algorithm, §1 Problem — registered entity does not satisfy its interface)
 │   ├── StudyNotLockedError      (§3 Runner)
 │   ├── StudyAlreadyLockedError  (§5 Repository)
 │   ├── ImmutableFieldError      (§5 Repository)
@@ -89,13 +90,22 @@ CorvusError (base)
 │   └── SeedCollisionError       (§3 Runner)
 ├── StorageError          — repository unavailable or corrupt
 │   ├── EntityNotFoundError      (§5 Repository)
-│   ├── VersionNotFoundError     (§5 Repository)
+│   ├── SchemaVersionError       (§5 Repository — artifact schema newer or incompatible)
 │   └── DuplicateEvaluationError (§5 Repository)
 ├── IntegrationError      — external system unavailable
-│   └── CodeReferenceError       (§5 Repository — unreachable code_reference)
+│   ├── CodeReferenceError       (§5 Repository — unreachable code_reference)
+│   ├── UnsupportedFormatError   (Ecosystem Bridge — unknown export format)
+│   └── ExportValidationError    (Ecosystem Bridge — source data incomplete for export)
 └── AnalysisError         — analysis precondition not met
     ├── ExperimentNotCompleteError  (§4 Analyzer)
+    ├── RunNotCompleteError         (§4 Analyzer — Run status is not "completed")
+    ├── MetricUndefinedError        (§4 Analyzer — metric undefined for the given data)
     └── InsufficientRunsError       (§4 Analyzer)
+
+This tree is the **only** exception hierarchy in the system (ADR-015). No document may introduce
+an exception class that is absent from it; a genuinely new failure kind is added here first.
+`VersionNotFoundError` was removed by ADR-020, which replaced version-addressed retrieval with
+immutable entities.
 ```
 
 All exceptions are importable from `corvus_corone.exceptions`.

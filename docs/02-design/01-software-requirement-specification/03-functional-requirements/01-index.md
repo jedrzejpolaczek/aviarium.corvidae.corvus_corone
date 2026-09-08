@@ -32,10 +32,11 @@ NOTE ON CONTAINER MAPPING:
 
 | Group | Container | FRs | File |
 |---|---|---|---|
-| 4.1 Problem Repository | Problem Repository | FR-01..FR-04 | [02-fr-4.1-problem-repository.md](02-fr-4.1-problem-repository.md) |
+| 4.1 Problem Repository | Problem Repository | FR-01..FR-04, FR-32..FR-33 | [02-fr-4.1-problem-repository.md](02-fr-4.1-problem-repository.md) |
 | 4.2 Algorithm Registry | Algorithm Registry | FR-05..FR-07 | [03-fr-4.2-algorithm-registry.md](03-fr-4.2-algorithm-registry.md) |
 | 4.3 Experiment Runner | Experiment Runner | FR-08..FR-12 | [04-fr-4.3-experiment-runner.md](04-fr-4.3-experiment-runner.md) |
 | 4.4 Measurement & Analysis Engine | Analysis Engine | FR-13..FR-16 | [05-fr-4.4-measurement-and-analysis.md](05-fr-4.4-measurement-and-analysis.md) |
 | 4.5 Reproducibility Layer | Results Store | FR-17..FR-19 | [06-fr-4.5-reproducibility-layer.md](06-fr-4.5-reproducibility-layer.md) |
 | 4.6 Reporting & Visualization | Reporting Engine | FR-20..FR-22 | [07-fr-4.6-reporting-and-visualization.md](07-fr-4.6-reporting-and-visualization.md) |
 | 4.7 Ecosystem Integration | Ecosystem Bridge | FR-23..FR-26 | [08-fr-4.7-ecosystem-integration.md](08-fr-4.7-ecosystem-integration.md) |
+| 4.8 Study Design Guidance | Study Orchestrator, Public API + CLI | FR-27..FR-31 | [09-fr-4.8-study-design-guidance.md](09-fr-4.8-study-design-guidance.md) |

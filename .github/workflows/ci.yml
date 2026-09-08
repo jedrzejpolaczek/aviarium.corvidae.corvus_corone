@@ -1,10 +1,32 @@
 name: CI
 
-# Triggered manually only — linters run locally via pre-push hook (scripts/pre-push).
+# Runs on every push to main and dev, and on every pull request.
+#
+# The documentation job is not decoration. The docs/ tree is a cross-referenced
+# graph whose integrity constraints cannot be verified by reading: a link breaks
+# when a different file is renamed in a different commit, and nothing in the file
+# containing the link changes. See scripts/check_docs.py and ADR-012.
 on:
+  push:
+    branches: [main, dev]
+  pull_request:
   workflow_dispatch:
 
 jobs:
+  docs:
+    name: Documentation integrity
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: check_docs
+        run: python scripts/check_docs.py
+
   lint:
     name: Lint & Format
     runs-on: ubuntu-latest
@@ -17,7 +39,7 @@ jobs:
           version: "latest"
 
       - name: Set up Python
-        run: uv python install 3.13
+        run: uv python install 3.10
 
       - name: Install dependencies
         run: uv sync --all-extras
@@ -40,7 +62,7 @@ jobs:
           version: "latest"
 
       - name: Set up Python
-        run: uv python install 3.13
+        run: uv python install 3.10
 
       - name: Install dependencies
         run: uv sync --all-extras
@@ -49,8 +71,16 @@ jobs:
         run: uv run mypy
 
   test:
-    name: Tests
-    runs-on: ubuntu-latest
+    # ADR-006: minimum Python 3.10, three-version window, Linux and macOS
+    # blocking, Windows best-effort.
+    name: Tests (py${{ matrix.python-version }}, ${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    continue-on-error: ${{ matrix.os == 'windows-latest' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python-version: ["3.10", "3.11", "3.12"]
     steps:
       - uses: actions/checkout@v4
 
@@ -60,7 +90,7 @@ jobs:
           version: "latest"
 
       - name: Set up Python
-        run: uv python install 3.13
+        run: uv python install ${{ matrix.python-version }}
 
       - name: Install dependencies
         run: uv sync --all-extras

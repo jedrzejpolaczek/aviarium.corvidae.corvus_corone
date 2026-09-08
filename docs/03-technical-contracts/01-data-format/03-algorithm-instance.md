@@ -1,12 +1,13 @@
 # §2.2 Algorithm Instance
 
-> Index: [01-data-format.md](01-data-format.md)
+> Index: [01-data-format.md](01-index.md)
 
-> See GLOSSARY: [Algorithm Instance](../GLOSSARY.md#algorithm-instance)
+> See GLOSSARY: [Algorithm Instance](../../GLOSSARY.md#algorithm-instance)
 
 | Name | Type | Required | Notes |
 | --- | --- | --- | --- |
-| id | int | yes | Algorithm Instance ID |
+| id | string | yes | Algorithm Instance ID |
+| schema_version | string | yes | Version of the entity schema this record conforms to, e.g. `0.0.1`. Governs the shape of the record, not the identity of the entity. See [13-schema-versioning.md](13-schema-versioning.md) |
 | name | string | yes | Human-readable name for this specific configuration eg. `NSGANet`, `Grid vs Random` |
 | version | string | yes | Version of this record. Structure is described in validation rules |
 | algorithm_family | string | yes | The abstract Algorithm this is an instance of (e.g., `Random Search`, `TPE`, `CMA-ES`) |

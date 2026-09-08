@@ -1,9 +1,9 @@
 # C4: Code — MetricDispatcher
 
 > C4 Index: [../01-index.md](../01-index.md)
-> C3 Component: [../../04-c4-leve3-components/04-analysis-engine/02-metric-dispatcher.md](../../04-c4-leve3-components/04-analysis-engine/02-metric-dispatcher.md)
-> C3 Index (Analysis Engine): [../../04-c4-leve3-components/04-analysis-engine/01-index.md](../../04-c4-leve3-components/04-analysis-engine/01-index.md)
-> Metric Taxonomy: [../../../03-technical-contracts/03-metric-taxonomy/](../../../03-technical-contracts/03-metric-taxonomy/)
+> C3 Component: [../../04-c4-leve3-components/04-analysis-engine/02-metric-dispatcher.md](../../03-c4-leve2-containers/04-c4-leve3-components/04-analysis-engine/02-metric-dispatcher.md)
+> C3 Index (Analysis Engine): [../../04-c4-leve3-components/04-analysis-engine/01-index.md](../../03-c4-leve2-containers/04-c4-leve3-components/04-analysis-engine/01-index.md)
+> Metric Taxonomy: [../../../03-technical-contracts/03-metric-taxonomy/](../../../../03-technical-contracts/03-metric-taxonomy/01-index.md)
 
 ---
 
@@ -53,14 +53,19 @@ computation functions. This is the extension point for new metrics:
 
 ```python
 _METRIC_REGISTRY: dict[str, Callable[[list[PerformanceRecord]], list[float]]] = {
-    "QUALITY-BEST_VALUE_AT_BUDGET": _compute_best_value_at_budget,
-    "ERT":                          _compute_ert,
-    "AUC-CONVERGENCE":              _compute_auc_convergence,
+    "QUALITY-BEST_VALUE_AT_BUDGET": _compute_quality_best_value_at_budget,
+    "RELIABILITY-SUCCESS_RATE":     _compute_reliability_success_rate,
+    "ROBUSTNESS-RESULT_STABILITY":  _compute_robustness_result_stability,
+    "ANYTIME-ECDF_AREA":            _compute_anytime_ecdf_area,
 }
 ```
 
-Adding a new metric: add an entry to `_METRIC_REGISTRY` and a corresponding definition in
-`docs/03-technical-contracts/03-metric-taxonomy/`. Both changes must be in the same PR.
+The four keys above are the Standard Reporting Set, which every Study Report must contain.
+`TIME-EVALUATIONS_TO_TARGET` is registered too but is opt-in (ADR-008).
+
+Adding a new metric: define it in `docs/03-technical-contracts/03-metric-taxonomy/` first, then
+add the registry entry. The taxonomy is the only source of metric identifiers (ADR-012), and
+`save_result_aggregates()` rejects a key that is not defined there.
 
 **Extension points:**
 
@@ -94,7 +99,7 @@ Tester. One instance per unique `(experiment_id, algorithm_id, problem_id, metri
 
 ### `AnalysisConfig`
 
-See [../02-cross-cutting/04-study-spec.md](../02-cross-cutting/04-study-spec.md).
+See [../02-cross-cutting/04-study-spec.md](../02-shared/04-study-spec.md).
 
 ---
 

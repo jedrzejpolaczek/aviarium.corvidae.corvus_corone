@@ -1,8 +1,8 @@
 # C4: Code — PilotState
 
 > C4 Index: [../01-index.md](../01-index.md)
-> C3 Component (LangGraph Graph): [../../04-c4-leve3-components/02-corvus-pilot/03-langgraph-graph.md](../../04-c4-leve3-components/02-corvus-pilot/03-langgraph-graph.md)
-> C3 Index (Corvus Pilot V2): [../../04-c4-leve3-components/02-corvus-pilot/01-index.md](../../04-c4-leve3-components/02-corvus-pilot/01-index.md)
+> C3 Component (LangGraph Graph): [../../04-c4-leve3-components/02-corvus-pilot/03-langgraph-graph.md](../../03-c4-leve2-containers/04-c4-leve3-components/02-corvus-pilot/03-langgraph-graph.md)
+> C3 Index (Corvus Pilot V2): [../../04-c4-leve3-components/02-corvus-pilot/01-index.md](../../03-c4-leve2-containers/04-c4-leve3-components/02-corvus-pilot/01-index.md)
 
 ---
 

@@ -1,6 +1,6 @@
 # External System: COCO (Comparing Continuous Optimizers)
 
-> C1 Context: [../01-c1-context.md](../01-c1-context.md)
+> C1 Context: [../01-c1-context.md](../01-c4-l1-context/01-c1-context.md)
 
 **What it is:** A widely-used benchmark framework for continuous black-box optimization, maintained by the COCO community. Defines standard problem suites (BBOB) and a performance analysis workflow.
 

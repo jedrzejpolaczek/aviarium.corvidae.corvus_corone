@@ -43,7 +43,19 @@ of the system handles everything else.
 
 After completing this tutorial, the reader will be able to wrap any Optuna sampler as
 a compliant Algorithm Instance that registers and runs without error in a corvus_corone
-Study — writing ≤15 lines of behavioral adapter code.
+Study.
+
+**What the "≤15 lines" claim does and does not cover.** The behavioural core —
+`initialize()`, `suggest()` and `observe()`, the three methods that decide how the optimizer
+searches — fits in about 15 lines. That is the number the interface test cares about: if the
+search behaviour of a real optimizer cannot be expressed in roughly that space, the Algorithm
+Interface is too wide.
+
+It is not the whole cost of contributing. `get_metadata()` adds roughly 25 further lines
+carrying 12 mandatory fields, including `configuration_justification` and a version-pinned
+`code_reference`. Those are provenance, not behaviour, and they are mandatory on purpose:
+MANIFESTO Principle 8 requires the algorithm, its configuration and its implementation to be
+reported separately and precisely. Budget for roughly 40 lines in total.
 
 ---
 
@@ -100,6 +112,13 @@ over state from Run 1 into Run 2 silently corrupts the experiment.
 Even if your algorithm ignores feedback (e.g., random search), `observe()` must be
 declared. A missing `observe()` raises `InterfaceViolationError` at registration.
 
+**Contract 4 — one `observe()` per suggested solution, in order.**
+`suggest(context, batch_size)` may return more than one candidate. The Runner then calls
+`observe()` once per candidate, in the order they were returned. An adapter that assumes
+`observe()` always refers to the most recent `suggest()` is wrong for any `batch_size`
+greater than 1: it attributes every result to the last candidate. Keep the pending
+candidates in a queue and pop them in order.
+
 For the full method signatures and edge cases, see
 [§2 Algorithm Interface](../03-technical-contracts/02-interface-contracts/03-algorithm-interface.md).
 
@@ -113,6 +132,8 @@ Everything else is metadata boilerplate.
 Create a file `my_tpe_adapter.py`:
 
 ```python
+from collections import deque
+
 import optuna
 
 optuna.logging.set_verbosity(optuna.logging.WARNING)
@@ -126,6 +147,7 @@ class OptunaTPEAdapter:
         self._n = n_startup_trials
         self._study = None    # created fresh in initialize() — never shared across Runs
         self._space = None
+        self._pending = deque()   # ← Contract 4: one entry per un-observed candidate
 
     # ── 15-line behavioral core ───────────────────────────────────────────────
 
@@ -137,18 +159,22 @@ class OptunaTPEAdapter:
         )                                                            # line 6
         self._study = optuna.create_study(                           # line 7
             sampler=sampler, direction="minimize"                    # line 8
-        )                                      # ← Contract 2 (new study = reset)  # line 9
+        )                                                            # line 9
+        self._pending.clear()                  # ← Contract 2 (new study = reset)
 
     def suggest(self, context, batch_size: int = 1) -> list:        # line 10
-        lo, hi = self._space.lower, self._space.upper               # line 11
-        return [                                                     # line 12
-            [self._study.ask().suggest_float(f"x{i}", lo, hi)       # line 13
-             for i in range(self._space.dimensions)]                 # line 14
-            for _ in range(batch_size)                               # line 15
-        ]
+        solutions = []                                               # line 11
+        for _ in range(batch_size):                                  # line 12
+            trial = self._study.ask()          # ← Contract 4       # line 13
+            self._pending.append(trial)                              # line 14
+            solutions.append([                                       # line 15
+                trial.suggest_float(v.name, v.bounds[0], v.bounds[1])
+                for v in self._space.variables
+            ])
+        return solutions
 
     def observe(self, solution, result) -> None:                    # ← Contract 3
-        self._study.tell(self._study.trials[-1], result.objective_value)
+        self._study.tell(self._pending.popleft(), result.objective_value)
 
     # ── Metadata boilerplate (not counted in the 15-line limit) ──────────────
 
@@ -177,10 +203,12 @@ class OptunaTPEAdapter:
         }
 ```
 
-**Why `observe()` has only 1 line of logic:**
-Optuna's `study.tell()` updates the internal model. The Runner already guaranteed that
-`suggest()` was called immediately before this `observe()`, so `trials[-1]` is always
-the trial we just asked for.
+**Why `observe()` pops from a queue rather than reading `trials[-1]`:**
+Optuna's `study.tell()` needs the trial that produced the solution being reported. Reading
+`trials[-1]` returns the most recently *asked* trial, which is correct only when
+`batch_size` is 1. With a batch of three, the Runner asks once for three candidates and
+then calls `observe()` three times; `trials[-1]` would attribute all three results to the
+third candidate. The queue keeps the correspondence exact for any batch size (Contract 4).
 
 **Why the line count stops at `observe()`:**
 `get_supported_variable_types()` and `get_metadata()` are metadata declarations, not

@@ -21,8 +21,8 @@ CONNECTS TO:
   → docs/03-technical-contracts/01-data-format.md §4                       : NFR-INTEROP-01 operationalized
 
 NOTE ON MEASURABLE CRITERIA:
-  All criteria marked TODO: REF-TASK-0010 are pending architectural decisions.
-  When REF-TASK-0010 is resolved, replace each TODO with a concrete number, threshold, or
+  REF-TASK-0010 is complete: every NFR below carries a measurable criterion.
+  Each criterion states a concrete number, threshold, or
   automated test condition that can be evaluated without human judgment.
 -->
 

@@ -125,7 +125,7 @@ This document operationalizes `docs/01-manifesto/MANIFESTO.md`. Where the MANIFE
 
 ### Document Status
 
-**Version:** 0.3 — UC-01–UC-06 expanded; FR-01–FR-26 defined; NFRs (6) and Constraints (CONST-SCI 6, CONST-COM 3, CONST-TECH 7) fully defined; §7 Interface Requirements complete for COCO, IOHprofiler, and Nevergrad (REF-TASK-0012); §8 Acceptance Test Strategy complete with FR→test file mapping, NFR→test mapping, and formal reproducibility procedure (REF-TASK-0013). Measurable NFR criteria pending (`REF-TASK-0010`).
+**Version:** 0.3 — UC-01–UC-06 expanded; FR-01–FR-31 defined, including the FR §4.8 study design guidance group; NFRs (6) with measurable criteria and Constraints (CONST-SCI 6, CONST-COM 3, CONST-TECH 7) fully defined; §7 Interface Requirements complete for COCO, IOHprofiler, and Nevergrad (REF-TASK-0012); §8 Acceptance Test Strategy complete with FR→test file mapping, NFR→test mapping, and formal reproducibility procedure (REF-TASK-0013). V1 release scope defined in §1.
 
 ---
 
@@ -169,7 +169,7 @@ Scope). They are listed here so that the use case inventory in this document mat
 
 ## 4. Functional Requirements
 
-Requirements FR-01 through FR-26 are defined in **[`03-functional-requirements/01-index.md`](../03-functional-requirements/01-index.md)**, grouped by C2 container:
+Requirements FR-01 through FR-31 are defined in **[`03-functional-requirements/01-index.md`](../03-functional-requirements/01-index.md)**, grouped by C2 container:
 
 | Group | Container | Requirements | File |
 |---|---|---|---|
@@ -180,6 +180,7 @@ Requirements FR-01 through FR-26 are defined in **[`03-functional-requirements/0
 | §4.5 | Reproducibility Layer | FR-17 – FR-19 | [06-fr-4.5-reproducibility-layer.md](../03-functional-requirements/06-fr-4.5-reproducibility-layer.md) |
 | §4.6 | Reporting & Visualization | FR-20 – FR-22 | [07-fr-4.6-reporting-and-visualization.md](../03-functional-requirements/07-fr-4.6-reporting-and-visualization.md) |
 | §4.7 | Ecosystem Integration | FR-23 – FR-26 | [08-fr-4.7-ecosystem-integration.md](../03-functional-requirements/08-fr-4.7-ecosystem-integration.md) |
+| §4.8 | Study Design Guidance | FR-27 – FR-31 | [09-fr-4.8-study-design-guidance.md](../03-functional-requirements/09-fr-4.8-study-design-guidance.md) |
 
 ---
 
@@ -196,7 +197,8 @@ NFR-REPRO-01 through NFR-USABILITY-01 are defined in **[`04-non-functional-requi
 | NFR-MODULAR-01 | Extensibility | MANIFESTO Value 6, Principle 27 | [06-nfr-modular-01.md](../04-non-functional-requirements/06-nfr-modular-01.md) |
 | NFR-USABILITY-01 | Minimal onboarding friction | MANIFESTO 28 | [07-nfr-usability-01.md](../04-non-functional-requirements/07-nfr-usability-01.md) |
 
-> **`TODO: REF-TASK-0010`** — Add measurable pass/fail thresholds to each NFR.
+All six NFRs carry measurable pass/fail criteria (REF-TASK-0010, complete). NFR-USABILITY-01
+carries the acceptance criterion for the FR §4.8 study design guidance group.
 
 ---
 

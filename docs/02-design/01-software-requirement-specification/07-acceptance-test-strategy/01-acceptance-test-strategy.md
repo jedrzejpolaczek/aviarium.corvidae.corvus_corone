@@ -162,7 +162,7 @@ silently succeeds.
 ### Non-Functional Requirements (NFR-XX)
 
 Accepted when the NFR-specific test category passes at the defined threshold. Thresholds are to be
-set when `REF-TASK-0010` is resolved. Until then, the test category is established but the
+set by the measurable criterion on each NFR (REF-TASK-0010, complete). The test category and the
 pass/fail line is not drawn — except for NFR-REPRO-01, whose pass condition is the
 bit-identical Result Aggregates assertion defined in the Reproducibility Test Procedure above.
 

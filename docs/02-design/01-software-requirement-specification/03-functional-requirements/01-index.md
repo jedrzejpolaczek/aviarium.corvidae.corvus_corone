@@ -39,3 +39,4 @@ NOTE ON CONTAINER MAPPING:
 | 4.5 Reproducibility Layer | Results Store | FR-17..FR-19 | [06-fr-4.5-reproducibility-layer.md](06-fr-4.5-reproducibility-layer.md) |
 | 4.6 Reporting & Visualization | Reporting Engine | FR-20..FR-22 | [07-fr-4.6-reporting-and-visualization.md](07-fr-4.6-reporting-and-visualization.md) |
 | 4.7 Ecosystem Integration | Ecosystem Bridge | FR-23..FR-26 | [08-fr-4.7-ecosystem-integration.md](08-fr-4.7-ecosystem-integration.md) |
+| 4.8 Study Design Guidance | Study Orchestrator, Public API + CLI | FR-27..FR-31 | [09-fr-4.8-study-design-guidance.md](09-fr-4.8-study-design-guidance.md) |

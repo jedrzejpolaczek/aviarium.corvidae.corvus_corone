@@ -1,6 +1,6 @@
 # External System: IOHprofiler
 
-> C1 Context: [../01-c1-context.md](../01-c1-context.md)
+> C1 Context: [../01-c1-context.md](../01-c4-l1-context/01-c1-context.md)
 
 **What it is:** An analysis and visualization platform for iterative optimization heuristics, providing ECDF-based anytime performance analysis and statistical comparison tools.
 

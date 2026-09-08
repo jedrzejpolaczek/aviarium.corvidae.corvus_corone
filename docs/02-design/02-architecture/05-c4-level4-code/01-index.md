@@ -1,6 +1,6 @@
 # C4: Code — Index
 
-> C3 Components: [../04-c4-leve3-components/01-c4-l3-components/01-c4-l3-components.md](../04-c4-leve3-components/01-c4-l3-components/01-c4-l3-components.md)
+> C3 Components: [../04-c4-leve3-components/01-c4-l3-components/01-c4-l3-components.md](../03-c4-leve2-containers/04-c4-leve3-components/01-c4-l3-components/01-c4-l3-components.md)
 
 C4 Level 4 documents the architecturally significant code abstractions within Corvus Corone —
 the interfaces, protocols, and data types whose shape is a design decision that affects multiple

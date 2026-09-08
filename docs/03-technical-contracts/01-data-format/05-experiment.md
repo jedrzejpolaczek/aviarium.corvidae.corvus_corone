@@ -1,8 +1,8 @@
 # §2.4 Experiment
 
-> Index: [01-data-format.md](01-data-format.md)
+> Index: [01-data-format.md](01-index.md)
 
-> See GLOSSARY: [Experiment](../GLOSSARY.md#experiment)
+> See GLOSSARY: [Experiment](../../GLOSSARY.md#experiment)
 
 | Name | Type | Required | Notes |
 | --- | --- | --- | --- |

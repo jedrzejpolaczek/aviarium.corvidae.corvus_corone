@@ -1,6 +1,6 @@
 # External System: V2 Platform Server (future)
 
-> C1 Context: [../01-c1-context.md](../01-c1-context.md)
+> C1 Context: [../01-c1-context.md](../01-c4-l1-context/01-c1-context.md)
 
 **What it is:** A planned community server providing shared result repositories, persistent artifact identifiers (DOIs), study discovery, and cross-researcher comparison — not deployed in V1.
 

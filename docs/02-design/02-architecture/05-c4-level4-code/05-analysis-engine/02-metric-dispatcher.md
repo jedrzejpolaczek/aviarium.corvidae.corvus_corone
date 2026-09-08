@@ -1,9 +1,9 @@
 # C4: Code — MetricDispatcher
 
 > C4 Index: [../01-index.md](../01-index.md)
-> C3 Component: [../../04-c4-leve3-components/04-analysis-engine/02-metric-dispatcher.md](../../04-c4-leve3-components/04-analysis-engine/02-metric-dispatcher.md)
-> C3 Index (Analysis Engine): [../../04-c4-leve3-components/04-analysis-engine/01-index.md](../../04-c4-leve3-components/04-analysis-engine/01-index.md)
-> Metric Taxonomy: [../../../03-technical-contracts/03-metric-taxonomy/](../../../03-technical-contracts/03-metric-taxonomy/)
+> C3 Component: [../../04-c4-leve3-components/04-analysis-engine/02-metric-dispatcher.md](../../03-c4-leve2-containers/04-c4-leve3-components/04-analysis-engine/02-metric-dispatcher.md)
+> C3 Index (Analysis Engine): [../../04-c4-leve3-components/04-analysis-engine/01-index.md](../../03-c4-leve2-containers/04-c4-leve3-components/04-analysis-engine/01-index.md)
+> Metric Taxonomy: [../../../03-technical-contracts/03-metric-taxonomy/](../../../../03-technical-contracts/03-metric-taxonomy/01-index.md)
 
 ---
 
@@ -99,7 +99,7 @@ Tester. One instance per unique `(experiment_id, algorithm_id, problem_id, metri
 
 ### `AnalysisConfig`
 
-See [../02-cross-cutting/04-study-spec.md](../02-cross-cutting/04-study-spec.md).
+See [../02-cross-cutting/04-study-spec.md](../02-shared/04-study-spec.md).
 
 ---
 

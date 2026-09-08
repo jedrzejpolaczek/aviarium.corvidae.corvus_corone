@@ -1,8 +1,8 @@
 # §2.3 Study
 
-> Index: [01-data-format.md](01-data-format.md)
+> Index: [01-data-format.md](01-index.md)
 
-> See GLOSSARY: [Study / Benchmarking Study](../GLOSSARY.md#study--benchmarking-study)
+> See GLOSSARY: [Study / Benchmarking Study](../../GLOSSARY.md#study--benchmarking-study)
 
 | Name | Type | Required | Notes |
 | --- | --- | --- | --- |

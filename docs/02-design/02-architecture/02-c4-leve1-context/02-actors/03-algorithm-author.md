@@ -1,6 +1,6 @@
 # Actor: Algorithm Author
 
-> C1 Context: [../01-c1-context.md](../01-c1-context.md)
+> C1 Context: [../01-c1-context.md](../01-c4-l1-context/01-c1-context.md)
 
 **Role:** A researcher publishing a new HPO algorithm, or an ML engineer wrapping an existing optimization library (Optuna, SMAC, HyperOpt, etc.) for evaluation.
 

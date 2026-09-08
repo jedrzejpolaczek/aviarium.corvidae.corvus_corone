@@ -1,6 +1,6 @@
 # §6 Cross-Cutting Contracts
 
-> Index: [01-interface-contracts.md](01-interface-contracts.md)
+> Index: [01-interface-contracts.md](01-index.md)
 
 Contracts that apply to **all** interface implementations in this system.
 These are the system-wide rules that make the whole greater than the sum of its parts.

@@ -1,8 +1,8 @@
 # C4: Code — AlgorithmInterface
 
 > C4 Index: [../01-index.md](../01-index.md)
-> C3 Component (Algorithm Registry): [../../04-c4-leve3-components/11-algorithm-registry/01-index.md](../../04-c4-leve3-components/11-algorithm-registry/01-index.md)
-> Technical Contract: [../../../03-technical-contracts/02-interface-contracts/](../../../03-technical-contracts/02-interface-contracts/)
+> C3 Component (Algorithm Registry): [../../04-c4-leve3-components/11-algorithm-registry/01-index.md](../../03-c4-leve2-containers/04-c4-leve3-components/11-algorithm-registry/01-index.md)
+> Technical Contract: [../../../03-technical-contracts/02-interface-contracts/](../../../../03-technical-contracts/02-interface-contracts/01-index.md)
 
 ---
 

@@ -1,6 +1,6 @@
 # §3 File Formats and Storage
 
-> Index: [01-data-format.md](01-data-format.md)
+> Index: [01-data-format.md](01-index.md)
 
 <!--
 CONNECTS TO:

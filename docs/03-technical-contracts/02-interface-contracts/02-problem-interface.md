@@ -1,6 +1,6 @@
 # §1 Problem Interface
 
-> Index: [01-interface-contracts.md](01-interface-contracts.md)
+> Index: [01-interface-contracts.md](01-index.md)
 
 Any class that provides a benchmark problem MUST implement all methods in this section.
 The Problem Interface is the boundary between the benchmark objective and the Runner.

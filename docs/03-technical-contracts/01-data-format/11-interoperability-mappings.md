@@ -1,6 +1,6 @@
 # §4 Interoperability Mappings
 
-> Index: [01-data-format.md](01-data-format.md)
+> Index: [01-data-format.md](01-index.md)
 
 This section defines how Corvus Corone entities map to external platform formats. Each subsection
 covers one platform: direction, field-level mapping, information-loss manifest items, and version

@@ -1,8 +1,8 @@
 # §2.5 Run
 
-> Index: [01-data-format.md](01-data-format.md)
+> Index: [01-data-format.md](01-index.md)
 
-> See GLOSSARY: [Run](../GLOSSARY.md#run)
+> See GLOSSARY: [Run](../../GLOSSARY.md#run)
 
 | Name | Type | Required | Notes |
 | --- | --- | --- | --- |

@@ -304,7 +304,7 @@ researcher-chosen. This prevents seed selection that favours a preferred algorit
 ### Step 7: Inspect the Result Aggregates
 
 The system automatically computes the
-[Standard Reporting Set](../03-technical-contracts/03-metric-taxonomy.md) metrics
+[Standard Reporting Set](../03-technical-contracts/03-metric-taxonomy/01-index.md) metrics
 across all runs. Verify they exist before generating reports:
 
 ```python
@@ -454,4 +454,4 @@ corvus verify --experiment-id <experiment.id>
 | Understand the three-level statistical analysis in depth | [statistical-methodology.md](../04-scientific-practice/01-methodology/02-statistical-methodology.md) |
 | Export your results to IOHprofiler for visualization | `05-researcher-export-iohprofiler.md` *(coming soon)* |
 | Reproduce a study from a published archive | `06-researcher-reproduce-study.md` *(coming soon)* |
-| Understand what metrics are computed and why | [metric-taxonomy.md](../03-technical-contracts/03-metric-taxonomy.md) |
+| Understand what metrics are computed and why | [metric-taxonomy.md](../03-technical-contracts/03-metric-taxonomy/01-index.md) |

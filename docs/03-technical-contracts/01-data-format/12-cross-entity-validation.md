@@ -1,6 +1,6 @@
 # §5 Validation Rules (Cross-Entity)
 
-> Index: [01-data-format.md](01-data-format.md)
+> Index: [01-data-format.md](01-index.md)
 
 <!--
   Invariants that span multiple entities — cannot be expressed as per-field rules.

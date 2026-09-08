@@ -1,6 +1,6 @@
 # §6 Schema Versioning
 
-> Index: [01-data-format.md](01-data-format.md)
+> Index: [01-data-format.md](01-index.md)
 
 This section defines how the data format schema is versioned, what changes require a version bump,
 how the version identifier is stored, and how artifacts produced under older schemas are handled.
@@ -20,7 +20,7 @@ Schema versions follow **semantic versioning** `MAJOR.MINOR.PATCH`:
 | `PATCH` | A **correction** — typo fixes, clarifying text, no structural change | `1.0.0` → `1.0.1` |
 
 The current schema version is declared at the top of
-[`01-data-format.md`](01-data-format.md).
+[`01-data-format.md`](01-index.md).
 
 ---
 

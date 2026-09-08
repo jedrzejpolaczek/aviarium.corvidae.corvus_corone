@@ -5,8 +5,8 @@
 > `docs/02-design/01-software-requirement-specification/01-srs/01-SRS.md` §1 V1 Release Scope.
 
 
-> C2 Container: [14-corvus-pilot.md](../../03-c4-leve2-containers/14-corvus-pilot.md)
-> C3 Index: [../01-c3-components.md](../01-c3-components.md)
+> C2 Container: [14-corvus-pilot.md](../../14-corvus-pilot.md)
+> C3 Index: [../01-c3-components.md](../01-c4-l3-components/01-c4-l3-components.md)
 
 Corvus Pilot V2 is the LLM-powered interaction layer over the Corvus Corone core library.
 It wraps library tools via MCP, routes queries through a LangGraph multi-agent lg, and

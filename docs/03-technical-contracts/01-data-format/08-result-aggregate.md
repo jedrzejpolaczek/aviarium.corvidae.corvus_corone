@@ -1,8 +1,8 @@
 # §2.7 Result Aggregate
 
-> Index: [01-data-format.md](01-data-format.md)
+> Index: [01-data-format.md](01-index.md)
 
-> See GLOSSARY: [Result Aggregate](../GLOSSARY.md#result-aggregate)
+> See GLOSSARY: [Result Aggregate](../../GLOSSARY.md#result-aggregate)
 
 | Name | Type | Required | Notes |
 | --- | --- | --- | --- |

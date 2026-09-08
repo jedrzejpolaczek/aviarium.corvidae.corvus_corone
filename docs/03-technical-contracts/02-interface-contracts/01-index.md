@@ -1,5 +1,11 @@
 # Interface Contracts
 
+> **Normative.** Under [ADR-012](../../02-design/02-architecture/01-adr/adr-012-documentation-layer-normativity.md)
+> this directory is one of the normative layers. Identifiers, signatures, field names and
+> types, enumeration values, error classes, metric identifiers and file formats are defined
+> here and nowhere else. The C2, C3 and C4 architecture documents describe how this material
+> is grouped into components; they may cite it but never introduce new material.
+
 <!--
 STORY ROLE: The "handshake specification". Defines the boundaries between components.
 A module is only as modular as its interface contracts are precise.

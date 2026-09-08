@@ -1,18 +1,90 @@
-# The Narrative Flow (reading hints)
+# Documentation Map and Reading Order
 
-## For system design (what we are building here)
-[MANIFESTO](../docs/01-manifesto/MANIFESTO.md) → SRS → C1 → C2 → C3 → C4 → **Docstrings** (code)
+## Precedence
 
-## Technical contracts (how components speak to each other)
-[C2](../docs/02-design/02-architecture/c2-containers.md)/[C3](../docs/02-design/02-architecture/c3-components.md) → [interface contracts](../docs/03-technical-contracts/interface-contracts.md) → [data format](../docs/03-technical-contracts/data-format.md) → [C4](../docs/02-design/02-architecture/c4-code.md) → Docstrings
+When two documents disagree, the one earlier in this order wins and the later one is corrected.
+The rule is recorded in
+[ADR-012](02-design/02-architecture/01-adr/adr-012-documentation-layer-normativity.md).
 
-## Scientific practice (how to use it)
-[MANIFESTO](../docs/01-manifesto/MANIFESTO.md) → [benchmarking protocol](../docs/04_scientific_practice/methodology/benchmarking-protocol.md) → [statistical methodology](../docs/04_scientific_practice/methodology/statistical-methodology.md) → [metric taxonomy](../docs/03-technical-contracts/metric-taxonomy.md)
+```
+MANIFESTO  →  SRS  →  ADR  →  03-technical-contracts/  →  C2 / C3 / C4  →  code
+```
 
-## Community (how it grow!)
-[MANIFESTO](../docs/01-manifesto/MANIFESTO.md) → [contribution guide](../docs/05_community/contribution-guide.md) → [versioning governance](../docs/05_community/versioning-governance.md) → [interface contracts](../docs/03-technical-contracts/interface-contracts.md) → [data format](../docs/03-technical-contracts/data-format.md)
+- **[`03-technical-contracts/`](03-technical-contracts/)** is the only place that *defines*
+  identifiers, signatures, field names and types, enumeration values, error classes, metric
+  identifiers and file formats.
+- **[SRS](02-design/01-software-requirement-specification/01-srs/01-SRS.md)** is the only place
+  that defines `FR-*`, `NFR-*`, `UC-*` and `CONST-*`, and, in §1, the V1 release scope.
+- **[ADRs](02-design/02-architecture/01-adr/)** are the only place that records decisions.
+- **C2, C3 and C4 are descriptive.** They explain how the normative material is grouped into
+  containers and components and why. They may cite, never coin.
 
-Each template has three structural features that maintain the story:
-1. **STORY ROLE** — what chapter is this in the narrative?
-2. **CONNECTS TO** — explicit bidirectional links to other documents
-3. **Docstring/task bridge** — every template explicitly states where the documentation story hands off to code docstrings and to issue tracker tasks, so the three documentation layers (docs, docstrings, tasks) form a single coherent system rather than three independent silos.
+---
+
+## For system design — what we are building
+
+[MANIFESTO](01-manifesto/MANIFESTO.md)
+→ [SRS](02-design/01-software-requirement-specification/01-srs/01-SRS.md)
+→ [C1 System Context](02-design/02-architecture/02-c4-leve1-context/01-c4-l1-context/01-c1-context.md)
+→ [C2 Containers](02-design/02-architecture/03-c4-leve2-containers/01-index.md)
+→ [C3 Components](02-design/02-architecture/03-c4-leve2-containers/04-c4-leve3-components/01-c4-l3-components/01-c4-l3-components.md)
+→ [C4 Code](02-design/02-architecture/05-c4-level4-code/01-index.md)
+→ docstrings in `packages/`
+
+Start here if you want to know what the system is and why its parts are drawn where they are.
+The V1 release scope, including which containers and actors are deferred, is in SRS §1.
+
+---
+
+## Technical contracts — how components speak to each other
+
+[C2 Containers](02-design/02-architecture/03-c4-leve2-containers/01-index.md)
+→ [Interface contracts](03-technical-contracts/02-interface-contracts/01-index.md)
+→ [Data format](03-technical-contracts/01-data-format/01-index.md)
+→ [Public API contract](03-technical-contracts/04-public-api-contract.md)
+→ docstrings
+
+Start here if you are implementing anything. This is the normative layer.
+
+---
+
+## Scientific practice — how to use it
+
+[MANIFESTO](01-manifesto/MANIFESTO.md)
+→ [Benchmarking protocol](04-scientific-practice/01-methodology/01-benchmarking-protocol.md)
+→ [Statistical methodology](04-scientific-practice/01-methodology/02-statistical-methodology.md)
+→ [Metric taxonomy](03-technical-contracts/03-metric-taxonomy/01-index.md)
+
+Start here if you want to run a study correctly rather than merely successfully.
+
+---
+
+## Community — how it grows
+
+[MANIFESTO](01-manifesto/MANIFESTO.md)
+→ [Contribution guide](05-community/01-contribution-guide.md)
+→ [Versioning governance](05-community/02-versioning-governance.md)
+→ [Interface contracts](03-technical-contracts/02-interface-contracts/01-index.md)
+→ [Data format](03-technical-contracts/01-data-format/01-index.md)
+
+Start here if you want to contribute a problem, an algorithm or an analysis tool.
+
+---
+
+## Reference
+
+- [GLOSSARY](GLOSSARY.md) — shared vocabulary; every other document and docstring uses these terms
+- [ROADMAP](ROADMAP.md) — work sequencing; it does not define release scope
+- [Tutorials](06-tutorials/) — step-by-step walkthroughs, starting with the algorithm author onboarding
+
+---
+
+## Document structure
+
+Each document carries three structural features that keep the corpus navigable:
+
+1. **STORY ROLE** — which chapter of the narrative this document is.
+2. **CONNECTS TO** — explicit bidirectional links to related documents.
+3. **Docstring and task bridge** — where the documentation hands off to code docstrings and to
+   issue tracker tasks, so that documents, docstrings and tasks form one system rather than
+   three silos.

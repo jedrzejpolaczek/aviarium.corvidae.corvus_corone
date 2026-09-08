@@ -7,6 +7,7 @@
 | Name | Type | Required | Notes |
 | --- | --- | --- | --- |
 | id | string | yes | Run ID |
+| schema_version | string | yes | Version of the entity schema this record conforms to, e.g. `0.0.1`. Governs the shape of the record, not the identity of the entity. See [13-schema-versioning.md](13-schema-versioning.md) |
 | experiment_id | string | yes | ID of the Experiment this Run belongs to |
 | study_id | string | yes | ID of the Study this Run belongs to (denormalized for query convenience) |
 | problem_instance_id | string | yes | ID of the Problem Instance executed in this Run |

@@ -73,6 +73,10 @@ Six milestones group all open documentation and design tasks.
 - [x] **[REF-TASK-0023] Repository storage abstraction interface** — `LocalFileRepository` spec satisfying ADR-001; document after IMPL-010 is merged
 - [x] **[REF-TASK-0036] LocalFileRepository directory structure** — annotated directory tree for a completed study; notes that layout is an implementation detail, not part of the `Repository` interface; document after IMPL-010
 
+### Data format — cross-entity rules and schema version
+- [x] **[REF-TASK-0038] Cross-entity validation rules** — `01-data-format/12-cross-entity-validation.md` was an empty comment; now defines CEV-01..CEV-12, each with the point of check and the consequence of violation (reject, warn, flag). These are the checks the Study Orchestrator performs, so the component was not implementable without them
+- [x] **[REF-TASK-0039] Declare the initial schema version** — `schema_version` was named in `13-schema-versioning.md` but present in no entity table, and the pointer to where the current version is declared named a file that does not exist. Version set to `0.0.1`, declared in `01-data-format/01-index.md`, field added to the seven entity schemas; stays below `1.0.0` until the V1 release so pre-release changes owe no migration guide
+
 ### MANIFESTO
 - [x] **[REF-TASK-0032] Reconcile anti-pattern numbering and add to MANIFESTO** — add Anti-patterns section; resolve missing AP-2; update SRS §6 references from C1 to MANIFESTO
 

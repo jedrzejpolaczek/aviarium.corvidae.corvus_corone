@@ -1,5 +1,14 @@
 # Data Format Specification
 
+> **Current schema version: `0.0.1`.**
+> Every entity record carries this value in its `schema_version` field. The version governs the
+> *shape* of the records, not the identity or lifecycle of the entities they describe. The rules
+> for bumping it, and for reading an artifact whose version differs, are in
+> [13-schema-versioning.md](13-schema-versioning.md).
+>
+> The version stays below `1.0.0` until the V1 release. Pre-release schema changes are therefore
+> not breaking changes and do not owe a migration guide; the first release version is `1.0.0`.
+
 > **Normative.** Under [ADR-012](../../02-design/02-architecture/01-adr/adr-012-documentation-layer-normativity.md)
 > this directory is one of the normative layers. Identifiers, signatures, field names and
 > types, enumeration values, error classes, metric identifiers and file formats are defined
@@ -107,5 +116,5 @@ flowchart TD
 | §2.8 Report | [09-report.md](09-report.md) | ✅ Formal schema |
 | §3 File Formats and Storage | [10-file-formats.md](10-file-formats.md) | ✅ §3.1 IOHprofiler export, §3.2 LocalFileRepository layout, §3.3 Parquet bulk format complete |
 | §4 Interoperability Mappings | [11-interoperability-mappings.md](11-interoperability-mappings.md) | ✅ §4.1 COCO, §4.2 IOHprofiler, §4.3 Nevergrad complete |
-| §5 Validation Rules (Cross-Entity) | [12-cross-entity-validation.md](12-cross-entity-validation.md) | 🚧 Pending |
-| §6 Schema Versioning | [13-schema-versioning.md](13-schema-versioning.md) | 🚧 Pending |
+| §5 Validation Rules (Cross-Entity) | [12-cross-entity-validation.md](12-cross-entity-validation.md) | ✅ CEV-01..CEV-12 |
+| §6 Schema Versioning | [13-schema-versioning.md](13-schema-versioning.md) | ✅ Defined |

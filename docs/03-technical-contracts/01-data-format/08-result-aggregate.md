@@ -7,6 +7,7 @@
 | Name | Type | Required | Notes |
 | --- | --- | --- | --- |
 | id | string | yes | Result Aggregate ID |
+| schema_version | string | yes | Version of the entity schema this record conforms to, e.g. `0.0.1`. Governs the shape of the record, not the identity of the entity. See [13-schema-versioning.md](13-schema-versioning.md) |
 | experiment_id | string | yes | ID of the Experiment this aggregate belongs to |
 | problem_instance_id | string | yes | ID of the Problem Instance being aggregated over |
 | algorithm_instance_id | string | yes | ID of the Algorithm Instance being aggregated over |

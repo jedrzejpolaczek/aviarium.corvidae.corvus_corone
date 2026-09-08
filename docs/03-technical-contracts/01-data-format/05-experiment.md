@@ -7,6 +7,7 @@
 | Name | Type | Required | Notes |
 | --- | --- | --- | --- |
 | id | string | yes | Experiment ID |
+| schema_version | string | yes | Version of the entity schema this record conforms to, e.g. `0.0.1`. Governs the shape of the record, not the identity of the entity. See [13-schema-versioning.md](13-schema-versioning.md) |
 | study_id | string | yes | ID of the Study this Experiment realizes |
 | status | string | yes | `planned`, `running`, `completed`, or `failed` |
 | execution_environment.platform | string | yes | Operating system and version (e.g., `Ubuntu 22.04`) |

@@ -7,6 +7,7 @@
 | Name | Type | Required | Notes |
 | --- | --- | --- | --- |
 | id | string | yes | Problem Instance ID |
+| schema_version | string | yes | Version of the entity schema this record conforms to, e.g. `0.0.1`. Governs the shape of the record, not the identity of the entity. See [13-schema-versioning.md](13-schema-versioning.md) |
 | name | string | yes | Human-readable name |
 | version | string | yes | Version of this record. Structure is described in validation rules |
 | provenance | string | yes | Source of this problem (e.g., `real_ml_task`, `synthetic`, `adapted_from_coco`) |

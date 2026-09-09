@@ -401,7 +401,7 @@ REF-TASK-0025 ──► 0026 ──► 0027 ──► 0028 ──► 0029 ──
   the corpus reconciles the two, and the reconciliation is a decision, not an omission.
   *Post-V1, but the answer shapes IMPL-028 onwards.*
 
-- [ ] **[REF-TASK-0048] Write `05-community/02-versioning-governance.md`.** All six sections —
+- [x] **[REF-TASK-0048] Write the deprecation policy; mark the rest of the governance document deferred.** *(Closed 2026-09-09.)* §3 is written, because ADR-020 rests the entire identity model of the system on it. The other five sections stay empty and now say so, each with the reason: §1 and §2 would restate decisions already recorded elsewhere; §4 depends on infrastructure that does not exist; §5's code licence is settled by ADR-022 and only the **data** licence is open; §6 cannot be written by one author, because a governance model written alone governs nobody. The two requirements that cited §5 as though it stated the licence policy now point at ADR-022 and CONST-TECH. The seven empty sections of the contribution guide got the same treatment — §2 is a real gap, since UC-04 names that document as the contribution process. All six sections —
   artifact types and versioning schemes, dependency tracking, deprecation policy, long-term
   storage, licensing, governance model — have headings and no content. NFR-REPRO-01, FR-03, FR-26,
   CONST-COM and four GLOSSARY entries cite it, including *Schema Version*, which points at "§1–2".
@@ -453,7 +453,7 @@ Documentation tasks:
 - [x] **REF-TASK-0045** — ADR-010 Parquet columns against ADR-023, closed by ADR-025
 - [x] **REF-TASK-0046** — record the ADR-016/018/019 exception to ADR-012 normativity, closed by ADR-026
 - [ ] **REF-TASK-0047** — Corvus Pilot V3 against AP-4 and AP-7 *(post-V1)*
-- [ ] **REF-TASK-0048** — write `02-versioning-governance.md`, finish the contribution guide
+- [x] **REF-TASK-0048** — deprecation policy written; the rest deferred explicitly and no longer cited as policy
 - [x] **REF-TASK-0049** — acceptance tests for FR-27..FR-31 and FR-39..FR-42
 - [x] **REF-TASK-0050** — decide the future of the C3 and C4 layers, closed by ADR-028
 - [x] **REF-TASK-0051** — `study_type` and `test_type: "none"`, reconciled by ADR-029 and `CV-024`

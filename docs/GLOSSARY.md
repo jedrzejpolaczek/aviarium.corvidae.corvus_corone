@@ -505,7 +505,7 @@ Terms are listed alphabetically within sections.
 
 ### Deprecation
 
-**Definition:** The act of marking an Algorithm Instance or Problem Instance as superseded, preventing it from appearing in new Study designs while preserving it indefinitely for exact reproduction of historical Experiments. A deprecated entity remains retrievable by explicit ID and version; it is excluded only from Registry listing results.
+**Definition:** The act of marking an Algorithm Instance or Problem Instance as one that should not be used in new work, while preserving it indefinitely for exact reproduction of historical Experiments. A deprecated entity remains retrievable by identifier — entities are immutable and there is no version to address (ADR-020) — and is excluded only from Registry listing results. It is the only permitted mutation of a stored entity. Nothing is ever deleted: a UUID that stops resolving breaks every archived study that referenced it.
 
 **Distinguished from:** deletion (which would break reproducibility of historical Experiments). Deprecation is a status change that preserves access for reproducibility; entities are never deleted from the Registry.
 
@@ -559,7 +559,7 @@ Terms are listed alphabetically within sections.
 
 **Format:** `MAJOR.MINOR.PATCH` where MAJOR increments on breaking changes (removed/renamed fields, type changes), MINOR increments on non-breaking additions (new optional fields, new entity types), and PATCH increments on corrections only.
 
-**Used in:** `docs/03-technical-contracts/01-data-format/13-schema-versioning.md` §6.3–6.4, `docs/05-community/02-versioning-governance.md` §1–2; present in every entity record (Problem Instance, Algorithm Instance, Study, Experiment, Run, ResultAggregate, Report).
+**Used in:** `docs/03-technical-contracts/01-data-format/13-schema-versioning.md` §6.3–6.4; present in every entity record (Problem Instance, Algorithm Instance, Study, Experiment, Run, ResultAggregate, Report).
 
 ---
 

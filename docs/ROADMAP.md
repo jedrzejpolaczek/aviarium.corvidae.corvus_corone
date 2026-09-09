@@ -82,6 +82,29 @@ Generated: 2026-03-04. Updated: 2026-05-15. Update whenever a milestone closes o
 > gate checks names; the third pass checked sentences in the component document; the fourth
 > checks sentences in the documents that component points at. Each level found defects the
 > previous one could not see, so the next re-measurement should assume there is another.
+>
+> **Fifth measurement, after the repairs of 2026-09-09.** The criterion moved with ADR-028: there
+> is no per-component document to specify from, so a component is now specified from the contract
+> its group index names.
+>
+> | Component | 4th pass | 5th pass |
+> |---|---|---|
+> | Statistical Tester | 12 | 3, then 0 |
+> | Interpolation Strategy (was LOCF Interpolator) | 11 | 1, then 0 |
+> | Execution Coordinator | 13 | not re-measured |
+>
+> The four that survived the repairs were found by taking the measurement rather than assuming
+> it. §3.4 still required rank-biserial correlation after §4.1 had settled on Cliff's delta — a
+> replacement applied to §3.5.1 and not to its neighbour, which is the failure mode the audit
+> brief names, committed while writing the section that forbids it. `StatisticalTestResult` had
+> nowhere to put the adjusted p-value FR-16 requires in the Report. `conclusion_scope` was
+> mandatory with no shape. And the bootstrap interval of §6.2 was unseeded, which would have made
+> it the one irreproducible number in a system whose point is reproducibility. All four are
+> closed, which is what "then 0" records.
+>
+> The Execution Coordinator was not re-measured: its page is gone and the exercise was not redone
+> against `04-runner-interface.md` and ADR-027, so its 13 stands unrefuted rather than improved.
+> The verdict remains a statement about the components actually measured.
 
 ---
 

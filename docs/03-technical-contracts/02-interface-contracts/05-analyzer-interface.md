@@ -86,7 +86,16 @@ statistical tests or generate the full report. Used for partial or custom analys
 - `algorithm_ids: list[str]` — two or more algorithm IDs to compare
 - `metric_name: str` — metric name from 03-metric-taxonomy/01-index.md
 - `test_config: TestConfig` — `{ test: str, alpha: float }` (e.g., `"wilcoxon"`, `0.05`)
-- returns: `StatisticalTestResult` — `{ test_name, p_value, effect_size, conclusion_scope, pre_registered }`
+- returns: `StatisticalTestResult` — `{ test_name, p_value, p_value_adjusted, correction_method, effect_size, effect_size_measure, conclusion_scope, pre_registered }`
+  - `p_value` is uncorrected; `p_value_adjusted` is the value after the family-wise
+    correction, and `correction_method` names it. Both are reported: FR-16 requires the
+    method and the adjusted values in the Researcher Report, and
+    `02-statistical-methodology.md` §3.6 requires the uncorrected value beside it. When the
+    family holds one hypothesis, `p_value_adjusted` equals `p_value` and `correction_method`
+    is `"none"`
+  - `effect_size_measure` names the measure `effect_size` holds: `cliffs_delta` for every
+    pairwise comparison, `eta_squared` for a Kruskal-Wallis omnibus, which has no pairwise
+    form (§4.1, §3.5)
 
 **Semantics:**
 Applies a specified statistical test to compare algorithms on a single metric.
@@ -100,7 +109,11 @@ correction (→ 02-statistical-methodology.md §3).
 - `test_config.alpha` is in `(0, 1)`
 
 **Postconditions:**
-- `conclusion_scope` explicitly states which problems and conditions are covered —
+- `conclusion_scope` is `{ problem_instance_ids: list[str], budget: int, study_type: str, notes: list[str] }`. The first three are copied from the Study rather than
+  composed, so that a scope statement cannot drift from what was actually run; `notes` carries
+  the conditions that are not fields — a diversity shortfall recorded under `CV-021`, a
+  non-null `improvement_epsilon`, a Run count below ten (§6.2). It explicitly states which
+  problems and conditions are covered —
   prevents over-generalization (MANIFESTO Principle 3)
 - `pre_registered` is `true` if this exact comparison appears in `Study.pre_registered_hypotheses`,
   `false` otherwise (exploratory)
@@ -144,5 +157,12 @@ This is the **only** implementation permitted without explicit pre-registration 
 Study record (ADR-003).
 
 **Non-default implementations:**
-- must be declared in the Study record before execution begins
-- will be labeled in the Report's limitations section (FR-21)
+- **There are none in V1, and no Study field declares one.** ADR-003 requires a non-default
+  strategy to be declared before execution and locked with the Study; LOCF is the sole V1
+  implementation, so `Study` carries no `interpolation_strategy` field and the Analyzer does
+  not read one. The abstraction exists for NFR-MODULAR-01, not for a V1 choice.
+- A second strategy therefore arrives with a Study field, a schema version bump and an ADR,
+  in one change. Adding the field before a second strategy exists would put a parameter with
+  methodological consequences into the pre-registration record with exactly one legal value,
+  which FR-28 has nothing to say about but which no researcher could act on.
+- When one exists it will be labelled in the Report's limitations section (FR-21).

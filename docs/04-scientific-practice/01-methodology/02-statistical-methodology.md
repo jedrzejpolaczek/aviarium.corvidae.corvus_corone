@@ -313,11 +313,11 @@ $p$.
 **Minimum sample:** $P \geq 5$ Problem Instances. Below 5, the test lacks sufficient power
 and the result must be labeled "exploratory" regardless of p-value.
 
-**Effect size:** Rank-biserial correlation $r = 1 - \frac{2W}{\frac{P(P+1)}{2}}$.
-Interpretation: $|r| < 0.1$ negligible, $0.1$–$0.3$ small, $0.3$–$0.5$ medium, $> 0.5$
-large (Cohen 1988 thresholds adapted for rank correlations).
+**Effect size:** Cliff's delta, with the thresholds of §4.2. Rank-biserial correlation is the
+natural partner of the $W$ statistic and stood here through several revisions; §4.1 records why
+one measure is reported across every pairwise comparison instead.
 
-Report at Level 3 alongside the p-value.
+Report at Level 3 alongside the p-value (§4.3).
 
 ---
 
@@ -341,7 +341,12 @@ proceed to pairwise comparisons.
 
 If omnibus $p < \alpha$: proceed to pairwise post-hoc tests (§3.5.1).
 
-**Effect size for omnibus:** $\eta^2 = \frac{H - k + 1}{N - k}$. Interpretation: $< 0.01$
+**Effect size for omnibus:** $\eta^2$, which is not Cliff's delta and does not contradict §4.1:
+delta is pairwise and has no omnibus form, so the omnibus carries $\eta^2$ and the pairwise
+comparisons that follow carry delta. A `StatisticalTestResult` names its measure in
+`effect_size_measure`, so a Report never presents the two on one scale.
+
+$\eta^2 = \frac{H - k + 1}{N - k}$. Interpretation: $< 0.01$
 negligible, $0.01$–$0.06$ small, $0.06$–$0.14$ medium, $> 0.14$ large.
 
 #### 3.5.1 Post-hoc pairwise comparisons
@@ -645,6 +650,15 @@ The tests in §3 are rank-based and make no distributional assumption, and an in
 from a normal approximation would reintroduce the assumption the whole of §3 declines to make.
 The bootstrap needs none: resample the Runs with replacement, recompute the statistic, take the
 2.5th and 97.5th percentiles of the resampled distribution.
+
+**10 000 resamples, and the resampling is seeded.** The count is the conventional choice for a
+percentile interval and is large enough that the Monte Carlo error in the 2.5th percentile is
+small beside the sampling error the interval is measuring. The seed matters more: a bootstrap
+is stochastic, so an unseeded one produces a different interval on every run and an analysis
+that cannot be reproduced, which NFR-REPRO-01 forbids and which would be the one unseeded
+random call in the system (`07-cross-cutting-contracts.md` § Randomness Isolation). The
+Analyzer derives its generator from the Study's `root_seed`, so re-analysing an archived
+Experiment reproduces the interval exactly, as it reproduces everything else.
 
 The median rather than the mean, for the same reason §3 uses rank tests: HPO metric distributions
 are frequently skewed, and the mean of a skewed distribution is not the value a reader thinks it

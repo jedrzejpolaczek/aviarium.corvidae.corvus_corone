@@ -44,7 +44,6 @@ Components that need artifacts obtain them through the repository properties.
      experiments/{experiment_id}/experiment.json
      runs/{run_id}/
        run.json
-       seed.json
        performance.jsonl
        performance.parquet (post-conversion)
        run.log
@@ -74,5 +73,5 @@ Components that need artifacts obtain them through the repository properties.
 
 ## SRS Traceability
 
-- FR-19 (filesystem storage): all artifacts stored on local filesystem under `results_dir`.
+- FR-19 (references by entity ID): the directory layout is keyed by entity UUID, so no artifact needs to be addressed by path, and none is.
 - Supports all use cases that read or write study data.

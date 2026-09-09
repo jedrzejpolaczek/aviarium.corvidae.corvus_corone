@@ -7,7 +7,7 @@
 
 ## Responsibility
 
-Generate a unique, deterministic seed for each Run, persist it to the Results Store, and inject it into every relevant random-number source in the Run subprocess before any algorithm code executes.
+Derive a deterministic seed for each Run from the Study's `root_seed`, hand it to the Run record for persistence, and inject it into every relevant random-number source in the Run subprocess before any algorithm code executes.
 
 ---
 
@@ -41,20 +41,19 @@ Seed injection into the Run process sets the seeded generators required by
 - Python `random` stdlib
 - `numpy.random`
 - `torch` (optional — only if importable in the Run subprocess)
-- `json` stdlib (for seed persistence)
-- Results Store filesystem path (passed in; no direct dependency on Results Store component)
+- **Results Store — RunRepository** — `Run.seed` is persisted and read back as a field of the Run record. This component holds no filesystem path (ADR-001, ADR-017).
 
 ---
 
 ## Key Behaviors
 
-1. **Deterministic seed generation** — given the same `run_id` and `base_seed`, always produces the same seed. Uses `hashlib.sha256(f"{base_seed}:{run_id}".encode()).digest()[:4]` converted to an unsigned int.
+1. **Deterministic seed derivation** — `SeedSequence(Study.root_seed)` is spawned once per Run, in the run-plan order problem → algorithm → repetition, and the first 32-bit word of the child sequence is that Run's seed (ADR-017). The same Study produces the same assignment because the spawn order is a property of the plan, not of execution timing.
 
 2. **Seed injection** — sets seeds on all known random sources before the algorithm's `__init__` is called. The injection order is fixed: `random.seed()` → `numpy.random.seed()` → `torch.manual_seed()` (if torch is importable).
 
-3. **Seed persistence** — writes `{"run_id": ..., "seed": ..., "generated_at": "<ISO8601>"}` to `seed.json` before the evaluation loop starts. This enables run resume without re-generating.
+3. **Collision detection** — before a Run executes, its seed is checked against the seeds already assigned within the Experiment for the same problem and algorithm pair. A repeat raises `SeedCollisionError`. The check is explicit and is not skipped on the grounds that the derivation should not collide (ADR-017).
 
-4. **Resume-path load** — if `seed.json` already exists for a `run_id`, `load_seed()` returns the stored value rather than regenerating. This guarantees that a resumed Run uses the same seed as the original attempt.
+4. **Resume path** — a resumed Run reads `Run.seed` through `RunRepository.get_run()` rather than re-deriving it. Re-deriving would depend on the spawn order being reconstructed identically, which a partial resume cannot guarantee (ADR-017, Risks).
 
 5. **No global state** — the Seed Manager holds no state after `inject_seeds()` completes. All state is on the filesystem or in the Python interpreter's random modules.
 
@@ -62,7 +61,7 @@ Seed injection into the Run process sets the seeded generators required by
 
 ## State
 
-No in-memory state after initialization. Seed values are persisted at `{results_dir}/{experiment_id}/runs/{run_id}/seed.json`.
+The set of seeds already assigned within the current Experiment, held for the collision check and discarded when the Experiment ends. Seed values themselves live on the Run record.
 
 ---
 
@@ -75,5 +74,5 @@ No in-memory state after initialization. Seed values are persisted at `{results_
 ## SRS Traceability
 
 Reproducibility requirement — MANIFESTO Principle 18. Required for:
-- FR-09 (reproducible runs): a run re-executed with the same seed must produce the same sequence of objective function evaluations.
+- FR-09 (system-assigned seeds): every Run seed is derived from the Study's declared `seed_strategy`; the Researcher does not choose individual seed values.
 - UC-02 (run study): each Run in a Study receives a unique, reproducible seed.

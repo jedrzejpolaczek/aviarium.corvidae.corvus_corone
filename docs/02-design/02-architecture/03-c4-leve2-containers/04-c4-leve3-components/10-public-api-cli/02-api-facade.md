@@ -27,8 +27,7 @@ For the V1 release the surface is: `cc.list_problems`, `cc.list_algorithms`, `cc
 `cc.get_experiment`, `cc.get_runs`, `cc.get_result_aggregates`, `cc.generate_reports` and
 `cc.export_raw_data`.
 
-Algorithm Visualization Engine and are outside V1 (SRS 1, V1 Release Scope). `cc.resume` has
-no counterpart in the contract and is not part of the surface.
+Visualization and genealogy functions belong to the Algorithm Visualization Engine, which SRS 1.4 places outside V1, and are absent from the surface. `cc.resume` has no counterpart in the contract and is not part of it either.
 
 ## Dependencies
 
@@ -36,19 +35,20 @@ no counterpart in the contract and is not part of the surface.
 - **Algorithm Registry** — `cc.list_algorithms()`, `cc.get_algorithm()`
 - **Problem Repository** — `cc.list_problems()`, `cc.get_problem()`
 - **Results Store** — `cc.get_result_aggregates()`, `cc.get_runs()`
-- **Ecosystem Bridge** — `cc.export()`
+- **Ecosystem Bridge** — `cc.export_raw_data()`
 - **Response Mapper** — all return values pass through here
 
 ---
 
 ## Key Behaviors
 
-1. **Input validation** — validates all function arguments before calling any internal container. Raises `ValidationError` with a complete list of errors. Examples: unknown `algorithm_id` format, invalid `viz_type` string, missing required `Study` fields.
+1. **Input validation** — validates all function arguments before calling any internal container, and raises `ValidationError` listing every failure at once rather than the first (FR-27). Examples: malformed `algorithm_id`, missing required `Study` fields.
 
 2. **Study coercion** — `cc.run()` accepts both raw `dict` and `Study` objects. If a dict is provided, it is coerced via `Study.from_dict()` before passing to the Study Orchestrator.
 
 3. **Response mapping** — all return values pass through the Response Mapper before being returned to the caller. The API Facade never returns raw domain objects.
 
+4. **No silent methodological defaults** — `seed_strategy` and `sampling_strategy` are required arguments of `cc.create_study()`; the facade does not supply a value for either (FR-28).
 
 5. **Thread safety** — the API Facade is stateless. Multiple concurrent `cc.run()` calls are safe as long as their `study_id` values differ (Results Store uses per-study directories).
 
@@ -69,8 +69,11 @@ Stateless. No instance variables.
 
 ## SRS Traceability
 
-- Entry point for all user-facing use cases (UC-01 through UC-10).
-- FR-28 (stable public API): the facade is the versioned API surface — internal refactors do not break callers.
+- Entry point for the V1 use cases, UC-01 through UC-06; UC-07 through UC-11 are deferred with the Learner actor (SRS 1.4).
+- FR-28 (no silent methodological defaults): enforced at the boundary, where the Researcher meets it.
+- FR-29 (errors name the rule they enforce): every `ValidationError` the facade raises names the requirement, principle or ADR behind it.
+
+> **No requirement mandates the API surface itself.** The facade's stability is governed > by [`04-public-api-contract.md`](../../../../../03-technical-contracts/04-public-api-contract.md) and the CLI by ADR-016, both normative; but the SRS contains > no functional requirement stating that the system offers a Python facade or a command > line at all. Earlier revisions cited FR-28 and FR-29 for this, which were renumbered > to Study Design Guidance. The gap is real and is recorded in ROADMAP.
 
 > **Post-V1 surface removed.** Earlier revisions listed three visualization and
 > genealogy functions here, together with the view types they return. They belong to

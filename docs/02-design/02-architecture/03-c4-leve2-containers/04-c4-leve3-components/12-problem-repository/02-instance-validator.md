@@ -59,4 +59,4 @@ Stateless.
 
 ## SRS Traceability
 
-- FR-02 (problem validation): problem instances must be validated before registration.
+- FR-02 (completeness on registration): `dimensions` must equal `len(variables)` and every variable's bounds must be valid; both are checked before the record is accepted.

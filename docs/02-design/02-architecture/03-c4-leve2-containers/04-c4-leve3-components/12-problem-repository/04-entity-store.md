@@ -7,7 +7,7 @@
 
 ## Responsibility
 
-Persist ProblemInstance objects as JSON files, resolve problem IDs to instances, and support querying by objective type, dimension, and deprecated status.
+Persist Problem Instance objects as JSON files, resolve problem UUIDs to instances, and support the queries the `ProblemRepository` contract exposes.
 
 ---
 
@@ -16,10 +16,12 @@ Persist ProblemInstance objects as JSON files, resolve problem IDs to instances,
 ```python
 class ProblemEntityStore:
     def write(self, instance: ProblemInstance) -> None: ...
-    def get(self, problem_id: str, version: str | None = None) -> ProblemInstance: ...
+    def get(self, problem_id: str) -> ProblemInstance: ...
     def list_all(self, include_deprecated: bool = False, filters: dict = {}) -> list[ProblemInstance]: ...
-    def update_deprecated(self, problem_id: str, version: str, deprecated: bool, reason: str) -> None: ...
-    def exists(self, problem_id: str, version: str) -> bool: ...
+    def update_deprecated(
+        self, problem_id: str, reason: str, superseded_by: str | None = None
+    ) -> None: ...
+    def exists(self, problem_id: str) -> bool: ...
 ```
 
 ---
@@ -35,10 +37,10 @@ class ProblemEntityStore:
 
 Identical architecture to [Algorithm Registry — Entity Store](../11-algorithm-registry/04-entity-store.md), applied to ProblemInstances:
 
-1. **Storage layout** — `{repo_dir}/{problem_id}/{version}.json`.
-2. **ID resolution** — `get(problem_id)` returns latest non-deprecated version; `get(problem_id, version)` returns exact version.
+1. **Storage layout** — `{repo_dir}/{problem_id}.json`, keyed by the entity's UUID (ADR-020).
+2. **ID resolution** — `get(problem_id)` returns the one entity with that UUID, deprecated or not.
 3. **Atomic writes** — write-to-tmp-then-rename.
-4. **Query support** — `list_all()` supports filtering by `objective_type` and `dimension` in addition to `include_deprecated`.
+4. **Query support** — `list_all()` applies the `ProblemFilter` fields the contract defines: `provenance`, `real_or_synthetic`, `min_dimensions`, `max_dimensions`, `landscape_characteristics`.
 5. **No in-memory cache** — all reads hit the filesystem.
 
 ---
@@ -57,4 +59,5 @@ No in-memory cache.
 
 ## SRS Traceability
 
-- FR-01 (persistent problem repository): repository must survive process restart.
+- FR-01 (schema-conforming storage): every stored record conforms to `02-problem-instance.md`.
+- FR-17 (UUID identity): the file name is derived from the entity's UUID.

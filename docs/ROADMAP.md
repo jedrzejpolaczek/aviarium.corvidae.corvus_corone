@@ -284,9 +284,14 @@ REF-TASK-0025 ──► 0026 ──► 0027 ──► 0028 ──► 0029 ──
 All documentation REF-TASKs are tracked by the milestone sections above (✅ = complete, [ ] = pending).
 The authoritative status for each task is the checkbox in the relevant milestone section — not this index.
 
-Open documentation tasks (the only two remaining):
+Open documentation tasks:
 - [ ] **REF-TASK-0014** — Metric taxonomy extensions *(Post-V1, deferred — requires real study data)*
 - [ ] **REF-TASK-0018** — Research question archetypes *(Post-V1, deferred — requires real study data)*
+- [ ] **REF-TASK-0038** — Requirements for the Python facade and the CLI. The Public API + CLI
+  container is in V1 scope and has no functional requirement behind it: the C3 components cited
+  FR-28 and FR-29, which were renumbered to Study Design Guidance. `04-public-api-contract.md`
+  and ADR-016 define the surface, but nothing in the SRS states that the system offers one.
+  *(Found by the C3 semantics pass, 2026-09-09.)*
 
 ### Implementation Tasks (IMPL)
 

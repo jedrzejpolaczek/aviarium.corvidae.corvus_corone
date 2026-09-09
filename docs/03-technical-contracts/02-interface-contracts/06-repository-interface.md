@@ -54,7 +54,7 @@ independently without changing the factory contract.
 Returns the Problem Instance with the given ID. Content is immutable, so the same ID always
 returns the same record, including for deprecated entities (ADR-020).
 
-**Exceptions:** `EntityNotFoundError`, `EntityNotFoundError`
+**Exceptions:** `EntityNotFoundError`
 
 #### list_problems(filters: ProblemFilter | None = None) → list[ProblemInstanceSummary]
 Returns summaries of all non-deprecated Problem Instances matching the filter.
@@ -76,7 +76,7 @@ Marks a Problem Instance as deprecated. Deprecated instances are excluded from
 ### AlgorithmRepository
 
 #### get_algorithm(id: str) → AlgorithmInstance
-**Exceptions:** `EntityNotFoundError`, `EntityNotFoundError`
+**Exceptions:** `EntityNotFoundError`
 
 #### list_algorithms(filters: AlgorithmFilter | None = None) → list[AlgorithmInstanceSummary]
 `AlgorithmFilter` fields: `algorithm_family`, `supported_variable_types` (subset match),
@@ -96,7 +96,7 @@ resolvable and version-pinned (UC-02 F2); `configuration_justification` is non-e
 ### StudyRepository
 
 #### get_study(id: str) → Study
-**Exceptions:** `EntityNotFoundError`, `EntityNotFoundError`
+**Exceptions:** `EntityNotFoundError`
 
 #### list_studies(filters: StudyFilter | None = None) → list[StudySummary]
 `StudyFilter` fields: `status` (`"draft"`, `"locked"`), `created_by`, `problem_ids` (overlap).

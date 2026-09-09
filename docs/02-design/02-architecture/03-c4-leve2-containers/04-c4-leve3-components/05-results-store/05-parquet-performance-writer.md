@@ -14,7 +14,7 @@ Convert a completed Run's JSONL performance file to Parquet/snappy format when t
 ## Interface
 
 ```python
-class RepositoryFactory:
+class ParquetPerformanceWriter:
     def convert_run(
         self,
         run_id: str,
@@ -71,4 +71,4 @@ No persistent state. The Parquet file on disk is the output artifact.
 ## SRS Traceability
 
 - ADR-010: Parquet/snappy is the secondary performance storage format for ≥1000 records.
-- FR-18 (query performance): bulk queries over large Run datasets require Parquet.
+- FR-18 (Artifact archive): the Parquet file is the bulk-queryable form of a completed Experiment's Performance Records in the archive.

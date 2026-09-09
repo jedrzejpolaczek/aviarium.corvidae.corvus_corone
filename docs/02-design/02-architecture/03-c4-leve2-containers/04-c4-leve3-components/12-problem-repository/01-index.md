@@ -23,7 +23,7 @@ flowchart LR
 
   subgraph PR["Problem Repository"]
     iv["Instance Validator\nValidates ProblemInstance\nschema on registration"]
-    vm["Version Manager\nManages version history\nPrevents modification"]
+    vm["Supersession Manager\nRecords superseded_by lineage\nEntities are immutable"]
     es["Entity Store\nPersists instances as JSON\nResolves IDs + deprecation"]
   end
 
@@ -51,7 +51,7 @@ flowchart LR
 | Component | File | Responsibility |
 |---|---|---|
 | Instance Validator | [02-instance-validator.md](02-instance-validator.md) | Validates ProblemInstance schema and required fields on registration |
-| Version Manager | [03-version-manager.md](03-version-manager.md) | Manages version history and prevents modification of registered versions |
+| Supersession Manager | [03-supersession-manager.md](03-supersession-manager.md) | Records the `superseded_by` lineage between an entity and the registration that replaces it (ADR-020) |
 | Entity Store | [04-entity-store.md](04-entity-store.md) | Persists problem instances as JSON; resolves IDs; supports the deprecation flag |
 
 ---

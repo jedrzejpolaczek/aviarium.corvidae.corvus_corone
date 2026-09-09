@@ -66,4 +66,6 @@ No persistent state.
 ## SRS Traceability
 
 - All use cases are accessible via CLI equivalents of the Python API.
-- FR-29 (CLI access): all core operations must be accessible from the command line.
+- ADR-016: `02-cli-spec.md` is the authoritative CLI surface, and the CLI mirrors the
+  Python facade. No functional requirement mandates a command line; see the note in
+  [02-api-facade.md](02-api-facade.md).

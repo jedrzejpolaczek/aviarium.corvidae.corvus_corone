@@ -17,7 +17,7 @@ Validate an AlgorithmInstance against the required schema before it is accepted 
 class AlgorithmInstanceValidator:
     def validate(self, instance: AlgorithmInstance) -> None:
         """
-        Raises AlgorithmValidationError with all violations if invalid.
+        Raises ValidationError with all violations if invalid.
         Does nothing if valid.
         """
 ```
@@ -41,7 +41,7 @@ class AlgorithmInstanceValidator:
 
 4. **Callable check** — validates `ask_callable` and `tell_callable` are Python callables with the expected signatures (checked via `inspect.signature`).
 
-5. **Error accumulation** — collects all violations before raising. `AlgorithmValidationError` lists every failed check, not just the first.
+5. **Error accumulation** — collects all violations before raising. `ValidationError` lists every failed check, not just the first.
 
 ---
 

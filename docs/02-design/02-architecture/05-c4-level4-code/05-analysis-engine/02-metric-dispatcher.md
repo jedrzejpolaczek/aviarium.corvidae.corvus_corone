@@ -38,7 +38,7 @@ Statistical Tester. It is the entry point for the entire Analysis Engine.
   registered in the metric taxonomy. Unknown metric names raise `UnknownMetricError`.
 - If `analysis_config.pre_registration` is `True`, the requested metrics must exactly match
   the pre-registered set for this experiment. Any deviation (added or removed metrics) raises
-  `PreRegistrationViolationError` (MANIFESTO Principle 16 — planning precedes execution).
+  `ValidationError` (MANIFESTO Principle 16 — planning precedes execution).
 - LOCF interpolation is applied to ALL records before any metric computation. Records that
   are still missing after interpolation are excluded and flagged in the returned results.
 - Metrics are computed independently per `(algorithm_id, problem_id)` pair. There is no
@@ -174,7 +174,7 @@ requirement that analysis choices must not be made after seeing the data. The di
 the only place in the system where this constraint can be enforced programmatically.
 
 **Implications for contributors:** Tests that exercise the pre-registration path must set
-`analysis_config.pre_registration=True` and verify that `PreRegistrationViolationError` is
+`analysis_config.pre_registration=True` and verify that `ValidationError` is
 raised when metrics deviate from the registered set.
 
 ---

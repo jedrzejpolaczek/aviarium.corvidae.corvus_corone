@@ -19,7 +19,7 @@ Called by the Study Orchestrator:
 class RunIsolator:
     def execute_run(
         self,
-        run_config: RunConfig,
+        run_config: Run,
         results_dir: Path,
         on_failure: Literal["skip", "abort"],
     ) -> RunResult:
@@ -46,15 +46,15 @@ class RunIsolator:
 
 1. **Subprocess spawn** — uses `multiprocessing.Process` with `start_method="spawn"` (not `fork`) to ensure a clean process state for each Run. This prevents state leakage between Runs.
 
-2. **Resource limits** — sets `RLIMIT_AS` (Unix) or equivalent (Windows via `psutil.Process.memory_info`) to `memory_limit_mb` from `RunConfig`. If the limit is exceeded, the subprocess is killed and the Run is marked `aborted`.
+2. **Resource limits** — sets `RLIMIT_AS` (Unix) or equivalent (Windows via `psutil.Process.memory_info`) to `memory_limit_mb` from `Run`. If the limit is exceeded, the subprocess is killed and the Run is marked `aborted`.
 
 3. **Failure handling**:
    - `on_failure="skip"`: if the subprocess exits with a non-zero code or raises an exception, mark the Run `status=skipped` and return immediately. Do not re-raise.
-   - `on_failure="abort"`: if the subprocess exits non-zero, raise `RunAbortedError` — the Study Orchestrator catches this and stops the Study.
+   - `on_failure="abort"`: if the subprocess exits non-zero, raise the critical error itself (`SeedCollisionError`, `StorageError`) propagates; aborting is the Runner's response to it, not a separate exception type (ADR-015) — the Study Orchestrator catches this and stops the Study.
 
-4. **Timeout enforcement** — if `RunConfig.timeout_s` is set and the subprocess exceeds it, the process is killed and the Run is marked `status=aborted` (regardless of `on_failure` setting — timeouts are always fatal).
+4. **Timeout enforcement** — if `Run.timeout_s` is set and the subprocess exceeds it, the process is killed and the Run is marked `status=aborted` (regardless of `on_failure` setting — timeouts are always fatal).
 
-5. **Subprocess coordination** — passes `RunConfig` (including `run_id`, `seed`, `budget`, algorithm reference, problem reference) to the subprocess via `multiprocessing.Queue`. The subprocess writes its `RunResult` back via the same Queue.
+5. **Subprocess coordination** — passes `Run` (including `run_id`, `seed`, `budget`, algorithm reference, problem reference) to the subprocess via `multiprocessing.Queue`. The subprocess writes its `RunResult` back via the same Queue.
 
 ---
 

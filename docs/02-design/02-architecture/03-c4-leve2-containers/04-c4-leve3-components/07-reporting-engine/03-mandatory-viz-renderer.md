@@ -24,7 +24,7 @@ class MandatoryVizRenderer:
         """
         Generates all mandatory visualizations.
         Returns {viz_type: output_path} for each visualization.
-        Raises MandatoryVizError if any required visualization fails.
+        Raises ValidationError if any required visualization fails.
         """
 ```
 
@@ -48,7 +48,7 @@ Optional visualizations (generated if `include_algorithm_viz=True` and data avai
 
 ## Key Behaviors
 
-1. **Mandatory set enforcement** — generates VIZ-L1-01, VIZ-L1-02 and VIZ-L1-03 for every problem in the Study, plus VIZ-L1-04 where the Run count requires it. These are non-negotiable; failure to generate any of them raises `MandatoryVizError`. Trajectory and sensitivity plots are Algorithm Visualization Engine output and are outside V1 (ADR-018).
+1. **Mandatory set enforcement** — generates VIZ-L1-01, VIZ-L1-02 and VIZ-L1-03 for every problem in the Study, plus VIZ-L1-04 where the Run count requires it. These are non-negotiable; failure to generate any of them raises `ValidationError`. Trajectory and sensitivity plots are Algorithm Visualization Engine output and are outside V1 (ADR-018).
 
 2. **Per-algorithm generation** — for each algorithm in the report, calls `viz_engine.visualize(algorithm_id, viz_type, experiment_id, output_dir)` for each mandatory type.
 

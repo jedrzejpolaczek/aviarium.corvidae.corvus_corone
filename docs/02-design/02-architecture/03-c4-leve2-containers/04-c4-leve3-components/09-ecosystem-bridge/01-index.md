@@ -80,7 +80,7 @@ One structured log entry per export: `export_type`, `experiment_id`, `records_ex
 
 ### Error Handling
 
-- **Missing data**: if the requested experiment has no PerformanceRecords, raises `ExportDataNotFoundError`.
+- **Missing data**: if the requested experiment has no PerformanceRecords, raises `EntityNotFoundError`.
 - **Format conversion failure**: if a specific record cannot be converted (e.g., unsupported parameter type for COCO), the record is excluded from the export, added to the loss manifest, and export continues. Never aborts on individual record failure.
 - **External library absent**: `coco-experiment` or `ioh` Python packages may not be installed. Import checks at call time raise `ImportError` with install instructions.
 

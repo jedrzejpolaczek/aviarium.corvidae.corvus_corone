@@ -21,7 +21,7 @@ class MetricDispatcher:
         self,
         experiment_id: str,
         analysis_config: AnalysisConfig,
-        results_store: PerformanceRecordReader,
+        results_store: RepositoryFactory,
     ) -> list[RawMetricResult]:
         """
         Loads records, computes metrics, returns raw results per algorithm/problem/budget.
@@ -43,7 +43,7 @@ class MetricDispatcher:
 
 ## Key Behaviors
 
-1. **Pre-registration enforcement** — before computing any metric, checks that the requested metrics match the pre-registration configuration. If `analysis_config.pre_registration` is `True` and the requested metrics differ from the registered set, raises `PreRegistrationViolationError`.
+1. **Pre-registration enforcement** — before computing any metric, checks that the requested metrics match the pre-registration configuration. If `analysis_config.pre_registration` is `True` and the requested metrics differ from the registered set, raises `ValidationError`.
 
 2. **Metric computation** — computes each configured metric across all Runs for each algorithm/problem combination:
    - `QUALITY-BEST_VALUE_AT_BUDGET`: `best_so_far` value at the final evaluation for each Run.

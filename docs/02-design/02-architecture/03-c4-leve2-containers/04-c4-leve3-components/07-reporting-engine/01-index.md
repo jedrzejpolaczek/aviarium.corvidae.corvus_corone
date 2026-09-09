@@ -32,7 +32,7 @@ flowchart LR
   mvr L_mvr_htr@--> htr
   htr L_htr_le@--> le
   le L_le_output@-- complete --> output["report.html"]
-  le L_le_error@-- incomplete --> error["ReportIncompleteError"]
+  le L_le_error@-- incomplete --> error["ValidationError"]
 
   rr L_rr_store@--> store["Results Store"]
   mvr L_mvr_ave@--> ave["Algorithm Visualization Engine"]
@@ -65,7 +65,7 @@ flowchart LR
 | Result Reader | [result-reader.md](02-result-reader.md) | Loads aggregated MetricResults and entity metadata from the Results Store |
 | Mandatory Viz Renderer | [mandatory-viz-renderer.md](03-mandatory-viz-renderer.md) | Generates the visualizations that must appear in every report via the Algorithm Visualization Engine |
 | HTML Template Renderer | [html-template-renderer.md](04-html-template-renderer.md) | Assembles the complete HTML report from component outputs using Jinja2 templates |
-| Limitations Enforcer | [limitations-enforcer.md](05-limitations-enforcer.md) | Validates that all required report sections are present; raises `ReportIncompleteError` if any are missing |
+| Limitations Enforcer | [limitations-enforcer.md](05-limitations-enforcer.md) | Validates that all required report sections are present; raises `ValidationError` if any are missing |
 
 ---
 
@@ -77,10 +77,10 @@ One structured log entry per report generation: `experiment_id`, `sections_rende
 
 ### Error Handling
 
-- **Missing study data**: if the Result Reader finds no MetricResults for the experiment, raises `ReportDataNotFoundError`. The Post-Execution Pipeline marks the Experiment `report_failed`.
-- **Visualization failure**: if a mandatory visualization cannot be generated, the Mandatory Viz Renderer raises `MandatoryVizError`. This propagates through the Limitations Enforcer as an incomplete report.
-- **Template render failure**: if Jinja2 template rendering fails (e.g., missing variable), raises `TemplateRenderError` with the specific missing variable named.
-- **Incomplete report**: `ReportIncompleteError` is raised by the Limitations Enforcer only. It lists all missing sections. Never silently generates a partial report.
+- **Missing study data**: if the Result Reader finds no MetricResults for the experiment, raises `EntityNotFoundError`. The Post-Execution Pipeline marks the Experiment `report_failed`.
+- **Visualization failure**: if a mandatory visualization cannot be generated, the Mandatory Viz Renderer raises `ValidationError`. This propagates through the Limitations Enforcer as an incomplete report.
+- **Template render failure**: if Jinja2 template rendering fails (e.g., missing variable), raises `ValidationError` with the specific missing variable named.
+- **Incomplete report**: `ValidationError` is raised by the Limitations Enforcer only. It lists all missing sections. Never silently generates a partial report.
 
 ### Randomness / Seed Management
 
@@ -90,14 +90,14 @@ No random state. Report generation is fully deterministic given the same inputs.
 
 | Parameter | Source | Scope |
 |---|---|---|
-| `report_title` | StudyConfig.reporting | Per-Study |
-| `include_algorithm_viz` | StudyConfig.reporting (default: True) | Per-Study |
-| `output_dir` | StudyConfig.reporting | Per-Study |
-| `template` | StudyConfig.reporting (default: `standard`) | Per-Study |
+| `report_title` | Study.reporting | Per-Study |
+| `include_algorithm_viz` | Study.reporting (default: True) | Per-Study |
+| `output_dir` | Study.reporting | Per-Study |
+| `template` | Study.reporting (default: `standard`) | Per-Study |
 
 ### Testing Strategy
 
 - **Result Reader**: unit-tested with mock Results Store; verifies correct loading and aggregation.
 - **Mandatory Viz Renderer**: integration-tested against a real Algorithm Visualization Engine instance; verifies all required visualizations are generated.
 - **HTML Template Renderer**: unit-tested with fixture data; snapshot-tested for HTML output stability.
-- **Limitations Enforcer**: unit-tested with deliberately incomplete section sets; verifies it raises `ReportIncompleteError` with the correct missing section list.
+- **Limitations Enforcer**: unit-tested with deliberately incomplete section sets; verifies it raises `ValidationError` with the correct missing section list.

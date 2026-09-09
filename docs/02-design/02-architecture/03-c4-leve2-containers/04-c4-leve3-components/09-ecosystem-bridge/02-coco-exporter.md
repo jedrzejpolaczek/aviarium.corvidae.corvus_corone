@@ -19,7 +19,7 @@ class COCOExporter:
         self,
         experiment_id: str,
         output_dir: Path,
-        record_reader: PerformanceRecordReader,
+        record_reader: RepositoryFactory,
         loss_auditor: LossAuditor,
         coco_suite: str = "bbob",
     ) -> ExportResult:
@@ -28,6 +28,10 @@ class COCOExporter:
         Returns: output_path, records_exported, manifest_path.
         """
 ```
+
+`ExportResult` fields: `output_path` (Path), `records_exported` (int),
+`manifest_path` (Path). The manifest is the `information_loss_manifest` required by
+FR-24; `ExportResult` is the Ecosystem Bridge's internal envelope around it.
 
 ---
 

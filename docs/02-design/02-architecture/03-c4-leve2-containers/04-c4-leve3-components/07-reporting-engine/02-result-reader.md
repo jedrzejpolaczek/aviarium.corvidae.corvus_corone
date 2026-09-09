@@ -18,12 +18,12 @@ class ResultReader:
     def load_report_data(
         self,
         experiment_id: str,
-        entity_store: JsonEntityStore,
-        record_reader: PerformanceRecordReader,
+        entity_store: RepositoryFactory,
+        record_reader: RepositoryFactory,
     ) -> ReportData:
         """
         Loads all data needed to render the report.
-        Raises ReportDataNotFoundError if MetricResults are absent.
+        Raises EntityNotFoundError if MetricResults are absent.
         """
 ```
 
@@ -33,7 +33,7 @@ class ResultReader:
 
 ## Dependencies
 
-- **Results Store — JSON Entity Store** — loads Study, Experiment, Run entities
+- **Results Store**, through the `RepositoryFactory` (ADR-001) — loads Study, Experiment, Run entities
 - **Results Store — Performance Record Reader** — loads aggregated convergence data for report charts
 
 ---
@@ -42,7 +42,7 @@ class ResultReader:
 
 1. **Entity loading** — loads the Experiment entity, parent Study, and all Run summaries (status, duration, seed, outcome).
 
-2. **MetricResult loading** — reads MetricResults from the Results Store. If none exist for the experiment, raises `ReportDataNotFoundError` with a clear message indicating analysis has not run.
+2. **MetricResult loading** — reads MetricResults from the Results Store. If none exist for the experiment, raises `EntityNotFoundError` with a clear message indicating analysis has not run.
 
 3. **Convergence data loading** — loads a downsampled convergence time-series per algorithm (median best-so-far across runs at each budget fraction) for the convergence chart.
 

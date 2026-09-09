@@ -14,7 +14,7 @@ Provide a unified read interface over JSONL and Parquet performance files, autom
 ## Interface
 
 ```python
-class PerformanceRecordReader:
+class RepositoryFactory:
     def read_run(
         self,
         run_id: str,
@@ -51,7 +51,7 @@ class PerformanceRecordReader:
 
 ## Key Behaviors
 
-1. **Format auto-detection** — checks for `performance.parquet` first; falls back to `performance.jsonl` if Parquet is absent. If neither exists, raises `RecordNotFoundError`.
+1. **Format auto-detection** — checks for `performance.parquet` first; falls back to `performance.jsonl` if Parquet is absent. If neither exists, raises `EntityNotFoundError`.
 
 2. **Parquet preference** — when both formats exist, reads from Parquet (59× faster range queries per ADR-010). Reads `performance.jsonl` only when Parquet is absent.
 

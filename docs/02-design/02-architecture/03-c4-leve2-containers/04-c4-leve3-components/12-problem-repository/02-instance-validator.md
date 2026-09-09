@@ -17,7 +17,7 @@ Validate a ProblemInstance against the required schema before it is accepted by 
 class ProblemInstanceValidator:
     def validate(self, instance: ProblemInstance) -> None:
         """
-        Raises ProblemValidationError with all violations if invalid.
+        Raises ValidationError with all violations if invalid.
         Does nothing if valid.
         """
 ```

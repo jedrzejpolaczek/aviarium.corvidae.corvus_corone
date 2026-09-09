@@ -1,5 +1,10 @@
 # Container: Algorithm Visualization Engine
 
+<!-- check-docs: allow-undefined -->
+<!-- This container is outside the V1 release (SRS 1). Its contracts are written
+     when the Learner actor enters scope, so ADR-012 check 4 cannot resolve its
+     vocabulary yet and is suppressed for this document. -->
+
 > **V1 scope: Deferred.** This container is not part of the V1 release. Release scope is
 > defined in `docs/02-design/01-software-requirement-specification/01-srs/01-SRS.md`
 > §1 V1 Release Scope.

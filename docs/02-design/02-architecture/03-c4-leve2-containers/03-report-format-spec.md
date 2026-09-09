@@ -118,7 +118,7 @@ Neither report type may contain:
 
 Violation detection: the Jinja2 template MUST include a validation step (or the
 Reporting Engine MUST run a post-render check) that scans rendered output for
-the prohibited patterns and raises a `ReportValidationError` if found.
+the prohibited patterns and raises a `ValidationError` if found.
 
 ---
 

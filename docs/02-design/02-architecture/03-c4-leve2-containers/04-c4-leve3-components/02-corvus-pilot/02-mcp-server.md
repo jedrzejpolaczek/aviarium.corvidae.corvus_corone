@@ -1,5 +1,10 @@
 # MCP Server
 
+<!-- check-docs: allow-undefined -->
+<!-- This container is outside the V1 release (SRS 1). Its contracts are written
+     when the Learner actor enters scope, so ADR-012 check 4 cannot resolve its
+     vocabulary yet and is suppressed for this document. -->
+
 > Container: [Corvus Pilot V2](../../14-corvus-pilot.md)
 > C3 Index: [index.md](01-index.md)
 
@@ -49,7 +54,7 @@ Inward (consumed by agent nodes):
 
 3. **Socratic access restriction** — the server itself does not enforce access restrictions; the LangGraph graph node configuration (tool-access lists per node) restricts which tools the Socratic Guide Node may call. The MCP server exposes the full surface; restriction is upstream.
 
-4. **Error passthrough** — exceptions raised by the core library (e.g., `EntityNotFoundError`, `StudyValidationError`) are caught, wrapped in a structured error dict `{"error": "<type>", "message": "<str>"}`, and returned as the tool result. The calling agent node is responsible for handling the error payload.
+4. **Error passthrough** — exceptions raised by the core library (e.g., `EntityNotFoundError`, `ValidationError`) are caught, wrapped in a structured error dict `{"error": "<type>", "message": "<str>"}`, and returned as the tool result. The calling agent node is responsible for handling the error payload.
 
 5. **Health check** — exposes a `health_check()` tool (not LLM-callable; used by integration tests and the CLI startup sequence) that verifies connectivity to the core library.
 

@@ -1,5 +1,10 @@
 # Static Renderer
 
+<!-- check-docs: allow-undefined -->
+<!-- This container is outside the V1 release (SRS 1). Its contracts are written
+     when the Learner actor enters scope, so ADR-012 check 4 cannot resolve its
+     vocabulary yet and is suppressed for this document. -->
+
 > Container: [Algorithm Visualization Engine](../../06-algorithm-visualization-engine.md)
 > C3 Index: [index.md](01-index.md)
 
@@ -25,7 +30,7 @@ class StaticRenderer:
     ) -> VisualizationResult:
         """
         Renders the visualization and writes to output_path.
-        Raises VisualizationNotApplicableError for pareto_front on single-objective data.
+        Raises ValidationError for pareto_front on single-objective data.
         """
 ```
 
@@ -49,7 +54,7 @@ class StaticRenderer:
 
 3. **Genealogy SVG** — uses `networkx` to lay out the directed genealogy graph (Sugiyama/hierarchical layout). Nodes are labeled with algorithm name and year; edges are labeled with the limitation addressed. Output is SVG for scalable rendering in browsers and reports.
 
-4. **Pareto front** — raises `VisualizationNotApplicableError` if the `viz_data.study_data` does not contain multi-objective results. The error message explains that a multi-objective experiment ID is required.
+4. **Pareto front** — raises `ValidationError` if the `viz_data.study_data` does not contain multi-objective results. The error message explains that a multi-objective experiment ID is required.
 
 5. **Fallback labeling** — if `viz_data.fallback_used`, adds a watermark text to the plot: "Illustrative data — no study results available." in the bottom-right corner of the figure.
 

@@ -16,7 +16,7 @@ Manage version history for registered AlgorithmInstances, enforce immutability o
 ```python
 class AlgorithmVersionManager:
     def register(self, instance: AlgorithmInstance, entity_store: AlgorithmEntityStore) -> None:
-        """Registers a new version. Raises AlgorithmAlreadyExistsError if id+version exists."""
+        """Registers a new version. Raises ValidationError if id+version exists."""
 
     def deprecate(self, algorithm_id: str, version: str, reason: str, entity_store: AlgorithmEntityStore) -> None:
         """Marks a version as deprecated. Does not delete it."""
@@ -38,7 +38,7 @@ class AlgorithmVersionManager:
 
 ## Key Behaviors
 
-1. **Immutability enforcement** — if an AlgorithmInstance with the same `(id, version)` already exists in the Entity Store, raises `AlgorithmAlreadyExistsError`. Existing registrations can never be modified, only deprecated.
+1. **Immutability enforcement** — if an AlgorithmInstance with the same `(id, version)` already exists in the Entity Store, raises `ValidationError`. Existing registrations can never be modified, only deprecated.
 
 2. **Deprecation without deletion** — marking a version deprecated sets `deprecated=True` and `deprecated_reason` on the stored entity. The entity remains queryable (for reproducibility of old Studies). Deprecated versions are excluded from `list_algorithms()` by default but included with `include_deprecated=True`.
 

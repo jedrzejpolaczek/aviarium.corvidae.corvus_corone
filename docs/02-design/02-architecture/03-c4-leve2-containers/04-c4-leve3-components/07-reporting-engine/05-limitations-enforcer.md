@@ -7,7 +7,7 @@
 
 ## Responsibility
 
-Validate that the rendered report contains all required sections — including a populated Limitations section — and raise `ReportIncompleteError` with a complete list of missing items if any required content is absent. The Limitations Enforcer is the architectural gate that prevents incomplete reports from being written to disk.
+Validate that the rendered report contains all required sections — including a populated Limitations section — and raise `ValidationError` with a complete list of missing items if any required content is absent. The Limitations Enforcer is the architectural gate that prevents incomplete reports from being written to disk.
 
 ---
 
@@ -35,7 +35,7 @@ class LimitationsEnforcer:
         limitations: list[str],
     ) -> None:
         """
-        Raises ReportIncompleteError if any required section is missing
+        Raises ValidationError if any required section is missing
         or if limitations list is empty.
         Does nothing if all sections are present.
         """
@@ -55,7 +55,7 @@ No external libraries. Pure Python validation logic.
 
 2. **Limitations non-empty check** — validates that `len(limitations) >= 1`. An empty limitations list is always considered an error: every benchmark study has known limitations, and the system must surface them. An empty list indicates a rendering failure, not a legitimately limitation-free study.
 
-3. **Error accumulation** — collects all violations (both missing sections and empty limitations) before raising. `ReportIncompleteError` lists all violations in one error, not just the first.
+3. **Error accumulation** — collects all violations (both missing sections and empty limitations) before raising. `ValidationError` lists all violations in one error, not just the first.
 
 4. **No partial output** — the Limitations Enforcer is called by the HTML Template Renderer before writing the output file. If validation fails, the file is not written. This is enforced architecturally (the template renderer calls `enforcer.validate()` before `file.write()`).
 

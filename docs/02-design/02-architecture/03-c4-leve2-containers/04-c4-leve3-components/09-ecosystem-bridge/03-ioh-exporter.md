@@ -19,7 +19,7 @@ class IOHExporter:
         self,
         experiment_id: str,
         output_dir: Path,
-        record_reader: PerformanceRecordReader,
+        record_reader: RepositoryFactory,
         loss_auditor: LossAuditor,
     ) -> ExportResult:
         """

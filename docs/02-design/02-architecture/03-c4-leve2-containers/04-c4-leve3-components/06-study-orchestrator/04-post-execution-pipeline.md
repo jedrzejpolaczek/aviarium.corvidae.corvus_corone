@@ -20,17 +20,20 @@ class PostExecutionPipeline:
     def run(
         self,
         experiment_id: str,
-        study_config: StudyConfig,
+        study_config: Study,
         analysis_engine: AnalysisEngine,
         reporting_engine: ReportingEngine,
-        parquet_writer: ParquetPerformanceWriter,
-        entity_store: JsonEntityStore,
+        parquet_writer: RepositoryFactory,
+        entity_store: RepositoryFactory,
     ) -> PostExecutionResult:
         """
         Runs: (1) Parquet conversion, (2) Analysis, (3) Reporting.
         Returns: analysis_status, report_path, errors.
         """
 ```
+
+`PostExecutionResult` fields: `analysis_status` (str), `report_path` (Path),
+`errors` (list of str).
 
 ---
 
@@ -39,15 +42,15 @@ class PostExecutionPipeline:
 - **Analysis Engine** — called for metric computation and statistical testing
 - **Reporting Engine** — called for report generation
 - **Results Store — Parquet Performance Writer** — triggered for each completed Run
-- **Results Store — JSON Entity Store** — updates Experiment status
+- **Results Store**, through the `RepositoryFactory` (ADR-001) — updates Experiment status
 
 ---
 
 ## Key Behaviors
 
-1. **Parquet conversion** — for each completed Run in the experiment, calls `ParquetPerformanceWriter.convert_run()`. Runs below the threshold (< 1000 records) are skipped silently. Conversion is done sequentially (not parallel) to avoid I/O contention.
+1. **Parquet conversion** — for each completed Run in the experiment, calls `RepositoryFactory.convert_run()`. Runs below the threshold (< 1000 records) are skipped silently. Conversion is done sequentially (not parallel) to avoid I/O contention.
 
-2. **Analysis trigger** — calls `AnalysisEngine.analyse(experiment_id, study_config.analysis)`. If the analysis fails, records the error in `PostExecutionResult` and updates the Experiment status to `analysis_failed`. Does not raise — the pipeline continues to attempt reporting.
+2. **Analysis trigger** — calls `AnalysisEngine.get_result_aggregates(experiment_id, study_config.analysis)`. If the analysis fails, records the error in `PostExecutionResult` and updates the Experiment status to `analysis_failed`. Does not raise — the pipeline continues to attempt reporting.
 
 3. **Reporting trigger** — calls `ReportingEngine.generate(experiment_id, study_config.reporting)` after analysis completes. If reporting fails, records the error and updates the Experiment status to `report_failed`.
 
@@ -63,7 +66,7 @@ class PostExecutionPipeline:
 
 ## State
 
-No persistent in-memory state. All status is written to the Results Store via the JSON Entity Store.
+No persistent in-memory state. All status is written to the Results Store through the `RepositoryFactory`.
 
 ---
 

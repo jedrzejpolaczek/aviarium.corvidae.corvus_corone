@@ -22,7 +22,7 @@ Generated: 2026-03-04. Updated: 2026-03-20. Update whenever a milestone closes o
 | MANIFESTO | — | ✅ Principles and anti-patterns AP-1..AP-7 complete |
 | C1 System Context | — | ⚠️ Principles complete |
 | C2 Containers | — | ⚠️ Principles complete |
-| C3 Components | — | ⚠️ 11 groups documented; not yet implementable without guesswork, see note below |
+| C3 Components | — | ✅ 11 groups; boundary vocabulary reconciled with the contracts (ADR-012) |
 | C4 Code | — | ⚠️ 7 groups drafted; descriptive layer only (ADR-012) |
 | Architecture Decision Records | REF-TASK-0011, 0024 | ⚠️ ADR-001 decided; technical constraints and bulk storage format pending |
 | SRS | REF-TASK-0008..0013, 0033..0035 | ⚠️ Use cases and FR-01..26 drafted; NFRs, interface requirements, acceptance tests, CLI spec, report format, competitive differentiation open |
@@ -36,17 +36,20 @@ Generated: 2026-03-04. Updated: 2026-03-20. Update whenever a milestone closes o
 | Implementation — Autonomous (Pilot V3) | IMPL-037..047 | ⛔ Not started *(post-V1)* |
 | Learner Actor | REF-TASK-0025..0030, IMPL-044..046 | ⛔ Not started *(post-V1)* |
 
-> **C3 implementability, measured 2026-09-09.** Three components were taken at random and
-> specified from the documentation alone, counting each point where a decision had to be invented
-> rather than read: Study Builder 10, Evaluation Loop 11, Statistical Tester 7. All three fail.
-> The failures are concentrated in the descriptive layer inventing its own vocabulary, which
-> ADR-012 forbids and `scripts/check_docs.py` check 4 now measures: 190 recorded violations,
-> frozen as a baseline that may only shrink. The Evaluation Loop is the worst case, because it
-> calls `ask()` and `tell()` where the Algorithm Interface defines `suggest()` and `observe()`,
-> and records on every iteration where ADR-002 records only on a trigger.
+> **C3 implementability, re-measured 2026-09-09 after the vocabulary sweep.** Three components
+> were specified from the documentation alone, counting each point where a decision had to be
+> invented: Study Builder, Evaluation Loop and Statistical Tester. Before the sweep they scored
+> 10, 11 and 7. After it they score zero, and `scripts/check_docs.py` reports no uncontracted
+> boundary vocabulary anywhere in the corpus.
 >
-> Implementing a C3 component today therefore still requires asking the author. Shrinking the
-> baseline to zero is the work that changes that.
+> The three worst defects were semantic rather than lexical, so the gate could not have found
+> them: the Evaluation Loop called `ask()` and `tell()` where the Algorithm Interface defines
+> `suggest()` and `observe()`, recorded on every iteration where ADR-002 records only on a
+> trigger, and reported whole batches against the last suggestion. The Study Builder generated
+> its run plan in the opposite order to ADR-017, which changes every seed.
+>
+> Eight component groups have not been re-measured. The gate covers their vocabulary; their
+> semantics have not been read against the contracts.
 
 ---
 
@@ -163,6 +166,9 @@ Six milestones group all open documentation and design tasks.
 ## IMPL Phase 2 — Repo Closure
 > ADRs, bulk storage after spike, ecosystem bridges (IOHprofiler/COCO/Nevergrad), LLM tools.
 
+- [ ] **`[IMPL-017a]`** Study design guidance — FR-27..FR-31: `lock_study()` reports every unresolved decision at once with its consequence; `seed_strategy` and `sampling_strategy` become required; every validation message names the rule it enforces; the ADR-009 diversity floor is checked with the exploratory escape hatch · *Fulfills: FR-27, FR-28, FR-29, FR-30, FR-31; acceptance criterion in NFR-USABILITY-01*
+- [ ] **`[IMPL-009a]`** PerformanceRecord carries `best_so_far` alongside `objective_value`; the Runner maintains the running best; anytime reconstruction reads `best_so_far` · *Fulfills: ADR-023*
+- [ ] **`[IMPL-013a]`** ECDF_AREA integrates over the full Budget; the reference case asserts `0.4375` · *Fulfills: ADR-024*
 - [ ] **`[IMPL-018]`** ADR-006: Technical constraints — `pyproject.toml` `requires-python = ">=3.10"`, MIT license, optional extras (`optuna`, `rag`, `all`), CI license check · *Fulfills: REF-TASK-0011*
 - [ ] **`[IMPL-019]`** ADR-007 + ADR-008: ECDF_AREA normalization (empirical min/max, limitations documented) + Standard Reporting Set definition; update `metric-taxonomy.md §3` · *Fulfills: REF-TASK-0016, REF-TASK-0017*
 - [ ] **`[IMPL-020]`** ADR-008 + statistical-methodology.md: diversity requirements (≥5 problems, ≥2 dimensionality ranges); Level 1 VIZ-L1-01..03 spec in §2; Wilcoxon/Kruskal decision tree in §3 · *Fulfills: REF-TASK-0019, REF-TASK-0020, REF-TASK-0021*

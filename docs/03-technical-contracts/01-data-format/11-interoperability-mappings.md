@@ -88,8 +88,8 @@ items are always evaluated; items that do not apply to the specific export (e.g.
 
 COCO's `.dat` format logs a row when the algorithm crosses a new precision target
 (i.e., `f(x)−f_opt` drops below a threshold in the standard log-scale target sequence).
-Corvus's `trigger_reason=improvement` fires when `objective_value` strictly improves by at
-least `Study.improvement_epsilon`.
+Corvus's `trigger_reason=improvement` fires when an evaluation changes `best_so_far` by at
+least `Study.improvement_epsilon` (ADR-023).
 
 These are not equivalent:
 - COCO targets are absolute gaps from `f_opt` on a fixed log scale; Corvus records any strict

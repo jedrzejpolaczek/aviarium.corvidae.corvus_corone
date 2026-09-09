@@ -65,7 +65,7 @@ flowchart TD
     S["**Study**\nid · research_question\nrepetitions · seed_strategy"]
     E["**Experiment**\nid · study_id\nstatus · platform"]
     R["**Run**\nid · seed · status\nproblem_id · algorithm_id"]
-    PR["**PerformanceRecord**\nid · run_id\neval_number · objective_value"]
+    PR["**PerformanceRecord**\nid · run_id\neval_number\nobjective_value · best_so_far"]
     RA["**ResultAggregate**\nid · experiment_id\nmetric_id · aggregate_value"]
     REP["**Report**\nid · experiment_id\ntype · content_format"]
 
@@ -116,5 +116,5 @@ flowchart TD
 | §2.8 Report | [09-report.md](09-report.md) | ✅ Formal schema |
 | §3 File Formats and Storage | [10-file-formats.md](10-file-formats.md) | ✅ §3.1 IOHprofiler export, §3.2 LocalFileRepository layout, §3.3 Parquet bulk format complete |
 | §4 Interoperability Mappings | [11-interoperability-mappings.md](11-interoperability-mappings.md) | ✅ §4.1 COCO, §4.2 IOHprofiler, §4.3 Nevergrad complete |
-| §5 Validation Rules (Cross-Entity) | [12-cross-entity-validation.md](12-cross-entity-validation.md) | ✅ CEV-01..CEV-12 |
+| §5 Validation Rules (Cross-Entity) | [12-cross-entity-validation.md](12-cross-entity-validation.md) | ✅ CV-001..CV-023 |
 | §6 Schema Versioning | [13-schema-versioning.md](13-schema-versioning.md) | ✅ Defined |

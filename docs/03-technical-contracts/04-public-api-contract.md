@@ -835,7 +835,7 @@ try:
         ],
     )
     print(f"Study created: {study.id}")
-    print(f"Status: {study.status}")   # always "locked"
+    print(f"Status: {study.status}")   # "draft" — call cc.lock_study() to pre-register
 except cc.ValidationError as e:
     print(f"Invalid study configuration: {e}")
 ```
@@ -1253,40 +1253,56 @@ All exceptions inherit from `corvus_corone.exceptions.CorvusError`, which is the
 base class for all library-specific errors. This allows callers to catch all library errors
 with a single `except cc.CorvusError` if needed.
 
-```
-corvus_corone.exceptions.CorvusError   (base class)
-├── StudyAlreadyLockedError
-├── SeedCollisionError
-├── BudgetExhaustedError
-├── NotFoundError
-├── ValidationError
-├── UnsupportedFormatError
-└── ExportValidationError
-```
+**The taxonomy itself is defined once, in**
+[`02-interface-contracts/07-cross-cutting-contracts.md`](02-interface-contracts/07-cross-cutting-contracts.md)
+§ Error Taxonomy, which ADR-015 made the single authority. This document adopts those names
+and does not add to them. The classes a caller of the facade can encounter are:
+
+| Class | Parent | Raised by |
+|---|---|---|
+| `ValidationError` | `CorvusError` | `cc.create_study()`, `cc.lock_study()` |
+| `StudyAlreadyLockedError` | `ValidationError` | `cc.update_study()` |
+| `StudyNotLockedError` | `ValidationError` | `cc.run()` on a draft Study |
+| `BudgetExhaustedError` | `BudgetError` | `Problem.evaluate()`; caught by the Runner, not propagated to `cc.run()` |
+| `SeedCollisionError` | `ReproducibilityError` | `cc.run()` |
+| `EntityNotFoundError` | `StorageError` | every `cc.get_*()`, and any function taking an entity ID |
+| `SchemaVersionError` | `StorageError` | any repository read of an artifact written under an incompatible schema major |
+| `UnsupportedFormatError` | `IntegrationError` | `cc.export_raw_data()` |
+| `ExportValidationError` | `IntegrationError` | `cc.export_raw_data()` |
+| `MetricUndefinedError` | `AnalysisError` | `cc.get_result_aggregates()` when a metric is undefined for the data |
+| `RunNotCompleteError` | `AnalysisError` | `cc.get_result_aggregates()`, `cc.generate_reports()` |
+| `ExperimentNotCompleteError` | `AnalysisError` | `cc.generate_reports()` |
+
+`CorvusCoroneError`, `NotFoundError` and a single conflated `StudyLockedError` were the names
+an earlier draft of this document used. ADR-015 removed all three: the first is a duplicate
+root, the second is less precise than `EntityNotFoundError`, and the third cannot distinguish
+`StudyNotLockedError` from `StudyAlreadyLockedError`.
 
 ---
 
 ### StudyAlreadyLockedError
 
-**Inherits from:** `CorvusError`
+**Inherits from:** `ValidationError`
 
 **Raised by:** `cc.update_study()`
 
-**When:** Always in V1, because all studies are locked immediately upon creation and cannot
-be modified. The exception signals that the requested mutation was rejected because the
-study's lock is in effect.
+**When:** `cc.lock_study()` has already been called on this Study. A Study is mutable while
+its status is `"draft"` and immutable once locked; locking is an explicit act, not a side
+effect of creation (ADR-013). The exception signals that the requested mutation arrived after
+pre-registration took effect.
 
 **Message format:** `"Study <study_id> is locked and cannot be modified."`
 
 **Caller guidance:** Catch this exception when calling `cc.update_study()` and inform the
-user that studies are immutable once created. If the researcher needs a different
-configuration, they must call `cc.create_study()` with the desired parameters.
+user that the Study was locked and its pre-registration fields are now fixed. If the
+researcher needs a different configuration, they must call `cc.create_study()` for a new
+Study; the locked one stays on record as what was actually pre-registered.
 
 ---
 
 ### SeedCollisionError
 
-**Inherits from:** `CorvusError`
+**Inherits from:** `ReproducibilityError`
 
 **Raised by:** `cc.run()`
 
@@ -1305,7 +1321,7 @@ the probability of collision is negligible for any realistic repetition count.
 
 ### BudgetExhaustedError
 
-**Inherits from:** `CorvusError`
+**Inherits from:** `BudgetError`
 
 **Raised by:** `Problem.evaluate()` internally (the interface method defined in
 `docs/03-technical-contracts/02-interface-contracts/02-problem-interface.md`).
@@ -1325,9 +1341,9 @@ documented for the benefit of Problem implementors and Runner implementors.
 
 ---
 
-### NotFoundError
+### EntityNotFoundError
 
-**Inherits from:** `CorvusError`
+**Inherits from:** `StorageError`
 
 **Raised by:** `cc.get_problem()`, `cc.get_algorithm()`, `cc.get_experiment()`,
 `cc.get_runs()`, `cc.get_result_aggregates()`, `cc.generate_reports()`,
@@ -1381,7 +1397,7 @@ parameter value and retry. If the error mentions an unknown problem or algorithm
 
 ### UnsupportedFormatError
 
-**Inherits from:** `CorvusError`
+**Inherits from:** `IntegrationError`
 
 **Raised by:** `cc.export_raw_data()`
 
@@ -1396,7 +1412,7 @@ strings dynamically from user input without validation.
 
 ### ExportValidationError
 
-**Inherits from:** `CorvusError`
+**Inherits from:** `IntegrationError`
 
 **Raised by:** `cc.export_raw_data()`
 
@@ -1416,239 +1432,23 @@ produced.
 
 ## CLI Command Surface
 
-The `corvus` command-line tool is installed alongside the `corvus_corone` Python package.
-All commands operate on the same repository as the Python API. Exit codes follow standard
-Unix conventions: 0 for success, non-zero for error.
-
-### Common Exit Codes
-
-| Code | Meaning |
-|---|---|
-| `0` | Command completed successfully. |
-| `1` | General error (invalid arguments, validation failure). |
-| `2` | Entity not found (equivalent to `EntityNotFoundError`). |
-| `3` | Locked entity error (equivalent to `StudyAlreadyLockedError`). |
-| `4` | Unsupported format (equivalent to `UnsupportedFormatError`). |
-| `5` | Export validation failure (equivalent to `ExportValidationError`). |
-| `10` | Seed collision error (equivalent to `SeedCollisionError`). |
-
----
-
-### corvus run
-
-Executes all Runs for a Study and prints the resulting Experiment ID.
-
-**Synopsis:**
-
-```
-corvus run <study_id>
-```
-
-**Arguments:**
-
-| Argument | Required | Description |
-|---|---|---|
-| `<study_id>` | Yes | The ID of the Study to execute. |
-
-**Output:** On success, prints the Experiment ID to stdout:
-
-```
-Experiment 3f2e1a00-... completed. 300 runs finished (300 completed, 0 failed).
-```
-
-**Exit codes:**
-
-| Code | Condition |
-|---|---|
-| `0` | Experiment completed; all Runs finished (including those with `status="failed"` — individual Run failures do not produce a non-zero exit code unless the whole Experiment fails). |
-| `1` | `<study_id>` argument is missing or malformed. |
-| `2` | No Study with `<study_id>` exists. |
-| `10` | Seed collision detected during execution. |
-
----
-
-### corvus list-problems
-
-Lists all registered problem instances.
-
-**Synopsis:**
-
-```
-corvus list-problems [--tag <tag> ...]
-```
-
-**Arguments:**
-
-| Argument | Required | Description |
-|---|---|---|
-| `--tag <tag>` | No | Filter by tag. May be specified multiple times. Only problem instances matching all given tags are shown. |
-
-**Output:** A table with columns `ID`, `NAME`, `DIM`, `NOISE` printed to stdout. One row
-per matching problem instance.
-
-```
-ID                                    NAME                          DIM  NOISE
-----                                  ----                          ---  -----
-sphere-d10-noise-gaussian-0.1         Sphere d=10 Gaussian σ=0.1    10   gaussian_0.1
-sphere-d10-noiseless                  Sphere d=10 noiseless          10   none
-```
-
-**Exit codes:**
-
-| Code | Condition |
-|---|---|
-| `0` | Command completed. Zero matching results is not an error. |
-| `1` | Invalid `--tag` usage. |
-
----
-
-### corvus list-algorithms
-
-Lists all registered algorithm instances.
-
-**Synopsis:**
-
-```
-corvus list-algorithms [--family <family>]
-```
-
-**Arguments:**
-
-| Argument | Required | Description |
-|---|---|---|
-| `--family <family>` | No | Filter to only algorithm instances with the given `algorithm_family` value. |
-
-**Output:** A table with columns `ID`, `NAME`, `FAMILY` printed to stdout.
-
-```
-ID                  NAME                       FAMILY
---                  ----                       ------
-cma-es-default      CMA-ES default config      evolution_strategy
-nelder-mead-default Nelder-Mead default config  direct_search
-```
-
-**Exit codes:**
-
-| Code | Condition |
-|---|---|
-| `0` | Command completed. Zero matching results is not an error. |
-| `1` | Invalid `--family` usage. |
-
----
-
-### corvus report
-
-Generates analysis reports for an Experiment.
-
-**Synopsis:**
-
-```
-corvus report <experiment_id> [--open]
-```
-
-**Arguments:**
-
-| Argument | Required | Description |
-|---|---|---|
-| `<experiment_id>` | Yes | The ID of the Experiment for which to generate reports. |
-| `--open` | No | If specified, opens the researcher report in the system's default web browser after generation. |
-
-**Output:** On success, prints the paths to the generated report files:
-
-```
-[researcher]    /path/to/reports/experiment-3f2e1a00-researcher.html
-[practitioner]  /path/to/reports/experiment-3f2e1a00-practitioner.html
-```
-
-**Exit codes:**
-
-| Code | Condition |
-|---|---|
-| `0` | Reports generated successfully. |
-| `1` | `<experiment_id>` argument is missing or malformed. |
-| `2` | No Experiment with `<experiment_id>` exists, or the Experiment has no ResultAggregates. |
-
----
-
-### corvus verify
-
-Verifies the integrity of an Experiment's data — checks that all Runs have the required
-PerformanceRecord fields and that ResultAggregates are consistent with Run data.
-
-**Synopsis:**
-
-```
-corvus verify <experiment_id>
-```
-
-**Arguments:**
-
-| Argument | Required | Description |
-|---|---|---|
-| `<experiment_id>` | Yes | The ID of the Experiment to verify. |
-
-**Output:** On success, prints a summary of the verification:
-
-```
-Experiment 3f2e1a00-...: OK
-  300 runs verified.
-  0 integrity issues found.
-```
-
-If issues are found, each issue is printed to stderr with a description:
-
-```
-Experiment 3f2e1a00-...: FAILED
-  300 runs verified.
-  3 integrity issues found.
-  ERROR: Run 'abc-...': PerformanceRecord 'xyz-...' missing field 'objective_value'.
-  ERROR: Run 'def-...': PerformanceRecord 'uvw-...' missing field 'eval_number'.
-  ...
-```
-
-**Exit codes:**
-
-| Code | Condition |
-|---|---|
-| `0` | Verification passed; no integrity issues. |
-| `2` | No Experiment with `<experiment_id>` exists. |
-| `5` | One or more integrity issues were found. |
-
----
-
-### corvus export
-
-Exports raw PerformanceRecord data for an Experiment to a file.
-
-**Synopsis:**
-
-```
-corvus export <experiment_id> [--format <format>] [--output <path>]
-```
-
-**Arguments:**
-
-| Argument | Required | Description |
-|---|---|---|
-| `<experiment_id>` | Yes | The ID of the Experiment whose data to export. |
-| `--format <format>` | No | Output format. One of `json` (default) or `csv`. |
-| `--output <path>` | No | Output file path. If not specified, a default path in the current working directory is used: `experiment-<id>.<format>`. |
-
-**Output:** On success, prints the path to the exported file:
-
-```
-Exported 45 000 PerformanceRecords to /path/to/experiment-3f2e1a00.json
-```
-
-**Exit codes:**
-
-| Code | Condition |
-|---|---|
-| `0` | Export completed successfully. |
-| `1` | `<experiment_id>` argument is missing, or `--output` path is not writable. |
-| `2` | No Experiment with `<experiment_id>` exists. |
-| `4` | `--format` specifies an unsupported format. |
-| `5` | Export validation failed due to missing mandatory fields in stored data. |
+**Specified elsewhere.** The `corvus` command-line tool is defined in
+[`../02-design/02-architecture/03-c4-leve2-containers/02-cli-spec.md`](../02-design/02-architecture/03-c4-leve2-containers/02-cli-spec.md),
+which ADR-016 made the authoritative CLI surface: command names, arguments, options, output
+format, error message format and exit codes. This document previously carried a second,
+independently maintained copy of that surface; the two had already diverged on the exit-code
+table, so the copy is removed rather than resynchronised (ADR-012: one definition per subject).
+
+What remains this document's responsibility is the relationship between the two surfaces:
+
+- Every CLI command delegates to a function specified above, takes the same subject in the
+  same position, and carries the same name modulo hyphenation (FR-40).
+- The CLI is a **subset** of the facade, never a parallel surface. Study authoring
+  (`cc.create_study()`, `cc.update_study()`, `cc.lock_study()`) has no command-line form in V1.
+- Every CLI error message begins with the exception class name from the taxonomy adopted in
+  § Exception Hierarchy above, so a script can identify the failure category without parsing
+  prose (FR-41), and the exit code distinguishes failure categories rather than collapsing
+  them (FR-42).
 
 ---
 

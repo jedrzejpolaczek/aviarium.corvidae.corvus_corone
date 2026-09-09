@@ -22,16 +22,16 @@ Generated: 2026-03-04. Updated: 2026-05-15. Update whenever a milestone closes o
 | MANIFESTO | — | ✅ Principles and anti-patterns AP-1..AP-7 complete |
 | C1 System Context | — | ⚠️ Principles complete |
 | C2 Containers | — | ⚠️ Principles complete |
-| C3 Components | — | ✅ 11 groups; boundary vocabulary reconciled with the contracts (ADR-012) |
+| C3 Components | REF-TASK-0041, 0050 | ⚠️ 11 groups; boundary vocabulary reconciled with the contracts (ADR-012), but the Experiment Runner and Study Orchestrator groups describe a failure model no contract defines |
 | C4 Code | — | ⚠️ 7 groups drafted; descriptive layer only (ADR-012) |
-| Architecture Decision Records | REF-TASK-0011, 0024 | ⚠️ ADR-001 decided; technical constraints and bulk storage format pending |
-| SRS | REF-TASK-0008..0013, 0033..0035 | ⚠️ Use cases and FR-01..26 drafted; NFRs, interface requirements, acceptance tests, CLI spec, report format, competitive differentiation open |
-| Statistical methodology | REF-TASK-0016..0021 | ⚠️ 3-level framework drafted; ECDF, test selection, diversity requirements open |
-| Metric taxonomy | REF-TASK-0014, 0015 | ⚠️ Drafted; implementation references pending |
-| Interface contracts | REF-TASK-0023, 0036 | ⚠️ Drafted; LocalFileRepository structure and post-implementation update pending |
-| Data format | REF-TASK-0022 | ⚠️ Drafted; post-implementation update pending |
-| Ecosystem integration | REF-TASK-0004..0007 | ⛔ Not started (spikes required) |
-| Implementation — Core Library | IMPL-000..027 | ⛔ Not started |
+| Architecture Decision Records | REF-TASK-0046 | ✅ ADR-001..ADR-024 accepted. ⚠️ ADR-012 normativity vs the ADR-016/018/019 exception unrecorded |
+| SRS | REF-TASK-0049 | ✅ UC-01..UC-11, FR-01..FR-42, 6 NFRs, 16 constraints, §7 interface requirements, §9 traceability. ⚠️ §8 acceptance strategy covers FR-01..26, 32, 33 only |
+| Statistical methodology | REF-TASK-0043, 0044 | ⚠️ §1–§3 and §7 written; **§4 Level 3, §5 anytime and §6 uncertainty are empty** (HTML comment only) |
+| Metric taxonomy | REF-TASK-0014 | ✅ 9 metrics, Standard Reporting Set, selection guide; implementation references land with IMPL-011 |
+| Interface contracts | REF-TASK-0042 | ✅ 6 interfaces + cross-cutting. ⚠️ four Repository methods carry a signature and no semantics |
+| Data format | REF-TASK-0045 | ✅ 7 entity schemas, file formats, interoperability mappings, CV-001..CV-023, schema version 0.0.2 |
+| Ecosystem integration | — | ✅ COCO, IOHprofiler and Nevergrad mappings documented; IOH and Nevergrad bridges implemented |
+| Implementation — Core Library | IMPL-000..027 | ⚠️ IMPL-000, 010, 023, 025 done; IMPL-001..009, 011..022, 024, 026, 027 not started |
 | Implementation — Researcher Agent (Pilot V2) | IMPL-028..036 | ⛔ Not started *(post-V1)* |
 | Implementation — Autonomous (Pilot V3) | IMPL-037..047 | ⛔ Not started *(post-V1)* |
 | Learner Actor | REF-TASK-0025..0030, IMPL-044..046 | ⛔ Not started *(post-V1)* |
@@ -61,12 +61,33 @@ Generated: 2026-03-04. Updated: 2026-05-15. Update whenever a milestone closes o
 > One gap was not repairable by editing and was opened as REF-TASK-0040: the Public API +
 > CLI container was in V1 scope with no functional requirement behind it. Closed the same
 > day as FR §4.10.
+>
+> **Fourth measurement, 2026-09-09 (consistency audit).** Re-measured with the same method but a
+> wider reading rule: a citation counts as read only if the *cited section says the same thing*.
+>
+> | Component | 3rd pass (against its own citations) | 4th pass (against what the citations say) |
+> |---|---|---|
+> | Statistical Tester | 0 | 12 |
+> | Execution Coordinator | not measured | 13 |
+> | LOCF Interpolator | not measured | 11 |
+>
+> The third column does not overturn the second; it measures a wider thing. Eight of the twelve
+> for the Statistical Tester are not in `03-statistical-tester.md` at all but in
+> `02-statistical-methodology.md`, which it cites — four of them in §4, a section that has no
+> content. The other two components were never in the three-component sample; the eight groups
+> repaired that day were reconciled with their contracts, which is not the same as being
+> measured. The verdict from three components is: not implementable from documentation alone.
+>
+> The pattern is the same one the second column already recorded, one level further out. The
+> gate checks names; the third pass checked sentences in the component document; the fourth
+> checks sentences in the documents that component points at. Each level found defects the
+> previous one could not see, so the next re-measurement should assume there is another.
 
 ---
 
 ## GitHub Milestones
 
-Six milestones group all open documentation and design tasks.
+Seven milestones group all open documentation and design tasks.
 
 | Milestone | Focus |
 |---|---|
@@ -76,6 +97,7 @@ Six milestones group all open documentation and design tasks.
 | V1 Infrastructure — ADRs & Technical Constraints | Python version, OS support, bulk storage format decision |
 | Post-V1 — Continuous Improvement | Tasks requiring empirical data from real studies before they can be completed |
 | Learner Actor — Education Platform *(post-V1)* | New actor: C1/SRS/C2 updates, GLOSSARY, tutorials |
+| V1 Consistency — audit follow-up | Ten decisions the 2026-09-09 consistency audit found missing: failure model, four unspecified Repository methods, three empty methodology sections, test-tree scope, ADR-010/ADR-023 reconciliation, the ADR-012 exception, Pilot V3 against AP-4/AP-7, governance document, acceptance-test coverage, and the future of the C3/C4 layers |
 
 ---
 
@@ -100,7 +122,7 @@ Six milestones group all open documentation and design tasks.
 - [x] **[REF-TASK-0036] LocalFileRepository directory structure** — annotated directory tree for a completed study; notes that layout is an implementation detail, not part of the `Repository` interface; document after IMPL-010
 
 ### Data format — cross-entity rules and schema version
-- [x] **[REF-TASK-0038] Cross-entity validation rules** — `01-data-format/12-cross-entity-validation.md` was an empty comment; now defines CEV-01..CEV-12, each with the point of check and the consequence of violation (reject, warn, flag). These are the checks the Study Orchestrator performs, so the component was not implementable without them
+- [x] **[REF-TASK-0038] Cross-entity validation rules** — `01-data-format/12-cross-entity-validation.md` was an empty comment; now defines CV-001..CV-023, each with the point of check and the consequence of violation (reject, warn, flag). These are the checks the Study Orchestrator performs, so the component was not implementable without them
 - [x] **[REF-TASK-0039] Declare the initial schema version** — `schema_version` was named in `13-schema-versioning.md` but present in no entity table, and the pointer to where the current version is declared named a file that does not exist. Version set to `0.0.1`, declared in `01-data-format/01-index.md`, field added to the seven entity schemas; stays below `1.0.0` until the V1 release so pre-release changes owe no migration guide
 
 ### MANIFESTO
@@ -116,10 +138,10 @@ Six milestones group all open documentation and design tasks.
 ## Milestone: V1 Methodology — Statistics & Metrics
 > Scientific methodology: ECDF_AREA formalization, statistical test selection, diversity requirements, sensitivity documentation.
 
-- [x] **[REF-TASK-0016] ANYTIME-ECDF_AREA computation procedure** — exact normalization (ADR-007 *(planned)*: empirical min/max) and aggregation across problems
+- [x] **[REF-TASK-0016] ANYTIME-ECDF_AREA computation procedure** — exact normalization (ADR-007: empirical min/max; integration domain settled by ADR-024) and aggregation across problems
 - [x] **[REF-TASK-0017] TIME-EVALUATIONS_TO_TARGET Standard Reporting Set decision** — weigh pre-specification burden vs. efficiency metric value; create ADR
 - [x] **[REF-TASK-0020] Statistical test selection procedure** — decision tree: Wilcoxon (2 algorithms) vs Kruskal-Wallis + Holm-Bonferroni (>2); document in `02-statistical-methodology.md §3`
-- [x] **[REF-TASK-0021] Problem instance diversity minimum requirements** — quantitative floor (ADR-008 *(planned)* candidate: ≥5 instances, ≥2 dimensionality ranges, ≥1 noise + ≥1 deterministic)
+- [x] **[REF-TASK-0021] Problem instance diversity minimum requirements** — quantitative floor, recorded as ADR-009 D-1..D-3: ≥5 instances, ≥2 dimensionality ranges, ≥1 stochastic + ≥1 deterministic
 - [x] **[REF-TASK-0022] Algorithm sensitivity documentation format** — `SensitivityReport` schema field in `AlgorithmInstance`; requires `docs/03-technical-contracts/01-data-format/03-algorithm-instance.md`
 - [x] **[REF-TASK-0019] Level 1 required visualizations** — mandatory EDA set (boxplot, convergence curves, ECDF, violin); document in `02-statistical-methodology.md §2`
 - [x] **[REF-TASK-0015] Metric implementation references** — link each metric definition to `corvus_corone/analysis/metrics.py`; fulfilled as part of IMPL-011
@@ -140,14 +162,14 @@ Six milestones group all open documentation and design tasks.
 
 ## Milestone: V1 Infrastructure — ADRs & Technical Constraints
 
-- [x] **[REF-TASK-0024] Bulk PerformanceRecord storage format decision** *(spike first)* — benchmark JSON vs Parquet vs HDF5 at 150 k records; create ADR-009
+- [x] **[REF-TASK-0024] Bulk PerformanceRecord storage format decision** *(spike first)* — benchmark JSON vs Parquet vs HDF5 at 150 k records; recorded as ADR-010
 
 ---
 
 ## IMPL Phase 0 — Project Setup
 > Monorepo initialization. Must complete before any implementation task.
 
-- [x] **`[IMPL-000]`** Setup monorepo: uv workspace, `pyproject.toml` (corvus_corone + corvus_corone_pilot), GitHub Actions CI matrix (ubuntu + macos × Python 3.10/3.11/3.12) · *Refs: ADR-006 *(planned)*, REF-TASK-0011*
+- [x] **`[IMPL-000]`** Setup monorepo: uv workspace, `pyproject.toml` (corvus_corone + corvus_corone_pilot), GitHub Actions CI matrix (ubuntu + macos × Python 3.10/3.11/3.12) · *Refs: ADR-006, REF-TASK-0011*
 
 ---
 
@@ -166,7 +188,7 @@ Six milestones group all open documentation and design tasks.
 - [x] **`[IMPL-010]`** Repository interface + LocalFileRepository — `storage/repository.py`: `Repository` ABC, `LocalFileRepository`, `RepositoryContractTest` · *Fulfills: REF-TASK-0023*
 - [ ] **`[IMPL-011]`** Metric taxonomy — `analysis/metrics.py`: `@metric` registry; `QUALITY-BEST_VALUE_AT_BUDGET`, `TIME-EVALUATIONS_TO_TARGET`, `RELIABILITY-SUCCESS_RATE`; implementation refs added to `03-metric-taxonomy/01-index.md` · *Fulfills: REF-TASK-0015*
 - [ ] **`[IMPL-012]`** Statistical analysis — `analysis/statistical.py`: three-level (exploratory summary, Wilcoxon/Kruskal-Wallis + Holm-Bonferroni, Cliff's delta); `ThreeLevelAnalysis.analyze()` requires all three levels · *Fulfills: REF-TASK-0020*
-- [ ] **`[IMPL-013]`** Anytime performance — `analysis/anytime.py`: `compute_anytime_curve`, `compute_ecdf`, `compute_ecdf_area` (empirical normalization per ADR-007 *(planned)*; LOCF per ADR-003); basic IOHprofiler `.dat` export · *Fulfills: REF-TASK-0016*
+- [ ] **`[IMPL-013]`** Anytime performance — `analysis/anytime.py`: `compute_anytime_curve`, `compute_ecdf`, `compute_ecdf_area` (empirical normalization per ADR-007, integration domain per ADR-024; LOCF over `best_so_far` per ADR-003 and ADR-023); basic IOHprofiler `.dat` export · *Fulfills: REF-TASK-0016*
 - [ ] **`[IMPL-014]`** Reporting Engine — `reporting/reports.py`: `StudyReport` (required `scope_statement`, `limitations`); Jinja2 templates for researcher + practitioner reports; raises `ValueError` when scope absent · *Fulfills: REF-TASK-0019*
 - [ ] **`[IMPL-015]`** Visualizations — `reporting/visualizations.py`: VIZ-L1-01 boxplot, VIZ-L1-02 convergence curves, VIZ-L1-03 ECDF (`plt.step(where='post')`), VIZ-L1-04 violin (n > 50); auto-generated for every report
 - [ ] **`[IMPL-016]`** Study Orchestrator — `orchestrator.py`: `StudyConfig`, `StudyOrchestrator.run()`, diversity validation, `SeedSequence` seed generation, Facade over all modules · *Refs: REF-TASK-0021*
@@ -180,11 +202,11 @@ Six milestones group all open documentation and design tasks.
 - [ ] **`[IMPL-017a]`** Study design guidance — FR-27..FR-31: `lock_study()` reports every unresolved decision at once with its consequence; `seed_strategy` and `sampling_strategy` become required; every validation message names the rule it enforces; the ADR-009 diversity floor is checked with the exploratory escape hatch · *Fulfills: FR-27, FR-28, FR-29, FR-30, FR-31; acceptance criterion in NFR-USABILITY-01*
 - [ ] **`[IMPL-009a]`** PerformanceRecord carries `best_so_far` alongside `objective_value`; the Runner maintains the running best; anytime reconstruction reads `best_so_far` · *Fulfills: ADR-023*
 - [ ] **`[IMPL-013a]`** ECDF_AREA integrates over the full Budget; the reference case asserts `0.4375` · *Fulfills: ADR-024*
-- [ ] **`[IMPL-018]`** ADR-006: Technical constraints — `pyproject.toml` `requires-python = ">=3.10"`, MIT license, optional extras (`optuna`, `rag`, `all`), CI license check · *Fulfills: REF-TASK-0011*
+- [ ] **`[IMPL-018]`** ADR-006 + ADR-022: Technical constraints — `pyproject.toml` `requires-python = ">=3.10"`, AGPL-3.0-or-later (ADR-022 supersedes the MIT clause of ADR-006), optional extras (`optuna`, `rag`, `all`) · *Fulfills: REF-TASK-0011*
 - [ ] **`[IMPL-019]`** ADR-007 + ADR-008: ECDF_AREA normalization (empirical min/max, limitations documented) + Standard Reporting Set definition; update `03-metric-taxonomy/01-index.md §3` · *Fulfills: REF-TASK-0016, REF-TASK-0017*
-- [ ] **`[IMPL-020]`** ADR-008 + 02-statistical-methodology.md: diversity requirements (≥5 problems, ≥2 dimensionality ranges); Level 1 VIZ-L1-01..03 spec in §2; Wilcoxon/Kruskal decision tree in §3 · *Fulfills: REF-TASK-0019, REF-TASK-0020, REF-TASK-0021*
+- [ ] **`[IMPL-020]`** ADR-009 + 02-statistical-methodology.md: diversity requirements (≥5 problems, ≥2 dimensionality ranges); Level 1 VIZ-L1-01..03 spec in §2; Wilcoxon/Kruskal decision tree in §3 · *Fulfills: REF-TASK-0019, REF-TASK-0020, REF-TASK-0021*
 - [ ] **`[IMPL-021]`** Sensitivity documentation — `SensitivityReport(BaseModel)` in `storage/entities.py`, `docs/03-technical-contracts/01-data-format/03-algorithm-instance.md`, `01-contribution-guide.md §2` · *Fulfills: REF-TASK-0022*
-- [ ] **`[IMPL-022]`** Bulk PerformanceRecord storage — **blocked on REF-TASK-0024 spike**; ADR-009 from benchmark evidence; `LocalFileRepository.save_bulk_records()`; round-trip test · *Fulfills: REF-TASK-0024*
+- [ ] **`[IMPL-022]`** Bulk PerformanceRecord storage — ADR-010 (decided from benchmark evidence); `LocalFileRepository.save_bulk_records()`; round-trip test · *Fulfills: REF-TASK-0024*
 - [x] **`[IMPL-023]`** IOHprofiler bridge — `bridge/iohprofiler.py`: full `.dat` export + `.meta.json` sidecar (seed, run_id, wall_time); round-trip test; `docs/03-technical-contracts/01-data-format/10-file-formats.md` mapping table · *Fulfills: REF-TASK-0007*
 - [ ] **`[IMPL-024]`** COCO bridge — **blocked on REF-TASK-0005 spike**; `bridge/coco_exporter.py`; continuous-only warning; `docs/03-technical-contracts/01-data-format/10-file-formats.md` mapping with documented data loss · *Fulfills: REF-TASK-0005*
 - [x] **`[IMPL-025]`** Nevergrad adapter — **blocked on REF-TASK-0006 spike**; `algorithms/adapters/nevergrad_adapter.py`; `ng.p.Dict` → `SearchSpace`; tutorial; `docs/03-technical-contracts/01-data-format/10-file-formats.md` mapping · *Fulfills: REF-TASK-0006*
@@ -225,9 +247,9 @@ Six milestones group all open documentation and design tasks.
 ## IMPL Phase 4 — Learner Actor
 > Learner implementation: Algorithm Visualization Engine, Socratic Guide (LangGraph node), Algorithm Genealogy module.
 
-- [ ] **`[IMPL-044]`** Algorithm Visualization Engine — `learner/visualization_engine.py`: convergence animation, parameter sensitivity heatmap, search trajectory, Pareto front, algorithm genealogy timeline · *Refs: REF-TASK-0027, UC-06*
-- [ ] **`[IMPL-045]`** Socratic Guide — `v2_researcher/agents/socratic_guide.py`: LangGraph node activated by `state["interaction_mode"] == "socratic"`, generates bridging questions, never direct answers; CLI `--mode socratic` · *Fulfills: REF-TASK-0028, UC-08*
-- [ ] **`[IMPL-046]`** Algorithm Genealogy — `learner/genealogy.py` + `learner/data/genealogy_data.json`: `AlgorithmNode`, `Genealogy` directed graph, lineage (MAB 1933 → BayesOpt 1998 → TPE 2011) and CMA-ES/NSGA-II history; tutorial `docs/06-tutorials/07-learner-algorithm-genealogy.md` · *Refs: REF-TASK-0030, UC-09*
+- [ ] **`[IMPL-044]`** Algorithm Visualization Engine — `learner/visualization_engine.py`: convergence animation, parameter sensitivity heatmap, search trajectory, Pareto front, algorithm genealogy timeline · *Refs: REF-TASK-0027, UC-07*
+- [ ] **`[IMPL-045]`** Socratic Guide — `v2_researcher/agents/socratic_guide.py`: LangGraph node activated by `state["interaction_mode"] == "socratic"`, generates bridging questions, never direct answers; CLI `--mode socratic` · *Fulfills: REF-TASK-0028, UC-09*
+- [ ] **`[IMPL-046]`** Algorithm Genealogy — `learner/genealogy.py` + `learner/data/genealogy_data.json`: `AlgorithmNode`, `Genealogy` directed graph, lineage (MAB 1933 → BayesOpt 1998 → TPE 2011) and CMA-ES/NSGA-II history; tutorial `docs/06-tutorials/07-learner-algorithm-genealogy.md` · *Refs: REF-TASK-0030, UC-10*
 
 ---
 
@@ -235,11 +257,11 @@ Six milestones group all open documentation and design tasks.
 > New actor introduced after V1: Learner persona with Algorithm Visualization, Socratic guidance mode, algorithm history/evolution features. Requires C1, SRS, C2, GLOSSARY updates.
 
 - [x] **[REF-TASK-0025] Add Learner actor to C1 context document** — role, goals, gives/gets, relationship to Researcher data flow, C1 diagram update ·
-- [x] **[REF-TASK-0026] Add Learner use cases to SRS §3** — UC-06 (visualization), UC-07 (contextual help), UC-08 (Socratic), UC-09 (algorithm history), UC-10 (explore Researcher results) ·
+- [x] **[REF-TASK-0026] Add Learner use cases to SRS §3** — UC-07 (visualization), UC-08 (contextual help), UC-09 (Socratic), UC-10 (algorithm history), UC-11 (explore Researcher results). *Numbers corrected 2026-09-09: this line predated the renumbering that made UC-06 the Researcher's export case.* ·
 - [x] **[REF-TASK-0027] Add Algorithm Visualization Engine container to C2** — matplotlib/plotly/manim; ADR for technology choice; diagram update ·
 - [x] **[REF-TASK-0028] Add Socratic Guide component to C2/C3** — LangGraph `--mode socratic`; guides toward understanding rather than answering ·
 - [x] **[REF-TASK-0029] Add Learner terms to GLOSSARY.md** — Learner, Algorithm Visualization, Algorithm Genealogy, Socratic Mode ·
-- [x] **[REF-TASK-0030] Add Learner education tutorials** — visualization (`UC-06`), Socratic mode (`UC-08`), algorithm genealogy explorer (`UC-09`) ·
+- [x] **[REF-TASK-0030] Add Learner education tutorials** — visualization (`UC-07`), Socratic mode (`UC-09`), algorithm genealogy explorer (`UC-10`) ·
 
 ---
 
@@ -266,7 +288,7 @@ MANIFESTO ──► C1 ──► C2/C3/C4 (complete)
                            └──► 02-interface-contracts/01-index.md (REF-TASK-0023) — after IMPL-010
 
 REF-TASK-0005/0006/0007 spikes ──► IMPL-024/025/023 bridges ──► SRS §7 (REF-TASK-0012)
-REF-TASK-0024 spike ──► IMPL-022 bulk storage (ADR-006)
+REF-TASK-0024 spike ──► IMPL-022 bulk storage (ADR-010)
 
 REF-TASK-0037 (public API contract) ──► IMPL-017 (Public API + CLI)
 
@@ -288,6 +310,112 @@ REF-TASK-0025 ──► 0026 ──► 0027 ──► 0028 ──► 0029 ──
 
 ---
 
+## Milestone: V1 Consistency — audit follow-up (2026-09-09)
+> Ten findings from the consistency audit that could not be closed by editing. Each names a
+> decision that does not exist yet, so each needs a decision before any document can state it.
+> The editable findings from the same audit were fixed in the commit that opened these.
+
+### Contracts — decisions that are missing
+
+- [ ] **[REF-TASK-0041] Decide the Run and Experiment failure model.** `Study.on_failure`
+  (`skip`/`abort`), `Study.max_workers`, `Run.timeout_s`, `Run.memory_limit_mb`,
+  `Experiment.skipped_count`, the Run statuses `skipped` and `aborted` and the Experiment
+  statuses `partial` and `aborted` are used across the Experiment Runner and Study Orchestrator
+  component groups and in `05-c4-level4-code/02-shared/04-study-spec.md`. None of them exists in
+  any entity schema: `06-run.md` admits `completed`, `failed`, `budget_exhausted`;
+  `05-experiment.md` admits `planned`, `running`, `completed`, `failed`; FR-12 requires a failed
+  Run to carry `status="failed"` and a non-empty `failure_reason`. A descriptive document may not
+  coin them (ADR-012), so either the contracts gain the model or the components lose it.
+  `max_workers` is settled already — SRS §1.4 B-01 reserves it for V2 — and must not return.
+  *Blocks IMPL-007, IMPL-016.*
+
+- [ ] **[REF-TASK-0042] Specify the four Repository methods that carry only a signature.**
+  `deprecate_algorithm(id, reason, superseded_by)`, `list_experiments()`,
+  `list_result_aggregates()` and `list_reports()` in `06-repository-interface.md` have no
+  semantics, preconditions, postconditions or exceptions, against the method template the
+  cross-cutting contract requires. `deprecate_algorithm` carries the whole supersession model of
+  ADR-020, so it is the one that cannot wait. *Blocks IMPL-002 and the IMPL-010 follow-up.*
+
+- [ ] **[REF-TASK-0045] Reconcile the ADR-010 Parquet column table with ADR-023.** ADR-010 lists
+  the bulk-format columns and predates the split of the value field, so it has `objective_value`
+  and no `best_so_far`. ADR-023 added the field and did not list ADR-010 among the documents it
+  corrects. `10-file-formats.md` now carries the column with a note; the ADR pair still needs a
+  superseding record so the next reader is not left comparing two accepted ADRs. Same class of
+  defect: ADR-009 and ADR-023 both cited cross-entity rules under a `CEV-` prefix that no rule
+  uses (the contract defines `CV-001`..`CV-023`); both citations were corrected in place, and
+  `check_docs.py` does not check this identifier family. *Blocks IMPL-022.*
+
+### Methodology — sections that are empty
+
+- [ ] **[REF-TASK-0043] Write §4, §5 and §6 of `02-statistical-methodology.md`.** All three are
+  headings whose entire body is an HTML comment: §4 Level 3 Practical Significance, §5 Anytime
+  Analysis, §6 Uncertainty Reporting. They are cited as if written by `05-analyzer-interface.md`
+  (Cliff's delta → §4), ADR-007 (→ §5), FR-15, NFR-STAT-01, `03-report-format-spec.md` and four
+  GLOSSARY entries. The blocking sub-decisions: the interpretation thresholds for Cliff's delta,
+  which exist nowhere in the corpus; and whether post-hoc pairwise comparisons report Cliff's
+  delta (§4, `03-statistical-tester.md`) or rank-biserial correlation (§3.5.1) — the two sections
+  disagree. *Blocks IMPL-012, IMPL-013.*
+
+- [ ] **[REF-TASK-0044] Decide whether the parametric branch of §3.3 is in V1.** The test
+  selection tree offers paired t-test, repeated-measures ANOVA and Tukey HSD alongside the
+  non-parametric path; `03-statistical-tester.md` states the tree "has exactly these two entries"
+  and admits only Wilcoxon and Kruskal-Wallis. The names `paired_t_test`, `rm_anova` and
+  `tukey_hsd` appear in no contract, so `Study.pre_registered_hypotheses.test_type` cannot express
+  them. Either the tree loses the branch or the taxonomy gains the names. Related: §3.7 sets a
+  default α of 0.05, which FR-28 forbids for a parameter with methodological consequences, while
+  `03-statistical-tester.md` already refuses that default — one of the two is wrong.
+  *Blocks IMPL-012.*
+
+### Governance and scope — decisions that were never recorded
+
+- [ ] **[REF-TASK-0046] Record the exception ADR-016, ADR-018 and ADR-019 make to ADR-012.**
+  ADR-012 states that C2/C3/C4 are descriptive and may cite but never coin, and `docs/README.md`
+  repeats it: `03-technical-contracts/` is the only place that defines identifiers, signatures,
+  field names, enumeration values and error classes. ADR-016 then makes `02-cli-spec.md`, a C2
+  document, the authority for command names, options, error-message format and exit codes; ADR-018
+  and ADR-019 lean on `03-report-format-spec.md` the same way. The later ADR wins, so the exception
+  is real — it is written down nowhere, which means a reader applying ADR-012 literally concludes
+  the CLI spec is illegal. Either promote those surfaces into the contracts, or amend the
+  precedence rule to name the exception.
+
+- [ ] **[REF-TASK-0047] Decide how Corvus Pilot V3 stays on the right side of AP-4 and AP-7.**
+  AP-7 rejects automated algorithm selection as a substitute for researcher judgement; AP-4
+  rejects analysis pipelines that cannot be independently inspected. IMPL-037 generates hypotheses
+  with an LLM, IMPL-041 runs an autonomous research cycle on a weekly cron, IMPL-035 returns a
+  calibrated prediction, IMPL-026 has an LLM judge study designs against the MANIFESTO. IMPL-039
+  is a safety module against runaway resource use, which answers a different question. Nothing in
+  the corpus reconciles the two, and the reconciliation is a decision, not an omission.
+  *Post-V1, but the answer shapes IMPL-028 onwards.*
+
+- [ ] **[REF-TASK-0048] Write `05-community/02-versioning-governance.md`.** All six sections —
+  artifact types and versioning schemes, dependency tracking, deprecation policy, long-term
+  storage, licensing, governance model — have headings and no content. NFR-REPRO-01, FR-03, FR-26,
+  CONST-COM and four GLOSSARY entries cite it, including *Schema Version*, which points at "§1–2".
+  ADR-020 rests its entity-identity model on a deprecation policy that is not written down. Same
+  document family: `01-contribution-guide.md` §2 and §4–§8 are empty, and
+  `06-tutorials/01-cmd-first-study.md` is a skeleton, which NFR-USABILITY-01 and the use-case
+  acceptance criterion both depend on.
+
+- [ ] **[REF-TASK-0049] Extend §8 Acceptance Test Strategy to FR-27..FR-31 and FR-39..FR-42.**
+  `01-acceptance-test-strategy.md` declares that every FR maps to at least one test file and
+  covers FR-01..FR-26 plus FR-32 and FR-33. The Study Design Guidance group and the Programmatic
+  and Command-Line Access group are both V1 and have no test category, while the traceability
+  matrix already fills those rows with categories the strategy does not assign — two SRS documents
+  claim coverage a third does not provide. FR-34..FR-38 are `[DEFERRED]` and are correctly absent.
+
+- [ ] **[REF-TASK-0050] Decide what happens to the C3 and C4 layers.** ADR-012 considered deleting
+  `05-c4-level4-code/` and consolidating the 45 C3 component files into eleven, and deferred it as
+  "a separate, independent decision rather than a repair". The 2026-09-09 audit is evidence for
+  taking it: every finding of the class "the descriptive layer invented vocabulary" came from
+  these two layers, `check_docs.py` enforces three of the seven categories ADR-012 names, and the
+  layers describe a library whose core has no code, so nothing can falsify them. Three options,
+  all defensible: consolidate to eleven decomposition-only indexes; keep them and close
+  REF-TASK-0041 first so the vocabulary exists; or mark the layer `allow-undefined` and stop
+  implying it is checked. Choosing none of the three is what produced the 2026-09-09 defect where
+  a correct traceability footnote was appended below an uncorrected document body.
+
+---
+
 ## Open Tasks Index
 
 ### Documentation Tasks (REF-TASK)
@@ -304,6 +432,16 @@ Documentation tasks:
   (FR-39..FR-42), which promotes the decisions already recorded in `04-public-api-contract.md`,
   `02-cli-spec.md` and ADR-015/ADR-016 to the layer that decides what V1 contains.
   *(Found by the C3 semantics pass, 2026-09-09; closed the same day.)*
+- [ ] **REF-TASK-0041** — Run and Experiment failure model *(blocks IMPL-007, IMPL-016)*
+- [ ] **REF-TASK-0042** — semantics for four signature-only Repository methods
+- [ ] **REF-TASK-0043** — `02-statistical-methodology.md` §4, §5, §6 *(blocks IMPL-012, IMPL-013)*
+- [ ] **REF-TASK-0044** — parametric branch of the test selection tree, and the §3.7 default α
+- [ ] **REF-TASK-0045** — ADR-010 Parquet columns against ADR-023 *(blocks IMPL-022)*
+- [ ] **REF-TASK-0046** — record the ADR-016/018/019 exception to ADR-012 normativity
+- [ ] **REF-TASK-0047** — Corvus Pilot V3 against AP-4 and AP-7 *(post-V1)*
+- [ ] **REF-TASK-0048** — write `02-versioning-governance.md`, finish the contribution guide
+- [ ] **REF-TASK-0049** — acceptance tests for FR-27..FR-31 and FR-39..FR-42
+- [ ] **REF-TASK-0050** — decide the future of the C3 and C4 layers
 
 ### Implementation Tasks (IMPL)
 
@@ -329,9 +467,9 @@ Documentation tasks:
 | IMPL-017 — Public API + CLI | Phase 1 | `api.py`, `cli.py`, corvus run/list commands · *Blocked on REF-TASK-0037* |
 | IMPL-018 — ADR-006 technical constraints | Phase 2 | ADR-006, pyproject.toml finalized |
 | IMPL-019 — ADR-007 + ADR-008 ECDF + SRS | Phase 2 | ADR-007/008, 03-metric-taxonomy/01-index.md §3 |
-| IMPL-020 — ADR-008 + statistical-methodology | Phase 2 | ADR-008, 02-statistical-methodology.md §2/§3 |
+| IMPL-020 — ADR-009 + statistical-methodology | Phase 2 | ADR-009, 02-statistical-methodology.md §2/§3 |
 | IMPL-021 — Sensitivity documentation | Phase 2 | SensitivityReport schema, docs/03-technical-contracts/01-data-format/03-algorithm-instance.md |
-| IMPL-022 — Bulk PerformanceRecord storage | Phase 2 | ADR-009, `save_bulk_records()` (spike first) |
+| IMPL-022 — Bulk PerformanceRecord storage | Phase 2 | ADR-010, `save_bulk_records()` |
 | IMPL-023 — IOHprofiler bridge | Phase 2 | `bridge/iohprofiler.py`, .dat + .meta.json |
 | IMPL-024 — COCO bridge | Phase 2 | `bridge/coco_exporter.py` (spike first) |
 | IMPL-025 — Nevergrad adapter | Phase 2 | `adapters/nevergrad_adapter.py` (spike first) |

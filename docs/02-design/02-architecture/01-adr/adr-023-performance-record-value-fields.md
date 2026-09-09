@@ -100,6 +100,12 @@ written before this ADR lacks it. Since no study has been run, there are no such
 schema version moves from `0.0.1` to `0.0.2`, which is a pre-release change and owes no migration
 guide (ADR-022 sets the pre-release policy, REF-TASK-0039 the version).
 
+*Citation corrected 2026-09-09: the mitigation above cited rule 6 under a `CEV-` prefix. No rule
+carries that prefix; `12-cross-entity-validation.md` defines `CV-001` through `CV-023`, and
+`CV-006` is the Study-locking rule. The rules that actually constrain the record sequence are `CV-010`
+(`evaluation_number` strictly increasing) and `CV-023` (`best_so_far` monotone). The decision is
+unchanged; only the pointer was wrong.*
+
 ---
 
 ## Alternatives Considered
@@ -143,7 +149,7 @@ sequential pass before any export or metric computation.
 
 - **Risk:** An implementation writes `best_so_far` inconsistently with `objective_value`, for
   example not resetting it between Runs.
-  **Mitigation:** CEV-06 already constrains the record sequence within a Run; a companion rule
+  **Mitigation:** CV-010 and CV-023 already constrain the record sequence within a Run; a companion rule
   that `best_so_far` is monotone in the objective direction is added to `07-performance-record.md`
   validation rules.
 

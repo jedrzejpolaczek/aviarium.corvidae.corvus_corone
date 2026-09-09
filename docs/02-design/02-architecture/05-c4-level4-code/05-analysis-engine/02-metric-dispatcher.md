@@ -99,7 +99,7 @@ Tester. One instance per unique `(experiment_id, algorithm_id, problem_id, metri
 
 ### `AnalysisConfig`
 
-See [../02-cross-cutting/04-study-spec.md](../02-shared/04-study-spec.md).
+See [../02-shared/04-study-spec.md](../02-shared/04-study-spec.md).
 
 ---
 

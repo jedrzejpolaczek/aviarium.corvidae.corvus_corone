@@ -61,7 +61,7 @@ Error: <ErrorType>: <human-readable message>
 Examples:
 
 ```
-Error: NotFoundError: Study with id '3f2e1a00-...' not found.
+Error: EntityNotFoundError: Study with id '3f2e1a00-...' not found.
 Error: ValidationError: create_study(): problem_ids: unknown problem id 'foo-bar'.
 Error: SeedCollisionError: Seed collision detected in Experiment 'abc-...': seed 42 would be assigned to multiple Runs.
 ```
@@ -76,7 +76,7 @@ parse stderr to identify the error category without parsing the free-form messag
 |---|---|
 | `0` | Command completed successfully. |
 | `1` | General error — invalid arguments, validation failure, unwritable output path. |
-| `2` | Entity not found — `NotFoundError` from the Python API. |
+| `2` | Entity not found — `EntityNotFoundError` from the Python API (ADR-015). |
 | `3` | Locked entity — `StudyAlreadyLockedError` from the Python API (ADR-015). |
 | `4` | Unsupported format — `UnsupportedFormatError` from the Python API. |
 | `5` | Export validation failure — `ExportValidationError` or integrity check failed. |

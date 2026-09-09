@@ -286,18 +286,18 @@ flowchart TB
 
 ### Flow 6: Reproduce a published study
 
-**Use case:** UC-05 · **Trigger:** Researcher retrieves archived Study artifacts and calls `cc.run()` using the archived Study plan and original seeds
+**Use case:** UC-05 · **Trigger:** Researcher retrieves archived Study artifacts and calls `cc.run()` on the archived Study plan. Seeds are not transported: the Study's `root_seed` regenerates the identical assignment (ADR-017), and FR-09 forbids an API for setting individual seeds
 
 | # | From | To | Data exchanged |
 |---|---|---|---|
-| 1 | Researcher | External artifact repository | Retrieves archived `Study` record, `AlgorithmInstance` versions, `ProblemInstance` versions, `Run` seed assignments |
-| 2 | Researcher | Public API + CLI | Imports archived `Study` record (status `"locked"`) and pinned entity versions |
-| 3 | Public API + CLI | Algorithm Registry | `register_algorithm()` for each pinned `AlgorithmInstance` version (if not already present) |
-| 4 | Public API + CLI | Problem Repository | `register_problem()` for each pinned `ProblemInstance` version (if not already present) |
-| 5 | Public API + CLI | Study Orchestrator | `run_study(study)` — locked `Study` with seeds from archived `Run` records (not re-generated) |
-| 6 | Study Orchestrator | Experiment Runner | `run_study(study)` — seeds injected from archived records |
-| 7 | Experiment Runner | Algorithm Registry | `get_algorithm(id, version="<pinned>")` — exact archived version |
-| 8 | Experiment Runner | Problem Repository | `get_problem(id, version="<pinned>")` — exact archived version |
+| 1 | Researcher | External artifact repository | Retrieves the archived `Study` record (including `root_seed`), the `AlgorithmInstance` and `ProblemInstance` records it references, and the original `Run` records for comparison |
+| 2 | Researcher | Public API + CLI | Imports the archived `Study` record (status `"locked"`) and the referenced entities |
+| 3 | Public API + CLI | Algorithm Registry | `register_algorithm()` for each referenced `AlgorithmInstance`, preserving its UUID (if not already present) |
+| 4 | Public API + CLI | Problem Repository | `register_problem()` for each referenced `ProblemInstance`, preserving its UUID (if not already present) |
+| 5 | Public API + CLI | Study Orchestrator | `run_study(study)` — the locked `Study`, carrying the archived `root_seed` |
+| 6 | Study Orchestrator | Experiment Runner | `run_study(study)` — the Runner rebuilds `SeedSequence(root_seed)` and spawns children in run-plan order, reproducing every `Run.seed` (ADR-017) |
+| 7 | Experiment Runner | Algorithm Registry | `get_algorithm(id)` — the UUID never changes meaning, so identifier alone is exact (ADR-020) |
+| 8 | Experiment Runner | Problem Repository | `get_problem(id)` — same |
 | 9 | Experiment Runner | Results Store | Writes new `Experiment` record linked to original `Study.id`; `Run[]` + `PerformanceRecord[]` |
 | 10 | Study Orchestrator | Analysis Engine | `analyze(experiment_id, config)` on the new Experiment |
 | 11 | Public API + CLI | Researcher | New `ResultAggregate[]` for comparison against original published aggregates |

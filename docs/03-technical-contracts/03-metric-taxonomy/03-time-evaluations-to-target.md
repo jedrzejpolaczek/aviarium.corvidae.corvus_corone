@@ -14,7 +14,7 @@ If $\min_k f(x_k) > \tau$, the value is $B + 1$.
 
 **Interpretation:** Lower is better. Captures the efficiency of the algorithm — how quickly it finds a solution of acceptable quality.
 
-**Required inputs:** Full sequence of Performance Records with `objective_value` and `evaluation_number` fields. Requires a pre-specified target $\tau$, which must be defined in the Study plan before data collection.
+**Required inputs:** Full sequence of Performance Records with `best_so_far` and `evaluation_number` fields — the target is crossed by the running best, not by a single raw evaluation (ADR-023). Requires a pre-specified target $\tau$, which must be defined in the Study plan before data collection.
 
 **Statistical treatment:** Distribution is often right-skewed (many Runs reach target early; some never do). The censored values ($B+1$) require survival analysis methods or non-parametric tests. See `docs/04-scientific-practice/01-methodology/02-statistical-methodology.md` §3.
 

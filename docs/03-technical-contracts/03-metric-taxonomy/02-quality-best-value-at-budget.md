@@ -14,7 +14,7 @@ $$\text{QUALITY-BEST\_VALUE\_AT\_BUDGET} = \min_{i \in \{1,\ldots,B\}} f(x_i)$$
 
 **Interpretation:** Lower is better for minimization problems. Reflects the algorithm's ability to find good solutions given the full computational Budget.
 
-**Required inputs:** All Performance Records for the Run; specifically the `objective_value` field of each record. Minimum: 1 completed Run.
+**Required inputs:** All Performance Records for the Run; specifically the `best_so_far` field of each record — the raw `objective_value` of a single evaluation is not the quantity this metric reports (ADR-023). Minimum: 1 completed Run.
 
 **Statistical treatment:** Distribution is typically non-normal (bounded below by the true optimum if known, potentially multi-modal). Non-parametric statistical tests are generally appropriate. See `docs/04-scientific-practice/01-methodology/02-statistical-methodology.md` §3.
 

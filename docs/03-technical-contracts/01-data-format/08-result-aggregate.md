@@ -13,7 +13,7 @@
 | algorithm_instance_id | string | yes | ID of the Algorithm Instance being aggregated over |
 | n_runs | int | yes | Number of Runs aggregated; must equal the count of `completed` Runs for this `(experiment, problem, algorithm)` combination |
 | metrics | map[string, object] | yes | Map of `metric_name → AggregateValue`; metric names must exactly match names in `docs/03-technical-contracts/03-metric-taxonomy/01-index.md` |
-| anytime_curves | list[object] | yes | Summarized performance curves: mean ± spread of `objective_value` at each `evaluation_number` across all aggregated Runs |
+| anytime_curves | list[object] | yes | Summarized performance curves: mean ± spread of `best_so_far` at each `evaluation_number` across all aggregated Runs, reconstructed by LOCF where a Run has no record at that count. The raw `objective_value` is not aggregated here (ADR-023) |
 
 `AggregateValue` is an open structure — the required field is `n_successful`; all other statistics are metric-defined:
 

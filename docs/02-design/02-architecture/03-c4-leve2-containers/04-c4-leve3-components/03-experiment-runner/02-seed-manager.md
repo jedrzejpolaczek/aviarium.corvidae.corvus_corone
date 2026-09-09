@@ -33,14 +33,16 @@ Two obligations follow, both stated in
    This component writes no file and constructs no path into the Results Store, which ADR-001
    forbids. Resuming a Run reads `Run.seed` through `RunRepository.get_run()`.
 
-Seed injection into the Run process sets the seeded generators required by
-`07-cross-cutting-contracts.md` 6: unseeded global random calls are forbidden.
+The seed is handed to the Problem and the Algorithm as a parameter, never installed into a
+process-global generator. `07-cross-cutting-contracts.md` § Randomness Isolation forbids the
+legacy global API outright and requires each implementation to build its own generator from the
+seed it received.
 
 ## Dependencies
 
-- Python `random` stdlib
-- `numpy.random`
-- `torch` (optional — only if importable in the Run subprocess)
+- `numpy.random.SeedSequence` — the derivation primitive (ADR-017). No other randomness
+  library is a dependency of this component: it produces integers, it does not seed anything
+  itself.
 - **Results Store — RunRepository** — `Run.seed` is persisted and read back as a field of the Run record. This component holds no filesystem path (ADR-001, ADR-017).
 
 ---
@@ -49,13 +51,13 @@ Seed injection into the Run process sets the seeded generators required by
 
 1. **Deterministic seed derivation** — `SeedSequence(Study.root_seed)` is spawned once per Run, in the run-plan order problem → algorithm → repetition, and the first 32-bit word of the child sequence is that Run's seed (ADR-017). The same Study produces the same assignment because the spawn order is a property of the plan, not of execution timing.
 
-2. **Seed injection** — sets seeds on all known random sources before the algorithm's `__init__` is called. The injection order is fixed: `random.seed()` → `numpy.random.seed()` → `torch.manual_seed()` (if torch is importable).
+2. **Seed handover** — the derived integer is passed to `Problem.reset(seed)` and `Algorithm.initialize(search_space, seed)` before any algorithm code executes. Each implementation constructs its own generator from it, as `07-cross-cutting-contracts.md` § Randomness Isolation requires. The Seed Manager calls no `random.seed()`, no `numpy.random.seed()` and no framework-specific global seeding function: those mutate interpreter-wide state, which would leak between Runs and defeat FR-11.
 
 3. **Collision detection** — before a Run executes, its seed is checked against the seeds already assigned within the Experiment for the same problem and algorithm pair. A repeat raises `SeedCollisionError`. The check is explicit and is not skipped on the grounds that the derivation should not collide (ADR-017).
 
 4. **Resume path** — a resumed Run reads `Run.seed` through `RunRepository.get_run()` rather than re-deriving it. Re-deriving would depend on the spawn order being reconstructed identically, which a partial resume cannot guarantee (ADR-017, Risks).
 
-5. **No global state** — the Seed Manager holds no state after `inject_seeds()` completes. All state is on the filesystem or in the Python interpreter's random modules.
+5. **No global state** — the only state the Seed Manager holds is the assigned-seed set used by behaviour 3, discarded when the Experiment ends. It writes no file and mutates no interpreter-global generator; `Run.seed` is persisted through `RunRepository` (ADR-001, ADR-017).
 
 ---
 

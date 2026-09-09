@@ -261,10 +261,18 @@ when present, giving a **20× write and 59× query speedup** (ADR-010 benchmark,
 | `run_id` | `pa.string()` | `run_id` |
 | `evaluation_number` | `pa.int32()` | `evaluation_number` |
 | `elapsed_time` | `pa.float64()` | `elapsed_time` |
-| `objective_value` | `pa.float64()` | `objective_value` |
+| `objective_value` | `pa.float64()` | `objective_value` (raw result of this evaluation) |
+| `best_so_far` | `pa.float64()` | `best_so_far` (running best; the column every anytime metric reads) |
 | `is_improvement` | `pa.bool_()` | `is_improvement` |
 | `trigger_reason` | `pa.dictionary(pa.int8(), pa.string())` | `trigger_reason` (7-value enum; dictionary-encoded) |
 | `current_solution` | `pa.string()` | `current_solution` (JSON-serialised; null if not stored) |
+
+> **`best_so_far` is not in the ADR-010 column table.** ADR-010 was accepted before ADR-023 split
+> the single value field in two, and an accepted ADR is not edited. The column is required here
+> because the Invariants below promise that a record read back from Parquet is identical to the
+> same record read from JSON Lines, and §2.6 makes `best_so_far` required. ADR-023 anticipated the
+> cost — "a plain float64 that the benchmark in ADR-010 already assumed" — but did not list this
+> document among the ones it corrects; see REF-TASK-0045.
 
 ### Benchmark summary (150,000 records)
 

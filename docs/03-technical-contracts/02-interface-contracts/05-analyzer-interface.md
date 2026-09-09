@@ -132,11 +132,14 @@ all gap-filling to it.
 - `eval_number ≥ 1` and `≤ run.budget_used`
 
 **Postconditions:**
-- returned value equals `objective_value` of the most recent record with
+- returned value equals `best_so_far` of the most recent record with
   `evaluation_number ≤ eval_number` (Last Observation Carried Forward — the default)
 
 **Default implementation: `LastObservationCarriedForward`**
-Returns `records[-1 where evaluation_number ≤ n].objective_value`.
+Returns `records[-1 where evaluation_number ≤ n].best_so_far`.
+Carrying `objective_value` forward would propagate the raw result of one evaluation, which
+may be worse than the best already seen; `best_so_far` is the quantity the rule was always
+about (ADR-023).
 This is the **only** implementation permitted without explicit pre-registration in the
 Study record (ADR-003).
 

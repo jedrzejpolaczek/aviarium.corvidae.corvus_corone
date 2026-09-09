@@ -35,11 +35,11 @@ flowchart TD
   subgraph Execution["Core Execution"]
     subgraph OrchSG["Study Orchestrator"]
       sb["Study Builder\nValidates & assembles\nStudySpec from inputs"]
-      ec["Execution Coordinator\nProcessPoolExecutor\nfan-out per Run"]
+      ec["Execution Coordinator\nSequential dispatch\none Run at a time (B-01)"]
       pep["Post-Execution Pipeline\nTriggers analysis\nand reporting"]
     end
     subgraph ERSG["Experiment Runner"]
-      sm["Seed Manager\nGenerates & injects seeds\nnumpy / random / torch"]
+      sm["Seed Manager\nSeedSequence(root_seed)\nspawn per Run (ADR-017)"]
       ri["Run Isolator\nSubprocess spawn\nResource limits"]
       el["Evaluation Loop\nask/tell cycle\nBudget tracking"]
       perf["Performance Recorder\nObservation → PerformanceRecord\nWrites to Results Store"]
@@ -73,18 +73,18 @@ flowchart TD
     subgraph RSSG["Results Store"]
       lfr["Local File Repository\nDirectory layout\nper Study/Run"]
       jes["JSON Entity Store\nStudySpec & metadata\nper-run JSON files"]
-      jw["JSONL Writer\nStreaming observation\nappend per evaluation"]
+      jw["JSONL Writer\nAppends a record\nper fired trigger (ADR-002)"]
       pw["Parquet Writer\nPost-run snappy conversion\ncolumnar analytics"]
       prr["Performance Record Reader\nLoads & deserialises\nrecords for analysis"]
     end
     subgraph ARSG["Algorithm Registry"]
       aiv["Instance Validator\nValidates AlgorithmInstance\nschema on registration"]
-      avm["Version Manager\nImmutable versions\nDeprecation flag"]
+      avm["Supersession Manager\nImmutable entities\nsuperseded_by (ADR-020)"]
       aes["Entity Store\nJSON persistence\nID resolution"]
     end
     subgraph PRSG["Problem Repository"]
       piv["Instance Validator\nValidates ProblemInstance\nschema on registration"]
-      pvm["Version Manager\nImmutable versions\nDeprecation flag"]
+      pvm["Supersession Manager\nImmutable entities\nsuperseded_by (ADR-020)"]
       pes["Entity Store\nJSON persistence\nID resolution"]
     end
   end

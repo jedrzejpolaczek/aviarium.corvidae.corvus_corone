@@ -312,7 +312,7 @@ The Learner does not modify, re-run, or extend any Study. They read completed Re
 
 **Direction:** Outbound — the system submits jobs and collects results.
 
-**V1 scope:** Deferred. V1 supports local execution only (sequential or Python multiprocessing). The `Runner` interface is designed as an abstraction so a SLURM or cloud backend can be plugged in for V2 without changing the data format or library API. See `ADR-001`.
+**V1 scope:** Deferred. V1 supports local, sequential execution only (SRS §1.4, boundary B-01). The `Runner` interface is designed as an abstraction so a SLURM, cloud or multiprocessing backend can be plugged in for V2 without changing the data format or library API. See `ADR-001`.
 
 ---
 

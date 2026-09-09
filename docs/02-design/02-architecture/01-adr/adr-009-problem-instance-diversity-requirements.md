@@ -89,7 +89,13 @@ conclusions valid only for that range. The system does not extrapolate to uncove
 > researcher says which of the two they are running. Rejecting without the hatch would be the
 > obstacle the second half of the system's purpose forbids; warning without the hatch would let a
 > confirmatory claim rest on five instances in one dimensionality range. See FR-30, FR-32, FR-33
-> and cross-entity rule CEV-11.
+> and cross-entity rule CV-021.
+>
+> *Citation corrected 2026-09-09: this line cited rule 11 under a `CEV-` prefix. No rule carries
+> that prefix —
+> `12-cross-entity-validation.md` defines `CV-001` through `CV-023`, and `CV-011` is the
+> `elapsed_time` monotonicity rule, not the diversity floor. The decision is unchanged; only the
+> pointer was wrong. See REF-TASK-0045 for the audit that found it.*
 
 *The range boundaries (5, 20) are conventional breakpoints in the HPO literature. They are
 not theoretically exact; future studies may provide empirical justification for adjusting

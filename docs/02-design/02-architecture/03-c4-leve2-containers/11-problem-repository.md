@@ -14,7 +14,7 @@ execution time.
 
 | Surface | Form | Who uses it |
 |---|---|---|
-| Problem lookup | `get_problem(id, version)` / `list_problems(filters)` | Public API (`cc.list_problems()`, `cc.get_problem()`), Experiment Runner (loads instance per Run) |
+| Problem lookup | `get_problem(id)` / `list_problems(filters)` | Public API (`cc.list_problems()`, `cc.get_problem()`), Experiment Runner (loads instance per Run) |
 | Problem registration | `register_problem(problem)` → `id` | Community Contributor (via `corvus verify`, UC-04) |
 | Problem deprecation | `deprecate_problem(id, reason, superseded_by)` | Maintainer |
 
@@ -23,13 +23,15 @@ Full interface contract: [`../../../03-technical-contracts/02-interface-contract
 **Dependencies:** None. The Problem Repository is a leaf component; it depends only on the
 persistence layer (local file store in V1).
 
-**Data owned:** All `ProblemInstance` records and their version history. Stored under the
+**Data owned:** All `ProblemInstance` records and their supersession lineage. Stored under the
 `LocalFileRepository` root (`problems/<id>/`).
 
-**Versioning:** `get_problem(id, version=None)` returns the latest non-deprecated version.
-An explicit version string returns exactly that version — required for reproducibility
-(MANIFESTO Principle 19). Deprecated instances remain retrievable by exact ID for
-study reproduction.
+**Versioning:** entities are immutable and there is no `version` parameter (ADR-020).
+`get_problem(id)` returns the same bytes forever; a revision is registered as a new entity
+with a new UUID, and the old one carries `superseded_by`. `list_problems()` excludes
+deprecated entities; `get_problem(id)` still retrieves them, which is what study
+reproduction needs (MANIFESTO Principle 19). The `version` field remains on the record as
+human-readable metadata for display and citation, never as an addressing key.
 
 **Actors served:** Researcher (study design — problem selection); Experiment Runner
 (execution-time instance loading); Community Contributor (registration, UC-04).

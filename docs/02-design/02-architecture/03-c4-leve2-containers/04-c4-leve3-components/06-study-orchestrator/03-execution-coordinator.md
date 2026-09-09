@@ -38,23 +38,35 @@ class ExecutionCoordinator:
 
 ## Dependencies
 
-- **Experiment Runner** — calls `run_isolator.execute_run()` for each Run
+- **Experiment Runner** — one Run at a time, through the Runner interface
+  (`02-interface-contracts/04-runner-interface.md`)
 - **Results Store**, through the `RepositoryFactory` (ADR-001) — updates Run and Experiment status
-- Python `concurrent.futures.ProcessPoolExecutor` — for parallel run execution
+- No concurrency primitive. V1 execution is local and sequential (SRS §1.4, boundary B-01);
+  `max_workers` is a V2 name and must not appear in a V1 component.
 
 ---
 
 ## Key Behaviors
 
-1. **Parallel dispatch** — uses `ProcessPoolExecutor(max_workers=study_config.max_workers)` to execute Runs in parallel. Each Run is submitted as a separate future.
+> **Unresolved: the failure model below is not in any contract.** `Study.on_failure`, the Run
+> statuses `skipped` and `aborted`, the Experiment statuses `partial` and `aborted`, and
+> `Experiment.skipped_count` appear in no entity schema. `06-run.md` admits `completed`,
+> `failed` and `budget_exhausted`; `05-experiment.md` admits `planned`, `running`, `completed`
+> and `failed`; FR-12 requires a failed Run to carry `status="failed"` and a non-empty
+> `failure_reason`. Behaviours 2, 3 and 5 are therefore described here against vocabulary that
+> does not exist, and this document may not coin it (ADR-012). The decision is open as
+> REF-TASK-0041; until it is made and the entity schemas are changed, treat behaviours 2 and 3
+> as a proposal, not as a specification.
+
+1. **Sequential dispatch** — iterates the run plan in order and executes one Run to completion before starting the next. The order is the run-plan order the Seed Manager also uses (problem index, then algorithm index, then repetition index), so that the sequence of `SeedSequence` children is reproducible (ADR-017). No parallelism, no worker pool, no futures (B-01).
 
 2. **`skip` policy** — when a Run returns `status=skipped`, the Coordinator records the failure, logs it, and continues to the next Run. The Experiment's `skipped_count` is incremented.
 
-3. **`abort` policy** — when a Run returns `status=aborted`, the Coordinator cancels all pending futures, marks the Experiment `status=aborted`, and raises the critical error itself (`SeedCollisionError`, `StorageError`) propagates; aborting is the Runner's response to it, not a separate exception type (ADR-015). No further Runs are dispatched.
+3. **`abort` policy** — a critical error (`SeedCollisionError`, `StorageError`) propagates out of the Coordinator; no further Runs are dispatched. Aborting is the Coordinator's response to the error, not a separate exception type (ADR-015).
 
 4. **Progress reporting** — if `on_progress` is provided, calls it after each Run completes (success or failure). Used by the CLI to display a progress bar.
 
-5. **Status updates** — updates each Run's status through the repository as Runs complete. Updates the Experiment status from `running` → `completed` / `partial` / `aborted` on coordinator exit.
+5. **Status updates** — updates each Run's status through the repository as Runs complete, then sets the Experiment status on exit.
 
 ---
 

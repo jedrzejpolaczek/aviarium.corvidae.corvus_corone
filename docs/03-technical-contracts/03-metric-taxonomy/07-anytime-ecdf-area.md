@@ -132,8 +132,8 @@ The following case must be reproduced exactly by any compliant implementation.
 
 PerformanceRecords for **Algorithm A** (minimization):
 
-| Run | evaluation_number | objective_value |
-|-----|-------------------|----------------|
+| Run | evaluation_number | best_so_far |
+|-----|-------------------|-------------|
 | 1   | 1                 | 1.0            |
 | 1   | 2                 | 0.8            |
 | 1   | 4                 | 0.6            |

@@ -1,7 +1,7 @@
 # ADR-008: TIME-EVALUATIONS_TO_TARGET Exclusion from Standard Reporting Set
 
 <!--
-STORY ROLE: Closes the open question of whether the Standard Reporting Set (metric-taxonomy.md §3)
+STORY ROLE: Closes the open question of whether the Standard Reporting Set (03-metric-taxonomy/01-index.md §3)
 should include TIME-EVALUATIONS_TO_TARGET. The decision establishes what the mandatory four-metric
 set covers and why that set is stable — with explicit reasoning about what categories of metric
 are appropriate to mandate vs. leave optional.
@@ -27,7 +27,7 @@ CONNECTS TO:
 ## Context
 
 The Standard Reporting Set currently contains four metrics that every study must compute
-(MANIFESTO Principle 29, metric-taxonomy.md §3). A `TODO: REF-TASK-0017` in that document
+(MANIFESTO Principle 29, 03-metric-taxonomy/01-index.md §3). A `TODO: REF-TASK-0017` in that document
 flagged the open question of whether `TIME-EVALUATIONS_TO_TARGET` should be added as a fifth
 mandatory metric.
 
@@ -190,4 +190,4 @@ without a formalized contract for reporting efficiency on task-specific targets.
 | `docs/03-technical-contracts/03-metric-taxonomy/07-anytime-ecdf-area.md` | The target-free alternative that covers the efficiency dimension |
 | `docs/04-scientific-practice/01-methodology/01-benchmarking-protocol.md` Step 5 | Where τ must be declared before data collection |
 | `docs/01-manifesto/MANIFESTO.md` Principle 29 | Objectivity over promotion — the principle the Standard Reporting Set enforces |
-| `ADR-007-ecdf-area-normalization.md` | Defines ECDF_AREA normalization — the companion metric that makes this decision possible |
+| `adr-007-ecdf-area-normalization.md` | Defines ECDF_AREA normalization — the companion metric that makes this decision possible |

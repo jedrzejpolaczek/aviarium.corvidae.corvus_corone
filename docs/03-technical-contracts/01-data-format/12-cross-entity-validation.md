@@ -14,11 +14,11 @@ or a ResultAggregate could count runs that never completed.
 
 CONNECTS TO:
   ← §2.1–§2.8 (entity schemas)           : per-entity fields referenced in each rule
-  → interface-contracts.md §5 (Repository): enforcement is the Repository's responsibility at
+  → 02-interface-contracts/01-index.md §5 (Repository): enforcement is the Repository's responsibility at
     write time; the Analyzer enforces read-time rules before analysis begins
   → c4-level4-code/06-results-store/      : implementation location for write-time checks
   → c4-level4-code/05-analysis-engine/    : implementation location for analysis-time checks
-  → community/versioning-governance.md    : schema versioning must not break any invariant here
+  → docs/05-community/02-versioning-governance.md    : schema versioning must not break any invariant here
 -->
 
 ---
@@ -41,9 +41,9 @@ Each rule specifies:
 
 | Check point | Responsible component |
 |---|---|
-| Write time | `Repository` (§5 of interface-contracts.md) |
+| Write time | `Repository` (§5 of 02-interface-contracts/01-index.md) |
 | Status transition | `Repository` on entity update |
-| Analysis time | `Analyzer` (§4 of interface-contracts.md) before computing metrics |
+| Analysis time | `Analyzer` (§4 of 02-interface-contracts/01-index.md) before computing metrics |
 
 ---
 

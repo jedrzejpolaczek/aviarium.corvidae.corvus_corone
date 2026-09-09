@@ -1,12 +1,12 @@
 # §3 File Formats and Storage
 
-> Index: [01-data-format.md](01-index.md)
+> Index: [docs/03-technical-contracts/01-data-format/01-index.md](01-index.md)
 
 <!--
 CONNECTS TO:
   ← §2 entity schemas     : every file described here stores an entity defined in §2
   → ADR-001               : the server-compatibility design constraint that shapes this layout
-  → interface-contracts.md §5 : Repository interface — the layout is its implementation detail
+  → 02-interface-contracts/01-index.md §5 : Repository interface — the layout is its implementation detail
   → src/corvus_corone/repository/local_file.py : the production implementation of this layout
 -->
 

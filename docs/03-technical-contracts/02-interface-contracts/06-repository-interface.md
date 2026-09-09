@@ -1,6 +1,6 @@
 # §5 Repository Interface
 
-> Index: [01-interface-contracts.md](01-index.md)
+> Index: [01-index.md](01-index.md)
 
 The Repository layer provides read/write access to all persistent entities. Storage layout
 and format are implementation details — callers interact only through these interfaces.
@@ -19,7 +19,7 @@ and format are implementation details — callers interact only through these in
   version-addressed retrieval and no `version` parameter. The `version` field on an entity is
   human-readable metadata for display and citation, never an addressing key —
   required for reproducibility (MANIFESTO Principle 19).
-  → versioning policy: [versioning-governance.md §1](../../05-community/02-versioning-governance.md)
+  → versioning policy: [02-versioning-governance.md §1](../../05-community/02-versioning-governance.md)
 - **Server-compatible IDs.** All entity IDs are UUIDs. No file paths in method signatures.
   → ADR-001
 
@@ -54,7 +54,7 @@ independently without changing the factory contract.
 Returns the Problem Instance with the given ID. Content is immutable, so the same ID always
 returns the same record, including for deprecated entities (ADR-020).
 
-**Exceptions:** `EntityNotFoundError`, `EntityNotFoundError`
+**Exceptions:** `EntityNotFoundError`
 
 #### list_problems(filters: ProblemFilter | None = None) → list[ProblemInstanceSummary]
 Returns summaries of all non-deprecated Problem Instances matching the filter.
@@ -64,7 +64,7 @@ Returns summaries of all non-deprecated Problem Instances matching the filter.
 #### register_problem(problem: ProblemInstance) → str
 Validates and persists a new Problem Instance. Returns the assigned ID.
 
-**Preconditions:** all data-format.md §2.1 validation rules pass
+**Preconditions:** all docs/03-technical-contracts/01-data-format/02-problem-instance.md validation rules pass
 **Exceptions:** `ValidationError`
 
 #### deprecate_problem(id: str, reason: str, superseded_by: str | None = None) → None
@@ -76,7 +76,7 @@ Marks a Problem Instance as deprecated. Deprecated instances are excluded from
 ### AlgorithmRepository
 
 #### get_algorithm(id: str) → AlgorithmInstance
-**Exceptions:** `EntityNotFoundError`, `EntityNotFoundError`
+**Exceptions:** `EntityNotFoundError`
 
 #### list_algorithms(filters: AlgorithmFilter | None = None) → list[AlgorithmInstanceSummary]
 `AlgorithmFilter` fields: `algorithm_family`, `supported_variable_types` (subset match),
@@ -85,7 +85,7 @@ Marks a Problem Instance as deprecated. Deprecated instances are excluded from
 #### register_algorithm(algorithm: AlgorithmInstance) → str
 Validates and persists a new Algorithm Instance. Returns the assigned ID.
 
-**Preconditions:** all data-format.md §2.2 validation rules pass; `code_reference` is
+**Preconditions:** all docs/03-technical-contracts/01-data-format/03-algorithm-instance.md validation rules pass; `code_reference` is
 resolvable and version-pinned (UC-02 F2); `configuration_justification` is non-empty (UC-02 F3)
 **Exceptions:** `ValidationError`, `CodeReferenceError`
 
@@ -96,7 +96,7 @@ resolvable and version-pinned (UC-02 F2); `configuration_justification` is non-e
 ### StudyRepository
 
 #### get_study(id: str) → Study
-**Exceptions:** `EntityNotFoundError`, `EntityNotFoundError`
+**Exceptions:** `EntityNotFoundError`
 
 #### list_studies(filters: StudyFilter | None = None) → list[StudySummary]
 `StudyFilter` fields: `status` (`"draft"`, `"locked"`), `created_by`, `problem_ids` (overlap).
@@ -104,7 +104,7 @@ resolvable and version-pinned (UC-02 F2); `configuration_justification` is non-e
 #### create_study(study: Study) → str
 Persists a new Study in `"draft"` status. Returns the assigned ID.
 
-**Preconditions:** all data-format.md §2.3 validation rules pass
+**Preconditions:** all docs/03-technical-contracts/01-data-format/04-study.md validation rules pass
 
 #### lock_study(id: str) → None
 Transitions Study from `"draft"` to `"locked"`. After locking, `sampling_strategy`,
@@ -172,8 +172,8 @@ Returns all Performance Records for the given Run, sorted ascending by `evaluati
 #### save_result_aggregates(aggregates: list[ResultAggregate]) → None
 Persists a batch of Result Aggregates. All aggregates must reference the same Experiment.
 
-**Preconditions:** all data-format.md §2.7 validation rules pass; metric names in `metrics`
-are valid entries in metric-taxonomy.md
+**Preconditions:** all docs/03-technical-contracts/01-data-format/08-result-aggregate.md validation rules pass; metric names in `metrics`
+are valid entries in 03-metric-taxonomy/01-index.md
 
 ---
 

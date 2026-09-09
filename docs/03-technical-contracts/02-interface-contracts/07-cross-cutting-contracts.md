@@ -1,6 +1,6 @@
 # §6 Cross-Cutting Contracts
 
-> Index: [01-interface-contracts.md](01-index.md)
+> Index: [01-index.md](01-index.md)
 
 Contracts that apply to **all** interface implementations in this system.
 These are the system-wide rules that make the whole greater than the sum of its parts.
@@ -120,7 +120,7 @@ corresponding entity record.
 
 This version is recorded in the `AlgorithmInstance` / `ProblemInstance` record at
 registration time and stored in every `Run` that uses the instance.
-→ data-format.md §2.1 and §2.2 provenance fields
+→ docs/03-technical-contracts/01-data-format/02-problem-instance.md and §2.2 provenance fields
 
 **Postconditions:**
 - result matches the regex `^\d+\.\d+\.\d+$`
@@ -140,6 +140,6 @@ the following sections:
 | **Returns** | Type and semantics of the return value |
 | **Raises** | Every exception from §Error Taxonomy that this method raises, with the condition that triggers it |
 | **Example** | At least one usage example |
-| **References** | Links to relevant specs (e.g., `metric_name → metric-taxonomy.md §2.1`) |
+| **References** | Links to relevant specs (e.g., `metric_name → 03-metric-taxonomy/01-index.md §2.1`) |
 
 → C4 code documents specify additional per-component docstring requirements.

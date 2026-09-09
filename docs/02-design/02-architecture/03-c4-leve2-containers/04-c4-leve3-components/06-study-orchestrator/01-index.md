@@ -1,7 +1,7 @@
 # C3: Components — Study Orchestrator
 
 > C2 Container: [07-study-orchestrator.md](../../07-study-orchestrator.md)
-> C3 Index: [../01-c3-components.md](../01-c4-l3-components/01-c4-l3-components.md)
+> C3 Index: [C3 overview](../01-c4-l3-components/01-c4-l3-components.md)
 
 The Study Orchestrator coordinates the full lifecycle of a Study execution: builds and validates the run plan, dispatches runs to the Experiment Runner, handles partial failures, and triggers the post-execution pipeline (Analysis Engine + Reporting Engine).
 Actors: invoked by the Public API + CLI; orchestrates Experiment Runner, Analysis Engine, and Reporting Engine.
@@ -59,9 +59,9 @@ flowchart LR
 
 | Component | File | Responsibility |
 |---|---|---|
-| Study Builder | [study-builder.md](02-study-builder.md) | Validates and assembles a Study from user input; resolves entity IDs |
-| Execution Coordinator | [execution-coordinator.md](03-execution-coordinator.md) | Dispatches Runs to the Experiment Runner; collects results; handles partial failures |
-| Post-Execution Pipeline | [post-execution-pipeline.md](04-post-execution-pipeline.md) | Triggers Analysis Engine and Reporting Engine after all Runs complete |
+| Study Builder | [02-study-builder.md](02-study-builder.md) | Validates and assembles a Study from user input; resolves entity IDs |
+| Execution Coordinator | [03-execution-coordinator.md](03-execution-coordinator.md) | Dispatches Runs to the Experiment Runner; collects results; handles partial failures |
+| Post-Execution Pipeline | [04-post-execution-pipeline.md](04-post-execution-pipeline.md) | Triggers Analysis Engine and Reporting Engine after all Runs complete |
 
 ---
 

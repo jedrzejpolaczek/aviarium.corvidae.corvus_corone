@@ -43,6 +43,6 @@ upstream container dependencies.
 **Actors served:** All actors indirectly — the Results Store is the shared persistence layer
 for every container in the system.
 
-**Relevant SRS section:** FR-17 (data immutability and locking), FR-18 (resume interrupted
-experiments), FR-19 (execution environment capture and storage), FR-22 (raw data export
-alongside reports).
+**Relevant SRS sections:** FR-17 (every entity carries a UUID; no file paths as identifiers),
+FR-18 (produce an Artifact archive for any completed Experiment), FR-19 (cross-entity references
+use entity IDs only), FR-22 (raw data export alongside reports).

@@ -1,7 +1,7 @@
 # JSONL Performance Writer
 
 > Container: [Results Store](../../12-results-store.md)
-> C3 Index: [index.md](01-index.md)
+> C3 Index: [01-index.md](01-index.md)
 
 ---
 
@@ -39,7 +39,7 @@ Called by the Performance Recorder component within the Experiment Runner.
 
 2. **Buffered I/O** — uses a 64 KB in-process write buffer. The buffer is flushed every 100 records (called by the Performance Recorder) and on `close()`.
 
-3. **Crash resilience** — because each record is a complete, independent JSON line, a crash mid-write at most corrupts the last incomplete line. On resume, the reader skips malformed lines and reports `data_quality.truncated_record=True`.
+3. **Crash resilience** — because each record is a complete, independent JSON line, a crash mid-write at most corrupts the last incomplete line. On resume the reader skips that line and logs it; the Run's own `status` and `failure_reason` fields carry the outcome, and no separate data-quality field exists.
 
 4. **No read capability** — this component is write-only. Reading is handled by the Performance Record Reader.
 
@@ -61,5 +61,5 @@ Open file handle to `performance.jsonl` for the run_id. Closed on `close()`.
 
 ## SRS Traceability
 
-- FR-14 (stream performance records): every evaluation observation must be persisted with minimal overhead.
+- FR-14 (anytime-curve granularity): the writer must sustain the recording rate that `Study.sampling_strategy` declares, so that granularity is a methodological choice and not an I/O limit.
 - ADR-010: JSONL is the primary write format; chosen for streaming write performance (20× faster than SQLite).

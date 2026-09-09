@@ -12,10 +12,10 @@ CONNECTS TO:
   → docs/03-technical-contracts/02-interface-contracts/04-runner-interface.md : Runner.on_evaluation() contract
   → docs/03-technical-contracts/03-metric-taxonomy/01-index.md : ANYTIME-ECDF_AREA, TIME-EVALUATIONS_TO_TARGET
   → docs/04-scientific-practice/01-methodology/01-benchmarking-protocol.md Step 5
-  → ADR-001-library-with-server-ready-data-layer.md
-  → ADR-003-anytime-curve-interpolation.md : what the Analysis Engine does with records produced here
-  → ADR-004-improvement-sensitivity-threshold.md : governs when the improvement trigger fires
-  → ADR-005-performance-record-storage-cap.md : governs storage limits on records produced here
+  → adr-001-library-with-server-ready-data-layer.md
+  → adr-003-anytime-curve-interpolation.md : what the Analysis Engine does with records produced here
+  → adr-004-improvement-sensitivity-threshold.md : governs when the improvement trigger fires
+  → adr-005-performance-record-storage-cap.md : governs storage limits on records produced here
 -->
 
 ---
@@ -49,7 +49,7 @@ be computed at all, whether IOHprofiler/COCO export is lossless, and whether
 - Storing every evaluation is impractical at large budgets: 10,000 evals × 30 runs ×
   10 problems × 5 algorithms = 15 million records per study
 - The strategy must be pre-registered in the Study record before execution begins
-  (MANIFESTO Principle 16; benchmarking-protocol.md Step 5)
+  (MANIFESTO Principle 16; 01-benchmarking-protocol.md Step 5)
 - The strategy must be compatible with IOHprofiler and COCO formats (NFR-INTEROP-01)
 - The system must not suppress or alter logged values (MANIFESTO Principles 13, 29)
 
@@ -256,7 +256,7 @@ making it the system default.
 | `docs/03-technical-contracts/02-interface-contracts/04-runner-interface.md` | Runner `on_evaluation()` contract governed by this ADR |
 | `docs/03-technical-contracts/03-metric-taxonomy/01-index.md` | `ANYTIME-ECDF_AREA` and `TIME-EVALUATIONS_TO_TARGET` depend on the records produced here |
 | `docs/04-scientific-practice/01-methodology/01-benchmarking-protocol.md Step 5` | Requires the sampling schedule to be specified before execution |
-| `ADR-001-library-with-server-ready-data-layer.md` | Bulk storage format for high-volume PerformanceRecords deferred to `REF-TASK-0024` |
-| `ADR-003-anytime-curve-interpolation.md` | How the Analyzer reconstructs best-so-far at unlogged evaluation counts |
-| `ADR-004-improvement-sensitivity-threshold.md` | When the improvement trigger fires (epsilon configuration) |
-| `ADR-005-performance-record-storage-cap.md` | Storage limits on records produced by this strategy |
+| `adr-001-library-with-server-ready-data-layer.md` | Bulk storage format for high-volume PerformanceRecords deferred to `REF-TASK-0024` |
+| `adr-003-anytime-curve-interpolation.md` | How the Analyzer reconstructs best-so-far at unlogged evaluation counts |
+| `adr-004-improvement-sensitivity-threshold.md` | When the improvement trigger fires (epsilon configuration) |
+| `adr-005-performance-record-storage-cap.md` | Storage limits on records produced by this strategy |

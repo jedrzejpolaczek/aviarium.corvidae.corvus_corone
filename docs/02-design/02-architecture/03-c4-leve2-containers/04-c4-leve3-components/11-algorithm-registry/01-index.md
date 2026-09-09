@@ -1,9 +1,9 @@
 # C3: Components — Algorithm Registry
 
 > C2 Container: [10-algorithm-registry.md](../../10-algorithm-registry.md)
-> C3 Index: [../01-c3-components.md](../01-c4-l3-components/01-c4-l3-components.md)
+> C3 Index: [C3 overview](../01-c4-l3-components/01-c4-l3-components.md)
 
-The Algorithm Registry stores and serves AlgorithmInstance registrations. Each instance is validated on registration, immutable after registration, and versioned to support reproducibility across study executions.
+The Algorithm Registry stores and serves Algorithm Instance registrations. Each instance is validated on registration and immutable thereafter; a revision is registered as a new entity and the old one records `superseded_by` (ADR-020). Reproducibility follows from the UUID in an archived Run never changing meaning.
 Actors: Study Orchestrator and Public API read from it; developers register new instances during library development.
 
 ---
@@ -23,7 +23,7 @@ flowchart LR
 
   subgraph AR["Algorithm Registry"]
     iv["Instance Validator\nValidates AlgorithmInstance\nschema on registration"]
-    vm["Version Manager\nManages version history\nPrevents modification"]
+    vm["Supersession Manager\nRecords superseded_by lineage\nEntities are immutable"]
     es["Entity Store\nPersists instances as JSON\nResolves IDs + deprecation"]
   end
 
@@ -50,9 +50,9 @@ flowchart LR
 
 | Component | File | Responsibility |
 |---|---|---|
-| Instance Validator | [instance-validator.md](02-instance-validator.md) | Validates AlgorithmInstance schema and required fields on registration |
-| Version Manager | [version-manager.md](03-version-manager.md) | Manages version history and prevents modification of registered versions |
-| Entity Store | [entity-store.md](04-entity-store.md) | Persists algorithm instances as JSON; resolves IDs; supports the deprecation flag |
+| Instance Validator | [02-instance-validator.md](02-instance-validator.md) | Validates AlgorithmInstance schema and required fields on registration |
+| Supersession Manager | [03-supersession-manager.md](03-supersession-manager.md) | Records the `superseded_by` lineage between an entity and the registration that replaces it (ADR-020) |
+| Entity Store | [04-entity-store.md](04-entity-store.md) | Persists algorithm instances as JSON; resolves IDs; supports the deprecation flag |
 
 ---
 
@@ -60,12 +60,12 @@ flowchart LR
 
 ### Logging & Observability
 
-One log entry per registration: `algorithm_id`, `version`, `registered_at`, `registered_by`. One log entry per deprecation: `algorithm_id`, `deprecated_at`, `reason`. All at INFO level.
+One log entry per registration: `algorithm_id`, `registered_at`, `registered_by`. One log entry per deprecation: `algorithm_id`, `deprecated_at`, `reason`, `superseded_by`. All at INFO level.
 
 ### Error Handling
 
 - `ValidationError`: raised by Instance Validator on schema violations. Lists all violations.
-- `ValidationError`: raised when attempting to register an ID+version combination that already exists.
+- `CodeReferenceError`: raised by Instance Validator when `code_reference` does not resolve or is not version-pinned (FR-06).
 - `EntityNotFoundError`: raised by Entity Store when `get_algorithm(id)` finds no matching entry.
 
 ### Randomness / Seed Management

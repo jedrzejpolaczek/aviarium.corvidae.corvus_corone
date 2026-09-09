@@ -1,7 +1,7 @@
 # LOCF Interpolator
 
 > Container: [Analysis Engine](../../09-analysis-engine.md)
-> C3 Index: [index.md](01-index.md)
+> C3 Index: [01-index.md](01-index.md)
 
 ---
 
@@ -67,5 +67,5 @@ No persistent state. Stateless per invocation.
 
 ## SRS Traceability
 
-- FR-14 (missing data handling): LOCF is the default interpolation method.
+- FR-14 (anytime-curve reconstruction granularity): LOCF is the default interpolation method between recorded evaluations.
 - MANIFESTO Principle 18 (reproducibility): interpolated records are flagged, not silently substituted, ensuring the analysis is auditable.

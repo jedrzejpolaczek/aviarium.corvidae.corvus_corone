@@ -1,7 +1,7 @@
 # HTML Template Renderer
 
 > Container: [Reporting Engine](../../05-reporting-engine.md)
-> C3 Index: [index.md](01-index.md)
+> C3 Index: [01-index.md](01-index.md)
 
 ---
 
@@ -70,4 +70,4 @@ No persistent state.
 ## SRS Traceability
 
 - UC-06 (view report): the HTML report is the primary artifact of the reporting pipeline.
-- FR-20 (self-contained report): report must open in a browser without an internet connection.
+- FR-20 (HTML reports): both reports are single self-contained HTML files, openable without a network connection.

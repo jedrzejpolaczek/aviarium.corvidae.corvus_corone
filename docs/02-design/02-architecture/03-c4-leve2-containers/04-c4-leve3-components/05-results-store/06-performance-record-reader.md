@@ -1,7 +1,7 @@
 # Performance Record Reader
 
 > Container: [Results Store](../../12-results-store.md)
-> C3 Index: [index.md](01-index.md)
+> C3 Index: [01-index.md](01-index.md)
 
 ---
 
@@ -14,7 +14,7 @@ Provide a unified read interface over JSONL and Parquet performance files, autom
 ## Interface
 
 ```python
-class RepositoryFactory:
+class PerformanceRecordReader:
     def read_run(
         self,
         run_id: str,
@@ -36,7 +36,7 @@ class RepositoryFactory:
         """Streaming read; preferred for large Runs."""
 ```
 
-`RecordFilter` fields: `iteration_range`, `status`, `algorithm_id`, `problem_id`.
+`RecordFilter` fields: `evaluation_number_range`, `improvements_only` (keeps records whose `is_improvement` is true), `trigger_reason`. A Performance Record carries no algorithm or problem identifier — those are reached through its `run_id`, per FR-19.
 
 ---
 
@@ -57,7 +57,7 @@ class RepositoryFactory:
 
 3. **Filter pushdown** — for Parquet reads, applies `RecordFilter` as a row-group predicate to avoid reading the full file. For JSONL reads, filtering is applied in Python (line-by-line).
 
-4. **Malformed line handling** — for JSONL reads, skips lines that fail JSON parsing and records a `data_quality.malformed_lines` count in the returned metadata.
+4. **Malformed line handling** — for JSONL reads, a line that fails JSON parsing is skipped and counted. The count is logged at WARNING level with the `run_id`; it is not written into any entity, because no entity schema has a field for it.
 
 5. **Streaming support** — `stream_run()` yields PerformanceRecord objects one at a time from either format, without loading the entire Run into memory. Used by the Analysis Engine for large datasets.
 
@@ -77,6 +77,6 @@ No persistent state.
 
 ## SRS Traceability
 
-- FR-18 (unified read interface): callers must not need to know the storage format.
+- FR-18 (Artifact archive): reading a completed Experiment's records must not depend on which of the two storage formats it was archived in.
 - ADR-010: the reader abstracts the dual-format decision from all consumers.
 - UC-05 (explore results): the reader enables filtered result queries.

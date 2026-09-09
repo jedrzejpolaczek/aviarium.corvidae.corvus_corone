@@ -1,7 +1,7 @@
 # Response Mapper
 
 > Container: [Public API + CLI](../../04-public-api-cli.md)
-> C3 Index: [index.md](01-index.md)
+> C3 Index: [01-index.md](01-index.md)
 
 ---
 
@@ -57,7 +57,7 @@ Stateless.
 
 ## SRS Traceability
 
-- FR-28 (stable public API): the Response Mapper is the enforcement mechanism for API stability.
+- The Response Mapper is what keeps the public shapes in `04-public-api-contract.md` independent of the internal domain objects. No functional requirement covers the API surface; see the note in [02-api-facade.md](02-api-facade.md).
 
 > **Post-V1 surface removed.** Earlier revisions listed three visualization and
 > genealogy functions here, together with the view types they return. They belong to

@@ -15,7 +15,7 @@ CONNECTS TO:
   → docs/03-technical-contracts/02-interface-contracts/01-index.md : all code contributions must implement contracts there
   → docs/03-technical-contracts/01-data-format/01-index.md         : all data contributions must conform to schemas there
   → docs/03-technical-contracts/03-metric-taxonomy/01-index.md     : metric contributions follow the taxonomy format there
-  → community/versioning-governance.md : accepted contributions enter the versioning pipeline
+  → docs/05-community/02-versioning-governance.md : accepted contributions enter the versioning pipeline
   → docs/GLOSSARY.md             : all contributions use precise glossary terms
   → architecture/adr/            : contributions requiring design decisions need an ADR
   → docs/tutorials/              : significant contributions should include or update a tutorial
@@ -79,7 +79,7 @@ private vulnerability reporting.
   | New analysis tool / metric  | §3 below                                        | docs/03-technical-contracts/03-metric-taxonomy/01-index.md          |
   | Documentation               | §4 below                                        | Style guide in §4                 |
   | Bug fix                     | §5 below                                        | (depends on area)                 |
-  | Architecture change         | Must open an ADR first: architecture/adr/TEMPLATE.md | SRS + C2/C3 impact analysis  |
+  | Architecture change         | Must open an ADR first: docs/02-design/02-architecture/01-adr/00-template.md | SRS + C2/C3 impact analysis  |
 -->
 
 ---
@@ -130,7 +130,7 @@ etc.
 
   After acceptance:
     - Assigned a Problem Instance ID and version
-    - Enters the versioning pipeline → community/versioning-governance.md §1
+    - Enters the versioning pipeline → docs/05-community/02-versioning-governance.md §1
     - Listed in the Problem Repository with your name in provenance
 -->
 
@@ -227,14 +227,14 @@ etc.
     - Use exact terms from GLOSSARY.md — never introduce synonyms
     - Every document must maintain its cross-reference links (CONNECTS TO sections)
     - When adding content that changes the scope of a document, update the STORY ROLE comment
-    - Cross-references use the format: docs/[path/to/doc.md] §[section]
-    - Tutorials follow the template: docs/tutorials/TEMPLATE.md
+    - Cross-references use the format: docs/<path>/<document> §<section>
+    - Tutorials follow the template: docs/06-tutorials/00-template.md
 
   When adding a tutorial:
     - It must be self-contained (reader should not need other docs to complete it)
     - It must reference the relevant protocol steps, specs, and methodology sections
     - It must have a clear audience, learning objective, and expected outcome
-    → see docs/tutorials/TEMPLATE.md
+    → see docs/06-tutorials/00-template.md
 
   Updating templates (replacing hints with real content):
     - This is the most common documentation task as the system is built
@@ -292,7 +292,7 @@ etc.
      - Cross-reference accuracy
 
   5. After acceptance:
-     → community/versioning-governance.md for artifact versioning and publication
+     → docs/05-community/02-versioning-governance.md for artifact versioning and publication
 -->
 
 ---
@@ -311,7 +311,7 @@ etc.
 
   For code contributions:
     [ ] I implement the relevant interface from docs/03-technical-contracts/02-interface-contracts/01-index.md completely
-    [ ] I have read and comply with the cross-cutting contracts (§6 of interface-contracts.md)
+    [ ] I have read and comply with the cross-cutting contracts (§6 of 02-interface-contracts/01-index.md)
     [ ] My code contains no uncontrolled randomness (seeds are always injected)
     [ ] All public methods have docstrings meeting the requirements in C4 for this component
     [ ] I have written tests covering: normal usage, edge cases, and error conditions

@@ -1,7 +1,7 @@
 # Result Reader
 
 > Container: [Reporting Engine](../../05-reporting-engine.md)
-> C3 Index: [index.md](01-index.md)
+> C3 Index: [01-index.md](01-index.md)
 
 ---
 
@@ -67,4 +67,4 @@ No persistent state.
 ## SRS Traceability
 
 - UC-06 (view report): report data loading is the first step of report generation.
-- FR-20 (report completeness): all required data must be present before rendering begins.
+- FR-20 (two reports per Experiment): the reader assembles the data both the Researcher and the Practitioner report need, in one pass (ADR-019).

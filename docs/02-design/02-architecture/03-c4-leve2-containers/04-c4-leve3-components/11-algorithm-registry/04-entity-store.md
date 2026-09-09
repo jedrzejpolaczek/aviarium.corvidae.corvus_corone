@@ -1,13 +1,13 @@
 # Entity Store
 
 > Container: [Algorithm Registry](../../10-algorithm-registry.md)
-> C3 Index: [index.md](01-index.md)
+> C3 Index: [01-index.md](01-index.md)
 
 ---
 
 ## Responsibility
 
-Persist AlgorithmInstance objects as JSON files, resolve algorithm IDs to instances, and support querying by family, deprecated status, and version.
+Persist Algorithm Instance objects as JSON files, resolve algorithm UUIDs to instances, and support the queries the `AlgorithmRepository` contract exposes.
 
 ---
 
@@ -16,10 +16,12 @@ Persist AlgorithmInstance objects as JSON files, resolve algorithm IDs to instan
 ```python
 class AlgorithmEntityStore:
     def write(self, instance: AlgorithmInstance) -> None: ...
-    def get(self, algorithm_id: str, version: str | None = None) -> AlgorithmInstance: ...
+    def get(self, algorithm_id: str) -> AlgorithmInstance: ...
     def list_all(self, include_deprecated: bool = False) -> list[AlgorithmInstance]: ...
-    def update_deprecated(self, algorithm_id: str, version: str, deprecated: bool, reason: str) -> None: ...
-    def exists(self, algorithm_id: str, version: str) -> bool: ...
+    def update_deprecated(
+        self, algorithm_id: str, reason: str, superseded_by: str | None = None
+    ) -> None: ...
+    def exists(self, algorithm_id: str) -> bool: ...
 ```
 
 ---
@@ -33,15 +35,15 @@ class AlgorithmEntityStore:
 
 ## Key Behaviors
 
-1. **Storage layout** — stores each AlgorithmInstance as `{registry_dir}/{algorithm_id}/{version}.json`. The directory structure mirrors the `(id, version)` key.
+1. **Storage layout** — stores each Algorithm Instance as `{registry_dir}/{algorithm_id}.json`, the file name being the entity's UUID. There is no version segment: a revision is a separate entity with its own UUID (ADR-020).
 
-2. **ID resolution** — `get(algorithm_id)` without a version returns the latest non-deprecated version (delegates to Version Manager logic). `get(algorithm_id, version)` returns the exact version.
+2. **ID resolution** — `get(algorithm_id)` returns the one entity with that UUID, deprecated or not, and returns the same bytes forever. Following a lineage forward is the caller's business, through `superseded_by`.
 
 3. **Atomic writes** — uses write-to-tmp-then-rename for all writes (same as Results Store JSON Entity Store).
 
-4. **Query support** — `list_all()` globs all `.json` files, deserialises each, and filters by `include_deprecated`. Supports further filtering by `algorithm_family` passed as a keyword argument.
+4. **Query support** — `list_all()` globs all `.json` files, deserialises each, and applies the `AlgorithmFilter` fields the contract defines: `algorithm_family`, `supported_variable_types`, `framework`, `contributed_by`. Deprecated entities are excluded unless `include_deprecated` is set.
 
-5. **Genealogy data** — if a `genealogy.json` file exists alongside the instance file, it is loaded and attached to the `AlgorithmInstance.genealogy` field on read.
+5. **Genealogy data** — genealogy is FR-37, which SRS 1.4 places outside V1. No genealogy file is read or written until that requirement enters scope.
 
 ---
 
@@ -59,5 +61,5 @@ No in-memory cache. All reads hit the filesystem. (A read cache may be added in 
 
 ## SRS Traceability
 
-- FR-05 (persistent registry): registry must survive process restart.
-- UC-10 (algorithm genealogy): genealogy data loaded from JSON alongside instance.
+- FR-05 (schema-conforming storage): every stored record conforms to `03-algorithm-instance.md`.
+- FR-17 (UUID identity): the file name is derived from the entity's UUID; the path is never the identifier.

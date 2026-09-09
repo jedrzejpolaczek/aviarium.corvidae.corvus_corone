@@ -57,7 +57,7 @@ compare what was tested against what was declared and set `pre_registered` on th
 | metric_id | string | yes | The metric the test is applied to. Must be a metric identifier defined in `docs/03-technical-contracts/03-metric-taxonomy/` |
 
 **Validation rules:**
-- `test_type` must match a test named in `statistical-methodology.md` §3
+- `test_type` must match a test named in `02-statistical-methodology.md` §3
 - `metric_id` must match a metric identifier in the metric taxonomy
 - An exploratory Study is declared by `study_type = "exploratory"`. The declaration is carried
   into the Report scope statement so that exploratory results are never presented as

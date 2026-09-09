@@ -1,19 +1,19 @@
 # Evaluation Loop
 
 > Container: [Experiment Runner](../../08-experiment-runner.md)
-> C3 Index: [index.md](01-index.md)
+> C3 Index: [01-index.md](01-index.md)
 
 ---
 
 ## Responsibility
 
-Drive the algorithm's ask/tell evaluation cycle for a single Run within budget, passing each candidate solution to the objective function and recording every observation via the Performance Recorder.
+Drive the algorithm's suggest/observe cycle for a single Run within budget, passing each candidate solution to the objective function and notifying the Performance Recorder after every evaluation.
 
 ---
 
 ## Interface
 
-Called within the Run subprocess by the Run Isolator:
+Called within the Run subprocess by the Run Isolator. The loop calls `algorithm.initialize(problem.get_search_space(), seed)` before the first `suggest()`, using the `Run.seed` the Seed Manager assigned; the contract requires initialisation first and requires it to reset all internal state:
 
 ```python
 class EvaluationLoop:
@@ -21,7 +21,9 @@ class EvaluationLoop:
         self,
         algorithm: AlgorithmInstance,
         problem: ProblemInstance,
+        run_id: str,
         budget: int,
+        seed: int,
         recorder: PerformanceRecorder,
     ) -> LoopResult:
         """
@@ -62,7 +64,10 @@ class EvaluationLoop:
            result = problem.evaluate(solution)     # -> EvaluationResult
            evaluation_number += 1                  # 1-indexed, matches the schema
            algorithm.observe(solution, result)     # one call per solution, in order
-           recorder.observe(evaluation_number, result)
+           recorder.record(
+               run_id, evaluation_number, result.objective_value,
+               solution, time.monotonic() - run_started_at,
+           )
    ```
 
    `observe()` is called once per suggested solution and in the order the solutions were
@@ -71,11 +76,13 @@ class EvaluationLoop:
 
 2. **Budget enforcement** — the loop runs for exactly `budget` *evaluations*, not `budget` iterations. With a batch size above 1 those differ, and a partial batch at the boundary is truncated rather than overrun. The algorithm does not control the stopping criterion — the loop does. If the algorithm raises `StopIteration` internally, the loop catches it and treats it as early convergence (marks `converged=True` in `LoopResult`).
 
-3. **Best-so-far tracking** — maintains the running best across all evaluations and passes it
-   to the Performance Recorder, which stores it as `PerformanceRecord.best_so_far` alongside the
-   raw `objective_value` of that evaluation (ADR-023).
+3. **Derived values belong to the recorder** — the loop reports the raw `objective_value` of
+   each evaluation and nothing else. `best_so_far`, `is_improvement` and `trigger_reason` are
+   computed by the Performance Recorder, which is the only component that sees the whole
+   sequence for a Run (ADR-023, ADR-002, ADR-004). The loop keeps a running best solely to
+   populate `LoopResult.best_value` for the Run Isolator.
 
-4. **Evaluation timing** — records wall-clock time per evaluation in milliseconds. Stored in the PerformanceRecord for outlier detection (pathologically slow evaluations indicate implementation problems).
+4. **Evaluation timing** — passes `elapsed_time`, wall-clock **seconds since Run start**, as `07-performance-record.md` defines it. It is measured with `time.monotonic()` against a start captured before the first `suggest()`, so that it is monotonically non-decreasing within the Run as the schema requires.
 
 5. **Exception isolation** — if `problem.evaluate()` raises, the loop catches it, stops the Run,
    and the Run record carries `status = "failed"` with `failure_reason` set from the exception
@@ -87,7 +94,7 @@ class EvaluationLoop:
 
 ## State
 
-Transient in-process state: `best_value`, `best_candidate`, `iteration_count`. All persistent data is written by the Performance Recorder. State is lost when the subprocess exits.
+Transient in-process state: `evaluation_number`, `run_started_at`, and the running `best_value` and `best_solution` used only for `LoopResult`. All persistent data is written by the Performance Recorder. State is lost when the subprocess exits.
 
 ---
 
@@ -99,5 +106,5 @@ Transient in-process state: `best_value`, `best_candidate`, `iteration_count`. A
 
 ## SRS Traceability
 
-- FR-12 (evaluation loop): the loop must complete exactly `budget` evaluations unless the algorithm signals early convergence.
-- UC-02 step 4 (execute run): each evaluation produces a PerformanceRecord.
+- FR-12 (failed Runs are recorded): a Run that ends before its budget is exhausted is recorded with its failure reason, never silently dropped.
+- UC-02 step 4 (execute run): each evaluation notifies the Performance Recorder, which writes a record when an ADR-002 trigger fires.

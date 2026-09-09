@@ -9,18 +9,18 @@ Implementors of IMPL-017 read this document first; the interface-contracts descr
 happens internally to fulfil these guarantees.
 
 NARRATIVE POSITION:
-  docs/03-technical-contracts/02-interface-contracts/01-interface-contracts.md (internal)
+  docs/03-technical-contracts/02-interface-contracts/01-index.md (internal)
   → 04-public-api-contract.md (external surface, THIS FILE)
   → researcher code, tutorials, contribution guides
 
 CONNECTS TO:
-  → docs/03-technical-contracts/02-interface-contracts/01-interface-contracts.md §1–§5 :
+  → docs/03-technical-contracts/02-interface-contracts/01-index.md §1–§5 :
       facade delegates to Problem, Algorithm, Runner, Analyzer, Repository interfaces
   → docs/03-technical-contracts/01-data-format/ :
       view objects here are distinct from the storage entities defined there; §2 of that
       document defines the canonical on-disk/DB schemas; view objects here are read-only
       projections for callers
-  → docs/03-technical-contracts/03-metric-taxonomy/01-metric-taxonomy.md :
+  → docs/03-technical-contracts/03-metric-taxonomy/01-index.md :
       metric_id keys used in ResultAggregate.metrics come from this taxonomy
   → docs/GLOSSARY.md : all capitalised terms (Study, Experiment, Run, Budget, etc.) are
       defined there and are used here with their exact glossary meanings
@@ -62,7 +62,7 @@ the exceptions that may be raised, and the CLI commands available on the command
 - The Problem, Algorithm, Runner, Analyzer, and Repository interfaces — those are specified
   in `docs/03-technical-contracts/02-interface-contracts/`.
 - Metric definitions — those are specified in
-  `docs/03-technical-contracts/03-metric-taxonomy/01-metric-taxonomy.md`.
+  `docs/03-technical-contracts/03-metric-taxonomy/01-index.md`.
 
 Implementors of IMPL-017 (the facade module) must satisfy every contract stated here. The
 contracts in `02-interface-contracts/` govern how they do so internally.
@@ -528,7 +528,7 @@ class ResultAggregate:
 | `problem_id` | `str` | ID of the problem instance this aggregate covers. |
 | `algorithm_id` | `str` | ID of the algorithm instance this aggregate covers. |
 | `n_runs` | `int` | Number of non-failed Runs that contributed to these statistics. May be less than `Study.repetitions` if some Runs failed. |
-| `metrics` | `dict[str, MetricStatistics]` | Map from metric ID (as defined in `docs/03-technical-contracts/03-metric-taxonomy/01-metric-taxonomy.md`) to a `MetricStatistics` object. Keys follow the format `CATEGORY-METRIC_NAME` (e.g., `"QUALITY-BEST_VALUE_AT_BUDGET"`, `"TIME-EVALUATIONS_TO_TARGET"`). |
+| `metrics` | `dict[str, MetricStatistics]` | Map from metric ID (as defined in `docs/03-technical-contracts/03-metric-taxonomy/01-index.md`) to a `MetricStatistics` object. Keys follow the format `CATEGORY-METRIC_NAME` (e.g., `"QUALITY-BEST_VALUE_AT_BUDGET"`, `"TIME-EVALUATIONS_TO_TARGET"`). |
 
 **Notes:**
 
@@ -1367,7 +1367,7 @@ confirm it was not truncated or modified.
 - `pre_registered_hypotheses` is empty (ADR-021).
 - Any entry in `pre_registered_hypotheses` is missing the required `"hypothesis"`,
   `"test_type"` or `"metric_id"` keys.
-- Any entry names a `"test_type"` that is not in `statistical-methodology.md` §3 and is not
+- Any entry names a `"test_type"` that is not in `02-statistical-methodology.md` §3 and is not
   `"none"`, or a `"metric_id"` that is not in the metric taxonomy.
 
 **Message format:** `"Validation error in create_study(): <field>: <reason>."`
@@ -1658,7 +1658,7 @@ Exported 45 000 PerformanceRecords to /path/to/experiment-3f2e1a00.json
 
 The facade (`corvus_corone`) is a thin coordination layer that delegates to the five
 component interfaces defined in
-`docs/03-technical-contracts/02-interface-contracts/01-interface-contracts.md`:
+`docs/03-technical-contracts/02-interface-contracts/01-index.md`:
 
 | Facade function | Internal interface(s) used |
 |---|---|
@@ -1703,7 +1703,7 @@ interface, which is outside the scope of the public API.
 
 The `metrics` field of `ResultAggregate` is a `dict[str, MetricStatistics]` whose keys are
 metric IDs. All valid metric IDs are defined in
-`docs/03-technical-contracts/03-metric-taxonomy/01-metric-taxonomy.md`. The format is
+`docs/03-technical-contracts/03-metric-taxonomy/01-index.md`. The format is
 `CATEGORY-METRIC_NAME` in `UPPER_SNAKE_CASE` (e.g., `"QUALITY-BEST_VALUE_AT_BUDGET"`,
 `"TIME-EVALUATIONS_TO_TARGET"`, `"RELIABILITY-SUCCESS_RATE"`).
 

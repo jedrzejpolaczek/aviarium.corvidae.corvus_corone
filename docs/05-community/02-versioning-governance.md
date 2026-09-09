@@ -12,7 +12,7 @@ CONNECTS TO:
   ← MANIFESTO Principles 19–22 : directly operationalized here
   ← SRS NFR-REPRO, NFR-OPEN    : non-functional requirements this policy implements
   → docs/03-technical-contracts/01-data-format/13-schema-versioning.md     : schema versioning details delegate to this policy
-  → community/contribution-guide.md : contributions enter the versioning pipeline described here
+  → docs/05-community/01-contribution-guide.md : contributions enter the versioning pipeline described here
   → architecture/adr/           : versioning scheme choices (e.g., semantic vs. date-based) need ADRs
 
 GOVERNANCE PRINCIPLE: This policy applies equally to all artifact types.
@@ -169,7 +169,7 @@ If something needs to change, deprecate and create a new version.
   Contributor License Agreement (CLA):
     Is a CLA required for contributions?
     What rights does contributing grant to the project?
-    → Reference: community/contribution-guide.md §6 review process
+    → Reference: docs/05-community/01-contribution-guide.md §6 review process
 
   Third-party components:
     How are license obligations for dependencies tracked?

@@ -1,7 +1,7 @@
 # JSON Entity Store
 
 > Container: [Results Store](../../12-results-store.md)
-> C3 Index: [index.md](01-index.md)
+> C3 Index: [01-index.md](01-index.md)
 
 ---
 
@@ -14,7 +14,7 @@ Read and write domain entities (Study, Experiment, Run metadata) as JSON files o
 ## Interface
 
 ```python
-class RepositoryFactory:
+class JsonEntityStore:
     def write(self, entity: Study | Experiment | Run) -> None: ...
     def read_study(self, study_id: str) -> Study: ...
     def read_experiment(self, experiment_id: str) -> Experiment: ...
@@ -62,5 +62,5 @@ No in-memory state. All state is on the filesystem.
 
 ## SRS Traceability
 
-- FR-17 (entity persistence): Study, Experiment, Run metadata must survive process restart.
+- FR-17 (entity identifiers): entities are addressed by the UUID they carry, and the file name on disk is derived from it rather than being the identifier (ADR-001).
 - UC-01 (create study): Study entity is created and persisted here.

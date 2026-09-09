@@ -1,7 +1,7 @@
 # C3: Components — Reporting Engine
 
 > C2 Container: [05-reporting-engine.md](../../05-reporting-engine.md)
-> C3 Index: [../01-c3-components.md](../01-c4-l3-components/01-c4-l3-components.md)
+> C3 Index: [C3 overview](../01-c4-l3-components/01-c4-l3-components.md)
 
 The Reporting Engine assembles an HTML benchmark report from Study results, mandatory visualizations, statistical summaries, and an explicit limitations section. It enforces completeness: the Limitations Enforcer blocks report generation if any required section is absent.
 Actors: triggered by Study Orchestrator; reads from Results Store; delegates visualization rendering to Algorithm Visualization Engine.
@@ -62,10 +62,10 @@ flowchart LR
 
 | Component | File | Responsibility |
 |---|---|---|
-| Result Reader | [result-reader.md](02-result-reader.md) | Loads aggregated MetricResults and entity metadata from the Results Store |
-| Mandatory Viz Renderer | [mandatory-viz-renderer.md](03-mandatory-viz-renderer.md) | Generates the visualizations that must appear in every report via the Algorithm Visualization Engine |
-| HTML Template Renderer | [html-template-renderer.md](04-html-template-renderer.md) | Assembles the complete HTML report from component outputs using Jinja2 templates |
-| Limitations Enforcer | [limitations-enforcer.md](05-limitations-enforcer.md) | Validates that all required report sections are present; raises `ValidationError` if any are missing |
+| Result Reader | [02-result-reader.md](02-result-reader.md) | Loads aggregated MetricResults and entity metadata from the Results Store |
+| Mandatory Viz Renderer | [03-mandatory-viz-renderer.md](03-mandatory-viz-renderer.md) | Generates the visualizations that must appear in every report via the Algorithm Visualization Engine |
+| HTML Template Renderer | [04-html-template-renderer.md](04-html-template-renderer.md) | Assembles the complete HTML report from component outputs using Jinja2 templates |
+| Limitations Enforcer | [05-limitations-enforcer.md](05-limitations-enforcer.md) | Validates that all required report sections are present; raises `ValidationError` if any are missing |
 
 ---
 

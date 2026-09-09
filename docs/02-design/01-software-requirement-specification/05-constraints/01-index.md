@@ -15,8 +15,8 @@ CONNECTS TO:
   ← docs/01-manifesto/MANIFESTO.md                                          : anti-patterns and principles
   ← docs/02-design/02-architecture/02-c4-leve1-context/01-c4-l1-context/01-c1-context.md                        : anti-pattern definitions in Scope Exclusions
   ← docs/02-design/02-architecture/01-adr/adr-001-library-with-server-ready-data-layer.md : CONST-TECH-01–03
-  → functional-requirements.md                                              : FRs that enforce each constraint
-  → non-functional-requirements.md                                          : NFR-OPEN-01 operationalizes community constraints
+  → 03-functional-requirements/01-index.md                                              : FRs that enforce each constraint
+  → 04-non-functional-requirements/01-index.md                                          : NFR-OPEN-01 operationalizes community constraints
   → docs/05-community/02-versioning-governance.md                          : licensing policy
   → docs/02-design/02-architecture/01-adr/                                 : pending technical constraint ADRs
 -->

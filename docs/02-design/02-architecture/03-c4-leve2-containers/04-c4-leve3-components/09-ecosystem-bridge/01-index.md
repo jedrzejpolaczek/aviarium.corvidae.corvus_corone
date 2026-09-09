@@ -1,7 +1,7 @@
 # C3: Components — Ecosystem Bridge
 
 > C2 Container: [13-ecosystem-bridge.md](../../13-ecosystem-bridge.md)
-> C3 Index: [../01-c3-components.md](../01-c4-l3-components/01-c4-l3-components.md)
+> C3 Index: [C3 overview](../01-c4-l3-components/01-c4-l3-components.md)
 
 The Ecosystem Bridge exports Study results to external benchmarking ecosystems (COCO BBOB, IOHprofiler) and wraps Nevergrad optimizers for use within Corvus studies (and vice versa). Every export produces an information-loss manifest documenting what data could not be faithfully represented in the target format.
 Actors: called by Public API + CLI; reads from Results Store; writes to external format files.
@@ -65,10 +65,10 @@ flowchart LR
 
 | Component | File | Responsibility |
 |---|---|---|
-| COCO Exporter | [coco-exporter.md](02-coco-exporter.md) | Exports Study results to COCO BBOB format |
-| IOH Exporter | [ioh-exporter.md](03-ioh-exporter.md) | Exports Study results to IOHprofiler format |
-| Nevergrad Adapter | [nevergrad-adapter.md](04-nevergrad-adapter.md) | Bidirectional bridge between Corvus and Nevergrad optimizer API |
-| Loss Auditor | [loss-auditor.md](05-loss-auditor.md) | Validates export completeness and writes the information-loss manifest |
+| COCO Exporter | [02-coco-exporter.md](02-coco-exporter.md) | Exports Study results to COCO BBOB format |
+| IOH Exporter | [03-ioh-exporter.md](03-ioh-exporter.md) | Exports Study results to IOHprofiler format |
+| Nevergrad Adapter | [04-nevergrad-adapter.md](04-nevergrad-adapter.md) | Bidirectional bridge between Corvus and Nevergrad optimizer API |
+| Loss Auditor | [05-loss-auditor.md](05-loss-auditor.md) | Validates export completeness and writes the information-loss manifest |
 
 ---
 

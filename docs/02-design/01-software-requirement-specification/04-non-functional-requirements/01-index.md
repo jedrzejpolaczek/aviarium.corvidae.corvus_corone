@@ -11,13 +11,13 @@ NARRATIVE POSITION:
 
 CONNECTS TO:
   ← docs/01-manifesto/MANIFESTO.md                                         : source principles
-  ← use-cases.md                                                            : which UCs exercise each NFR
-  → functional-requirements.md                                              : FRs that enforce each NFR
-  → constraints.md                                                          : community constraints overlap NFR-OPEN-01
-  → acceptance-test-strategy.md                                             : test category per NFR
+  ← 02-use-cases/01-index.md                                                            : which UCs exercise each NFR
+  → 03-functional-requirements/01-index.md                                              : FRs that enforce each NFR
+  → 05-constraints/01-index.md                                                          : community constraints overlap NFR-OPEN-01
+  → 01-acceptance-test-strategy.md                                             : test category per NFR
   → docs/04-scientific-practice/01-methodology/02-statistical-methodology.md : NFR-STAT-01 operationalized
   → docs/05-community/02-versioning-governance.md                          : NFR-REPRO-01 and NFR-OPEN-01
-  → docs/03-technical-contracts/02-interface-contracts.md                  : NFR-MODULAR-01 operationalized
+  → docs/03-technical-contracts/02-interface-contracts/01-index.md                  : NFR-MODULAR-01 operationalized
   → docs/03-technical-contracts/01-data-format/11-interoperability-mappings.md                       : NFR-INTEROP-01 operationalized
 
 NOTE ON MEASURABLE CRITERIA:

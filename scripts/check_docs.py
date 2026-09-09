@@ -9,6 +9,8 @@ as a consequence of an edit to a different file:
   2. Every requirement identifier cited anywhere is defined somewhere.
   3. No requirement identifier is defined twice.
   4. The descriptive layers coin no boundary vocabulary of their own (ADR-012).
+  5. Every document filename named in prose exists.
+  6. A requirement cited with a descriptive label is not describing a different one.
 
 A file may opt out of the identifier checks by carrying the marker
 ``<!-- check-docs: allow-undefined -->``. This is for documents that legitimately
@@ -69,7 +71,7 @@ def read(path: str) -> str:
     matches nothing on CRLF files.
     """
     with open(path, "rb") as fh:
-        return fh.read().decode("utf-8", errors="replace").replace("\r\n", "\n")
+        return fh.read().decode("utf-8", errors="replace").replace("\r\r\n", "\r\n")
 
 
 # ---------------------------------------------------------------------------
@@ -156,6 +158,9 @@ def defined_identifiers() -> dict[str, set[str]]:
 
 
 ALLOW_MARKER = "<!-- check-docs: allow-undefined -->"
+# A document that does not exist yet is not a stale reference. Marks the line,
+# not the file, so the rest of a roadmap stays checked.
+PLANNED_MARKER = "<!-- check-docs: planned -->"
 
 
 def check_duplicate_definitions() -> list[str]:
@@ -265,7 +270,7 @@ def _iter_identifiers(text: str):
     # requiring every component class to be pre-declared in the contracts would push
     # implementation detail into the layer that defines the boundary. What must come
     # from the contracts is anything a component hands to, or receives from, another.
-    for block in re.findall(r"```(?:python)?\n(.*?)```", text, re.S):
+    for block in re.findall(r"```(?:python)?\r\n(.*?)```", text, re.S):
         for m in re.finditer(r":\s*([A-Z][A-Za-z0-9]*)\b", block):
             yield "type", m.group(1)
         for m in re.finditer(r"->\s*([A-Z][A-Za-z0-9]*)\b", block):
@@ -371,6 +376,152 @@ def check_vocabulary() -> list[str]:
 
 
 # ---------------------------------------------------------------------------
+# Check 5 — filenames named in prose exist
+# ---------------------------------------------------------------------------
+
+# A markdown link has a target the link check resolves. A filename mentioned in
+# prose has none, so a rename leaves it behind silently. This is how references to
+# a monolithic data-format.md survived long after it was split into thirteen files.
+
+LINK_TARGET = re.compile(r"\]\([^)]*\)")
+DOC_NAME = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]*\.md\b")
+
+# Files named in prose that are not expected to exist in this repository.
+EXTERNAL_DOCS = {"README.md", "CLAUDE.md", "CONTRIBUTING.md", "LICENSE.md"}
+
+
+def existing_basenames() -> set[str]:
+    names = set()
+    for dirpath, _, filenames in os.walk("."):
+        if any(part in dirpath for part in (".git", ".venv", "__pycache__", "node_modules")):
+            continue
+        for name in filenames:
+            names.add(name)
+    return names
+
+
+def check_prose_filenames(files: list[str]) -> list[str]:
+    problems = []
+    real = existing_basenames()
+    for path in files:
+        text = read(path)
+        if ALLOW_MARKER in text:
+            continue
+        # blank out link targets so only prose remains
+        prose = LINK_TARGET.sub(lambda m: " " * len(m.group(0)), text)
+        seen: set[str] = set()
+        for m in DOC_NAME.finditer(prose):
+            name = m.group(0)
+            if name in real or name in EXTERNAL_DOCS or name in seen:
+                continue
+            line_start = prose.rfind("\n", 0, m.start()) + 1
+            line_end = prose.find("\n", m.end())
+            if PLANNED_MARKER in prose[line_start : line_end if line_end != -1 else len(prose)]:
+                continue
+            seen.add(name)
+            problems.append(
+                f"{path}: prose names '{name}', which no file in the repository matches"
+            )
+    return problems
+
+
+# ---------------------------------------------------------------------------
+# Check 6 — a requirement label describes the requirement it cites
+# ---------------------------------------------------------------------------
+
+# Architecture documents cite requirements as "FR-19 (cross-entity references)".
+# When the parenthetical drifts it usually drifts onto a neighbouring requirement,
+# which is invisible to a reader who trusts the label. Rather than storing a second
+# copy of the requirement descriptions, this compares the label against the
+# statements in the requirement files and complains when some other requirement is
+# the better match.
+
+CITED_WITH_LABEL = re.compile(r"\b(FR-[0-9]+) \(([^)]{4,90})\)")
+
+STOPWORDS = {
+    "the",
+    "a",
+    "an",
+    "and",
+    "or",
+    "of",
+    "for",
+    "in",
+    "on",
+    "to",
+    "with",
+    "by",
+    "at",
+    "is",
+    "are",
+    "be",
+    "must",
+    "system",
+    "every",
+    "all",
+    "any",
+    "no",
+    "not",
+    "per",
+    "before",
+    "after",
+    "when",
+    "which",
+    "that",
+    "this",
+    "from",
+    "into",
+    "its",
+    "their",
+}
+
+
+def _words(text: str) -> set[str]:
+    return {w for w in re.findall(r"[a-z_]{3,}", text.lower()) if w not in STOPWORDS}
+
+
+def requirement_statements() -> dict[str, set[str]]:
+    """Map each FR identifier to the words of its own statement."""
+    out: dict[str, set[str]] = {}
+    for path in markdown_files(SRS_DIR + "/03-functional-requirements"):
+        text = read(path)
+        for m in re.finditer(
+            r"^## (FR-[0-9]+)(?:[^\r\n]*)\r\n\s*\r\n\*\*(.+?)\*\*", text, re.M | re.S
+        ):
+            out[m.group(1)] = _words(m.group(2)[:400])
+    return out
+
+
+def check_requirement_labels(files: list[str]) -> list[str]:
+    problems = []
+    statements = requirement_statements()
+    if not statements:
+        return problems
+    for path in files:
+        text = read(path)
+        if ALLOW_MARKER in text:
+            continue
+        for m in CITED_WITH_LABEL.finditer(text):
+            cited, label = m.group(1), m.group(2)
+            words = _words(label)
+            if len(words) < 2 or cited not in statements:
+                continue
+            own = len(words & statements[cited])
+            better = [
+                (len(words & body), fr)
+                for fr, body in statements.items()
+                if fr != cited and len(words & body) > own + 1
+            ]
+            if better:
+                score, best = max(better)
+                problems.append(
+                    f"{path}: {cited} is labelled '{label}', which describes {best} more closely "
+                    f"({score} shared terms against {own})"
+                )
+    return problems
+
+
+# ---------------------------------------------------------------------------
 
 
 def main(argv: list[str]) -> int:
@@ -383,13 +534,15 @@ def main(argv: list[str]) -> int:
 
     if "--write-baseline" in argv:
         entries = sorted(check_vocabulary())
-        with open(BASELINE_PATH, "w", encoding="utf-8", newline="\n") as fh:
-            fh.write("# Known uncontracted vocabulary, recorded when check 4 was introduced.\n")
-            fh.write("# ADR-012 forbids the descriptive layers from coining identifiers.\n")
-            fh.write("# This file may only shrink. Delete a line once the name is either\n")
-            fh.write("# promoted into docs/03-technical-contracts or removed from the document.\n")
+        with open(BASELINE_PATH, "w", encoding="utf-8", newline="\r\n") as fh:
+            fh.write("# Known uncontracted vocabulary, recorded when check 4 was introduced.\r\n")
+            fh.write("# ADR-012 forbids the descriptive layers from coining identifiers.\r\n")
+            fh.write("# This file may only shrink. Delete a line once the name is either\r\n")
+            fh.write(
+                "# promoted into docs/03-technical-contracts or removed from the document.\r\n"
+            )
             for entry in entries:
-                fh.write(entry + "\n")
+                fh.write(entry + "\r\n")
         print(f"wrote {len(entries)} baseline entries to {BASELINE_PATH}")
         return 0
 
@@ -402,17 +555,32 @@ def main(argv: list[str]) -> int:
     id_problems = check_identifiers(files, defined)
     dup_problems = check_duplicate_definitions()
     vocab_all = check_vocabulary()
+    prose_problems = check_prose_filenames(files)
+    label_problems = check_requirement_labels(files)
     baseline = load_baseline()
     vocab_problems = [v for v in vocab_all if v not in baseline]
     stale = sorted(baseline - set(vocab_all))
 
-    for problem in link_problems + id_problems + dup_problems + vocab_problems:
+    for problem in (
+        link_problems
+        + id_problems
+        + dup_problems
+        + vocab_problems
+        + prose_problems
+        + label_problems
+    ):
         print(problem)
     for entry in stale:
         print(f"baseline entry no longer fires, delete it: {entry}")
 
     total = (
-        len(link_problems) + len(id_problems) + len(dup_problems) + len(vocab_problems) + len(stale)
+        len(link_problems)
+        + len(id_problems)
+        + len(dup_problems)
+        + len(vocab_problems)
+        + len(prose_problems)
+        + len(label_problems)
+        + len(stale)
     )
     print()
     print(f"{len(files)} files checked")
@@ -423,13 +591,15 @@ def main(argv: list[str]) -> int:
         f"  uncontracted vocabulary:{len(vocab_problems):>4}"
         f"   (baselined: {len(vocab_all) - len(vocab_problems)})"
     )
+    print(f"  prose filenames:        {len(prose_problems)}")
+    print(f"  requirement labels:     {len(label_problems)}")
     if stale:
         print(f"  stale baseline entries: {len(stale)}")
 
     if total:
-        print(f"\nFAILED: {total} violation(s)")
+        print(f"\r\nFAILED: {total} violation(s)")
         return 1
-    print("\nOK")
+    print("\r\nOK")
     return 0
 
 

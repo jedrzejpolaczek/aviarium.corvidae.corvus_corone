@@ -162,7 +162,7 @@ for UC-07 educational goals, and if a containerised deployment path is available
 
 ### Why matplotlib over plotly for the mandatory visualizations
 
-The four VIZ-L1 visualizations (§2 of statistical-methodology.md) are defined to be
+The four VIZ-L1 visualizations (§2 of 02-statistical-methodology.md) are defined to be
 reproducible, publication-quality outputs. Their visual appearance must be stable and
 deterministic across library versions. matplotlib provides pixel-level control over
 rendering and is already used by the Reporting Engine; there is no reason to introduce a
@@ -204,7 +204,7 @@ required for offline use on HPC systems without internet access.
 
 **Why not chosen:** Seaborn is a high-level wrapper around matplotlib. For the mandatory
 VIZ-L1 visualizations, the exact rendering (axis labels, colour scales, legend placement)
-is specified normatively in statistical-methodology.md §2. Using the low-level matplotlib
+is specified normatively in 02-statistical-methodology.md §2. Using the low-level matplotlib
 API directly provides the control needed to match the specification; seaborn would add a
 layer of abstraction without benefit.
 
@@ -239,4 +239,4 @@ layer of abstraction without benefit.
 | `docs/02-design/02-architecture/03-c4-leve2-containers/01-index.md` | Algorithm Visualization Engine container specification |
 | `docs/04-scientific-practice/01-methodology/02-statistical-methodology.md §2` | VIZ-L1-01..04 visualization specifications that mandate matplotlib |
 | `docs/02-design/01-software-requirement-specification/02-use-cases/08-uc-07.md` | UC-07 Learner visualization use case |
-| `ADR-006-python-version-and-platform-constraints.md` | Platform constraints that exclude manim in V1 |
+| `adr-006-python-version-and-platform-constraints.md` | Platform constraints that exclude manim in V1 |

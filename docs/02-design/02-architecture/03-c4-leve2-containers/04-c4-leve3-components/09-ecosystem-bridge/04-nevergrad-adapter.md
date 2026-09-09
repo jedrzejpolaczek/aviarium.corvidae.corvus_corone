@@ -1,7 +1,7 @@
 # Nevergrad Adapter
 
 > Container: [Ecosystem Bridge](../../13-ecosystem-bridge.md)
-> C3 Index: [index.md](01-index.md)
+> C3 Index: [01-index.md](01-index.md)
 
 ---
 
@@ -22,7 +22,7 @@ class NevergradAdapter:
         hyperparameters: dict,
         algorithm_id: str,
     ) -> AlgorithmInstance:
-        """Returns an AlgorithmInstance with ask()/tell() backed by Nevergrad."""
+        """Returns an Algorithm Instance whose suggest()/observe() are backed by Nevergrad."""
 
     # Direction 2: Export Corvus results to Nevergrad format
     def export(
@@ -47,7 +47,7 @@ class NevergradAdapter:
 
 ## Key Behaviors
 
-1. **Optimizer wrapping** — creates a thin `AlgorithmInstance` subclass that delegates `ask()` to `ng_optimizer.ask()` and `tell()` to `ng_optimizer.tell()`. The Nevergrad parameter space is translated to the Corvus search space schema at construction time.
+1. **Optimizer wrapping** — creates a thin Algorithm Instance that implements the `suggest()` and `observe()` of `03-algorithm-interface.md` by delegating to Nevergrad's own `ask()` and `tell()`. The two names belong to opposite sides of the adapter and must not be used interchangeably: `ask`/`tell` appear nowhere in this system's own interface. The Nevergrad parameter space is translated to the Corvus search space schema at construction time.
 
 2. **Parameter space translation** — maps Corvus `SearchSpace` (continuous, integer, categorical, conditional) to Nevergrad `ng.p.Instrumentation`. Conditional spaces are translated to `ng.p.Choice` where possible; unsupported conditionals are added to the loss manifest.
 
@@ -73,4 +73,5 @@ The `AlgorithmInstance` wrapper holds a live Nevergrad optimizer object during a
 
 ## SRS Traceability
 
-- FR-25 (Nevergrad integration): bidirectional Nevergrad bridge.
+- FR-23 (external benchmark format): Nevergrad is one of the three named target platforms.
+- FR-25 (unsupported formats rejected): a Nevergrad optimizer whose parameter space has no Corvus equivalent is refused at construction, not approximated silently.

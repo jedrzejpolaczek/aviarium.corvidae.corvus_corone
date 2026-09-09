@@ -9,7 +9,7 @@ so this must be a single documented decision.
 
 CONNECTS TO:
   → docs/03-technical-contracts/03-metric-taxonomy/07-anytime-ecdf-area.md : metric definition
-  → ADR-003-anytime-curve-interpolation.md : LOCF interpolation used before normalization
+  → adr-003-anytime-curve-interpolation.md : LOCF interpolation used before normalization
   → docs/04-scientific-practice/01-methodology/02-statistical-methodology.md §5
   → docs/03-technical-contracts/03-metric-taxonomy/08-standard-reporting-set.md
 -->
@@ -171,7 +171,7 @@ external reference that could be distorted by unrelated data.
 | Document | Relationship |
 |---|---|
 | `docs/03-technical-contracts/03-metric-taxonomy/07-anytime-ecdf-area.md` | Metric definition — computation procedure references this ADR |
-| `ADR-003-anytime-curve-interpolation.md` | LOCF interpolation applied before normalization |
+| `adr-003-anytime-curve-interpolation.md` | LOCF interpolation applied before normalization |
 | `docs/04-scientific-practice/01-methodology/02-statistical-methodology.md §5` | Anytime analysis section; ECDF visualization and area metric |
 | `docs/03-technical-contracts/03-metric-taxonomy/08-standard-reporting-set.md` | ANYTIME-ECDF_AREA is mandatory in every Study Report |
 | `docs/02-design/01-software-requirement-specification/03-functional-requirements/07-fr-4.6-reporting-and-visualization.md` | FR-21 mandates limitations disclosure covering this ADR's cross-study warning |

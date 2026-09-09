@@ -1,7 +1,7 @@
 # Instance Validator
 
 > Container: [Problem Repository](../../11-problem-repository.md)
-> C3 Index: [index.md](01-index.md)
+> C3 Index: [01-index.md](01-index.md)
 
 ---
 
@@ -59,4 +59,4 @@ Stateless.
 
 ## SRS Traceability
 
-- FR-02 (problem validation): problem instances must be validated before registration.
+- FR-02 (completeness on registration): `dimensions` must equal `len(variables)` and every variable's bounds must be valid; both are checked before the record is accepted.

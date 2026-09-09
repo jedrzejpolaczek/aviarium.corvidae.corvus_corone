@@ -4,6 +4,13 @@ version = "0.1.0"
 description = "Python library and pilot for HPO benchmarking."
 readme = "README.md"
 requires-python = ">=3.10"
+# ADR-022: AGPL-3.0-or-later. Declared here as well as in LICENSE, because a
+# licence that is not in the distribution metadata is invisible to every
+# compliance tool, including the licensecheck step CONST-TECH-XX requires.
+license = { text = "AGPL-3.0-or-later" }
+classifiers = [
+	"License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)",
+]
 dependencies = [
 	"gitpython>=3.1.46",
 	"pydantic>=2.7.0",

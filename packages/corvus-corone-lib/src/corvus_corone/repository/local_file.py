@@ -172,7 +172,7 @@ class _FileProblemRepository(ProblemRepository):
     def _path(self, entity_id: str) -> Path:
         return self._base / f"{entity_id}.json"
 
-    def get_problem(self, id: str, version: str | None = None) -> dict[str, Any]:
+    def get_problem(self, id: str) -> dict[str, Any]:
         p = self._path(id)
         if not p.exists():
             raise EntityNotFoundError(
@@ -242,7 +242,7 @@ class _FileAlgorithmRepository(AlgorithmRepository):
     def _path(self, entity_id: str) -> Path:
         return self._base / f"{entity_id}.json"
 
-    def get_algorithm(self, id: str, version: str | None = None) -> dict[str, Any]:
+    def get_algorithm(self, id: str) -> dict[str, Any]:
         p = self._path(id)
         if not p.exists():
             raise EntityNotFoundError(
@@ -329,7 +329,7 @@ class _FileStudyRepository(StudyRepository):
     def _path(self, entity_id: str) -> Path:
         return self._base / f"{entity_id}.json"
 
-    def get_study(self, id: str, version: str | None = None) -> dict[str, Any]:
+    def get_study(self, id: str) -> dict[str, Any]:
         p = self._path(id)
         if not p.exists():
             raise EntityNotFoundError(

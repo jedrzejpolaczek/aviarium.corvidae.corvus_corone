@@ -132,6 +132,23 @@ class ImmutableFieldError(ValidationError):
         super().__init__(message, "IMMUTABLE_FIELD", context)
 
 
+class InterfaceViolationError(ValidationError):
+    """A registered Algorithm or Problem does not satisfy its interface.
+
+    References
+    ----------
+    → interface-contracts.md §1 Problem Interface, §2 Algorithm Interface
+    → ADR-015
+    """
+
+    def __init__(
+        self,
+        message: str,
+        context: dict[str, Any] | None = None,
+    ) -> None:
+        super().__init__(message, "INTERFACE_VIOLATION", context)
+
+
 class UnknownMetricError(ValidationError):
     """Metric name is not registered in metric-taxonomy.md.
 
@@ -248,12 +265,14 @@ class EntityNotFoundError(StorageError):
         super().__init__(message, "ENTITY_NOT_FOUND", context)
 
 
-class VersionNotFoundError(StorageError):
-    """Entity with the given ID exists but the requested version does not.
+class SchemaVersionError(StorageError):
+    """Artifact schema version is newer, or a different major, than supported.
 
     References
     ----------
-    → interface-contracts.md §5 Repository Interface — versioning semantics
+    → interface-contracts.md §5 Repository Interface
+    → 01-data-format/13-schema-versioning.md
+    → ADR-015
     """
 
     def __init__(
@@ -261,7 +280,7 @@ class VersionNotFoundError(StorageError):
         message: str,
         context: dict[str, Any] | None = None,
     ) -> None:
-        super().__init__(message, "VERSION_NOT_FOUND", context)
+        super().__init__(message, "SCHEMA_VERSION", context)
 
 
 class DuplicateEvaluationError(StorageError):
@@ -314,6 +333,40 @@ class CodeReferenceError(IntegrationError):
         super().__init__(message, "CODE_REFERENCE_ERROR", context)
 
 
+class UnsupportedFormatError(IntegrationError):
+    """Export requested in a format the Ecosystem Bridge does not produce.
+
+    References
+    ----------
+    → interface-contracts.md §Ecosystem Bridge
+    → FR-25, ADR-015
+    """
+
+    def __init__(
+        self,
+        message: str,
+        context: dict[str, Any] | None = None,
+    ) -> None:
+        super().__init__(message, "UNSUPPORTED_FORMAT", context)
+
+
+class ExportValidationError(IntegrationError):
+    """Source data is incomplete for the requested export.
+
+    References
+    ----------
+    → interface-contracts.md §Ecosystem Bridge
+    → FR-24, FR-25, ADR-015
+    """
+
+    def __init__(
+        self,
+        message: str,
+        context: dict[str, Any] | None = None,
+    ) -> None:
+        super().__init__(message, "EXPORT_VALIDATION", context)
+
+
 # ---------------------------------------------------------------------------
 # AnalysisError branch
 # ---------------------------------------------------------------------------
@@ -345,6 +398,43 @@ class ExperimentNotCompleteError(AnalysisError):
         context: dict[str, Any] | None = None,
     ) -> None:
         super().__init__(message, "EXPERIMENT_NOT_COMPLETE", context)
+
+
+class RunNotCompleteError(AnalysisError):
+    """The Analyzer was given a Run whose status is not "completed".
+
+    References
+    ----------
+    → interface-contracts.md §4 Analyzer Interface
+    → ADR-015
+    """
+
+    def __init__(
+        self,
+        message: str,
+        context: dict[str, Any] | None = None,
+    ) -> None:
+        super().__init__(message, "RUN_NOT_COMPLETE", context)
+
+
+class MetricUndefinedError(AnalysisError):
+    """The metric is undefined for the given data.
+
+    Raised, for example, for ECDF_AREA on a Problem-Algorithm cell holding fewer
+    than two Runs.
+
+    References
+    ----------
+    → interface-contracts.md §4 Analyzer Interface
+    → ADR-015
+    """
+
+    def __init__(
+        self,
+        message: str,
+        context: dict[str, Any] | None = None,
+    ) -> None:
+        super().__init__(message, "METRIC_UNDEFINED", context)
 
 
 class InsufficientRunsError(AnalysisError):

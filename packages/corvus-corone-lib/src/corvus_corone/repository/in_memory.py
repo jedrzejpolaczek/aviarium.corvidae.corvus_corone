@@ -83,7 +83,6 @@ class _InMemoryProblemRepository(ProblemRepository):
     def get_problem(
         self,
         id: str,
-        version: str | None = None,
     ) -> dict[str, Any]:
         if id not in self._store:
             raise EntityNotFoundError(
@@ -160,7 +159,6 @@ class _InMemoryAlgorithmRepository(AlgorithmRepository):
     def get_algorithm(
         self,
         id: str,
-        version: str | None = None,
     ) -> dict[str, Any]:
         if id not in self._store:
             raise EntityNotFoundError(
@@ -275,7 +273,6 @@ class _InMemoryStudyRepository(StudyRepository):
     def get_study(
         self,
         id: str,
-        version: str | None = None,
     ) -> dict[str, Any]:
         if id not in self._store:
             raise EntityNotFoundError(

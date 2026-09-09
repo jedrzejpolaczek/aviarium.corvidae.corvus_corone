@@ -40,12 +40,3 @@ the *set* an entire Study proposes to use, against the diversity floor of ADR-00
 
 The diversity check belongs to the Study Orchestrator, not here: it is a property of a Study's
 problem *set*, and this container knows only about instances.
-
-
----
-
-## Open decisions
-
-- **REF-TASK-0051** — the exemption from the diversity floor is declared by
-  `study_type = "exploratory"` in FR-32 and FR-33 and by a hypothesis with `test_type: "none"` in
-  FR-31 and ADR-021. Both appear in ADR-009.

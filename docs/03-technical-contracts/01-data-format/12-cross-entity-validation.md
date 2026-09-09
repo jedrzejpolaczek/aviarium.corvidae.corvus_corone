@@ -74,6 +74,7 @@ Each rule specifies:
 | [CV-021](#cv-021) | Problem Instance diversity floor, unless the Study is exploratory | Study, ProblemInstance | Status → locked | Reject |
 | [CV-022](#cv-022) | Experiment.execution_environment is complete before any Run | Experiment, Run | Write | Reject |
 | [CV-023](#cv-023) | PerformanceRecord.best_so_far is monotone within a Run | PerformanceRecord, Run | Write | Reject |
+| [CV-024](#cv-024) | study_type and the hypothesis test_type values agree | Study | Status → locked | Reject |
 
 ---
 
@@ -700,3 +701,42 @@ is constant between improvements; a non-monotone sequence silently invalidates e
 metric rather than failing loudly.
 
 **Error:** `ValidationError` naming the evaluation at which monotonicity broke.
+
+---
+
+### CV-024
+
+**`study_type` and the hypothesis `test_type` values must agree**
+
+| | |
+|---|---|
+| **Entities** | Study |
+| **Check point** | Status transition — `lock_study()` |
+| **Response** | Reject |
+
+```
+exploratory_declared = study.study_type == "exploratory"
+all_untested = all(h.test_type == "none" for h in study.pre_registered_hypotheses)
+
+assert exploratory_declared == all_untested
+```
+
+**Rationale:** the corpus declares a Study exploratory two ways, and they answer different
+questions. `study_type` is the researcher's declaration, and it is what waives the diversity floor
+(`CV-021`) and what the Report scope statement carries. `test_type = "none"` is what the
+hypotheses of such a Study contain, because ADR-021 makes `pre_registered_hypotheses` mandatory
+and non-empty and `none` is what an entry says when no test will be run against it. Neither can be
+dropped without loss — see ADR-029 — so this rule is what keeps them one statement rather than
+two.
+
+Without it, a Study declared `"standard"` whose every hypothesis is `none` would waive nothing,
+run nothing, and report itself as confirmatory.
+
+There is deliberately no mixed case. A Study is confirmatory or exploratory; a researcher who
+wants to explore one question and confirm another runs two Studies, which then carry honest
+separate scope statements.
+
+**Error:** `ValidationError` naming the disagreement rather than one side of it — either the
+declaration says exploratory while a hypothesis names a test that will not be run, or a hypothesis
+declines to be tested while the Study claims to be confirmatory — and stating both remedies
+(FR-27, FR-29).

@@ -70,6 +70,7 @@ trusting anything you read:
 | ADR-023 | `objective_value` is the **raw** per-evaluation result; the running best is a separate `best_so_far` field, and that is what anytime metrics reconstruct |
 | ADR-024 | the ECDF_AREA integration domain; the worked reference value is 0.4375, not 0.21875 |
 | ADR-025 | a later ADR may supersede *part* of an earlier one; the superseded ADR's Status line says so, and that line is the only edit a closed ADR may receive |
+| ADR-029 | a Study is exploratory when `study_type = "exploratory"` **and** every hypothesis carries `test_type = "none"`; `CV-024` rejects a Study where the two disagree, and there is no mixed Study |
 | ADR-028 | `05-c4-level4-code/` is gone and the 45 C3 component files are eleven group indexes that define nothing. A component's behaviour is specified in its contract or it is not specified |
 | ADR-027 | there is no run-failure policy in V1: a failed Run is `status="failed"` with a `failure_reason` and the Experiment continues. No `on_failure`, no `skipped`/`aborted`/`partial`, no `timeout_s`, no `memory_limit_mb` |
 | ADR-026 | `03-technical-contracts/` is not quite the only place that defines boundary vocabulary: `02-cli-spec.md` (CLI surface), `03-report-format-spec.md` (report sections) and `02-statistical-methodology.md` (`VIZ-L1-NN`) are authoritative for those surfaces and no others |

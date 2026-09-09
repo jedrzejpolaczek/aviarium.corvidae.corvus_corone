@@ -42,12 +42,3 @@ message enforces, and state the remedies.
 The run-plan order — problem index, then algorithm index, then repetition index — is not an
 implementation detail: it is the order `SeedSequence` children are spawned in, so it is what makes
 a Study reproducible from its `root_seed` alone (ADR-017).
-
-
----
-
-## Open decisions
-
-- **REF-TASK-0051** — the corpus declares a Study exploratory two incompatible ways,
-  `study_type = "exploratory"` and a hypothesis with `test_type: "none"`. This container performs
-  the check, so it cannot be implemented until one of them wins.

@@ -367,7 +367,7 @@ REF-TASK-0025 ──► 0026 ──► 0027 ──► 0028 ──► 0029 ──
   the Statistical Tester page already refuses that default — one of the two is wrong.
   *Blocks IMPL-012.*
 
-- [ ] **[REF-TASK-0051] Decide how a Study is declared exploratory.** The corpus has two
+- [x] **[REF-TASK-0051] Decide how a Study is declared exploratory.** *(Closed 2026-09-09 by ADR-029: both, with a consistency rule.)* They are not two spellings of one statement. `study_type` is the declaration and is what waives the diversity floor; `test_type = "none"` is what the hypotheses of such a Study contain, because ADR-021 makes the hypothesis list mandatory and non-empty. Dropping the second puts a false statement in the pre-registration record — a hypothesis naming a test that will not run; dropping the first makes the waiver a derived property rather than a declaration, against ADR-009's own reasoning. New rule `CV-024` requires them to agree at `lock_study()`, which also excludes the mixed Study: a researcher wanting one runs two, which then carry honest separate scope statements. The corpus has two
   incompatible mechanisms and never relates them. `study_type = "exploratory"`, a Study-level
   field, is used by FR-32, FR-33, `04-study.md` (three times, including an explicit "not through
   `test_type`"), cross-entity rule `CV-021`, `01-benchmarking-protocol.md` and ADR-009 lines 181
@@ -456,7 +456,7 @@ Documentation tasks:
 - [ ] **REF-TASK-0048** — write `02-versioning-governance.md`, finish the contribution guide
 - [x] **REF-TASK-0049** — acceptance tests for FR-27..FR-31 and FR-39..FR-42
 - [x] **REF-TASK-0050** — decide the future of the C3 and C4 layers, closed by ADR-028
-- [ ] **REF-TASK-0051** — `study_type` or `test_type: "none"` for an exploratory Study *(blocks IMPL-016, IMPL-017a)*
+- [x] **REF-TASK-0051** — `study_type` and `test_type: "none"`, reconciled by ADR-029 and `CV-024`
 
 ### Implementation Tasks (IMPL)
 

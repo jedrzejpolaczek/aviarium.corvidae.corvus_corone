@@ -216,6 +216,11 @@ Seven milestones group all open documentation and design tasks.
 ---
 
 ## IMPL Phase 3a — Pilot V2 Researcher
+> **Constrained by ADR-030.** Every capability in this phase and in 3b proposes and never
+> commits: none may call `cc.lock_study()`, and each output ships the material a researcher
+> needs to reject it. IMPL-035 loses its confidence gate and IMPL-041 becomes a proposal queue
+> rather than an autonomous programme. No component may name one algorithm as the one to use —
+> AP-7 and CONST-SCI-01, unchanged.
 > corvus_corone_pilot V2: MCP server, ReAct agent, LangGraph graph, ML foundations, multi-agent system, MLflow tracking.
 
 - [ ] **`[IMPL-028]`** Pilot setup — `corvus_corone_pilot/pyproject.toml` (langgraph, mcp, langchain-ollama, mlflow, xgboost, shap, dvc); uv workspace root updated; CI extended
@@ -392,7 +397,7 @@ REF-TASK-0025 ──► 0026 ──► 0027 ──► 0028 ──► 0029 ──
   the CLI spec is illegal. Either promote those surfaces into the contracts, or amend the
   precedence rule to name the exception.
 
-- [ ] **[REF-TASK-0047] Decide how Corvus Pilot V3 stays on the right side of AP-4 and AP-7.**
+- [x] **[REF-TASK-0047] Decide how Corvus Pilot V3 stays on the right side of AP-4 and AP-7.** *(Closed 2026-09-09 by ADR-030.)* Two rules. The Pilot proposes and never commits, with the boundary at `cc.lock_study()` — a call rather than an intention, so conformance is visible in a call graph. And every output carries its own grounds for rejection, which is what AP-4 actually asks for: not that a conclusion be explainable, but that it be contestable, which needs the inputs, the intermediates and the rule being applied. Decided before Phase 3a rather than during it, because the alternative is the pattern that produced the C3 layer — a design spelled out before anyone checked whether it was allowed to exist.
   AP-7 rejects automated algorithm selection as a substitute for researcher judgement; AP-4
   rejects analysis pipelines that cannot be independently inspected. IMPL-037 generates hypotheses
   with an LLM, IMPL-041 runs an autonomous research cycle on a weekly cron, IMPL-035 returns a
@@ -452,7 +457,7 @@ Documentation tasks:
 - [x] **REF-TASK-0044** — parametric branch of the test selection tree, and the §3.7 default α
 - [x] **REF-TASK-0045** — ADR-010 Parquet columns against ADR-023, closed by ADR-025
 - [x] **REF-TASK-0046** — record the ADR-016/018/019 exception to ADR-012 normativity, closed by ADR-026
-- [ ] **REF-TASK-0047** — Corvus Pilot V3 against AP-4 and AP-7 *(post-V1)*
+- [x] **REF-TASK-0047** — Corvus Pilot V3 against AP-4 and AP-7, closed by ADR-030
 - [x] **REF-TASK-0048** — deprecation policy written; the rest deferred explicitly and no longer cited as policy
 - [x] **REF-TASK-0049** — acceptance tests for FR-27..FR-31 and FR-39..FR-42
 - [x] **REF-TASK-0050** — decide the future of the C3 and C4 layers, closed by ADR-028

@@ -380,3 +380,10 @@ cross-reference, not a definition.
 
 > These exclusions become hard constraints in
 > `docs/02-design/01-software-requirement-specification/05-constraints/02-const-scientific.md`.
+
+> **Corvus Pilot and AP-4 / AP-7.** The deferred Corvus Pilot container comes closer to these two
+> exclusions than anything else in the architecture: it generates hypotheses, judges study
+> designs and predicts outcomes. ADR-030 states the boundary that keeps it on the permitted side
+> — it proposes and never commits, it may not call `cc.lock_study()`, and every output ships the
+> material needed to reject it. The exclusion above is unchanged: no component, in any phase,
+> may name one algorithm as the one to use.

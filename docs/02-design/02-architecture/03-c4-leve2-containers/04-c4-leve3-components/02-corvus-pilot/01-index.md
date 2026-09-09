@@ -51,8 +51,10 @@ The V1 surface it will call is already fixed: [`04-public-api-contract.md`](../.
 
 ---
 
-## Open decisions
+## The constraint this container is built under
 
-- **REF-TASK-0047** — how the V3 autonomous capabilities stay on the right side of MANIFESTO
-  anti-patterns AP-4 (opaque analysis pipelines) and AP-7 (automated algorithm selection as a
-  substitute for researcher judgement). That decision shapes this container and is not made.
+ADR-030: the Pilot proposes and never commits. It may not call `cc.lock_study()`, which is
+where a scientific commitment is made (ADR-013), and every output ships the material a
+researcher needs to reject it — a proposed hypothesis carries the past results behind it, a
+design critique cites the principle each point rests on. No component here, in any phase, may
+name one algorithm as the one to use (AP-7, CONST-SCI-01).

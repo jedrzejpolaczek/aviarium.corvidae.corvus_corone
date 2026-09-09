@@ -14,7 +14,7 @@ NARRATIVE POSITION:
 
 FILE STRUCTURE — this SRS is an index document; detailed content lives in:
   ../02-use-cases/01-index.md                          : UC-01 through UC-11 (UC-07..UC-11 are post-V1)
-  ../03-functional-requirements/01-index.md            : FR-01 through FR-26
+  ../03-functional-requirements/01-index.md            : FR-01 through FR-42
   ../04-non-functional-requirements/01-index.md        : NFR-REPRO-01 through NFR-USABILITY-01
   ../05-constraints/01-index.md                        : CONST-SCI-XX, CONST-COM-XX, CONST-TECH-XX
   ../06-interface-requirements/01-index.md             : per-external-system interface specifications
@@ -125,7 +125,7 @@ This document operationalizes `docs/01-manifesto/MANIFESTO.md`. Where the MANIFE
 
 ### Document Status
 
-**Version:** 0.3 — UC-01–UC-06 expanded; FR-01–FR-31 defined, including the FR §4.8 study design guidance group; NFRs (6) with measurable criteria and Constraints (CONST-SCI 6, CONST-COM 3, CONST-TECH 7) fully defined; §7 Interface Requirements complete for COCO, IOHprofiler, and Nevergrad (REF-TASK-0012); §8 Acceptance Test Strategy complete with FR→test file mapping, NFR→test mapping, and formal reproducibility procedure (REF-TASK-0013). V1 release scope defined in §1.
+**Version:** 0.4 — UC-01–UC-06 expanded; FR-01–FR-42 defined, including the §4.8 study design guidance group, the §4.9 Learner group (deferred) and the §4.10 programmatic and command-line access group; NFRs (6) with measurable criteria and Constraints (CONST-SCI 6, CONST-COM 3, CONST-TECH 7) fully defined; §7 Interface Requirements complete for COCO, IOHprofiler, and Nevergrad (REF-TASK-0012); §8 Acceptance Test Strategy complete with FR→test file mapping, NFR→test mapping, and formal reproducibility procedure (REF-TASK-0013). V1 release scope defined in §1.
 
 ---
 
@@ -232,7 +232,7 @@ Per-interface specifications for all 5 external systems are in **[`06-interface-
 
 ## 8. Acceptance Test Strategy
 
-Test categories, FR→test file mapping (FR-01–FR-26), NFR→test procedure mapping, and the formal reproducibility test procedure are in **[`07-acceptance-test-strategy/01-acceptance-test-strategy.md`](../07-acceptance-test-strategy/01-acceptance-test-strategy.md)**. ✅ Complete (REF-TASK-0013).
+Test categories, FR→test file mapping, NFR→test procedure mapping, and the formal reproducibility test procedure are in **[`07-acceptance-test-strategy/01-acceptance-test-strategy.md`](../07-acceptance-test-strategy/01-acceptance-test-strategy.md)**. ✅ Complete for every V1 requirement: FR-01–FR-33 and FR-39–FR-42 (REF-TASK-0013, extended by REF-TASK-0049). FR-34–FR-38 are `[DEFERRED]` with §4.9 and enter the strategy when Phase 4 opens.
 
 ---
 

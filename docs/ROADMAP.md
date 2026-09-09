@@ -25,7 +25,7 @@ Generated: 2026-03-04. Updated: 2026-05-15. Update whenever a milestone closes o
 | C3 Components | REF-TASK-0041, 0050 | ⚠️ 11 groups; boundary vocabulary reconciled with the contracts (ADR-012), but the Experiment Runner and Study Orchestrator groups describe a failure model no contract defines |
 | C4 Code | — | ⚠️ 7 groups drafted; descriptive layer only (ADR-012) |
 | Architecture Decision Records | REF-TASK-0046 | ✅ ADR-001..ADR-024 accepted. ⚠️ ADR-012 normativity vs the ADR-016/018/019 exception unrecorded |
-| SRS | REF-TASK-0049 | ✅ UC-01..UC-11, FR-01..FR-42, 6 NFRs, 16 constraints, §7 interface requirements, §9 traceability. ⚠️ §8 acceptance strategy covers FR-01..26, 32, 33 only |
+| SRS | — | ✅ UC-01..UC-11, FR-01..FR-42, 6 NFRs, 16 constraints, §7 interface requirements, §8 acceptance strategy for every V1 requirement, §9 traceability |
 | Statistical methodology | REF-TASK-0043, 0044 | ⚠️ §1–§3 and §7 written; **§4 Level 3, §5 anytime and §6 uncertainty are empty** (HTML comment only) |
 | Metric taxonomy | REF-TASK-0014 | ✅ 9 metrics, Standard Reporting Set, selection guide; implementation references land with IMPL-011 |
 | Interface contracts | REF-TASK-0042 | ✅ 6 interfaces + cross-cutting. ⚠️ four Repository methods carry a signature and no semantics |
@@ -396,7 +396,7 @@ REF-TASK-0025 ──► 0026 ──► 0027 ──► 0028 ──► 0029 ──
   `06-tutorials/01-cmd-first-study.md` is a skeleton, which NFR-USABILITY-01 and the use-case
   acceptance criterion both depend on.
 
-- [ ] **[REF-TASK-0049] Extend §8 Acceptance Test Strategy to FR-27..FR-31 and FR-39..FR-42.**
+- [x] **[REF-TASK-0049] Extend §8 Acceptance Test Strategy to FR-27..FR-31 and FR-39..FR-42.** *(Closed 2026-09-09.)* Two categories added — Guidance quality and Interface conformance, the second of which the traceability matrix already named without the strategy defining it — and nine mapping rows. Two further defects surfaced while doing it: four rows carried ✅ against `tests/e2e/` stub files removed when ADR-013 and ADR-017 replaced the lifecycle and seed strategy they encoded, and the assertions that do exist (`test_repository_interface.py`, the IMPL-010 suite) were cited nowhere. Both corrected, and the matrix's category column now matches the strategy row for row.
   `01-acceptance-test-strategy.md` declares that every FR maps to at least one test file and
   covers FR-01..FR-26 plus FR-32 and FR-33. The Study Design Guidance group and the Programmatic
   and Command-Line Access group are both V1 and have no test category, while the traceability
@@ -440,7 +440,7 @@ Documentation tasks:
 - [ ] **REF-TASK-0046** — record the ADR-016/018/019 exception to ADR-012 normativity
 - [ ] **REF-TASK-0047** — Corvus Pilot V3 against AP-4 and AP-7 *(post-V1)*
 - [ ] **REF-TASK-0048** — write `02-versioning-governance.md`, finish the contribution guide
-- [ ] **REF-TASK-0049** — acceptance tests for FR-27..FR-31 and FR-39..FR-42
+- [x] **REF-TASK-0049** — acceptance tests for FR-27..FR-31 and FR-39..FR-42
 - [ ] **REF-TASK-0050** — decide the future of the C3 and C4 layers
 
 ### Implementation Tasks (IMPL)

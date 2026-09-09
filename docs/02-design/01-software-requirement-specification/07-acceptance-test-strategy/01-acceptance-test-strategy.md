@@ -42,6 +42,8 @@ A requirement is considered accepted when its designated test category passes.
 | Constraint enforcement tests | CONST-SCI-01 through CONST-SCI-06 cannot be violated by any API path | FR-21; `05-constraints/01-index.md` Scientific Constraints | UC-03 F1 |
 | Usability tests | Timed tutorial completion within stated targets | NFR-USABILITY-01 | UC-01, UC-02 |
 | Open format compliance tests | Raw Data export formats are on the approved open-format list | NFR-OPEN-01; FR-22; CONST-COM-03 | UC-01 Step 10 |
+| Guidance quality tests | A rejection states what the researcher has to decide, not only which field is absent: every unresolved decision in one response, the rule each message enforces, and the remedies available | FR-27, FR-29, FR-30 | UC-01 F1–F3 |
+| Interface conformance tests | The public surface is exactly the documented one, and the command line is a subset of it rather than a parallel surface | FR-28, FR-39, FR-40, FR-41, FR-42 | UC-01 – UC-06 |
 
 ---
 
@@ -50,18 +52,27 @@ A requirement is considered accepted when its designated test category passes.
 Every FR maps to at least one test file. Files marked ✅ exist; files marked 🚧 are planned
 and will be created as the corresponding feature is implemented.
 
+> **On the ✅ marks.** Four rows carried ✅ against
+> `tests/e2e/test_uc01_researcher_study.py` and `tests/e2e/test_uc02_contribute_algorithm.py`,
+> which do not exist. Those were the interface stubs described under *Acceptance Scenarios*
+> below: a temporary instrument for testing whether the contracts were implementable, removed
+> once ADR-013 and ADR-017 replaced the lifecycle and seed strategy they encoded. The ticks
+> stayed behind. They are corrected here, and the assertions that do exist —
+> `tests/unit/test_repository_interface.py`, the IMPL-010 contract suite — are cited where
+> they genuinely apply.
+
 | FR | Description (short) | Test Category | Test File |
 |---|---|---|---|
-| FR-01 | Store ProblemInstance with all required fields | Unit, Validation rejection | 🚧 `tests/unit/test_problem_repository.py` |
-| FR-02 | Validate ProblemInstance completeness on registration | Validation rejection | 🚧 `tests/unit/test_problem_repository.py` |
-| FR-03 | Problem Instance versioning | Unit | 🚧 `tests/unit/test_problem_repository.py` |
-| FR-04 | Reject version mismatch before any Run begins | Integration | ✅ `tests/e2e/test_uc01_researcher_study.py` |
+| FR-01 | Store ProblemInstance with all required fields | Unit, Validation rejection | ✅ `tests/unit/test_repository_interface.py` (round-trip, deep copy); 🚧 `tests/unit/test_problem_repository.py` (full required-field set) |
+| FR-02 | Validate ProblemInstance completeness on registration | Validation rejection | ✅ `tests/unit/test_repository_interface.py` (case c, missing `name`); 🚧 `tests/unit/test_problem_repository.py` (cases a and b) |
+| FR-03 | A revision is a new entity; the original stays retrievable and carries `superseded_by` (ADR-020) | Unit | ✅ `tests/unit/test_repository_interface.py` (deprecated entity still retrievable by id); 🚧 `tests/unit/test_problem_repository.py` (`superseded_by` lineage) |
+| FR-04 | A Study resolves to the entity it referenced, for the lifetime of the Study (ADR-020) | Integration | 🚧 `tests/e2e/test_uc01_researcher_study.py` |
 | FR-32 | Validate Study has ≥ 5 Problem Instances before Experiment begins | Unit, Validation rejection | 🚧 `tests/unit/test_problem_repository.py` |
 | FR-33 | Validate Study Problem Instance set covers diversity rules (D-2, D-3) | Unit, Validation rejection | 🚧 `tests/unit/test_problem_repository.py` |
-| FR-05 | Store AlgorithmInstance with all required fields | Unit, Validation rejection | 🚧 `tests/unit/test_algorithm_registry.py` |
-| FR-06 | Reject unpinned code_reference | Validation rejection | ✅ `tests/e2e/test_uc02_contribute_algorithm.py` |
-| FR-07 | Require non-empty configuration_justification | Validation rejection | ✅ `tests/e2e/test_uc02_contribute_algorithm.py` |
-| FR-08 | Enforce pre-registration gate; reject modifications after lock | Pre-registration gate | 🚧 `tests/e2e/test_uc01_researcher_study.py` |
+| FR-05 | Store AlgorithmInstance with all required fields | Unit, Validation rejection | ✅ `tests/unit/test_repository_interface.py` (round-trip); 🚧 `tests/unit/test_algorithm_registry.py` (all 13 required fields) |
+| FR-06 | Reject unpinned code_reference | Validation rejection | ✅ `tests/unit/test_repository_interface.py` |
+| FR-07 | Require non-empty configuration_justification | Validation rejection | ✅ `tests/unit/test_repository_interface.py` |
+| FR-08 | Enforce pre-registration gate; reject modifications after lock | Pre-registration gate | ✅ `tests/unit/test_repository_interface.py` (`StudyAlreadyLockedError` on re-lock, draft → locked transition); 🚧 `tests/e2e/test_uc01_researcher_study.py` (field immutability, timestamped log) |
 | FR-09 | Deterministic seed assignment from seed_strategy | Integration, Reproducibility | 🚧 `tests/e2e/test_uc05_reproducibility.py` |
 | FR-10 | Auto-capture execution environment per Experiment | Integration, Reproducibility | 🚧 `tests/e2e/test_uc05_reproducibility.py` |
 | FR-11 | Run isolation — no shared mutable state between Runs | Integration | 🚧 `tests/e2e/test_uc01_researcher_study.py` |
@@ -70,7 +81,7 @@ and will be created as the corresponding feature is implemented.
 | FR-14 | Record PerformanceRecords at log-scale + improvement schedule | Unit | 🚧 `tests/unit/test_experiment_runner.py` |
 | FR-15 | Require all three analysis levels before generating report | Statistical validity | 🚧 `tests/e2e/test_uc01_researcher_study.py` |
 | FR-16 | Apply multiple-testing correction when declared | Statistical validity | 🚧 `tests/e2e/test_uc01_researcher_study.py` |
-| FR-17 | All entities carry RFC 4122 UUID; no path-based IDs | Unit, Integration | 🚧 `tests/unit/test_reproducibility_layer.py` |
+| FR-17 | All entities carry RFC 4122 UUID; no path-based IDs | Unit, Integration | ✅ `tests/unit/test_repository_interface.py` (every `register`/`create` returns a UUID); 🚧 `tests/unit/test_reproducibility_layer.py` (no path-valued reference fields) |
 | FR-18 | Artifact archive contains all required records | Reproducibility | 🚧 `tests/e2e/test_uc05_reproducibility.py` |
 | FR-19 | Cross-entity references use IDs only, no file paths | Unit | 🚧 `tests/unit/test_reproducibility_layer.py` |
 | FR-20 | Generate ResearcherReport and PractitionerReport with scope field | Integration | 🚧 `tests/e2e/test_uc01_researcher_study.py` |
@@ -80,6 +91,24 @@ and will be created as the corresponding feature is implemented.
 | FR-24 | Return non-empty information-loss manifest on every export call | Interoperability | ✅ `tests/interop/test_ioh_export.py` |
 | FR-25 | Reject unsupported formats and exports missing mandatory fields | Interoperability | 🚧 `tests/interop/test_ecosystem_bridge.py` |
 | FR-26 | No undocumented field mappings in export bridge | Interoperability | 🚧 `tests/interop/test_ecosystem_bridge.py` |
+| FR-27 | Report every unresolved design decision in one response, not the first | Guidance quality, Validation rejection | 🚧 `tests/unit/test_study_design_guidance.py` |
+| FR-28 | No silent defaults on parameters with methodological consequences | Interface conformance, Validation rejection | 🚧 `tests/unit/test_study_design_guidance.py` |
+| FR-29 | Every validation message names the rule, principle or ADR it enforces | Guidance quality | 🚧 `tests/unit/test_study_design_guidance.py` |
+| FR-30 | Name the deficient diversity axis and both remedies at `lock_study()` | Guidance quality, Validation rejection | 🚧 `tests/unit/test_study_design_guidance.py` |
+| FR-31 | Exploratory Study declarable, and carried into both Report scope statements | Constraint enforcement, Statistical validity | 🚧 `tests/unit/test_study_design_guidance.py` |
+| FR-39 | Public namespace equals the function set of `04-public-api-contract.md` | Interface conformance | 🚧 `tests/unit/test_public_api_surface.py` |
+| FR-40 | Every CLI command delegates to a facade function; no command-only capability | Interface conformance | 🚧 `tests/cli/test_cli_surface.py` |
+| FR-41 | Results on stdout, diagnostics on stderr; error text starts with the class name | Interface conformance | 🚧 `tests/cli/test_cli_surface.py` |
+| FR-42 | Exit codes distinguish failure categories; failed Runs still exit `0` | Interface conformance | 🚧 `tests/cli/test_cli_surface.py` |
+
+FR-34 – FR-38 are `[DEFERRED]` (SRS §4.9, Learner actor, ROADMAP Phase 4) and are deliberately absent from this table. A deferred requirement is a decision, not a gap; it enters here when the phase opens.
+
+> **What the nine rows above cost to write.** Nothing: each of those requirements already
+> carries an *Accepted when* clause naming a concrete assertion — set equality of the public
+> namespace against the contract, the two streams captured separately, exit `0` for an
+> Experiment whose individual Runs failed. The rows were missing, not the criteria. They were
+> added by REF-TASK-0049 after the consistency audit found that this document claimed to cover
+> every FR while covering FR-01 – FR-26, FR-32 and FR-33.
 
 ---
 
@@ -91,7 +120,7 @@ and will be created as the corresponding feature is implemented.
 | NFR-STAT-01 | Statistical validity | Statistical validity | 🚧 `tests/e2e/test_uc01_researcher_study.py` — assert `AnalysisIncompleteError` raised when any level skipped |
 | NFR-INTEROP-01 | Ecosystem interoperability | Interoperability | ✅ `tests/interop/test_ioh_export.py` — manifest non-empty assertion on every `export()` call |
 | NFR-OPEN-01 | Open data and code | Open format compliance | 🚧 `tests/unit/test_reporting.py` — assert export parseable by `json`/`csv` stdlib only |
-| NFR-MODULAR-01 | Extensibility | Plugin | ✅ `tests/e2e/test_uc02_contribute_algorithm.py`; 🚧 `tests/e2e/test_uc04_contribute_problem.py` — register and use a third-party adapter without modifying core |
+| NFR-MODULAR-01 | Extensibility | Plugin | 🚧 `tests/e2e/test_uc02_contribute_algorithm.py`; 🚧 `tests/e2e/test_uc04_contribute_problem.py` — register and use a third-party adapter without modifying core |
 | NFR-USABILITY-01 | Minimal onboarding friction | Usability | Manual: `docs/06-tutorials/01-cmd-first-study.md` completable in ≤30 min; `NevergradAdapter` in ≤14 boilerplate lines (line-count asserted in 🚧 `tests/interop/test_nevergrad_adapter.py`) |
 
 ---

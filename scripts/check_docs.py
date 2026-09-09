@@ -8,6 +8,7 @@ as a consequence of an edit to a different file:
   1. Every relative link resolves to a file that exists.
   2. Every requirement identifier cited anywhere is defined somewhere.
   3. No requirement identifier is defined twice.
+  4. The descriptive layers coin no vocabulary of their own (ADR-012).
 
 A file may opt out of the identifier checks by carrying the marker
 ``<!-- check-docs: allow-undefined -->``. This is for documents that legitimately
@@ -23,9 +24,12 @@ Exit codes: 0 clean, 1 violations found, 2 usage error.
 
 References
 ----------
-ADR-012 (documentation layer normativity) is the rule this script will eventually
-enforce in full; the vocabulary check that verifies the descriptive layer coins no
-new identifiers is deliberately not implemented yet. See audit-2026-09-08.md.
+ADR-012 (documentation layer normativity) is the rule check 4 enforces. It compares
+three families of identifier found in the C2, C3 and C4 documents against the
+normative contracts: exception class names, the public facade surface reached
+through ``cc.``, and type names appearing in code blocks. Those three are where the
+audit found parallel specifications; broader static analysis of prose is deliberately
+out of scope, because it produces noise rather than findings.
 """
 
 from __future__ import annotations
@@ -54,8 +58,14 @@ def markdown_files(root: str = DOCS) -> list[str]:
 
 
 def read(path: str) -> str:
+    """Read a document with line endings normalised.
+
+    Normalisation matters: several checks match multi-line patterns, and the corpus
+    mixes LF and CRLF. Without this the fenced-code-block scan in check 4 silently
+    matches nothing on CRLF files.
+    """
     with open(path, "rb") as fh:
-        return fh.read().decode("utf-8", errors="replace")
+        return fh.read().decode("utf-8", errors="replace").replace("\r\n", "\n")
 
 
 # ---------------------------------------------------------------------------
@@ -182,6 +192,102 @@ def check_identifiers(files: list[str], defined: dict[str, set[str]]) -> list[st
 
 
 # ---------------------------------------------------------------------------
+# Check 4 — the descriptive layers coin no vocabulary (ADR-012)
+# ---------------------------------------------------------------------------
+
+CONTRACTS_DIR = "docs/03-technical-contracts"
+
+DESCRIPTIVE_DIRS = [
+    "docs/02-design/02-architecture/03-c4-leve2-containers",
+    "docs/02-design/02-architecture/05-c4-level4-code",
+]
+
+# Names that belong to Python, the standard library or a declared third-party
+# dependency. They are not project vocabulary and the contracts do not define them.
+FOREIGN_NAMES = {
+    # builtins and stdlib
+    "ValueError", "RuntimeError", "ImportError", "TypeError", "KeyError",
+    "FileNotFoundError", "NotImplementedError", "OSError", "AttributeError",
+    "FrozenInstanceError", "StopIteration",
+    # typing and annotations
+    "Literal", "Optional", "Any", "Iterator", "Iterable", "Sequence", "Mapping",
+    "Callable", "Path", "Protocol", "TypedDict", "Union", "None", "True", "False",
+    # third-party
+    "ArrowIOError", "UndefinedError",
+}
+
+
+def _iter_identifiers(text: str):
+    """Yield (family, name) pairs for the three checked families."""
+    # exception class names
+    for m in re.finditer(r"\b([A-Z][A-Za-z0-9]*Error)\b", text):
+        yield "exception", m.group(1)
+    # public facade surface
+    for m in re.finditer(r"\bcc" + re.escape(".") + r"([a-z_][a-z0-9_]*)\b", text):
+        yield "facade", m.group(1)
+    # type names introduced in fenced code blocks
+    for block in re.findall(r"```(?:python)?\n(.*?)```", text, re.S):
+        for m in re.finditer(r"\b(?:class|def)\s+([A-Za-z_][A-Za-z0-9_]*)", block):
+            yield "symbol", m.group(1)
+        for m in re.finditer(r":\s*([A-Z][A-Za-z0-9]*)\b", block):
+            yield "symbol", m.group(1)
+        for m in re.finditer(r"->\s*([A-Z][A-Za-z0-9]*)\b", block):
+            yield "symbol", m.group(1)
+
+
+def contract_vocabulary() -> set[str]:
+    """Every identifier-shaped token appearing anywhere in the normative contracts."""
+    vocabulary: set[str] = set()
+    for path in markdown_files(CONTRACTS_DIR):
+        text = read(path)
+        for m in re.finditer(r"\b([A-Za-z_][A-Za-z0-9_]*)\b", text):
+            vocabulary.add(m.group(1))
+    return vocabulary
+
+
+BASELINE_PATH = "scripts/docs_baseline.txt"
+
+
+def load_baseline() -> set[str]:
+    """Violations that already existed when the check was introduced.
+
+    A corpus that predates its own gate cannot go green on the first run. Recording
+    the known violations lets the gate block regressions immediately while the
+    backlog is worked down. The baseline may only shrink: an entry that no longer
+    fires is reported so it can be deleted.
+    """
+    if not os.path.exists(BASELINE_PATH):
+        return set()
+    out = set()
+    for line in read(BASELINE_PATH).splitlines():
+        line = line.strip()
+        if line and not line.startswith("#"):
+            out.add(line)
+    return out
+
+
+def check_vocabulary() -> list[str]:
+    problems = []
+    vocabulary = contract_vocabulary()
+    for directory in DESCRIPTIVE_DIRS:
+        if not os.path.isdir(directory):
+            continue
+        for path in markdown_files(directory):
+            text = read(path)
+            if ALLOW_MARKER in text:
+                continue
+            seen: set[str] = set()
+            for family, name in _iter_identifiers(text):
+                if name in FOREIGN_NAMES or name in vocabulary or name in seen:
+                    continue
+                seen.add(name)
+                problems.append(
+                    f"{path}: {family} '{name}' is not defined in {CONTRACTS_DIR} (ADR-012)"
+                )
+    return problems
+
+
+# ---------------------------------------------------------------------------
 
 
 def main(argv: list[str]) -> int:
@@ -192,6 +298,18 @@ def main(argv: list[str]) -> int:
     files = markdown_files()
     defined = defined_identifiers()
 
+    if "--write-baseline" in argv:
+        entries = sorted(check_vocabulary())
+        with open(BASELINE_PATH, "w", encoding="utf-8", newline="\n") as fh:
+            fh.write("# Known uncontracted vocabulary, recorded when check 4 was introduced.\n")
+            fh.write("# ADR-012 forbids the descriptive layers from coining identifiers.\n")
+            fh.write("# This file may only shrink. Delete a line once the name is either\n")
+            fh.write("# promoted into docs/03-technical-contracts or removed from the document.\n")
+            for entry in entries:
+                fh.write(entry + "\n")
+        print(f"wrote {len(entries)} baseline entries to {BASELINE_PATH}")
+        return 0
+
     if "--list" in argv:
         for family in sorted(defined):
             print(f"{family}: {' '.join(sorted(defined[family]))}")
@@ -200,16 +318,29 @@ def main(argv: list[str]) -> int:
     link_problems = check_links(files)
     id_problems = check_identifiers(files, defined)
     dup_problems = check_duplicate_definitions()
+    vocab_all = check_vocabulary()
+    baseline = load_baseline()
+    vocab_problems = [v for v in vocab_all if v not in baseline]
+    stale = sorted(baseline - set(vocab_all))
 
-    for problem in link_problems + id_problems + dup_problems:
+    for problem in link_problems + id_problems + dup_problems + vocab_problems:
         print(problem)
+    for entry in stale:
+        print(f"baseline entry no longer fires, delete it: {entry}")
 
-    total = len(link_problems) + len(id_problems) + len(dup_problems)
+    total = (
+        len(link_problems) + len(id_problems) + len(dup_problems)
+        + len(vocab_problems) + len(stale)
+    )
     print()
     print(f"{len(files)} files checked")
     print(f"  dead links:             {len(link_problems)}")
     print(f"  undefined identifiers:  {len(id_problems)}")
     print(f"  duplicate definitions:  {len(dup_problems)}")
+    print(f"  uncontracted vocabulary:{len(vocab_problems):>4}"
+          f"   (baselined: {len(vocab_all) - len(vocab_problems)})")
+    if stale:
+        print(f"  stale baseline entries: {len(stale)}")
 
     if total:
         print(f"\nFAILED: {total} violation(s)")

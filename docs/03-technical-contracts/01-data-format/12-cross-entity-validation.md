@@ -151,15 +151,17 @@ defined in
 
 ## CEV-11 — Problem Instance diversity floor
 
-**Rule:** A Study's Problem Instance set SHOULD satisfy the diversity floor of ADR-009:
+**Rule:** A Study's Problem Instance set MUST satisfy the diversity floor of ADR-009, unless the
+Study is declared exploratory:
 at least five instances, covering at least two dimensionality ranges, including at least one
 noisy and one deterministic instance (FR-32, FR-33).
 
 **Checked:** at `lock_study()`.
 
-**Consequence:** warn, naming the axis that falls short. The warning is carried into the Report
-limitations section. It is a warning rather than a rejection because a Study deliberately scoped
-to one problem class is legitimate as long as the Report says so (FR-30).
+**Consequence:** reject, `ValidationError`, naming the failing rule and the shortfall, **unless
+the Study is exploratory**, meaning every entry in `pre_registered_hypotheses` carries
+`test_type = "none"` (ADR-021). For an exploratory Study the shortfall is recorded and carried
+into the limitations section of both Reports instead (FR-30, FR-32, FR-33).
 
 ---
 

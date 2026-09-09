@@ -76,8 +76,20 @@ The study must include Problem Instances from **at least 2 of the 3 dimensionali
 | High-dimensional | `dimensions` > 20 |
 
 A study that covers only one range (e.g., all problems have `dimensions` in 2–4) produces
-conclusions valid only for that range. The system must reject or warn — it does not
-extrapolate to uncovered ranges.
+conclusions valid only for that range. The system does not extrapolate to uncovered ranges.
+
+> **Consequence settled.** D-1, D-2 and D-3 are checked at `lock_study()` and **reject** the
+> Study with a `ValidationError` naming the failing rule, **unless the Study is declared
+> exploratory**. A Study is exploratory when every entry in `pre_registered_hypotheses` carries
+> `test_type = "none"` (ADR-021); the shortfall is then carried into the limitations section of
+> both Reports rather than blocking execution.
+>
+> The escape hatch is what makes rejection acceptable. A Study deliberately scoped to one problem
+> class is legitimate science, but it is not confirmatory, and the declaration is how the
+> researcher says which of the two they are running. Rejecting without the hatch would be the
+> obstacle the second half of the system's purpose forbids; warning without the hatch would let a
+> confirmatory claim rest on five instances in one dimensionality range. See FR-30, FR-32, FR-33
+> and cross-entity rule CEV-11.
 
 *The range boundaries (5, 20) are conventional breakpoints in the HPO literature. They are
 not theoretically exact; future studies may provide empirical justification for adjusting

@@ -11,6 +11,12 @@
 
 ---
 
+> **Before you start: licensing.** Corvus Corone is AGPL-3.0-or-later. An adapter you
+> contribute is a derivative work of this library, so a proprietary optimizer cannot be
+> contributed without being licensed compatibly. Benchmarking one privately is unrestricted.
+> See [the contribution guide](../05-community/01-contribution-guide.md) and
+> [ADR-022](../02-design/02-architecture/01-adr/adr-022-agpl-licence-and-dependency-policy.md).
+
 ## Overview
 
 Contributing an algorithm has four steps:

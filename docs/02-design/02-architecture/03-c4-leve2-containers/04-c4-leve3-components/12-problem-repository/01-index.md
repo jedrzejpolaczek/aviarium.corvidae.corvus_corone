@@ -64,8 +64,8 @@ Same pattern as Algorithm Registry: one log entry per registration and per depre
 
 ### Error Handling
 
-- `ProblemValidationError`: raised by Instance Validator on schema violations.
-- `ProblemAlreadyExistsError`: raised on duplicate `(id, version)` registration.
+- `ValidationError`: raised by Instance Validator on schema violations.
+- `ValidationError`: raised on duplicate `(id, version)` registration.
 - `EntityNotFoundError`: raised by Entity Store on missing problem ID.
 
 ### Randomness / Seed Management

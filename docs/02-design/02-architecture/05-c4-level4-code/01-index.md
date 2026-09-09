@@ -31,8 +31,8 @@ flowchart TD
     pi["ProblemInterface\nProtocol\nevaluate · bounds · dimension · optimum"]
     pii["ProblemInstance\ndataclass frozen\nproblem_id · version · implementation"]
     pr["PerformanceRecord\ndataclass frozen\nrun_id · iteration · value · best_so_far"]
-    sc["StudyConfig\ndataclass\nalgorithms · problems · budget · base_seed"]
-    rc["RunConfig\ndataclass\nrun_id · algorithm_id · problem_id · seed"]
+    sc["Study\ndataclass\nalgorithms · problems · budget · base_seed"]
+    rc["Run\ndataclass\nrun_id · algorithm_id · problem_id · seed"]
   end
 
   subgraph PILOT["03 · Corvus Pilot V2"]
@@ -115,7 +115,7 @@ flowchart TD
 | [02-shared/01-algorithm-interface.md](02-shared/01-algorithm-interface.md) | `AlgorithmInterface` (Protocol) | Experiment Runner, Algorithm Registry, Analysis Engine, Visualization Engine, Ecosystem Bridge |
 | [02-shared/02-problem-interface.md](02-shared/02-problem-interface.md) | `ProblemInterface` (Protocol) | Experiment Runner, Problem Repository, Analysis Engine |
 | [02-shared/03-performance-record.md](02-shared/03-performance-record.md) | `PerformanceRecord` (dataclass) | Experiment Runner, Results Store, Analysis Engine, Reporting Engine, Visualization Engine |
-| [02-shared/04-study-spec.md](02-shared/04-study-spec.md) | `StudyConfig` + `RunConfig` (dataclasses) | Public API, Study Orchestrator, Experiment Runner, Analysis Engine |
+| [02-shared/04-study-spec.md](02-shared/04-study-spec.md) | `Study` + `Run` (dataclasses) | Public API, Study Orchestrator, Experiment Runner, Analysis Engine |
 | [03-corvus-corone-pilot/02-pilot-state.md](03-corvus-corone-pilot/02-pilot-state.md) | `PilotState` (TypedDict) | Corvus Pilot V2 — all 7 agent nodes share this state |
 | [04-experiment-runner/02-seed-manager.md](04-experiment-runner/02-seed-manager.md) | `SeedManager` (class + invariant) | Experiment Runner — reproducibility contract boundary |
 | [04-experiment-runner/03-evaluation-loop.md](04-experiment-runner/03-evaluation-loop.md) | `EvaluationLoop` (ask/tell contract) | Experiment Runner — core execution contract between AlgorithmInterface, ProblemInterface, PerformanceRecorder |

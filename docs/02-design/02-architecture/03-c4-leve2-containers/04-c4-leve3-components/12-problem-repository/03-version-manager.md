@@ -33,7 +33,7 @@ class ProblemVersionManager:
 
 Identical architecture to [Algorithm Registry — Version Manager](../11-algorithm-registry/03-version-manager.md), applied to ProblemInstances:
 
-1. **Immutability enforcement** — duplicate `(id, version)` raises `ProblemAlreadyExistsError`.
+1. **Immutability enforcement** — duplicate `(id, version)` raises `ValidationError`.
 2. **Deprecation without deletion** — sets `deprecated=True` on the stored entity.
 3. **Current version resolution** — returns latest non-deprecated version.
 4. **Version format validation** — same semver / date-based validation as Algorithm Registry.

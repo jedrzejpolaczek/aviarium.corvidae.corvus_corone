@@ -81,7 +81,7 @@ classDiagram
     +write(record) None
   }
 
-  class JsonEntityStore {
+  class RepositoryFactory {
     +save(entity) None
     +load(entity_id) dict
   }
@@ -89,7 +89,7 @@ classDiagram
   Repository <|.. LocalFileRepository : implements
   Repository <|.. ServerRepository : implements
   JsonlPerformanceWriter --> Repository : resolves jsonl_path
-  JsonEntityStore --> Repository : resolves entity_path
+  RepositoryFactory --> Repository : resolves entity_path
 ```
 
 ---
@@ -102,7 +102,7 @@ classDiagram
 
 **Why:** Centralising path resolution into a single Protocol ensures that changing the
 directory layout requires exactly one code change — in the `Repository` implementation.
-Without this, paths would be scattered across `JsonlPerformanceWriter`, `JsonEntityStore`,
+Without this, paths would be scattered across `JsonlPerformanceWriter`, `RepositoryFactory`,
 `PerformanceRecorder`, and others.
 
 **Implications for contributors:** Never construct artifact paths manually. Always call

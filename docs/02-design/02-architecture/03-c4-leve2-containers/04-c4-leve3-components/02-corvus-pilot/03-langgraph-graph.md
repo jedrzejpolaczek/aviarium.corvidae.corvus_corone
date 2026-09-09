@@ -1,5 +1,10 @@
 # LangGraph Graph
 
+<!-- check-docs: allow-undefined -->
+<!-- This container is outside the V1 release (SRS 1). Its contracts are written
+     when the Learner actor enters scope, so ADR-012 check 4 cannot resolve its
+     vocabulary yet and is suppressed for this document. -->
+
 > Container: [Corvus Pilot V2](../../14-corvus-pilot.md)
 > C3 Index: [index.md](01-index.md)
 

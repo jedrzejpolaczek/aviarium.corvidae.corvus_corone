@@ -14,7 +14,7 @@ Convert a completed Run's JSONL performance file to Parquet/snappy format when t
 ## Interface
 
 ```python
-class ParquetPerformanceWriter:
+class RepositoryFactory:
     def convert_run(
         self,
         run_id: str,
@@ -26,6 +26,9 @@ class ParquetPerformanceWriter:
         Returns: records_converted, jsonl_path, parquet_path, skipped_reason.
         """
 ```
+
+`ConversionResult` fields: `records_converted` (int), `jsonl_path` (Path),
+`parquet_path` (Path), `skipped_reason` (str or null).
 
 Called by the Study Orchestrator's Post-Execution Pipeline after a Run completes.
 

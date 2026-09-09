@@ -20,4 +20,4 @@ The following cross-container abstractions from [02-shared/](../02-shared/) are 
 | Abstraction | Role in Analysis Engine |
 |---|---|
 | [`PerformanceRecord`](../02-shared/03-performance-record.md) | `MetricDispatcher` loads and aggregates records per `(algorithm_id, problem_id)` pair |
-| [`StudyConfig` / `AnalysisConfig`](../02-shared/04-study-spec.md) | `AnalysisConfig` (carried inside `StudyConfig`) specifies which metrics to compute, the significance level, and whether pre-registration is enforced |
+| [`Study` / `AnalysisConfig`](../02-shared/04-study-spec.md) | `AnalysisConfig` (carried inside `Study`) specifies which metrics to compute, the significance level, and whether pre-registration is enforced |

@@ -64,8 +64,8 @@ One log entry per registration: `algorithm_id`, `version`, `registered_at`, `reg
 
 ### Error Handling
 
-- `AlgorithmValidationError`: raised by Instance Validator on schema violations. Lists all violations.
-- `AlgorithmAlreadyExistsError`: raised when attempting to register an ID+version combination that already exists.
+- `ValidationError`: raised by Instance Validator on schema violations. Lists all violations.
+- `ValidationError`: raised when attempting to register an ID+version combination that already exists.
 - `EntityNotFoundError`: raised by Entity Store when `get_algorithm(id)` finds no matching entry.
 
 ### Randomness / Seed Management

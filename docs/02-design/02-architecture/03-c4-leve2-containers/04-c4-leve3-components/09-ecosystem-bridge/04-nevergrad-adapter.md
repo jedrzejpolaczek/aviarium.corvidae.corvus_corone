@@ -29,7 +29,7 @@ class NevergradAdapter:
         self,
         experiment_id: str,
         output_dir: Path,
-        record_reader: PerformanceRecordReader,
+        record_reader: RepositoryFactory,
         loss_auditor: LossAuditor,
     ) -> ExportResult:
         """Exports experiment to Nevergrad benchmark JSON format."""

@@ -1,5 +1,10 @@
 # C3: Components — Algorithm Visualization Engine
 
+<!-- check-docs: allow-undefined -->
+<!-- This container is outside the V1 release (SRS 1). Its contracts are written
+     when the Learner actor enters scope, so ADR-012 check 4 cannot resolve its
+     vocabulary yet and is suppressed for this document. -->
+
 > **V1 scope: Deferred.** The components in this group are not part of the V1 release.
 > Release scope is defined in
 > `docs/02-design/01-software-requirement-specification/01-srs/01-SRS.md` §1 V1 Release Scope.
@@ -88,7 +93,7 @@ One structured log entry per `visualize()` call: `algorithm_id`, `viz_type`, `ex
 ### Error Handling
 
 - `EntityNotFoundError`: raised if the algorithm ID is not in the registry. Not caught internally — surfaces to the caller with a list of available algorithms.
-- `VisualizationNotApplicableError`: raised by the Static Renderer if `viz_type="pareto_front"` is requested for a single-objective experiment.
+- `ValidationError`: raised by the Static Renderer if `viz_type="pareto_front"` is requested for a single-objective experiment.
 - `ImportError`: raised by the Interactive Renderer if `plotly` is not installed. Message includes `pip install corvus_corone[interactive]`.
 - All fallback (no-data) visualizations return a `VisualizationResult` with `fallback_reason` populated and `fallback_used=True`.
 
@@ -103,7 +108,7 @@ No random state consumed. Fallback synthetic data uses a fixed seed (42) passed 
 | `format` | `visualize()` call | Per call |
 | `output_path` / `output_dir` | `visualize()` call | Per call |
 | `experiment_id` | `visualize()` call (optional) | Per call |
-| matplotlib DPI | `StudyConfig.reporting` (default: 150) | Per-Study |
+| matplotlib DPI | `Study.reporting` (default: 150) | Per-Study |
 
 ### Testing Strategy
 

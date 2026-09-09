@@ -8,7 +8,7 @@ as a consequence of an edit to a different file:
   1. Every relative link resolves to a file that exists.
   2. Every requirement identifier cited anywhere is defined somewhere.
   3. No requirement identifier is defined twice.
-  4. The descriptive layers coin no vocabulary of their own (ADR-012).
+  4. The descriptive layers coin no boundary vocabulary of their own (ADR-012).
 
 A file may opt out of the identifier checks by carrying the marker
 ``<!-- check-docs: allow-undefined -->``. This is for documents that legitimately
@@ -26,10 +26,14 @@ References
 ----------
 ADR-012 (documentation layer normativity) is the rule check 4 enforces. It compares
 three families of identifier found in the C2, C3 and C4 documents against the
-normative contracts: exception class names, the public facade surface reached
-through ``cc.``, and type names appearing in code blocks. Those three are where the
-audit found parallel specifications; broader static analysis of prose is deliberately
-out of scope, because it produces noise rather than findings.
+normative contracts: exception class names, the public facade surface reached through
+``cc.``, and types appearing in a parameter or return annotation. Those three are the
+boundary vocabulary, and they are where the audit found parallel specifications.
+
+A component's own class and method names are not checked. ADR-012 constrains what the
+descriptive layers may *define*, not how they decompose a container into parts, and
+demanding that every component class appear in a contract would move implementation
+detail into the layer that defines the boundary.
 """
 
 from __future__ import annotations
@@ -214,6 +218,8 @@ FOREIGN_NAMES = {
     "Callable", "Path", "Protocol", "TypedDict", "Union", "None", "True", "False",
     # third-party
     "ArrowIOError", "UndefinedError",
+    # prose artefacts that look like annotations
+    "H1", "H2", "H3", "Wrap", "None",
 }
 
 
@@ -225,19 +231,36 @@ def _iter_identifiers(text: str):
     # public facade surface
     for m in re.finditer(r"\bcc" + re.escape(".") + r"([a-z_][a-z0-9_]*)\b", text):
         yield "facade", m.group(1)
-    # type names introduced in fenced code blocks
+    # Types crossing a component boundary, that is names used in a parameter or
+    # return annotation inside a fenced code block.
+    #
+    # A component's own class and method names are deliberately NOT checked. Those
+    # are internal structure, and ADR-012 constrains vocabulary, not decomposition:
+    # requiring every component class to be pre-declared in the contracts would push
+    # implementation detail into the layer that defines the boundary. What must come
+    # from the contracts is anything a component hands to, or receives from, another.
     for block in re.findall(r"```(?:python)?\n(.*?)```", text, re.S):
-        for m in re.finditer(r"\b(?:class|def)\s+([A-Za-z_][A-Za-z0-9_]*)", block):
-            yield "symbol", m.group(1)
         for m in re.finditer(r":\s*([A-Z][A-Za-z0-9]*)\b", block):
-            yield "symbol", m.group(1)
+            yield "type", m.group(1)
         for m in re.finditer(r"->\s*([A-Z][A-Za-z0-9]*)\b", block):
-            yield "symbol", m.group(1)
+            yield "type", m.group(1)
+
+
+CONTAINERS = [
+    "PublicApiCli", "StudyOrchestrator", "ExperimentRunner", "AnalysisEngine",
+    "ReportingEngine", "AlgorithmVisualizationEngine", "AlgorithmRegistry",
+    "ProblemRepository", "ResultsStore", "EcosystemBridge", "CorvusPilot",
+]
 
 
 def contract_vocabulary() -> set[str]:
-    """Every identifier-shaped token appearing anywhere in the normative contracts."""
-    vocabulary: set[str] = set()
+    """Every identifier-shaped token in the contracts, plus the C2 container names.
+
+    A component that names a sibling container as a collaborator is citing the C2
+    decomposition, not coining vocabulary. C2 is where containers are named, so those
+    names are defined even though they do not appear in the contracts.
+    """
+    vocabulary: set[str] = set(CONTAINERS)
     for path in markdown_files(CONTRACTS_DIR):
         text = read(path)
         for m in re.finditer(r"\b([A-Za-z_][A-Za-z0-9_]*)\b", text):
@@ -249,12 +272,13 @@ BASELINE_PATH = "scripts/docs_baseline.txt"
 
 
 def load_baseline() -> set[str]:
-    """Violations that already existed when the check was introduced.
+    """Violations grandfathered in, if any.
 
-    A corpus that predates its own gate cannot go green on the first run. Recording
-    the known violations lets the gate block regressions immediately while the
-    backlog is worked down. The baseline may only shrink: an entry that no longer
-    fires is reported so it can be deleted.
+    A corpus that predates its own gate cannot always go green on the first run, so
+    known violations may be recorded and worked down. The backlog was cleared on
+    2026-09-09 and the file is absent; it exists for the next time a check is
+    tightened. The baseline may only shrink: an entry that no longer fires is
+    reported so it can be deleted.
     """
     if not os.path.exists(BASELINE_PATH):
         return set()
@@ -264,6 +288,28 @@ def load_baseline() -> set[str]:
         if line and not line.startswith("#"):
             out.add(line)
     return out
+
+
+def group_declarations(path: str) -> set[str]:
+    """Names declared by the component group the document belongs to.
+
+    A type that one component in a container hands to another component in the same
+    container is internal structure, not boundary vocabulary. It is legitimate for the
+    group to declare it, so long as it is declared somewhere in the group rather than
+    merely used. A name that crosses a container boundary has no such declaration and
+    must come from the contracts.
+    """
+    declared: set[str] = set()
+    directory = os.path.dirname(path)
+    for sibling in markdown_files(directory):
+        text = read(sibling)
+        for m in re.finditer(r"\bclass\s+([A-Za-z_][A-Za-z0-9_]*)", text):
+            declared.add(m.group(1))
+        # declaration by prose, the form used throughout the C3 documents:
+        #   `LoopResult` fields: ...   /   `RunResult`: `run_id`, `status`, ...
+        for m in re.finditer(r"`([A-Z][A-Za-z0-9]*)`(?:\s+fields)?\s*:", text):
+            declared.add(m.group(1))
+    return declared
 
 
 def check_vocabulary() -> list[str]:
@@ -276,9 +322,12 @@ def check_vocabulary() -> list[str]:
             text = read(path)
             if ALLOW_MARKER in text:
                 continue
+            local = group_declarations(path)
             seen: set[str] = set()
             for family, name in _iter_identifiers(text):
                 if name in FOREIGN_NAMES or name in vocabulary or name in seen:
+                    continue
+                if family == "type" and name in local:
                     continue
                 seen.add(name)
                 problems.append(

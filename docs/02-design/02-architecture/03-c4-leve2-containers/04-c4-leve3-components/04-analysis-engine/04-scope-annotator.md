@@ -21,7 +21,7 @@ class ScopeAnnotator:
         self,
         test_results: list[TestResult],
         raw_metric_results: list[RawMetricResult],
-        registry: AlgorithmRegistry,
+        registry: AlgorithmRepository,
         repo: ProblemRepository,
     ) -> list[AnnotatedResult]:
         """

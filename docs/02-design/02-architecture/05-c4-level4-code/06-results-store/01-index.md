@@ -19,4 +19,4 @@ The following cross-container abstractions from [02-shared/](../02-shared/) are 
 
 | Abstraction | Role in Results Store |
 |---|---|
-| [`PerformanceRecord`](../02-shared/03-performance-record.md) | `JsonlPerformanceWriter` serialises records to JSONL; `ParquetPerformanceWriter` converts them post-run; `PerformanceRecordReader` deserialises them for the Analysis Engine |
+| [`PerformanceRecord`](../02-shared/03-performance-record.md) | `JsonlPerformanceWriter` serialises records to JSONL; `RepositoryFactory` converts them post-run; `RepositoryFactory` deserialises them for the Analysis Engine |

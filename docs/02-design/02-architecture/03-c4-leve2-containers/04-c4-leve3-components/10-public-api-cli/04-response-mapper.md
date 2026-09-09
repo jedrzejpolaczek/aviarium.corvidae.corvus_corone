@@ -7,7 +7,6 @@
 
 ## Responsibility
 
-Transform internal domain objects (Study, Run, MetricResult, AlgorithmInstance, etc.) into stable, versioned API return types (StudyResult, AlgorithmSummary, VisualizationResult, etc.) that form the public API contract.
 
 ---
 
@@ -15,13 +14,10 @@ Transform internal domain objects (Study, Run, MetricResult, AlgorithmInstance, 
 
 ```python
 class ResponseMapper:
-    def map_study_result(self, study: Study, experiment: Experiment, runs: list[Run]) -> StudyResult: ...
-    def map_algorithm_summary(self, instance: AlgorithmInstance) -> AlgorithmSummary: ...
-    def map_algorithm_detail(self, instance: AlgorithmInstance) -> AlgorithmDetail: ...
+    def map_study_result(self, study: Study, experiment: Experiment, runs: list[Run]) -> Experiment: ...
+    def map_algorithm_summary(self, instance: AlgorithmInstance) -> AlgorithmInstanceSummary: ...
+    def map_algorithm_detail(self, instance: AlgorithmInstance) -> AlgorithmInstance: ...
     def map_result_aggregates(self, metric_results: list[MetricResult]) -> ResultAggregates: ...
-    def map_visualization_result(self, viz_output: VizOutput) -> VisualizationResult: ...
-    def map_genealogy(self, genealogy_data: dict) -> AlgorithmGenealogy: ...
-    def map_lineage(self, lineage_data: dict) -> AlgorithmLineage: ...
 ```
 
 ---
@@ -35,7 +31,7 @@ class ResponseMapper:
 
 ## Key Behaviors
 
-1. **Schema stability** — API return types (e.g., `StudyResult`, `AlgorithmSummary`) are stable across library versions. Internal domain objects may change; the Response Mapper absorbs those changes and maintains the API contract.
+1. **Schema stability** — API return types (e.g., `Experiment`, `AlgorithmInstanceSummary`) are stable across library versions. Internal domain objects may change; the Response Mapper absorbs those changes and maintains the API contract.
 
 2. **Field selection** — API return types expose only the fields needed by callers; internal implementation details (e.g., file paths, internal status enums) are excluded or renamed to user-friendly names.
 
@@ -62,3 +58,9 @@ Stateless.
 ## SRS Traceability
 
 - FR-28 (stable public API): the Response Mapper is the enforcement mechanism for API stability.
+
+> **Post-V1 surface removed.** Earlier revisions listed three visualization and
+> genealogy functions here, together with the view types they return. They belong to
+> the Algorithm Visualization Engine, which SRS 1 places outside the V1 release, and no
+> contract defines them. They are added back when that container enters scope, together
+> with the contracts that define them (ADR-012).

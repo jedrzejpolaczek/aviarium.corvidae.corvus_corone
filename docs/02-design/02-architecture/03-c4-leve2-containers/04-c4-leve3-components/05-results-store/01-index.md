@@ -91,7 +91,7 @@ Parquet conversion completion is logged at INFO level: `experiment_id`, `run_id`
 ### Error Handling
 
 - **Write failures**: if a JSONL write fails mid-Run (e.g., disk full), the writer raises `StorageError` immediately. The Run Isolator catches this and marks the Run `aborted`.
-- **Read failures**: if neither JSONL nor Parquet exists for a requested run_id, the reader raises `RecordNotFoundError`. Callers are expected to handle this.
+- **Read failures**: if neither JSONL nor Parquet exists for a requested run_id, the reader raises `EntityNotFoundError`. Callers are expected to handle this.
 - **Partial Parquet conversion**: if the Parquet writer fails mid-conversion, the JSONL file is preserved (not deleted). The next read operation will fall back to JSONL. The failed Parquet file is deleted to avoid partial reads.
 
 ### Randomness / Seed Management
@@ -102,9 +102,9 @@ No random state. The Results Store is purely I/O.
 
 | Parameter | Source | Scope |
 |---|---|---|
-| `results_dir` | StudyConfig / env `CORVUS_RESULTS_DIR` | Global |
-| `parquet_threshold` | StudyConfig (default: 1000 records) | Per-Run |
-| `compression` | StudyConfig (default: `snappy`) | Per-Run Parquet |
+| `results_dir` | Study / env `CORVUS_RESULTS_DIR` | Global |
+| `parquet_threshold` | Study (default: 1000 records) | Per-Run |
+| `compression` | Study (default: `snappy`) | Per-Run Parquet |
 
 ### Testing Strategy
 

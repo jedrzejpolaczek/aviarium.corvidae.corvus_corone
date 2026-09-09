@@ -1,5 +1,10 @@
 # C3: Components — Corvus Pilot V2
 
+<!-- check-docs: allow-undefined -->
+<!-- This container is outside the V1 release (SRS 1). Its contracts are written
+     when the Learner actor enters scope, so ADR-012 check 4 cannot resolve its
+     vocabulary yet and is suppressed for this document. -->
+
 > **V1 scope: Deferred.** The components in this group are not part of the V1 release.
 > Release scope is defined in
 > `docs/02-design/01-software-requirement-specification/01-srs/01-SRS.md` §1 V1 Release Scope.
@@ -120,7 +125,7 @@ MCP tool call failures are caught at the Executor Node boundary. If a tool call 
 - The Analyst Node surfaces the failure to the user in natural language.
 - Socratic Guide Node: MCP tool failures silently fall back to metadata-only mode — no error surfaced to the Learner.
 
-Unhandled exceptions in any node propagate to the LangGraph Graph, which catches and wraps them in a `PilotError` and surfaces to CLI.
+Unhandled exceptions in any node propagate to the LangGraph Graph, which catches and wraps them in a the critical error itself (`SeedCollisionError`, `StorageError`) propagates; aborting is the Runner's response to it, not a separate exception type (ADR-015) and surfaces to CLI.
 
 ### Randomness / Seed Management
 

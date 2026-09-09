@@ -26,7 +26,7 @@ class HtmlTemplateRenderer:
         """
         Renders and writes the HTML report.
         Returns the output_path on success.
-        Raises TemplateRenderError if a required template variable is missing.
+        Raises ValidationError if a required template variable is missing.
         """
 ```
 
@@ -48,7 +48,7 @@ class HtmlTemplateRenderer:
 
 3. **Section rendering** — renders the following sections in order: Study metadata, Algorithm comparison table, Convergence plots, Trajectory scatter plots, Sensitivity heatmaps, Statistical test results, Limitations.
 
-4. **Error reporting** — if a Jinja2 `UndefinedError` occurs (missing template variable), raises `TemplateRenderError` naming the undefined variable and the template section it occurred in.
+4. **Error reporting** — if a Jinja2 `UndefinedError` occurs (missing template variable), raises `ValidationError` naming the undefined variable and the template section it occurred in.
 
 5. **Self-contained output** — the output HTML file has no external dependencies (no CDN links, no relative image paths). It can be opened in any browser without a web server.
 

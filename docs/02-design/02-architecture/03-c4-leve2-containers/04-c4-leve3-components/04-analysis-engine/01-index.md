@@ -72,21 +72,21 @@ The Analysis Engine logs one structured JSON entry per Study on completion: `exp
 
 - Missing PerformanceRecords for a Run: the LOCF Interpolator fills gaps; if the entire Run is missing, it is excluded from analysis and flagged in the MetricResult `data_quality` field.
 - Statistical test precondition failures (e.g., fewer than 2 samples for Wilcoxon): the tester records `test_result=null` with `reason="insufficient_samples"` rather than raising.
-- Pre-registration violations: if a test not declared in the pre-registration config is requested, the Metric Dispatcher raises `PreRegistrationViolationError`. This is not caught internally — it propagates to the Study Orchestrator as a fatal error.
+- Pre-registration violations: if a test not declared in the pre-registration config is requested, the Metric Dispatcher raises `ValidationError`. This is not caught internally — it propagates to the Study Orchestrator as a fatal error.
 
 ### Randomness / Seed Management
 
-No random state consumed by this container. Statistical tests use deterministic algorithms (exact Wilcoxon or permutation-based with a fixed seed passed in from StudyConfig). The seed is passed as a parameter, not read from global state.
+No random state consumed by this container. Statistical tests use deterministic algorithms (exact Wilcoxon or permutation-based with a fixed seed passed in from Study). The seed is passed as a parameter, not read from global state.
 
 ### Configuration
 
 | Parameter | Source | Scope |
 |---|---|---|
-| `metrics` | StudyConfig.analysis | Per-Study |
-| `statistical_tests` | StudyConfig.analysis | Per-Study |
-| `pre_registration` | StudyConfig.analysis | Per-Study |
-| `locf_max_gap` | StudyConfig.analysis (default: 10) | Per-Study |
-| `alpha` | StudyConfig.analysis (default: 0.05) | Per-Study |
+| `metrics` | Study.analysis | Per-Study |
+| `statistical_tests` | Study.analysis | Per-Study |
+| `pre_registration` | Study.analysis | Per-Study |
+| `locf_max_gap` | Study.analysis (default: 10) | Per-Study |
+| `alpha` | Study.analysis (default: 0.05) | Per-Study |
 
 ### Testing Strategy
 

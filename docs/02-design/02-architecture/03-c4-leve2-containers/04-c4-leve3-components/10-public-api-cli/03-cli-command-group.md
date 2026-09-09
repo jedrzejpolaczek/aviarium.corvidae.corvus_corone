@@ -42,7 +42,7 @@ decide what the commands are.
 
 2. **Output formatting** — by default, outputs human-readable text. With `--json` flag on any command, outputs machine-readable JSON (the raw `cc.*` response dict). This supports scripting without parsing human-readable output.
 
-3. **Error display** — catches `CorvusValidationError` and prints each validation error on its own line with a `[ERROR]` prefix. Exits with code 1. Unexpected exceptions print a stack trace and exit with code 2.
+3. **Error display** — catches `ValidationError` and prints each validation error on its own line with a `[ERROR]` prefix. Exits with code 1. Unexpected exceptions print a stack trace and exit with code 2.
 
 4. **Progress display** — `corvus run` uses a progress callback from `cc.run()` to update a progress bar (via `rich` if installed, or simple line printing if not). Progress updates show `{completed}/{total} runs`.
 

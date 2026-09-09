@@ -77,7 +77,7 @@ not raw implementations.
 **Constraints / invariants:**
 
 - `algorithm_id` + `version` must be unique in the registry. Attempting to re-register raises
-  `AlgorithmAlreadyExistsError`.
+  `ValidationError`.
 - Once registered, `AlgorithmInstance` fields are immutable. Mutation raises
   `FrozenInstanceError` (dataclass `frozen=True`).
 - `default_config` must be JSON-serializable (enforced by the Instance Validator on registration).

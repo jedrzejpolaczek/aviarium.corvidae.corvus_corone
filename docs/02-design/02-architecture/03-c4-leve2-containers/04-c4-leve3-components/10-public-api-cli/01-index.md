@@ -86,7 +86,7 @@ Public API calls are not individually logged (too high volume for interactive us
 
 ### Error Handling
 
-All validation errors at the API Facade boundary are raised as `CorvusValidationError` with a structured error dict listing all validation failures (not just the first). Internal container errors (`StudyAbortedError`, `EntityNotFoundError`, etc.) are caught and re-raised as corresponding `cc.*Error` subclasses with user-friendly messages.
+All validation errors at the API Facade boundary are raised as `ValidationError` with a structured error dict listing all validation failures (not just the first). Internal container errors (the critical error itself (`SeedCollisionError`, `StorageError`) propagates; aborting is the Runner's response to it, not a separate exception type (ADR-015), `EntityNotFoundError`, etc.) are caught and re-raised as corresponding `cc.*Error` subclasses with user-friendly messages.
 
 ### Randomness / Seed Management
 
@@ -94,7 +94,7 @@ The API Facade generates a Study-level `base_seed` if not provided by the user (
 
 ### Configuration
 
-The Public API reads `CORVUS_RESULTS_DIR` from the environment as the default `results_dir`. All other configuration is passed explicitly via function arguments or `StudyConfig`.
+The Public API reads `CORVUS_RESULTS_DIR` from the environment as the default `results_dir`. All other configuration is passed explicitly via function arguments or `Study`.
 
 ### Testing Strategy
 

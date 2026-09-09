@@ -83,10 +83,10 @@ Seed storage: `{results_dir}/{experiment_id}/runs/{run_id}/seed.json` — used b
 
 | Parameter | Source | Scope |
 |---|---|---|
-| `budget` | StudyConfig | Per-Run |
-| `on_failure` | StudyConfig (`skip` or `abort`) | Per-Study |
-| `max_workers` | StudyConfig | Per-Study |
-| `memory_limit_mb` | StudyConfig (default: 4096) | Per-Run subprocess |
+| `budget` | Study | Per-Run |
+| `on_failure` | Study (`skip` or `abort`) | Per-Study |
+| `max_workers` | Study | Per-Study |
+| `memory_limit_mb` | Study (default: 4096) | Per-Run subprocess |
 
 ### Testing Strategy
 

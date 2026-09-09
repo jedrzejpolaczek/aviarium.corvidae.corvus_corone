@@ -20,7 +20,7 @@ class StatisticalTester:
     def test(
         self,
         metric_results: list[RawMetricResult],
-        test_config: StatisticalTestConfig,
+        test_config: TestConfig,
         alpha: float = 0.05,
     ) -> list[TestResult]:
         """
@@ -29,34 +29,49 @@ class StatisticalTester:
         """
 ```
 
-`TestResult` fields: `metric_name`, `algorithm_ids`, `test_name`, `statistic`, `p_value`, `effect_size`, `significant`, `reason` (if test not applicable).
+`TestResult` is this component's envelope around the contract's `StatisticalTestResult`.
+It carries every field the contract requires, `test_name`, `p_value`, `effect_size`,
+`conclusion_scope` and `pre_registered`, plus the routing fields the Analysis Engine
+needs: `metric_name`, `algorithm_ids`, `statistic`, `significant`, and `reason` when the
+test was not applicable. `conclusion_scope` is not optional: the Analyzer contract
+requires every conclusion to state the conditions under which it holds.
 
 ---
 
 ## Dependencies
 
-- `scipy.stats` — `wilcoxon`, `mannwhitneyu`, `kruskal` functions
+- `scipy.stats` — `wilcoxon` and `kruskal`
 - `numpy` — array manipulation
-- `pingouin` (optional) — for effect size computation (Cohen's d, rank-biserial correlation)
+- `numpy` — Cliff's delta is computed from the samples directly; no effect-size package
+  is required
 
 ---
 
 ## Key Behaviors
 
-1. **Test selection** — applies the test specified in `StatisticalTestConfig.test_name`:
-   - `wilcoxon`: paired signed-rank test for paired Run comparisons (same problem instance, same budget, different algorithms)
-   - `mannwhitneyu`: unpaired test for independent samples
-   - `kruskal`: non-parametric multi-group comparison (3+ algorithms)
+1. **Test selection** — applies the test specified in `TestConfig.test_name`:
+   - `wilcoxon`: paired signed-rank test, for two algorithms
+   - `kruskal`: Kruskal-Wallis, for more than two algorithms, followed by pairwise Wilcoxon
 
-2. **Pre-registration guard** — if `test_config.pre_registered=True` and the test name was not declared in the Study's pre-registration config, raises `PreRegistrationViolationError`.
+   The decision tree has exactly these two entries. Benchmarking data is always paired, because
+   every algorithm is run on the same Problem Instances, so an unpaired test such as
+   Mann-Whitney U does not apply and is not offered
+   (`02-statistical-methodology.md` 3.2 and 3.3).
+
+2. **Pre-registration guard** — if `test_config.pre_registered=True` and the test name was not declared in the Study's pre-registration config, raises `ValidationError`.
 
 3. **Precondition validation** — before applying any test, validates sample size requirements:
    - Wilcoxon: requires ≥ 6 paired observations. If fewer, records `test_result=null, reason="insufficient_samples"`.
    - Kruskal-Wallis: requires ≥ 2 observations per group and ≥ 3 groups.
 
-4. **Effect size computation** — computes Cliff's delta, as required by `02-statistical-methodology.md` 4, as the effect size estimate. If `pingouin` is not installed, effect size is `null` (not an error).
+4. **Effect size computation** — computes Cliff's delta, required by
+   `02-statistical-methodology.md` 4 for every comparison. It is a rank statistic
+   computable directly from the two samples, so it needs no optional dependency and is
+   never `null`.
 
-5. **Multiple comparison correction** — if `test_config.multiple_comparison_correction` is set (e.g., Bonferroni, Holm-Sidak), applies the correction to the p-values before setting the `significant` flag.
+5. **Multiple comparison correction** — applies Holm-Bonferroni to the family of p-values
+   before setting `significant`. The methodology names it as the required procedure
+   (`02-statistical-methodology.md` 3.6), so it is not a configurable choice.
 
 ---
 

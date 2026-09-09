@@ -23,4 +23,4 @@ The following cross-container abstractions from [02-shared/](../02-shared/) are 
 | [`AlgorithmInterface`](../02-shared/01-algorithm-interface.md) | `EvaluationLoop` calls `ask()`, `tell()`, `reset()` on every Run |
 | [`ProblemInterface`](../02-shared/02-problem-interface.md) | `EvaluationLoop` calls `evaluate()` on every candidate solution |
 | [`PerformanceRecord`](../02-shared/03-performance-record.md) | `PerformanceRecorder` constructs and streams one record per evaluation |
-| [`RunConfig`](../02-shared/04-study-spec.md) | `RunIsolator` receives a `RunConfig` per subprocess — seed, budget, algorithm/problem IDs |
+| [`Run`](../02-shared/04-study-spec.md) | `RunIsolator` receives a `Run` per subprocess — seed, budget, algorithm/problem IDs |

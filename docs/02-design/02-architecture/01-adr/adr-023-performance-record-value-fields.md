@@ -159,6 +159,7 @@ sequential pass before any export or metric computation.
 
 | Document | Relationship |
 |---|---|
+| `adr-010-bulk-performance-record-format.md` | Its Parquet column table is superseded in one respect by this ADR: the bulk format carries `best_so_far` alongside `objective_value`. Row added retrospectively under [ADR-025](adr-025-superseded-clauses-of-accepted-adrs.md), which is where the omission was found |
 | `docs/03-technical-contracts/01-data-format/07-performance-record.md` | Schema changed by this ADR |
 | `docs/03-technical-contracts/01-data-format/10-file-formats.md` | `best_so_far` becomes a defined field |
 | `docs/03-technical-contracts/01-data-format/11-interoperability-mappings.md` | `LOSS-COCO-09` withdrawn |

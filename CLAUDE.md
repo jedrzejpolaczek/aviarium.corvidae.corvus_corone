@@ -69,6 +69,10 @@ trusting anything you read:
 | ADR-022 | AGPL-3.0-or-later; supersedes the licensing clauses of ADR-006, and inverts its dependency policy |
 | ADR-023 | `objective_value` is the **raw** per-evaluation result; the running best is a separate `best_so_far` field, and that is what anytime metrics reconstruct |
 | ADR-024 | the ECDF_AREA integration domain; the worked reference value is 0.4375, not 0.21875 |
+| ADR-025 | a later ADR may supersede *part* of an earlier one; the superseded ADR's Status line says so, and that line is the only edit a closed ADR may receive |
+
+Partial supersessions currently in force, in addition to ADR-006's licensing clauses:
+the Parquet column table of ADR-010 (ADR-023 added `best_so_far`).
 
 ## 5. Vocabulary that is easy to get wrong
 

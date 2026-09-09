@@ -272,7 +272,8 @@ when present, giving a **20× write and 59× query speedup** (ADR-010 benchmark,
 > because the Invariants below promise that a record read back from Parquet is identical to the
 > same record read from JSON Lines, and §2.6 makes `best_so_far` required. ADR-023 anticipated the
 > cost — "a plain float64 that the benchmark in ADR-010 already assumed" — but did not list this
-> document among the ones it corrects; see REF-TASK-0045.
+> document among the ones it corrects. The partial supersession is now recorded on ADR-010's
+> Status line under the convention set by ADR-025.
 
 ### Benchmark summary (150,000 records)
 

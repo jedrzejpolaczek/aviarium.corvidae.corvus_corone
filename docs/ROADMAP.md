@@ -24,12 +24,12 @@ Generated: 2026-03-04. Updated: 2026-05-15. Update whenever a milestone closes o
 | C2 Containers | — | ⚠️ Principles complete |
 | C3 Components | REF-TASK-0041, 0050 | ⚠️ 11 groups; boundary vocabulary reconciled with the contracts (ADR-012), but the Experiment Runner and Study Orchestrator groups describe a failure model no contract defines |
 | C4 Code | — | ⚠️ 7 groups drafted; descriptive layer only (ADR-012) |
-| Architecture Decision Records | REF-TASK-0046 | ✅ ADR-001..ADR-024 accepted. ⚠️ ADR-012 normativity vs the ADR-016/018/019 exception unrecorded |
+| Architecture Decision Records | REF-TASK-0046 | ✅ ADR-001..ADR-025 accepted. ⚠️ ADR-012 normativity vs the ADR-016/018/019 exception unrecorded |
 | SRS | — | ✅ UC-01..UC-11, FR-01..FR-42, 6 NFRs, 16 constraints, §7 interface requirements, §8 acceptance strategy for every V1 requirement, §9 traceability |
 | Statistical methodology | REF-TASK-0043, 0044 | ⚠️ §1–§3 and §7 written; **§4 Level 3, §5 anytime and §6 uncertainty are empty** (HTML comment only) |
 | Metric taxonomy | REF-TASK-0014 | ✅ 9 metrics, Standard Reporting Set, selection guide; implementation references land with IMPL-011 |
 | Interface contracts | — | ✅ 6 interfaces + cross-cutting; every method carries semantics, preconditions, postconditions and exceptions |
-| Data format | REF-TASK-0045 | ✅ 7 entity schemas, file formats, interoperability mappings, CV-001..CV-023, schema version 0.0.3 |
+| Data format | — | ✅ 7 entity schemas, file formats, interoperability mappings, CV-001..CV-023, schema version 0.0.3 |
 | Ecosystem integration | — | ✅ COCO, IOHprofiler and Nevergrad mappings documented; IOH and Nevergrad bridges implemented |
 | Implementation — Core Library | IMPL-000..027 | ⚠️ IMPL-000, 010, 023, 025 done; IMPL-001..009, 011..022, 024, 026, 027 not started |
 | Implementation — Researcher Agent (Pilot V2) | IMPL-028..036 | ⛔ Not started *(post-V1)* |
@@ -336,7 +336,7 @@ REF-TASK-0025 ──► 0026 ──► 0027 ──► 0028 ──► 0029 ──
   cross-cutting contract requires. `deprecate_algorithm` carries the whole supersession model of
   ADR-020, so it is the one that cannot wait. *Blocks IMPL-002 and the IMPL-010 follow-up.*
 
-- [ ] **[REF-TASK-0045] Reconcile the ADR-010 Parquet column table with ADR-023.** ADR-010 lists
+- [x] **[REF-TASK-0045] Reconcile the ADR-010 Parquet column table with ADR-023.** *(Closed 2026-09-09 by ADR-025.)* The hole was in the ADR practice rather than in either ADR: the rule said a closed ADR is superseded, never edited, and had no form for superseding *part* of one. ADR-006 had improvised a Status-line clause and ADR-023 had done nothing, which is what an unwritten convention produces. ADR-025 makes the ADR-006 form the rule and applies it. `pyarrow` stays undeclared until IMPL-022 — adding an unused runtime dependency so a file agrees with a document is the wrong direction of fit, and the obligation sits where the import appears. ADR-010 lists
   the bulk-format columns and predates the split of the value field, so it has `objective_value`
   and no `best_so_far`. ADR-023 added the field and did not list ADR-010 among the documents it
   corrects. `10-file-formats.md` now carries the column with a note; the ADR pair still needs a
@@ -436,7 +436,7 @@ Documentation tasks:
 - [x] **REF-TASK-0042** — semantics for four signature-only Repository methods
 - [ ] **REF-TASK-0043** — `02-statistical-methodology.md` §4, §5, §6 *(blocks IMPL-012, IMPL-013)*
 - [ ] **REF-TASK-0044** — parametric branch of the test selection tree, and the §3.7 default α
-- [ ] **REF-TASK-0045** — ADR-010 Parquet columns against ADR-023 *(blocks IMPL-022)*
+- [x] **REF-TASK-0045** — ADR-010 Parquet columns against ADR-023, closed by ADR-025
 - [ ] **REF-TASK-0046** — record the ADR-016/018/019 exception to ADR-012 normativity
 - [ ] **REF-TASK-0047** — Corvus Pilot V3 against AP-4 and AP-7 *(post-V1)*
 - [ ] **REF-TASK-0048** — write `02-versioning-governance.md`, finish the contribution guide

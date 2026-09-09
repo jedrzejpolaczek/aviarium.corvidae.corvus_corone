@@ -13,7 +13,20 @@ CONNECTS TO:
 
 ---
 
-**Status:** Accepted
+**Status:** Accepted; the Parquet column table is superseded in one respect by
+[ADR-023](adr-023-performance-record-value-fields.md)
+
+> **Superseded in part.** The column table below lists a single value column,
+> `objective_value`, described as the best value at that evaluation. ADR-023 split that field
+> in two: `objective_value` is the raw result of the evaluation, and a required `best_so_far`
+> holds the running best. The Parquet schema therefore carries **both** columns, as
+> `10-file-formats.md` now shows; without `best_so_far` the format cannot satisfy its own
+> round-trip invariant against the JSON Lines file.
+>
+> Everything else in this ADR stands: Parquet with snappy over HDF5, `row_group_size = 500`,
+> the 1,000-record threshold, `.jsonl` as the source of truth, and `pyarrow` as the library.
+> One additional plain `float64` column changes neither the benchmark nor its conclusion.
+> Recorded under the convention set by [ADR-025](adr-025-superseded-clauses-of-accepted-adrs.md).
 
 **Date:** 2026-03-25
 

@@ -22,7 +22,7 @@ Generated: 2026-03-04. Updated: 2026-03-20. Update whenever a milestone closes o
 | MANIFESTO | — | ✅ Principles and anti-patterns AP-1..AP-7 complete |
 | C1 System Context | — | ⚠️ Principles complete |
 | C2 Containers | — | ⚠️ Principles complete |
-| C3 Components | — | ✅ 11 component groups documented |
+| C3 Components | — | ⚠️ 11 groups documented; not yet implementable without guesswork, see note below |
 | C4 Code | — | ⚠️ 7 groups drafted; descriptive layer only (ADR-012) |
 | Architecture Decision Records | REF-TASK-0011, 0024 | ⚠️ ADR-001 decided; technical constraints and bulk storage format pending |
 | SRS | REF-TASK-0008..0013, 0033..0035 | ⚠️ Use cases and FR-01..26 drafted; NFRs, interface requirements, acceptance tests, CLI spec, report format, competitive differentiation open |
@@ -35,6 +35,18 @@ Generated: 2026-03-04. Updated: 2026-03-20. Update whenever a milestone closes o
 | Implementation — Researcher Agent (Pilot V2) | IMPL-028..036 | ⛔ Not started *(post-V1)* |
 | Implementation — Autonomous (Pilot V3) | IMPL-037..047 | ⛔ Not started *(post-V1)* |
 | Learner Actor | REF-TASK-0025..0030, IMPL-044..046 | ⛔ Not started *(post-V1)* |
+
+> **C3 implementability, measured 2026-09-09.** Three components were taken at random and
+> specified from the documentation alone, counting each point where a decision had to be invented
+> rather than read: Study Builder 10, Evaluation Loop 11, Statistical Tester 7. All three fail.
+> The failures are concentrated in the descriptive layer inventing its own vocabulary, which
+> ADR-012 forbids and `scripts/check_docs.py` check 4 now measures: 190 recorded violations,
+> frozen as a baseline that may only shrink. The Evaluation Loop is the worst case, because it
+> calls `ask()` and `tell()` where the Algorithm Interface defines `suggest()` and `observe()`,
+> and records on every iteration where ADR-002 records only on a trigger.
+>
+> Implementing a C3 component today therefore still requires asking the author. Shrinking the
+> baseline to zero is the work that changes that.
 
 ---
 

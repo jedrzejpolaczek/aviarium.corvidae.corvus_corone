@@ -10,7 +10,7 @@
 **All source code MUST be released under an open source license.**
 
 - Source: MANIFESTO Principle 20
-- Operationalized in: Licensing ADR (→ REF-TASK-0011)
+- Operationalized in: [ADR-022](../../../02-design/02-architecture/01-adr/adr-022-agpl-licence-and-dependency-policy.md) — AGPL-3.0-or-later; `LICENSE` at the repository root
 
 ## CONST-COM-02
 

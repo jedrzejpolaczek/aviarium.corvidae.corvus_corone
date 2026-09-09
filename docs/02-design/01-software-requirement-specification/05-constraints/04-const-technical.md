@@ -45,7 +45,7 @@
 
 ## CONST-TECH-06
 
-**The runtime dependency tree MUST NOT include packages distributed under GPL-2.0-only, GPL-3.0-only, AGPL-3.0, or equivalent copyleft licenses that would make the combined work GPL. Permissive licenses (MIT, BSD-2-Clause, BSD-3-Clause, Apache-2.0, ISC, PSF-2.0) and LGPL with dynamic linking are permitted. A `licensecheck` step in CI MUST fail the build if a GPL-only dependency is introduced.**
+**Every runtime dependency MUST be under a free software licence whose terms AGPL-3.0-or-later can satisfy. MIT, BSD-2-Clause, BSD-3-Clause, Apache-2.0, ISC, PSF-2.0, LGPL and GPL-3.0-or-later all qualify. Proprietary and source-available-but-not-free licences do not, and neither does GPL-2.0-only, which is incompatible with version 3. A `licensecheck` step in CI MUST fail the build when a non-qualifying dependency is introduced.**
 
 - Source: ADR-006; CONST-COM-01
 - Connects to: `docs/02-design/02-architecture/01-adr/adr-006-python-version-and-platform-constraints.md`; `docs/02-design/01-software-requirement-specification/05-constraints/03-const-community.md` CONST-COM-01

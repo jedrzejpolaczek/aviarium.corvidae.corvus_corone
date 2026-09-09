@@ -260,8 +260,9 @@ class IOHExporter:
                         best_eval = None
 
                         for rec in run.records:
-                            # Use best_so_far if available, fall back to objective_value
-                            raw_y = getattr(rec, "best_so_far", rec.objective_value)
+                            # ADR-023: best_so_far is a required field. IOHprofiler raw_y is
+                            # the best-so-far value, never the raw evaluation value.
+                            raw_y = rec.best_so_far
 
                             if (
                                 best_y is None

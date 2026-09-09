@@ -46,7 +46,7 @@ evaluations raw_y
 | Column | Source | Notes |
 |---|---|---|
 | `evaluations` | `PerformanceRecord.evaluation_number` | 1-based integer |
-| `raw_y` | `PerformanceRecord.best_so_far` (or `objective_value` if absent) | Best-so-far value at this evaluation |
+| `raw_y` | `PerformanceRecord.best_so_far` | Best-so-far value at this evaluation. Always present (ADR-023) |
 
 ### JSON sidecar
 

@@ -53,8 +53,13 @@ NFR-REPRO-01 and MANIFESTO Principle 19.
 The canonical interpolation rule for best-so-far curves is
 **Last Observation Carried Forward (LOCF)**:
 
-> The best-so-far at evaluation `n` is the `objective_value` of the most recent
+> The best-so-far at evaluation `n` is the `best_so_far` of the most recent
 > PerformanceRecord in the same Run with `evaluation_number ≤ n`.
+
+> **Amended by [ADR-023](adr-023-performance-record-value-fields.md).** The rule originally
+> named `objective_value`, which ADR-023 redefined as the raw value of a single evaluation.
+> Carrying that forward would propagate a value worse than the best already seen. The quantity
+> the rule was always about is now stored explicitly as `best_so_far`.
 
 LOCF is implemented as the default `InterpolationStrategy` in the Analyzer. It is the
 only strategy that may be used without explicit pre-registration in the Study record.
@@ -89,8 +94,7 @@ This makes LOCF categorically different from all alternatives:
 
 ### Why pluggable despite LOCF being the only correct choice
 
-LOCF is correct for the current data model where `objective_value` is the running
-best-so-far. If a future extension stores the current (non-cumulative) evaluation result
+LOCF is correct for the current data model where `best_so_far` is stored per record. If a future extension stores the current (non-cumulative) evaluation result
 rather than the best-so-far, the correct interpolation would differ. Hardcoding LOCF
 prevents that extension without an interface break.
 

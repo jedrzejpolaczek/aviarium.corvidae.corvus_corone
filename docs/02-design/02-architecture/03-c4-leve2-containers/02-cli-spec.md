@@ -77,7 +77,7 @@ parse stderr to identify the error category without parsing the free-form messag
 | `0` | Command completed successfully. |
 | `1` | General error — invalid arguments, validation failure, unwritable output path. |
 | `2` | Entity not found — `NotFoundError` from the Python API. |
-| `3` | Locked entity — `StudyLockedError` from the Python API. |
+| `3` | Locked entity — `StudyAlreadyLockedError` from the Python API (ADR-015). |
 | `4` | Unsupported format — `UnsupportedFormatError` from the Python API. |
 | `5` | Export validation failure — `ExportValidationError` or integrity check failed. |
 | `10` | Seed collision — `SeedCollisionError` from the Python API. |

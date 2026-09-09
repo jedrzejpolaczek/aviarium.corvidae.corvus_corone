@@ -256,8 +256,9 @@ Two practical notes:
 
 ## Contact Information
 
-**TODO — before opening the repository (point 8 of the audit follow-up).** Needs a maintainer
-contact and an issue-reporting route, both of which the contribution guide assumes exist.
+**TODO — before opening the repository.** Needs a maintainer contact and an issue-reporting
+route, both of which the contribution guide assumes exist. Tracked with the other launch
+blockers in [the pre-launch checklist](docs/05-community/04-pre-launch-checklist.md).
 
 ## Acknowledgments
 

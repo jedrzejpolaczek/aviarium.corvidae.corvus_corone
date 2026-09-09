@@ -61,8 +61,8 @@ current reference implementation: `cocopp` ≥ 2.6). The legacy `BBOBOldDataForm
 |---|---|---|---|
 | `PerformanceRecord.evaluation_number` | Col 0 (`%lu`) | f-evaluations count | Exact |
 | *(not stored)* | Col 1 (`%lu`) | Constraint evaluations count | Always exported as `0`; Corvus does not track constraint evaluations separately. **LOSS-COCO-02** |
-| `PerformanceRecord.objective_value − ProblemInstance.objective.known_optimum` | Col 2 (`%+10.9e`) | `best f(x)−f_opt so far` | Exact when `known_optimum` is not `null`; see **LOSS-COCO-01** otherwise |
-| *(not stored)* | Col 3 (`%+10.9e`) | `current f(x)` (non-best) | Corvus records only `best objective value so far` in `objective_value`. When `is_improvement=false`, the current evaluation value is not stored. Exported as the same value as col 2. **LOSS-COCO-09** |
+| `PerformanceRecord.best_so_far − ProblemInstance.objective.known_optimum` | Col 2 (`%+10.9e`) | `best f(x)−f_opt so far` | Exact when `known_optimum` is not `null`; see **LOSS-COCO-01** otherwise |
+| `PerformanceRecord.objective_value − ProblemInstance.objective.known_optimum` | Col 3 (`%+10.9e`) | `current f(x)` (non-best) | Exact for every recorded evaluation. Corvus stores the raw value alongside the best-so-far (ADR-023), so this column is genuine rather than duplicated from col 2 |
 | `PerformanceRecord.current_solution` values | Col 4+ (`%+10.9e` each) | Decision variables | Exported only when `current_solution` is present AND `dimensions < 7`. If `current_solution` is absent or `dimensions ≥ 7`, columns 4+ are omitted. **LOSS-COCO-10** |
 
 ### §4.1.2 Information-loss manifest
@@ -81,7 +81,7 @@ items are always evaluated; items that do not apply to the specific export (e.g.
 | `LOSS-COCO-06` | warning | `ProblemInstance.evaluation.budget_type != "evaluation_count"` | COCO `maxevals` is expressed in function evaluations. Wall-time or combined budgets are approximated using `Run.budget_used` converted to the nearest integer evaluation count. |
 | `LOSS-COCO-07` | informational | Always | `AlgorithmInstance.hyperparameters` are not represented in any structured COCO field; written to the `.info` comment block only and not parsed by `cocopp`. |
 | `LOSS-COCO-08` | informational | Any `Run.status == "failed"` | Failed runs are excluded from COCO export. The `.info` instance list will contain fewer entries than `Study.experimental_design.repetitions`. |
-| `LOSS-COCO-09` | informational | Always | COCO col 3 is the current (non-best) `f(x)` at each recorded evaluation. Corvus stores only `best_so_far`; col 3 is duplicated from col 2. ERT-based analyses are unaffected; per-evaluation value analyses will show staircase artifact. |
+| `LOSS-COCO-09` | *withdrawn* | Never | Withdrawn by ADR-023. Corvus now stores both `objective_value` (raw) and `best_so_far`, so COCO col 2 maps from `best_so_far` and col 3 from `objective_value`. There is no loss on these columns. |
 | `LOSS-COCO-10` | informational | `PerformanceRecord.current_solution` absent OR `dimensions ≥ 7` | Decision variable columns (col 4+) omitted. `cocopp` scatter plots of decision space are unavailable. |
 
 ### §4.1.3 Trigger-model compatibility

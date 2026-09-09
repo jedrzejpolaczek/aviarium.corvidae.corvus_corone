@@ -1,6 +1,6 @@
 # Data Format Specification
 
-> **Current schema version: `0.0.1`.**
+> **Current schema version: `0.0.2`.**
 > Every entity record carries this value in its `schema_version` field. The version governs the
 > *shape* of the records, not the identity or lifecycle of the entities they describe. The rules
 > for bumping it, and for reading an artifact whose version differs, are in

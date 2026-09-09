@@ -70,6 +70,7 @@ trusting anything you read:
 | ADR-023 | `objective_value` is the **raw** per-evaluation result; the running best is a separate `best_so_far` field, and that is what anytime metrics reconstruct |
 | ADR-024 | the ECDF_AREA integration domain; the worked reference value is 0.4375, not 0.21875 |
 | ADR-025 | a later ADR may supersede *part* of an earlier one; the superseded ADR's Status line says so, and that line is the only edit a closed ADR may receive |
+| ADR-026 | `03-technical-contracts/` is not quite the only place that defines boundary vocabulary: `02-cli-spec.md` (CLI surface), `03-report-format-spec.md` (report sections) and `02-statistical-methodology.md` (`VIZ-L1-NN`) are authoritative for those surfaces and no others |
 
 Partial supersessions currently in force, in addition to ADR-006's licensing clauses:
 the Parquet column table of ADR-010 (ADR-023 added `best_so_far`).

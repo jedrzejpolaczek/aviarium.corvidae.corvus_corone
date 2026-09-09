@@ -24,7 +24,7 @@ Generated: 2026-03-04. Updated: 2026-05-15. Update whenever a milestone closes o
 | C2 Containers | — | ⚠️ Principles complete |
 | C3 Components | REF-TASK-0041, 0050 | ⚠️ 11 groups; boundary vocabulary reconciled with the contracts (ADR-012), but the Experiment Runner and Study Orchestrator groups describe a failure model no contract defines |
 | C4 Code | — | ⚠️ 7 groups drafted; descriptive layer only (ADR-012) |
-| Architecture Decision Records | REF-TASK-0046 | ✅ ADR-001..ADR-025 accepted. ⚠️ ADR-012 normativity vs the ADR-016/018/019 exception unrecorded |
+| Architecture Decision Records | — | ✅ ADR-001..ADR-026 accepted |
 | SRS | — | ✅ UC-01..UC-11, FR-01..FR-42, 6 NFRs, 16 constraints, §7 interface requirements, §8 acceptance strategy for every V1 requirement, §9 traceability |
 | Statistical methodology | REF-TASK-0043, 0044 | ⚠️ §1–§3 and §7 written; **§4 Level 3, §5 anytime and §6 uncertainty are empty** (HTML comment only) |
 | Metric taxonomy | REF-TASK-0014 | ✅ 9 metrics, Standard Reporting Set, selection guide; implementation references land with IMPL-011 |
@@ -368,7 +368,7 @@ REF-TASK-0025 ──► 0026 ──► 0027 ──► 0028 ──► 0029 ──
 
 ### Governance and scope — decisions that were never recorded
 
-- [ ] **[REF-TASK-0046] Record the exception ADR-016, ADR-018 and ADR-019 make to ADR-012.**
+- [x] **[REF-TASK-0046] Record the exception ADR-016, ADR-018 and ADR-019 make to ADR-012.** *(Closed 2026-09-09 by ADR-026.)* Amend rather than promote: moving the three surfaces into the contracts would separate each definition from the explanation that makes it a decision, which is clearest for `VIZ-L1-NN` — the identifiers exist to name the four charts Level 1 requires, and the requirement is the section they would be moved out of. Turned out to be three exceptions, not two: `02-statistical-methodology.md` defines the `VIZ-L1-NN` identifiers and no contract mentions them.
   ADR-012 states that C2/C3/C4 are descriptive and may cite but never coin, and `docs/README.md`
   repeats it: `03-technical-contracts/` is the only place that defines identifiers, signatures,
   field names, enumeration values and error classes. ADR-016 then makes `02-cli-spec.md`, a C2
@@ -437,7 +437,7 @@ Documentation tasks:
 - [ ] **REF-TASK-0043** — `02-statistical-methodology.md` §4, §5, §6 *(blocks IMPL-012, IMPL-013)*
 - [ ] **REF-TASK-0044** — parametric branch of the test selection tree, and the §3.7 default α
 - [x] **REF-TASK-0045** — ADR-010 Parquet columns against ADR-023, closed by ADR-025
-- [ ] **REF-TASK-0046** — record the ADR-016/018/019 exception to ADR-012 normativity
+- [x] **REF-TASK-0046** — record the ADR-016/018/019 exception to ADR-012 normativity, closed by ADR-026
 - [ ] **REF-TASK-0047** — Corvus Pilot V3 against AP-4 and AP-7 *(post-V1)*
 - [ ] **REF-TASK-0048** — write `02-versioning-governance.md`, finish the contribution guide
 - [x] **REF-TASK-0049** — acceptance tests for FR-27..FR-31 and FR-39..FR-42

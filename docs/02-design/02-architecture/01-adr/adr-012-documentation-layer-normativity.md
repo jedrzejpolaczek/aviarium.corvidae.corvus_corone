@@ -18,7 +18,16 @@ CONNECTS TO:
 
 ---
 
-**Status:** Accepted
+**Status:** Accepted; the exclusivity of `03-technical-contracts/` carries three named
+exceptions, listed by [ADR-026](adr-026-named-exceptions-to-contract-exclusivity.md)
+
+> **Amended in part.** The Decision below says `03-technical-contracts/` is the *only* place
+> that may define boundary vocabulary. ADR-016, ADR-018 and ADR-019 each made a document
+> outside it authoritative for one named surface — the CLI, the report format, and the
+> `VIZ-L1-NN` identifiers. ADR-026 lists those three and states that there are no others.
+> Everything else here stands, including the precedence order and the rule that a conflict
+> between a descriptive document and a normative one is a defect in the descriptive one.
+> Recorded under the convention set by [ADR-025](adr-025-superseded-clauses-of-accepted-adrs.md).
 
 **Date:** 2026-09-08
 

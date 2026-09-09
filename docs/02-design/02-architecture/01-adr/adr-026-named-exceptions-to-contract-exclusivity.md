@@ -80,8 +80,8 @@ for nothing else; it may not coin an entity field, an exception class or a metri
 the audit found it doing exactly that with `NotFoundError`.
 
 It does not travel down. A C3 component document under a container whose C2 page holds an
-exception has no exception of its own. `10-public-api-cli/03-cli-command-group.md` cites
-`02-cli-spec.md`; it does not extend it, which is what ADR-016 already required of it.
+exception has no exception of its own. The Public API + CLI group index cites `02-cli-spec.md`; it does not extend it, which is what
+ADR-016 already required of it.
 
 It does not create a second home. Where an exception document defines a surface, no other
 document may define the same surface. The duplicate CLI section of `04-public-api-contract.md`

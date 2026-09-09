@@ -22,8 +22,8 @@ Generated: 2026-03-04. Updated: 2026-05-15. Update whenever a milestone closes o
 | MANIFESTO | — | ✅ Principles and anti-patterns AP-1..AP-7 complete |
 | C1 System Context | — | ⚠️ Principles complete |
 | C2 Containers | — | ⚠️ Principles complete |
-| C3 Components | REF-TASK-0041, 0050 | ⚠️ 11 groups; boundary vocabulary reconciled with the contracts (ADR-012), but the Experiment Runner and Study Orchestrator groups describe a failure model no contract defines |
-| C4 Code | — | ⚠️ 7 groups drafted; descriptive layer only (ADR-012) |
+| C3 Components | — | ✅ 11 group indexes, decomposition and responsibility only; each component row names the contract that specifies it (ADR-028) |
+| C4 Code | — | — removed by ADR-028; behaviour is specified in `03-technical-contracts/` and nowhere else |
 | Architecture Decision Records | — | ✅ ADR-001..ADR-026 accepted |
 | SRS | — | ✅ UC-01..UC-11, FR-01..FR-42, 6 NFRs, 16 constraints, §7 interface requirements, §8 acceptance strategy for every V1 requirement, §9 traceability |
 | Statistical methodology | REF-TASK-0043, 0044 | ⚠️ §1–§3 and §7 written; **§4 Level 3, §5 anytime and §6 uncertainty are empty** (HTML comment only) |
@@ -72,7 +72,7 @@ Generated: 2026-03-04. Updated: 2026-05-15. Update whenever a milestone closes o
 > | LOCF Interpolator | not measured | 11 |
 >
 > The third column does not overturn the second; it measures a wider thing. Eight of the twelve
-> for the Statistical Tester are not in `03-statistical-tester.md` at all but in
+> for the Statistical Tester are not in the Statistical Tester page at all but in
 > `02-statistical-methodology.md`, which it cites — four of them in §4, a section that has no
 > content. The other two components were never in the three-component sample; the eight groups
 > repaired that day were reconciled with their contracts, which is not the same as being
@@ -311,17 +311,18 @@ REF-TASK-0025 ──► 0026 ──► 0027 ──► 0028 ──► 0029 ──
 ---
 
 ## Milestone: V1 Consistency — audit follow-up (2026-09-09)
-> Ten findings from the consistency audit that could not be closed by editing. Each names a
+> Findings from the consistency audit that could not be closed by editing, plus what closing
+> them uncovered. Each names a
 > decision that does not exist yet, so each needs a decision before any document can state it.
 > The editable findings from the same audit were fixed in the commit that opened these.
 
 ### Contracts — decisions that are missing
 
-- [ ] **[REF-TASK-0041] Decide the Run and Experiment failure model.** `Study.on_failure`
+- [x] **[REF-TASK-0041] Decide the Run and Experiment failure model.** *(Closed 2026-09-09 by ADR-027: there is no failure policy in V1.)* FR-12 was already the whole answer — a failed Run is `status="failed"` with a `failure_reason`, the Experiment continues, and both Reports carry the counts. A `skip`/`abort` switch asks the researcher, before any data exists, what to do about something they have not anticipated; its `skip` branch is identical to having no policy, and its `abort` branch discards the Runs that succeeded. A second failure status would require the Runner to classify an exception from third-party code as recoverable or fatal, which it cannot. Resource limits are a property of the machine, not of the experimental design, and putting them in the Study record would make two Runs of one Study on different hardware formally different studies. `Study.on_failure`
   (`skip`/`abort`), `Study.max_workers`, `Run.timeout_s`, `Run.memory_limit_mb`,
   `Experiment.skipped_count`, the Run statuses `skipped` and `aborted` and the Experiment
   statuses `partial` and `aborted` are used across the Experiment Runner and Study Orchestrator
-  component groups and in `05-c4-level4-code/02-shared/04-study-spec.md`. None of them exists in
+  component groups and in the C4 shared layer. None of them exists in
   any entity schema: `06-run.md` admits `completed`, `failed`, `budget_exhausted`;
   `05-experiment.md` admits `planned`, `running`, `completed`, `failed`; FR-12 requires a failed
   Run to carry `status="failed"` and a non-empty `failure_reason`. A descriptive document may not
@@ -353,18 +354,31 @@ REF-TASK-0025 ──► 0026 ──► 0027 ──► 0028 ──► 0029 ──
   (Cliff's delta → §4), ADR-007 (→ §5), FR-15, NFR-STAT-01, `03-report-format-spec.md` and four
   GLOSSARY entries. The blocking sub-decisions: the interpretation thresholds for Cliff's delta,
   which exist nowhere in the corpus; and whether post-hoc pairwise comparisons report Cliff's
-  delta (§4, `03-statistical-tester.md`) or rank-biserial correlation (§3.5.1) — the two sections
+  delta (§4, the Statistical Tester page) or rank-biserial correlation (§3.5.1) — the two sections
   disagree. *Blocks IMPL-012, IMPL-013.*
 
 - [x] **[REF-TASK-0044] Decide whether the parametric branch of §3.3 is in V1.** *(Closed 2026-09-09: it is not.)* The guard was never satisfiable — confirming normality needs a positive Level 1 result, the guard itself said `n < 30 → assume non-normal`, and an ADR-009-compliant Study gives the paired test five per-problem differences, on which Shapiro-Wilk has almost no power to reject. Taking that as permission was the inference the section warned against two paragraphs below the tree that offered it. §3.7's default α went with it: FR-28 forbids a silent default on a parameter with methodological consequences, and 0.05 is now the recommendation a researcher still has to write down. Post-V1 the branch needs three contracted `test_type` values, Cohen's d in §4, and an ADR stating when the guard opens. The test
   selection tree offers paired t-test, repeated-measures ANOVA and Tukey HSD alongside the
-  non-parametric path; `03-statistical-tester.md` states the tree "has exactly these two entries"
+  non-parametric path; the Statistical Tester page states the tree "has exactly these two entries"
   and admits only Wilcoxon and Kruskal-Wallis. The names `paired_t_test`, `rm_anova` and
   `tukey_hsd` appear in no contract, so `Study.pre_registered_hypotheses.test_type` cannot express
   them. Either the tree loses the branch or the taxonomy gains the names. Related: §3.7 sets a
   default α of 0.05, which FR-28 forbids for a parameter with methodological consequences, while
-  `03-statistical-tester.md` already refuses that default — one of the two is wrong.
+  the Statistical Tester page already refuses that default — one of the two is wrong.
   *Blocks IMPL-012.*
+
+- [ ] **[REF-TASK-0051] Decide how a Study is declared exploratory.** The corpus has two
+  incompatible mechanisms and never relates them. `study_type = "exploratory"`, a Study-level
+  field, is used by FR-32, FR-33, `04-study.md` (three times, including an explicit "not through
+  `test_type`"), cross-entity rule `CV-021`, `01-benchmarking-protocol.md` and ADR-009 lines 181
+  and 246. `test_type: "none"`, a per-hypothesis value, is used by FR-31, ADR-021,
+  `04-public-api-contract.md`, the Statistical Tester, the first tutorial and ADR-009 line 84 —
+  the same ADR, four sections apart. Precedence does not settle it: the conflict is inside the
+  SRS, between FR-31 and FR-32/FR-33, which are the same layer. Nor is it obviously one
+  statement said twice: `study_type` waives the diversity floor at Study level, `test_type` is a
+  claim about one hypothesis, and a Study with one `none` hypothesis and two confirmatory ones
+  has no answer under the second. *Found while closing REF-TASK-0044. Blocks IMPL-016,
+  IMPL-017a.*
 
 ### Governance and scope — decisions that were never recorded
 
@@ -403,7 +417,7 @@ REF-TASK-0025 ──► 0026 ──► 0027 ──► 0028 ──► 0029 ──
   matrix already fills those rows with categories the strategy does not assign — two SRS documents
   claim coverage a third does not provide. FR-34..FR-38 are `[DEFERRED]` and are correctly absent.
 
-- [ ] **[REF-TASK-0050] Decide what happens to the C3 and C4 layers.** ADR-012 considered deleting
+- [x] **[REF-TASK-0050] Decide what happens to the C3 and C4 layers.** *(Closed 2026-09-09 by ADR-028: consolidate.)* 61 documents removed, 11 written. The deciding evidence was that the gate structurally cannot check what the layer got wrong — field names and enumeration values are two of the four ADR-012 categories `check_docs.py` does not enforce — and that nothing else could either, because the code the layer describes does not exist. The 2026-09-09 repair pass demonstrated the failure mode while repairing: a correct traceability footnote appended below an unchanged body three paragraphs from the statement it contradicted. ADR-012 considered deleting
   `05-c4-level4-code/` and consolidating the 45 C3 component files into eleven, and deferred it as
   "a separate, independent decision rather than a repair". The 2026-09-09 audit is evidence for
   taking it: every finding of the class "the descriptive layer invented vocabulary" came from
@@ -432,7 +446,7 @@ Documentation tasks:
   (FR-39..FR-42), which promotes the decisions already recorded in `04-public-api-contract.md`,
   `02-cli-spec.md` and ADR-015/ADR-016 to the layer that decides what V1 contains.
   *(Found by the C3 semantics pass, 2026-09-09; closed the same day.)*
-- [ ] **REF-TASK-0041** — Run and Experiment failure model *(blocks IMPL-007, IMPL-016)*
+- [x] **REF-TASK-0041** — Run and Experiment failure model, closed by ADR-027
 - [x] **REF-TASK-0042** — semantics for four signature-only Repository methods
 - [ ] **REF-TASK-0043** — `02-statistical-methodology.md` §4, §5, §6 *(blocks IMPL-012, IMPL-013)*
 - [x] **REF-TASK-0044** — parametric branch of the test selection tree, and the §3.7 default α
@@ -441,7 +455,8 @@ Documentation tasks:
 - [ ] **REF-TASK-0047** — Corvus Pilot V3 against AP-4 and AP-7 *(post-V1)*
 - [ ] **REF-TASK-0048** — write `02-versioning-governance.md`, finish the contribution guide
 - [x] **REF-TASK-0049** — acceptance tests for FR-27..FR-31 and FR-39..FR-42
-- [ ] **REF-TASK-0050** — decide the future of the C3 and C4 layers
+- [x] **REF-TASK-0050** — decide the future of the C3 and C4 layers, closed by ADR-028
+- [ ] **REF-TASK-0051** — `study_type` or `test_type: "none"` for an exploratory Study *(blocks IMPL-016, IMPL-017a)*
 
 ### Implementation Tasks (IMPL)
 

@@ -3,94 +3,50 @@
 > C2 Container: [09-analysis-engine.md](../../09-analysis-engine.md)
 > C3 Index: [C3 overview](../01-c4-l3-components/01-c4-l3-components.md)
 
-The Analysis Engine computes benchmark metrics from raw PerformanceRecords, applies pre-registered statistical tests, annotates results with scope metadata, and interpolates missing data. It is batch-only in V1 — it runs after all Runs in a Study complete.
-Actors: invoked by Study Orchestrator; reads PerformanceRecords from Results Store; writes MetricResults back to Results Store.
+> **Descriptive page. It defines nothing.** Under ADR-012 this layer explains how a container is
+> decomposed and why the boundaries fall where they do. Every type, field name, enumeration
+> value, exception class and signature it mentions is defined in the contracts listed under
+> *Where the vocabulary comes from*; a statement here that those contracts do not support is a
+> defect in this page, never in them. ADR-028 removed the per-component files this page used to
+> link to, for the reason recorded there.
 
----
-
-## Component Diagram
-
-```mermaid
----
-config:
-  look: neo
-  theme: redux-dark
-  themeVariables:
-    background: transparent
----
-flowchart LR
-  orch["Study Orchestrator"] L_orch_ae@--> ae
-
-  subgraph ae["Analysis Engine"]
-    md["Metric Dispatcher\nRoutes metrics to tests"]
-    st["Statistical Tester\nWilcoxon (2 algorithms)\nKruskal-Wallis"]
-    sa["Scope Annotator\nTags results with\nproblem+algorithm+budget"]
-    li["LOCF Interpolator\nFills missing convergence\ndata"]
-  end
-
-  store_in["Results Store\n(PerformanceRecords)"] L_store_md@--> md
-  li L_li_md@--> md
-  md L_md_st@--> st
-  st L_st_sa@--> sa
-  sa L_sa_store@--> store_out["Results Store\n(MetricResults)"]
-
-  style ae fill:#161616,stroke:#AA00FF,color:#aaaaaa
-
-  linkStyle 0 stroke:#FF6D00,fill:none
-  linkStyle 1 stroke:#2962FF,fill:none
-  linkStyle 2,3,4 stroke:#AA00FF,fill:none
-  linkStyle 5 stroke:#00C853,fill:none
-
-  L_orch_ae@{ animation: fast }
-  L_store_md@{ animation: fast }
-  L_li_md@{ animation: fast }
-  L_md_st@{ animation: fast }
-  L_st_sa@{ animation: fast }
-  L_sa_store@{ animation: fast }
-```
+The Analysis Engine turns Performance Records into Result Aggregates and statistical conclusions.
+It runs in batch after every Run of an Experiment has reached a terminal status (SRS §1.4,
+boundary B-02), and it produces all three analysis levels or none: FR-15 makes a report
+impossible without exploratory summaries, confirmatory tests and effect sizes together.
 
 ---
 
 ## Components
 
-| Component | File | Responsibility |
+| Component | Responsibility | Implements |
 |---|---|---|
-| Metric Dispatcher | [02-metric-dispatcher.md](02-metric-dispatcher.md) | Loads PerformanceRecords, computes configured metrics, and routes to Statistical Tester |
-| Statistical Tester | [03-statistical-tester.md](03-statistical-tester.md) | Applies pre-registered statistical tests (Wilcoxon signed-rank for 2 algorithms, Kruskal-Wallis with Holm-Bonferroni for more) via SciPy |
-| Scope Annotator | [04-scope-annotator.md](04-scope-annotator.md) | Tags every MetricResult with problem+algorithm+budget scope for downstream filtering |
-| LOCF Interpolator | [05-locf-interpolator.md](05-locf-interpolator.md) | Fills missing convergence observations using Last Observation Carried Forward |
+| Metric Dispatcher | Selects the calculator for each requested metric and assembles the Result Aggregate | [`03-metric-taxonomy/`](../../../../../03-technical-contracts/03-metric-taxonomy/01-index.md), [`05-analyzer-interface.md`](../../../../../03-technical-contracts/02-interface-contracts/05-analyzer-interface.md) |
+| Statistical Tester | Applies the pre-registered test and computes the effect size that accompanies it | [`05-analyzer-interface.md`](../../../../../03-technical-contracts/02-interface-contracts/05-analyzer-interface.md); `02-statistical-methodology.md` §3 |
+| Scope Annotator | Attaches the conditions under which each conclusion holds, which the Analyzer contract makes non-optional | [`05-analyzer-interface.md`](../../../../../03-technical-contracts/02-interface-contracts/05-analyzer-interface.md) |
+| Interpolation Strategy | Reconstructs `best_so_far` at an evaluation count that was not logged | ADR-003, ADR-023; [`05-analyzer-interface.md`](../../../../../03-technical-contracts/02-interface-contracts/05-analyzer-interface.md) |
 
 ---
 
-## Cross-Cutting Concerns
+## Where the vocabulary comes from
 
-### Logging & Observability
+| Subject | Contract |
+|---|---|
+| `analyze`, `compare`, `compute_metrics`, `InterpolationStrategy` | [`02-interface-contracts/05-analyzer-interface.md`](../../../../../03-technical-contracts/02-interface-contracts/05-analyzer-interface.md) |
+| Metric identifiers and their computation procedures | [`03-metric-taxonomy/01-index.md`](../../../../../03-technical-contracts/03-metric-taxonomy/01-index.md) |
+| Result Aggregate fields | [`01-data-format/08-result-aggregate.md`](../../../../../03-technical-contracts/01-data-format/08-result-aggregate.md) |
+| Test selection, correction procedure, pitfalls | `04-scientific-practice/01-methodology/02-statistical-methodology.md` §3 (authoritative for the procedures, per ADR-026) |
 
-The Analysis Engine logs one structured JSON entry per Study on completion: `experiment_id`, `metrics_computed`, `tests_applied`, `runs_with_missing_data`, `duration_s`. Individual metric computation is not logged to avoid log volume.
+The interpolation strategy reads `best_so_far` and never `objective_value`: carrying the raw
+result of one evaluation forward would propagate a value worse than the best already seen
+(ADR-023). LOCF is exact rather than approximate, which is the argument in ADR-003.
 
-### Error Handling
 
-- Missing PerformanceRecords for a Run: the LOCF Interpolator fills gaps; if the entire Run is missing, it is excluded from analysis and flagged in the MetricResult `data_quality` field.
-- Statistical test precondition failures (e.g., fewer than 2 samples for Wilcoxon): the tester records `test_result=null` with `reason="insufficient_samples"` rather than raising.
-- Pre-registration violations: if a test not declared in the pre-registration config is requested, the Metric Dispatcher raises `ValidationError`. This is not caught internally — it propagates to the Study Orchestrator as a fatal error.
+---
 
-### Randomness / Seed Management
+## Open decisions
 
-No random state consumed by this container. Statistical tests use deterministic algorithms (exact Wilcoxon or permutation-based with a fixed seed passed in from Study). The seed is passed as a parameter, not read from global state.
-
-### Configuration
-
-| Parameter | Source | Scope |
-|---|---|---|
-| `metrics` | Study.analysis | Per-Study |
-| `statistical_tests` | Study.analysis | Per-Study |
-| `pre_registration` | Study.analysis | Per-Study |
-| `locf_max_gap` | Study.analysis (default: 10) | Per-Study |
-| `alpha` | Study.analysis (default: 0.05) | Per-Study |
-
-### Testing Strategy
-
-- **Metric Dispatcher**: unit-tested with synthetic PerformanceRecord fixtures; verifies correct metric computation for `QUALITY-BEST_VALUE_AT_BUDGET` and `ANYTIME-ECDF_AREA`.
-- **Statistical Tester**: unit-tested with known input distributions and known expected p-values from literature.
-- **Scope Annotator**: unit-tested; verifies all scope fields are populated and correct.
-- **LOCF Interpolator**: unit-tested with time-series fixtures containing deliberate gaps; verifies gap-filling fidelity.
+- **REF-TASK-0043** — §4, §5 and §6 of `02-statistical-methodology.md` are headings with no
+  content, including the Level 3 material this container implements. The Cliff's delta
+  interpretation thresholds exist nowhere in the corpus, and §3.5.1 and §4 disagree on which
+  effect size accompanies a post-hoc pairwise test.

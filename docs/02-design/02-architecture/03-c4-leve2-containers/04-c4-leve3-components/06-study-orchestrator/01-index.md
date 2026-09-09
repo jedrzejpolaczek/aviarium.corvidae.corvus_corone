@@ -3,90 +3,51 @@
 > C2 Container: [07-study-orchestrator.md](../../07-study-orchestrator.md)
 > C3 Index: [C3 overview](../01-c4-l3-components/01-c4-l3-components.md)
 
-The Study Orchestrator coordinates the full lifecycle of a Study execution: builds and validates the run plan, dispatches runs to the Experiment Runner, handles partial failures, and triggers the post-execution pipeline (Analysis Engine + Reporting Engine).
-Actors: invoked by the Public API + CLI; orchestrates Experiment Runner, Analysis Engine, and Reporting Engine.
+> **Descriptive page. It defines nothing.** Under ADR-012 this layer explains how a container is
+> decomposed and why the boundaries fall where they do. Every type, field name, enumeration
+> value, exception class and signature it mentions is defined in the contracts listed under
+> *Where the vocabulary comes from*; a statement here that those contracts do not support is a
+> defect in this page, never in them. ADR-028 removed the per-component files this page used to
+> link to, for the reason recorded there.
 
----
+The Study Orchestrator is where a Study becomes an Experiment. It validates the plan and locks it,
+walks the run plan in order, and triggers analysis and reporting once the plan is exhausted.
 
-## Component Diagram
-
-```mermaid
----
-config:
-  look: neo
-  theme: redux-dark
-  themeVariables:
-    background: transparent
----
-flowchart LR
-  api["Public API + CLI"] L_api_sb@--> sb
-
-  subgraph SO["Study Orchestrator"]
-    sb["Study Builder\nValidates & assembles\nStudyConfig"]
-    ec["Execution Coordinator\nDispatches runs\nHandles failures"]
-    pep["Post-Execution Pipeline\nTriggers Analysis Engine\n+ Reporting Engine"]
-  end
-
-  sb L_sb_ec@--> ec
-  ec L_ec_er@--> er["Experiment Runner"]
-  er L_er_ec@--> ec
-  ec L_ec_pep@--> pep
-  pep L_pep_ae@--> ae["Analysis Engine"]
-  pep L_pep_re@--> re["Reporting Engine"]
-  sb L_sb_rs@--> rs["Results Store\n(entity writes)"]
-
-  style SO fill:#161616,stroke:#FF6D00,color:#aaaaaa
-
-  linkStyle 0 stroke:#FFD600,fill:none
-  linkStyle 1,2,3,4 stroke:#FF6D00,fill:none
-  linkStyle 5 stroke:#AA00FF,fill:none
-  linkStyle 6 stroke:#00BCD4,fill:none
-  linkStyle 7 stroke:#00C853,fill:none
-
-  L_api_sb@{ animation: fast }
-  L_sb_ec@{ animation: fast }
-  L_ec_er@{ animation: fast }
-  L_er_ec@{ animation: fast }
-  L_ec_pep@{ animation: fast }
-  L_pep_ae@{ animation: fast }
-  L_pep_re@{ animation: fast }
-  L_sb_rs@{ animation: fast }
-```
+Locking is the moment pre-registration takes effect and is an explicit act, not a side effect of
+creating the Study (ADR-013). Everything the orchestrator refuses at that moment it must also
+explain: FR §4.8 requires it to report every unresolved decision at once, name the rule each
+message enforces, and state the remedies.
 
 ---
 
 ## Components
 
-| Component | File | Responsibility |
+| Component | Responsibility | Implements |
 |---|---|---|
-| Study Builder | [02-study-builder.md](02-study-builder.md) | Validates and assembles a Study from user input; resolves entity IDs |
-| Execution Coordinator | [03-execution-coordinator.md](03-execution-coordinator.md) | Dispatches Runs to the Experiment Runner; collects results; handles partial failures |
-| Post-Execution Pipeline | [04-post-execution-pipeline.md](04-post-execution-pipeline.md) | Triggers Analysis Engine and Reporting Engine after all Runs complete |
+| Study Builder | Validates the plan, applies the cross-entity rules, and performs the draft-to-locked transition | ADR-013, ADR-021; [`12-cross-entity-validation.md`](../../../../../03-technical-contracts/01-data-format/12-cross-entity-validation.md) |
+| Execution Coordinator | Walks the run plan in order, one Run at a time, and records each outcome | ADR-017, ADR-027; SRS §1.4 B-01 |
+| Post-Execution Pipeline | Triggers the Analysis Engine and then the Reporting Engine once the plan is exhausted | [`05-analyzer-interface.md`](../../../../../03-technical-contracts/02-interface-contracts/05-analyzer-interface.md), ADR-019 |
 
 ---
 
-## Cross-Cutting Concerns
+## Where the vocabulary comes from
 
-### Logging & Observability
+| Subject | Contract |
+|---|---|
+| Study, Experiment and Run fields and their status enumerations | [`01-data-format/`](../../../../../03-technical-contracts/01-data-format/01-index.md) |
+| Validation performed at lock time, `CV-018` and `CV-021` among them | [`01-data-format/12-cross-entity-validation.md`](../../../../../03-technical-contracts/01-data-format/12-cross-entity-validation.md) |
+| Repository access, through a factory rather than individual repositories | [`02-interface-contracts/06-repository-interface.md`](../../../../../03-technical-contracts/02-interface-contracts/06-repository-interface.md) |
+| Exception classes raised at the boundary | [`02-interface-contracts/07-cross-cutting-contracts.md`](../../../../../03-technical-contracts/02-interface-contracts/07-cross-cutting-contracts.md) |
 
-The Study Orchestrator logs one structured JSON entry per Study lifecycle event: `study_created`, `run_dispatched`, `run_completed`, `run_failed`, `analysis_started`, `analysis_completed`, `report_generated`. Logged to `{results_dir}/{study_id}/orchestrator.log`.
+The run-plan order — problem index, then algorithm index, then repetition index — is not an
+implementation detail: it is the order `SeedSequence` children are spawned in, so it is what makes
+a Study reproducible from its `root_seed` alone (ADR-017).
 
-### Error Handling
 
-- **Run-level failures**: delegated to the Execution Coordinator per `on_failure` policy (skip or abort).
-- **Analysis Engine failure**: if analysis fails after all runs complete, the Study is marked `status=analysis_failed`. The raw PerformanceRecords are preserved. The user can re-trigger analysis manually via `cc.get_result_aggregates(experiment_id=...)`.
-- **Reporting Engine failure**: non-fatal. The Study is marked `status=report_failed`. Data is not lost.
+---
 
-### Randomness / Seed Management
+## Open decisions
 
-The Study Builder generates the `base_seed` for the Study (from `Study.seed` if provided, or from `random.randint(0, 2^31)` if not). This is the only random call in the orchestrator; all downstream seeding uses this base seed via the Seed Manager.
-
-### Configuration
-
-All configuration is driven by `Study`. There are no global or environment-level configuration settings for the orchestrator beyond `results_dir`.
-
-### Testing Strategy
-
-- **Study Builder**: unit-tested; verifies validation logic for all Study fields; verifies entity ID resolution against mock registries.
-- **Execution Coordinator**: integration-tested against a mock Experiment Runner; verifies `skip` vs `abort` failure handling.
-- **Post-Execution Pipeline**: integration-tested; verifies that Analysis Engine and Reporting Engine are called in the correct order and with correct inputs.
+- **REF-TASK-0051** — the corpus declares a Study exploratory two incompatible ways,
+  `study_type = "exploratory"` and a hypothesis with `test_type: "none"`. This container performs
+  the check, so it cannot be implemented until one of them wins.

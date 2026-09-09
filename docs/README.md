@@ -40,7 +40,6 @@ MANIFESTO  →  SRS  →  ADR  →  03-technical-contracts/  →  C2 / C3 / C4  
 → [C1 System Context](02-design/02-architecture/02-c4-leve1-context/01-c4-l1-context/01-c1-context.md)
 → [C2 Containers](02-design/02-architecture/03-c4-leve2-containers/01-index.md)
 → [C3 Components](02-design/02-architecture/03-c4-leve2-containers/04-c4-leve3-components/01-c4-l3-components/01-c4-l3-components.md)
-→ [C4 Code](02-design/02-architecture/05-c4-level4-code/01-index.md)
 → docstrings in `packages/`
 
 Start here if you want to know what the system is and why its parts are drawn where they are.

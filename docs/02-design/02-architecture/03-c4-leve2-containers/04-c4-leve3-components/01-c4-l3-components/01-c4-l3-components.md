@@ -16,10 +16,10 @@ flowchart TD
     direction LR
     subgraph PilotSG["Corvus Pilot V2"]
       mcp["MCP Server\nExposes cc.* tools\nover MCP protocol"]
-      lg["LangGraph Graph\nPilotState TypedDict\nMemorySaver checkpointing"]
+      lg["Graph\nSession state\nand checkpointing"]
       qr["Query Router\nroute_query() conditional\nedge · intent classification"]
       sg["Socratic Guide Node\nNever answers directly\nElicits requirements"]
-      pl["Planner Node\nDecomposes goals into\nStudySpec candidates"]
+      pl["Planner Node\nDecomposes a goal into\nfacade calls"]
       ex["Executor Node\nCalls cc.* via API Facade\nHandles tool results"]
       an["Analyst Node\nInterprets results\nformats findings"]
       st["Session Tracker\nPersists conversation\nstate across turns"]
@@ -34,7 +34,7 @@ flowchart TD
   %% ── Core Execution ──────────────────────────────────────────────────────────
   subgraph Execution["Core Execution"]
     subgraph OrchSG["Study Orchestrator"]
-      sb["Study Builder\nValidates & assembles\nStudySpec from inputs"]
+      sb["Study Builder\nValidates the plan\nand locks the Study"]
       ec["Execution Coordinator\nSequential dispatch\none Run at a time (B-01)"]
       pep["Post-Execution Pipeline\nTriggers analysis\nand reporting"]
     end
@@ -58,7 +58,7 @@ flowchart TD
       rr["Result Reader\nLoads PerformanceRecords\nfrom Results Store"]
       mvr["Mandatory Viz Renderer\nEnsures required plots\nare always produced"]
       htr["HTML Template Renderer\nJinja2 templates\nself-contained HTML"]
-      le["Limitations Enforcer\nBlocks incomplete reports\nReportIncompleteError"]
+      le["Limitations Enforcer\nBlocks a Report missing\na mandatory section (FR-21)"]
     end
     subgraph AVESG["Algorithm Visualization Engine"]
       dr["Data Resolver\nLoads algorithm state\nfallback chain"]
@@ -72,7 +72,7 @@ flowchart TD
   subgraph StorageLayer["Storage & Registry"]
     subgraph RSSG["Results Store"]
       lfr["Local File Repository\nDirectory layout\nper Study/Run"]
-      jes["JSON Entity Store\nStudySpec & metadata\nper-run JSON files"]
+      jes["Entity Store\nThe seven entity types\nas JSON"]
       jw["JSONL Writer\nAppends a record\nper fired trigger (ADR-002)"]
       pw["Parquet Writer\nPost-run snappy conversion\ncolumnar analytics"]
       prr["Performance Record Reader\nLoads & deserialises\nrecords for analysis"]

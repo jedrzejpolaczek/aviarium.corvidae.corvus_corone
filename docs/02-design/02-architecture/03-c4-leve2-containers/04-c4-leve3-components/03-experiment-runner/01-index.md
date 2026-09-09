@@ -3,103 +3,56 @@
 > C2 Container: [08-experiment-runner.md](../../08-experiment-runner.md)
 > C3 Index: [C3 overview](../01-c4-l3-components/01-c4-l3-components.md)
 
-The Experiment Runner executes individual algorithm Runs in isolated subprocesses, injects reproducible seeds, drives the evaluation loop, and records performance observations to the Results Store.
-Actors: invoked by Study Orchestrator; writes PerformanceRecords to Results Store.
+> **Descriptive page. It defines nothing.** Under ADR-012 this layer explains how a container is
+> decomposed and why the boundaries fall where they do. Every type, field name, enumeration
+> value, exception class and signature it mentions is defined in the contracts listed under
+> *Where the vocabulary comes from*; a statement here that those contracts do not support is a
+> defect in this page, never in them. ADR-028 removed the per-component files this page used to
+> link to, for the reason recorded there.
 
----
+The Experiment Runner executes one Run at a time: it derives the Run's seed, hands it to the
+Problem and the Algorithm, drives the evaluation loop within the Budget, and writes a Performance
+Record whenever a recording trigger fires.
 
-## Component Diagram
-
-```mermaid
----
-config:
-  look: neo
-  theme: redux-dark
-  themeVariables:
-    background: transparent
----
-flowchart TB
-  subgraph ER["Experiment Runner"]
-    sm["Seed Manager\nSeedSequence(root_seed)\nHands seed to Problem/Algorithm"]
-    ri["Run Isolator\nSubprocess isolation\nResource limits"]
-    el["Evaluation Loop\nDrives objective function\nTracks budget"]
-    pr["Performance Recorder\nReceives observations\nWrites to Results Store"]
-  end
-
-  orch["Study Orchestrator"] L_orch_ri@--> ri
-  ri L_ri_sm@--> sm
-  ri L_ri_el@--> el
-  el L_el_pr@--> pr
-  pr L_pr_store@--> store["Results Store\n(JSONL Writer)"]
-  sm -.-> el
-
-  style ER fill:#161616,stroke:#FF6D00,color:#aaaaaa
-
-  linkStyle 0,1,2,3 stroke:#FF6D00,fill:none
-  linkStyle 4 stroke:#00C853,fill:none
-  linkStyle 5 stroke:#FF6D00,fill:none
-
-  L_orch_ri@{ animation: fast }
-  L_ri_sm@{ animation: fast }
-  L_ri_el@{ animation: fast }
-  L_el_pr@{ animation: fast }
-  L_pr_store@{ animation: fast }
-```
+Execution is local and sequential (SRS §1.4, boundary B-01). A Run that fails is recorded with
+`status = "failed"` and a `failure_reason`, and the next Run starts; there is no failure policy to
+configure (ADR-027).
 
 ---
 
 ## Components
 
-| Component | File | Responsibility |
+| Component | Responsibility | Implements |
 |---|---|---|
-| Seed Manager | [02-seed-manager.md](02-seed-manager.md) | Generates, stores, and injects per-Run random seeds into Python's random stack |
-| Run Isolator | [03-run-isolator.md](03-run-isolator.md) | Wraps each Run in a subprocess with resource limits and failure handling |
-| Evaluation Loop | [04-evaluation-loop.md](04-evaluation-loop.md) | Drives the algorithm's ask/tell cycle within budget; records each observation |
-| Performance Recorder | [05-performance-recorder.md](05-performance-recorder.md) | Receives observation data and writes PerformanceRecord objects to the Results Store |
+| Seed Manager | Derives each Run's seed from the Study's `root_seed` and detects collisions before execution | ADR-017; [`04-runner-interface.md`](../../../../../03-technical-contracts/02-interface-contracts/04-runner-interface.md) |
+| Run Isolator | Gives each Run a fresh execution context, so that state left behind by one Run cannot reach the next (FR-11) | [`04-runner-interface.md`](../../../../../03-technical-contracts/02-interface-contracts/04-runner-interface.md) |
+| Evaluation Loop | Drives the `suggest` / `observe` cycle against the Budget and reports each raw evaluation result | [`02-problem-interface.md`](../../../../../03-technical-contracts/02-interface-contracts/02-problem-interface.md), [`03-algorithm-interface.md`](../../../../../03-technical-contracts/02-interface-contracts/03-algorithm-interface.md) |
+| Performance Recorder | Decides which evaluations become records, maintains the running best, and writes them through the repository | ADR-002, ADR-004, ADR-005, ADR-023 |
 
 ---
 
-## Cross-Cutting Concerns
+## Where the vocabulary comes from
 
-### Logging & Observability
+| Subject | Contract |
+|---|---|
+| Runner behaviour, `on_evaluation`, seed handover | [`02-interface-contracts/04-runner-interface.md`](../../../../../03-technical-contracts/02-interface-contracts/04-runner-interface.md) |
+| Performance Record fields, including `objective_value` and `best_so_far` | [`01-data-format/07-performance-record.md`](../../../../../03-technical-contracts/01-data-format/07-performance-record.md) |
+| Run fields and the `status` enumeration | [`01-data-format/06-run.md`](../../../../../03-technical-contracts/01-data-format/06-run.md) |
+| Randomness isolation, error taxonomy, logging | [`02-interface-contracts/07-cross-cutting-contracts.md`](../../../../../03-technical-contracts/02-interface-contracts/07-cross-cutting-contracts.md) |
 
-Each Run logs start time, seed, budget, and outcome (success/skip/abort) as a structured JSON line to the run log file at `{results_dir}/{experiment_id}/runs/{run_id}/run.log`. Node-level progress is not logged to avoid I/O overhead during tight evaluation loops.
+**Recording triggers** are ADR-002: the log-scale schedule, the improvement trigger governed by
+`Study.improvement_epsilon` (ADR-004), and the mandatory end-of-run record. ADR-005 governs what
+happens when a Run produces an unusual number of them.
 
-### Error Handling
 
-Two failure modes for a single Run:
-- **skip**: non-fatal failure (e.g., algorithm raised `ValueError` on a specific parameter set). The Run is marked `status=skipped`; remaining runs continue. The Study Orchestrator receives a partial result.
-- **abort**: fatal failure (e.g., subprocess crash, memory limit exceeded). The Run is marked `status=aborted`; the Study Orchestrator decides whether to continue remaining runs based on `on_failure` configuration.
+---
 
-Exceptions are never silently swallowed — all failures are written to `run.log` with full traceback.
+## What this container does not have
 
-### Randomness / Seed Management
+`Study.on_failure`, `Study.max_workers`, `Run.timeout_s`, `Run.memory_limit_mb`, the Run statuses
+`skipped` and `aborted`, and the Experiment statuses `partial` and `aborted` were described here
+for a long time and exist in no schema. ADR-027 settles it: they are not coming, and FR-12 is the
+whole of the failure behaviour. Recorded so that the next reader does not reintroduce them.
 
-All seeds are derived by the Seed Manager from the Study's `root_seed` before execution begins (ADR-017). The seed travels with the Run record, which is the only channel: `Run.seed` is a field, and no component writes a seed file or reads one from the environment (ADR-001).
-
-The seed is then handed to `Problem.reset(seed)` and `Algorithm.initialize(search_space, seed)`, each of which constructs its own generator from it. No process-global generator is seeded: `07-cross-cutting-contracts.md` § Randomness Isolation forbids the legacy global API, and interpreter-wide state would leak between Runs, which FR-11 rules out.
-
-Seed storage: the `seed` field of the Run record, read back through `RunRepository.get_run()` on resume (ADR-017). No seed file is written.
-
-### Configuration
-
-| Parameter | Source | Scope |
-|---|---|---|
-| `budget` | Study | Per-Run |
-| `on_failure` | *not in any entity schema* | — |
-| `max_workers` | *V2 name, reserved by SRS §1.4 B-01* | — |
-| `memory_limit_mb` | *not in any entity schema* | — |
-
-> **Unresolved (REF-TASK-0041).** Only `budget` exists as a Study field. `on_failure`,
-> `max_workers`, `memory_limit_mb` and `Run.timeout_s` appear in no entity schema, and the Run
-> statuses `skipped` and `aborted` used in the failure-handling section above are not in the
-> `06-run.md` enumeration (`completed`, `failed`, `budget_exhausted`). A descriptive document may
-> not coin them (ADR-012). The failure and resource-limit model is an open decision; what is
-> written here is a proposal awaiting a contract change, not a specification.
-
-### Testing Strategy
-
-- **Seed Manager**: unit-tested; verifies that two runs with the same seed produce identical objective function evaluation sequences.
-- **Run Isolator**: integration-tested; verifies that a subprocess crash does not crash the parent process and produces an `aborted` status.
-- **Evaluation Loop**: unit-tested with a mock objective function; verifies budget enforcement (loop stops at `budget` evaluations).
-- **Performance Recorder**: unit-tested against a mock JSONL writer; verifies that a record is written exactly when a sampling, improvement or end-of-run trigger fires, and that `trigger_reason` names the triggers that fired.
+`max_workers` in particular is a V2 name reserved by SRS §1.4 B-01 and must not reappear in a V1
+component.

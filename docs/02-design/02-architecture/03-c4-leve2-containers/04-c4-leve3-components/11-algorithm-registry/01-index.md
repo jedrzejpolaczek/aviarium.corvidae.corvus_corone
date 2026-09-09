@@ -3,79 +3,42 @@
 > C2 Container: [10-algorithm-registry.md](../../10-algorithm-registry.md)
 > C3 Index: [C3 overview](../01-c4-l3-components/01-c4-l3-components.md)
 
-The Algorithm Registry stores and serves Algorithm Instance registrations. Each instance is validated on registration and immutable thereafter; a revision is registered as a new entity and the old one records `superseded_by` (ADR-020). Reproducibility follows from the UUID in an archived Run never changing meaning.
-Actors: Study Orchestrator and Public API read from it; developers register new instances during library development.
+> **Descriptive page. It defines nothing.** Under ADR-012 this layer explains how a container is
+> decomposed and why the boundaries fall where they do. Every type, field name, enumeration
+> value, exception class and signature it mentions is defined in the contracts listed under
+> *Where the vocabulary comes from*; a statement here that those contracts do not support is a
+> defect in this page, never in them. ADR-028 removed the per-component files this page used to
+> link to, for the reason recorded there.
 
----
+The Algorithm Registry stores Algorithm Instances and serves them by identifier. An instance is
+validated once, at registration, and is immutable afterwards: a revision is a new entity with a
+new UUID, and the old one records `superseded_by` (ADR-020).
 
-## Component Diagram
-
-```mermaid
----
-config:
-  look: neo
-  theme: redux-dark
-  themeVariables:
-    background: transparent
----
-flowchart LR
-  dev["Developer"] L_dev_iv@-- register --> iv
-
-  subgraph AR["Algorithm Registry"]
-    iv["Instance Validator\nValidates AlgorithmInstance\nschema on registration"]
-    vm["Supersession Manager\nRecords superseded_by lineage\nEntities are immutable"]
-    es["Entity Store\nPersists instances as JSON\nResolves IDs + deprecation"]
-  end
-
-  iv L_iv_vm@--> vm
-  vm L_vm_es@--> es
-
-  api["Public API\nStudy Orchestrator\nPilot MCP"] L_api_es@-- read --> es
-
-  style AR fill:#161616,stroke:#46EDC8,color:#aaaaaa
-
-  linkStyle 0 stroke:#FFD600,fill:none
-  linkStyle 1,2 stroke:#46EDC8,fill:none
-  linkStyle 3 stroke:#2962FF,fill:none
-
-  L_dev_iv@{ animation: slow }
-  L_iv_vm@{ animation: fast }
-  L_vm_es@{ animation: fast }
-  L_api_es@{ animation: fast }
-```
+That immutability is what makes an archived Run reproducible. The UUID it references never changes
+meaning, so `get_algorithm(id)` returns the same bytes forever — including for deprecated
+instances, which only disappear from listings.
 
 ---
 
 ## Components
 
-| Component | File | Responsibility |
+| Component | Responsibility | Implements |
 |---|---|---|
-| Instance Validator | [02-instance-validator.md](02-instance-validator.md) | Validates AlgorithmInstance schema and required fields on registration |
-| Supersession Manager | [03-supersession-manager.md](03-supersession-manager.md) | Records the `superseded_by` lineage between an entity and the registration that replaces it (ADR-020) |
-| Entity Store | [04-entity-store.md](04-entity-store.md) | Persists algorithm instances as JSON; resolves IDs; supports the deprecation flag |
+| Instance Validator | Applies the registration rules, including the pinned `code_reference` and the non-empty configuration justification | FR-05 – FR-07; [`03-algorithm-instance.md`](../../../../../03-technical-contracts/01-data-format/03-algorithm-instance.md) |
+| Supersession Manager | Records the lineage between an instance and the registration that replaces it | ADR-020; [`06-repository-interface.md`](../../../../../03-technical-contracts/02-interface-contracts/06-repository-interface.md) |
+| Entity Store | Persists instances and resolves identifiers | [`06-repository-interface.md`](../../../../../03-technical-contracts/02-interface-contracts/06-repository-interface.md) |
 
 ---
 
-## Cross-Cutting Concerns
+## Where the vocabulary comes from
 
-### Logging & Observability
+| Subject | Contract |
+|---|---|
+| Algorithm Instance fields, including `deprecated`, `deprecation_reason` and `superseded_by` | [`01-data-format/03-algorithm-instance.md`](../../../../../03-technical-contracts/01-data-format/03-algorithm-instance.md) |
+| `register_algorithm`, `get_algorithm`, `list_algorithms`, `deprecate_algorithm` | [`02-interface-contracts/06-repository-interface.md`](../../../../../03-technical-contracts/02-interface-contracts/06-repository-interface.md) |
+| The interface a registered algorithm must satisfy | [`02-interface-contracts/03-algorithm-interface.md`](../../../../../03-technical-contracts/02-interface-contracts/03-algorithm-interface.md) |
 
-One log entry per registration: `algorithm_id`, `registered_at`, `registered_by`. One log entry per deprecation: `algorithm_id`, `deprecated_at`, `reason`, `superseded_by`. All at INFO level.
+Supersession is a lineage, not a graph: `superseded_by` must resolve to another Algorithm Instance,
+must not be the entity itself, and must not close a cycle. The repository contract states the
+preconditions.
 
-### Error Handling
-
-- `ValidationError`: raised by Instance Validator on schema violations. Lists all violations.
-- `CodeReferenceError`: raised by Instance Validator when `code_reference` does not resolve or is not version-pinned (FR-06).
-- `EntityNotFoundError`: raised by Entity Store when `get_algorithm(id)` finds no matching entry.
-
-### Randomness / Seed Management
-
-No random state. Registry is purely read/write storage.
-
-### Configuration
-
-The Registry reads its storage path from `CORVUS_REGISTRY_DIR` (env) or defaults to the package's bundled `data/algorithm_registry/` directory.
-
-### Testing Strategy
-
-All three components are unit-tested with fixture AlgorithmInstance objects. Integration tests verify round-trip registration and retrieval fidelity.

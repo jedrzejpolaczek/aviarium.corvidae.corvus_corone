@@ -13,7 +13,13 @@ CONNECTS TO:
 
 ---
 
-**Status:** Accepted
+**Status:** Accepted; the component document this ADR corrects is absorbed into
+[`07-reporting-engine/01-index.md`](../03-c4-leve2-containers/04-c4-leve3-components/07-reporting-engine/01-index.md)
+
+> **Target absorbed.** This ADR corrects `04-html-template-renderer.md` to render once per
+> audience. That was done, and [ADR-028](adr-028-consolidate-the-c3-layer-and-remove-c4.md) then consolidated the C3 layer, so the Template
+> Renderer is described in its group index. The decision is unchanged; only the document it
+> points at has moved.
 
 **Date:** 2026-09-08
 

@@ -462,12 +462,20 @@ def _path_reference_resolves(name: str, source: str) -> bool:
     return any(p == fragment or p.endswith(suffix) for p in _repository_paths())
 
 
+# An accepted ADR is a historical record and may name a document that has since been
+# absorbed elsewhere. ADR-025 makes the Status line the one edit such an ADR may receive,
+# and ADR-028 uses it to say where the named documents went. An ADR carrying that
+# declaration is exempt from this check and from this check only; every other check still
+# applies to it. The declaration is in the file, so the exemption is reviewable.
+TARGETS_ABSORBED = re.compile(r"^\*\*Status:\*\*[^\r\n]*absorbed into", re.M)
+
+
 def check_prose_filenames(files: list[str]) -> list[str]:
     problems = []
     real = existing_basenames()
     for path in files:
         text = read(path)
-        if ALLOW_MARKER in text:
+        if ALLOW_MARKER in text or TARGETS_ABSORBED.search(text):
             continue
         # blank out link targets so only prose remains
         prose = LINK_TARGET.sub(lambda m: " " * len(m.group(0)), text)

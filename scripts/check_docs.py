@@ -210,16 +210,42 @@ DESCRIPTIVE_DIRS = [
 # dependency. They are not project vocabulary and the contracts do not define them.
 FOREIGN_NAMES = {
     # builtins and stdlib
-    "ValueError", "RuntimeError", "ImportError", "TypeError", "KeyError",
-    "FileNotFoundError", "NotImplementedError", "OSError", "AttributeError",
-    "FrozenInstanceError", "StopIteration",
+    "ValueError",
+    "RuntimeError",
+    "ImportError",
+    "TypeError",
+    "KeyError",
+    "FileNotFoundError",
+    "NotImplementedError",
+    "OSError",
+    "AttributeError",
+    "FrozenInstanceError",
+    "StopIteration",
     # typing and annotations
-    "Literal", "Optional", "Any", "Iterator", "Iterable", "Sequence", "Mapping",
-    "Callable", "Path", "Protocol", "TypedDict", "Union", "None", "True", "False",
+    "Literal",
+    "Optional",
+    "Any",
+    "Iterator",
+    "Iterable",
+    "Sequence",
+    "Mapping",
+    "Callable",
+    "Path",
+    "Protocol",
+    "TypedDict",
+    "Union",
+    "None",
+    "True",
+    "False",
     # third-party
-    "ArrowIOError", "UndefinedError",
+    "ArrowIOError",
+    "UndefinedError",
     # prose artefacts that look like annotations
-    "H1", "H2", "H3", "Wrap", "None",
+    "H1",
+    "H2",
+    "H3",
+    "Wrap",
+    "None",
 }
 
 
@@ -247,9 +273,17 @@ def _iter_identifiers(text: str):
 
 
 CONTAINERS = [
-    "PublicApiCli", "StudyOrchestrator", "ExperimentRunner", "AnalysisEngine",
-    "ReportingEngine", "AlgorithmVisualizationEngine", "AlgorithmRegistry",
-    "ProblemRepository", "ResultsStore", "EcosystemBridge", "CorvusPilot",
+    "PublicApiCli",
+    "StudyOrchestrator",
+    "ExperimentRunner",
+    "AnalysisEngine",
+    "ReportingEngine",
+    "AlgorithmVisualizationEngine",
+    "AlgorithmRegistry",
+    "ProblemRepository",
+    "ResultsStore",
+    "EcosystemBridge",
+    "CorvusPilot",
 ]
 
 
@@ -378,16 +412,17 @@ def main(argv: list[str]) -> int:
         print(f"baseline entry no longer fires, delete it: {entry}")
 
     total = (
-        len(link_problems) + len(id_problems) + len(dup_problems)
-        + len(vocab_problems) + len(stale)
+        len(link_problems) + len(id_problems) + len(dup_problems) + len(vocab_problems) + len(stale)
     )
     print()
     print(f"{len(files)} files checked")
     print(f"  dead links:             {len(link_problems)}")
     print(f"  undefined identifiers:  {len(id_problems)}")
     print(f"  duplicate definitions:  {len(dup_problems)}")
-    print(f"  uncontracted vocabulary:{len(vocab_problems):>4}"
-          f"   (baselined: {len(vocab_all) - len(vocab_problems)})")
+    print(
+        f"  uncontracted vocabulary:{len(vocab_problems):>4}"
+        f"   (baselined: {len(vocab_all) - len(vocab_problems)})"
+    )
     if stale:
         print(f"  stale baseline entries: {len(stale)}")
 

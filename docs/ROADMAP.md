@@ -356,7 +356,7 @@ REF-TASK-0025 ──► 0026 ──► 0027 ──► 0028 ──► 0029 ──
   delta (§4, `03-statistical-tester.md`) or rank-biserial correlation (§3.5.1) — the two sections
   disagree. *Blocks IMPL-012, IMPL-013.*
 
-- [ ] **[REF-TASK-0044] Decide whether the parametric branch of §3.3 is in V1.** The test
+- [x] **[REF-TASK-0044] Decide whether the parametric branch of §3.3 is in V1.** *(Closed 2026-09-09: it is not.)* The guard was never satisfiable — confirming normality needs a positive Level 1 result, the guard itself said `n < 30 → assume non-normal`, and an ADR-009-compliant Study gives the paired test five per-problem differences, on which Shapiro-Wilk has almost no power to reject. Taking that as permission was the inference the section warned against two paragraphs below the tree that offered it. §3.7's default α went with it: FR-28 forbids a silent default on a parameter with methodological consequences, and 0.05 is now the recommendation a researcher still has to write down. Post-V1 the branch needs three contracted `test_type` values, Cohen's d in §4, and an ADR stating when the guard opens. The test
   selection tree offers paired t-test, repeated-measures ANOVA and Tukey HSD alongside the
   non-parametric path; `03-statistical-tester.md` states the tree "has exactly these two entries"
   and admits only Wilcoxon and Kruskal-Wallis. The names `paired_t_test`, `rm_anova` and
@@ -435,7 +435,7 @@ Documentation tasks:
 - [ ] **REF-TASK-0041** — Run and Experiment failure model *(blocks IMPL-007, IMPL-016)*
 - [x] **REF-TASK-0042** — semantics for four signature-only Repository methods
 - [ ] **REF-TASK-0043** — `02-statistical-methodology.md` §4, §5, §6 *(blocks IMPL-012, IMPL-013)*
-- [ ] **REF-TASK-0044** — parametric branch of the test selection tree, and the §3.7 default α
+- [x] **REF-TASK-0044** — parametric branch of the test selection tree, and the §3.7 default α
 - [x] **REF-TASK-0045** — ADR-010 Parquet columns against ADR-023, closed by ADR-025
 - [x] **REF-TASK-0046** — record the ADR-016/018/019 exception to ADR-012 normativity, closed by ADR-026
 - [ ] **REF-TASK-0047** — Corvus Pilot V3 against AP-4 and AP-7 *(post-V1)*

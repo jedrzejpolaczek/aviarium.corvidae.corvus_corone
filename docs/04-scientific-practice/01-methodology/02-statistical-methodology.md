@@ -186,7 +186,7 @@ to Level 2:
 | Question | Where to look | Why it matters |
 |---|---|---|
 | Are there outlier Runs with anomalous performance? | VIZ-L1-01 outlier points, VIZ-L1-02 wide IQR | Determine whether they are errors (exclude with disclosure) or informative (keep and note) |
-| Is the distribution shape approximately normal? | VIZ-L1-01 / VIZ-L1-04 symmetry | Determines whether parametric or non-parametric tests apply in Level 2 (§3.3) |
+| Is the distribution shape strongly skewed or multi-modal? | VIZ-L1-01 / VIZ-L1-04 symmetry | Not a test-selection question in V1 — §3.3 is non-parametric throughout — but it belongs in the Report: a bimodal or heavily skewed distribution changes how the median and the effect size should be read |
 | Do algorithms cross in performance at different budgets? | VIZ-L1-02 crossing curves | Conclusions must be budget-scoped; a single endpoint comparison is insufficient |
 | Does relative performance differ across problems? | VIZ-L1-01/VIZ-L1-02 per-problem plots | Algorithm × problem interactions require per-problem scoping in Level 2 |
 | Does any algorithm show a bimodal distribution? | VIZ-L1-04 (if generated) | Bimodality warrants investigation before aggregation; may indicate a structural failure mode |
@@ -251,31 +251,51 @@ explicit justification if used.
 *Implements MANIFESTO Principle 15; reference: Bartz-Beielstein et al. (2020) §4.*
 
 ```
-Is the distribution of per-problem metric differences approximately normal?
-(Use Q-Q plots and Shapiro-Wilk from Level 1 to check. n < 30 → assume non-normal.)
+How many Algorithm Instances does the hypothesis compare?
 │
-├── YES — and n ≥ 30 runs per algorithm:
-│   ├── 2 algorithms, paired  →  Paired t-test
-│   └── > 2 algorithms        →  Repeated-measures ANOVA
-│                                  → if omnibus p < α: Tukey HSD post-hoc (pairwise)
+├── 2 algorithms, paired  →  Wilcoxon signed-rank test              [§3.4]
 │
-└── NO (non-normal) or unknown  [DEFAULT — use this path unless normality is confirmed]
-    ├── 2 algorithms, paired  →  Wilcoxon signed-rank test           [§3.4]
-    └── > 2 algorithms        →  Kruskal-Wallis test (omnibus)       [§3.5]
-                                   → if omnibus p < α: pairwise Wilcoxon signed-rank
-                                     with Holm-Bonferroni correction [§3.6]
+└── > 2 algorithms        →  Kruskal-Wallis test (omnibus)          [§3.5]
+                               → if omnibus p < α: pairwise Wilcoxon signed-rank
+                                 with Holm-Bonferroni correction    [§3.6]
 ```
 
-**The default path is non-normal / non-parametric.** HPO metric distributions are
-frequently skewed or multi-modal (bounded objectives, success-rate proportions, ECDF areas
-near 0 or 1). Use the parametric path only when Level 1 provides positive evidence of
-normality — not as the default.
+Two leaves, and the `test_type` field of a pre-registered hypothesis takes the corresponding
+value: `wilcoxon` or `kruskal`. A third value, `none`, declares the Study exploratory (ADR-021,
+FR-31) and runs no test at all.
+
+**Why there is no parametric branch.** Earlier revisions of this section offered one — paired
+t-test, repeated-measures ANOVA, Tukey HSD — behind a normality check, while describing the
+non-parametric path as the default to be used *unless normality is confirmed*. The branch was
+removed from V1 for three reasons, and the first is the one that decides it.
+
+The condition guarding it is almost never met. Confirming normality needs a positive result from
+Level 1, and the guard itself said `n < 30 → assume non-normal`. A Study that satisfies the
+ADR-009 diversity floor has five Problem Instances; the paired test operates on five per-problem
+differences. Shapiro-Wilk on five observations has almost no power to reject, so a
+"non-significant normality test" there is an absence of evidence, not evidence of normality —
+and taking it as permission to use the parametric path is the inference the section warned
+against two paragraphs below the tree that offered it.
+
+HPO metric distributions are the second reason: bounded objectives, success-rate proportions and
+ECDF areas near 0 or 1 are frequently skewed or multi-modal, so the non-parametric path is not
+merely the safe default, it is usually the correct one.
+
+The third is that the branch was not expressible. `paired_t_test`, `rm_anova` and `tukey_hsd`
+appear in no contract, so no researcher could pre-register one, and ADR-021 makes pre-registration
+the condition of locking a Study. A test that cannot be declared before data collection cannot be
+run as confirmatory analysis in this system.
+
+**Post-V1.** A parametric branch is a reasonable extension once studies exist with enough
+Problem Instances for a normality check to mean something. It needs three new contracted
+`test_type` values, Cohen's d alongside Cliff's delta in §4, and an ADR stating the evidence
+threshold at which the guard opens. None of that is V1 work.
 
 ---
 
 ### 3.4 Wilcoxon signed-rank test (2 algorithms, paired)
 
-**When:** 2 Algorithm Instances, paired design (same Problem Instances), non-normal.
+**When:** 2 Algorithm Instances on the same Problem Instances. This is the whole of the two-algorithm case in V1; §3.3 has no parametric alternative to select against.
 
 **Null hypothesis H₀:** The distribution of differences $d_p = m_A(p) - m_B(p)$ is
 symmetric about zero, where $m_A(p)$ is the metric value of Algorithm A on Problem Instance
@@ -303,7 +323,7 @@ Report at Level 3 alongside the p-value.
 
 ### 3.5 Kruskal-Wallis test (> 2 algorithms, omnibus)
 
-**When:** More than 2 Algorithm Instances, any pairing structure, non-normal.
+**When:** More than 2 Algorithm Instances. This is the whole of the multi-algorithm case in V1.
 
 **Null hypothesis H₀:** All $k$ algorithm metric distributions are identical.
 
@@ -366,9 +386,20 @@ positives), which belongs in Level 1, not Level 2.
 
 ### 3.7 Significance threshold
 
-The default α is **0.05**. Researchers may declare a different threshold but must do so
-in `pre_registered_hypotheses` before data collection. Post-hoc threshold adjustment is
-a form of p-hacking (Pitfall 1).
+**α has no default. It is a required part of every pre-registered hypothesis.**
+
+FR-28 forbids a silent default on any parameter with methodological consequences, and a
+significance threshold is the clearest case there is: a threshold the system supplies is a
+threshold nobody chose, and one chosen after the data exists is not a threshold at all
+(Pitfall 1). `test_config.alpha` is therefore declared in `pre_registered_hypotheses` before
+data collection and locked with the Study, and the Analyzer refuses a comparison that has no
+declared α rather than assuming one.
+
+**0.05 is the conventional value and remains the recommendation**, which is a different thing
+from a default: a researcher who wants 0.05 writes 0.05, and the record then says they chose
+it. Choose a smaller threshold when a false positive is expensive — a claim that one algorithm
+beats another on a published benchmark is hard to retract — and note that Holm-Bonferroni
+(§3.6) already tightens the effective threshold as the hypothesis family grows.
 
 A result at $p = 0.048$ and a result at $p = 0.003$ are both "reject at α = 0.05" —
 the system does not distinguish degrees of significance from the binary reject/fail-to-reject

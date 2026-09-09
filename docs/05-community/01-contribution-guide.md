@@ -27,6 +27,35 @@ The specs define the "what"; this guide describes the "how and who".
 
 ---
 
+## Licensing of contributions
+
+Corvus Corone is licensed under the **GNU Affero General Public License, version 3.0 or later**
+([`LICENSE`](../../LICENSE),
+[ADR-022](../02-design/02-architecture/01-adr/adr-022-agpl-licence-and-dependency-policy.md)).
+Read this before you write code, not after.
+
+**Everything you contribute is licensed under AGPL-3.0-or-later.** By opening a pull request you
+agree to that. It applies to problems, algorithm adapters, analysis tools and documentation
+alike.
+
+**An algorithm adapter is a derivative work of this library.** If the optimizer you are wrapping
+is proprietary, you cannot contribute the adapter without licensing your optimizer compatibly.
+This is a real restriction and it narrows the algorithm portfolio that MANIFESTO Principle 9 asks
+for. It was accepted deliberately; the reasoning and the conditions for revisiting it are in
+ADR-022.
+
+**Benchmarking a proprietary algorithm privately is unrestricted.** The licence obligations
+attach on distribution and on network service, not on private use. You may benchmark a closed
+optimizer for your own research and publish the results. What you cannot do is contribute the
+adapter to this repository, or offer a service built on Corvus Corone, without opening the
+corresponding source.
+
+**Dependencies you introduce** must be under a licence compatible with AGPL-3.0-or-later. MIT,
+BSD, Apache-2.0, ISC, PSF-2.0, LGPL and GPL-3.0-or-later qualify. Proprietary licences and
+GPL-2.0-only do not (CONST-TECH-06).
+
+---
+
 ## Types of Contributions
 
 <!--

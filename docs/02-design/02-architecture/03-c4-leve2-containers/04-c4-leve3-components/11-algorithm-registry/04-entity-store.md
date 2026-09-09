@@ -1,7 +1,7 @@
 # Entity Store
 
 > Container: [Algorithm Registry](../../10-algorithm-registry.md)
-> C3 Index: [index.md](01-index.md)
+> C3 Index: [01-index.md](01-index.md)
 
 ---
 

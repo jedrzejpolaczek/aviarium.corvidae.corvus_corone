@@ -6,7 +6,7 @@
      vocabulary yet and is suppressed for this document. -->
 
 > Container: [Algorithm Visualization Engine](../../06-algorithm-visualization-engine.md)
-> C3 Index: [index.md](01-index.md)
+> C3 Index: [01-index.md](01-index.md)
 
 ---
 

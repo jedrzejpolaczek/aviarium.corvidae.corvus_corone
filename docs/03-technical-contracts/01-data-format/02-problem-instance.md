@@ -1,6 +1,6 @@
 # §2.1 Problem Instance
 
-> Index: [01-data-format.md](01-index.md)
+> Index: [docs/03-technical-contracts/01-data-format/01-index.md](01-index.md)
 
 > See GLOSSARY: [Problem Instance](../../GLOSSARY.md#problem-instance)
 

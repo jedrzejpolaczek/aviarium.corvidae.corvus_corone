@@ -1,7 +1,7 @@
 # CLI Command Group
 
 > Container: [Public API + CLI](../../04-public-api-cli.md)
-> C3 Index: [index.md](01-index.md)
+> C3 Index: [01-index.md](01-index.md)
 
 ---
 

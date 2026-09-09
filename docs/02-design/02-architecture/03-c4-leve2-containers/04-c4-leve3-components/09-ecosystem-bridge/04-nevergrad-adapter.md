@@ -1,7 +1,7 @@
 # Nevergrad Adapter
 
 > Container: [Ecosystem Bridge](../../13-ecosystem-bridge.md)
-> C3 Index: [index.md](01-index.md)
+> C3 Index: [01-index.md](01-index.md)
 
 ---
 

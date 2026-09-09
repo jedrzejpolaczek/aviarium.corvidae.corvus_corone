@@ -16,7 +16,7 @@ CONNECTS TO:
   → docs/04_scientific_practice/methodology/statistical-methodology.md : Steps 7–8 (Analyze, Report) delegate to that guide
   → docs/03-technical-contracts/metric-taxonomy.md §4 : Step 5 (Specify metrics) uses the selection guide there
   → docs/03-technical-contracts/interface-contracts.md : Steps 3–4 (configure algorithms/problems) must follow contracts
-  → docs/03-technical-contracts/data-format.md    : every step produces artifacts conforming to schemas there
+  → docs/03-technical-contracts/01-data-format/01-index.md    : every step produces artifacts conforming to schemas there
   → docs/GLOSSARY.md        : exact terms used throughout — Algorithm Instance, Problem Instance, Study, Run, Budget
   
 USAGE NOTE: This protocol is not a rigid checklist but a structured guide.
@@ -88,7 +88,7 @@ A valid Research Question (→ GLOSSARY) must contain four elements:
 
 **Output:** A written Research Question stored in the Study record's `research_question` field. The question should fit in 2–4 sentences. Vagueness at this step cascades into invalid analysis at Step 7.
 
-→ Study record format: `docs/03-technical-contracts/data-format.md` §2.3
+→ Study record format: `docs/03-technical-contracts/01-data-format/01-index.md` §2.3
 
 ---
 
@@ -117,7 +117,7 @@ Pre-registered hypotheses are stored in the Study record before the Experiment b
 
 Observations from Level 1 analysis may suggest new hypotheses. These are valid and should be documented — but they must be pre-registered in a *future* Study to receive confirmatory status. Never retrofit a post-hoc observation into the current Study's confirmed hypotheses.
 
-→ Storage: `docs/03-technical-contracts/data-format.md` §2.3 `pre_registered_hypotheses` field
+→ Storage: `docs/03-technical-contracts/01-data-format/01-index.md` §2.3 `pre_registered_hypotheses` field
 
 ---
 
@@ -145,7 +145,7 @@ Observations from Level 1 analysis may suggest new hypotheses. These are valid a
 - Known optimum or best-known solution, if available
 - Landscape characteristics, if known (modality, separability, etc.)
 
-→ These fields are documented in `docs/03-technical-contracts/data-format.md` §2.1.
+→ These fields are documented in `docs/03-technical-contracts/01-data-format/01-index.md` §2.1.
 
 **Documentation per selected instance:** Record why this instance was selected (representativeness argument) and which diversity characteristics it contributes. This justification is stored in the Problem Instance's `provenance` metadata.
 
@@ -187,7 +187,7 @@ conclusion. Include more diverse instances whenever compute budget permits.
 | Algorithm Instance (all configuration parameter values with justification) | Algorithm Instance record |
 | Implementation (library name, exact version, code revision reference) | Algorithm Instance record |
 
-→ Full record format: `docs/03-technical-contracts/data-format.md` §2.2
+→ Full record format: `docs/03-technical-contracts/01-data-format/01-index.md` §2.2
 
 **Configuration fairness checklist:**
 - [ ] All Algorithm Instances receive exactly the same computational Budget
@@ -266,7 +266,7 @@ A completed and locked Study record containing:
 - `sampling_strategy`, `log_scale_schedule`, `improvement_epsilon` (from this step)
 - The metric list, which becomes the `AnalysisConfig` when Step 7 triggers analysis
 
-→ Study record format: `docs/03-technical-contracts/data-format.md` §2.3
+→ Study record format: `docs/03-technical-contracts/01-data-format/01-index.md` §2.3
 
 ---
 

@@ -1,7 +1,7 @@
 # Version Manager
 
 > Container: [Problem Repository](../../11-problem-repository.md)
-> C3 Index: [index.md](01-index.md)
+> C3 Index: [01-index.md](01-index.md)
 
 ---
 

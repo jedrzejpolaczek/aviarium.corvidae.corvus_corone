@@ -151,7 +151,7 @@ Six milestones group all open documentation and design tasks.
 - [ ] **`[IMPL-006]`** Optuna TPE adapter — `algorithms/adapters/optuna_adapter.py` in ≤ 15 lines; tutorial `docs/06-tutorials/01_wrap_optuna_sampler.md` · *Fulfills: REF-TASK-0004*
 - [ ] **`[IMPL-007]`** Experiment Runner — `runner/runner.py`: `deepcopy` isolation per run, determinism test, independence test · *Refs: MANIFESTO Principle 18*
 - [ ] **`[IMPL-008]`** Seed Manager — `runner/seed_manager.py`: `generate_seeds()` via `numpy.random.SeedSequence.spawn()`
-- [ ] **`[IMPL-009]`** Data entities — `storage/entities.py`: `RunRecord`, `PerformanceRecord`, `StudyRecord` (UUID IDs, JSON round-trip) · *Refs: data-format.md §2, ADR-001*
+- [ ] **`[IMPL-009]`** Data entities — `storage/entities.py`: `RunRecord`, `PerformanceRecord`, `StudyRecord` (UUID IDs, JSON round-trip) · *Refs: docs/03-technical-contracts/01-data-format/01-index.md, ADR-001*
 - [x] **`[IMPL-010]`** Repository interface + LocalFileRepository — `storage/repository.py`: `Repository` ABC, `LocalFileRepository`, `RepositoryContractTest` · *Fulfills: REF-TASK-0023*
 - [ ] **`[IMPL-011]`** Metric taxonomy — `analysis/metrics.py`: `@metric` registry; `QUALITY-BEST_VALUE_AT_BUDGET`, `TIME-EVALUATIONS_TO_TARGET`, `RELIABILITY-SUCCESS_RATE`; implementation refs added to `metric-taxonomy.md` · *Fulfills: REF-TASK-0015*
 - [ ] **`[IMPL-012]`** Statistical analysis — `analysis/statistical.py`: three-level (exploratory summary, Wilcoxon/Kruskal-Wallis + Holm-Bonferroni, Cliff's delta); `ThreeLevelAnalysis.analyze()` requires all three levels · *Fulfills: REF-TASK-0020*
@@ -174,9 +174,9 @@ Six milestones group all open documentation and design tasks.
 - [ ] **`[IMPL-020]`** ADR-008 + statistical-methodology.md: diversity requirements (≥5 problems, ≥2 dimensionality ranges); Level 1 VIZ-L1-01..03 spec in §2; Wilcoxon/Kruskal decision tree in §3 · *Fulfills: REF-TASK-0019, REF-TASK-0020, REF-TASK-0021*
 - [ ] **`[IMPL-021]`** Sensitivity documentation — `SensitivityReport(BaseModel)` in `storage/entities.py`, `docs/03-technical-contracts/01-data-format/03-algorithm-instance.md`, `contribution-guide.md §2` · *Fulfills: REF-TASK-0022*
 - [ ] **`[IMPL-022]`** Bulk PerformanceRecord storage — **blocked on REF-TASK-0024 spike**; ADR-009 from benchmark evidence; `LocalFileRepository.save_bulk_records()`; round-trip test · *Fulfills: REF-TASK-0024*
-- [x] **`[IMPL-023]`** IOHprofiler bridge — `bridge/iohprofiler.py`: full `.dat` export + `.meta.json` sidecar (seed, run_id, wall_time); round-trip test; `data-format.md §3` mapping table · *Fulfills: REF-TASK-0007*
-- [ ] **`[IMPL-024]`** COCO bridge — **blocked on REF-TASK-0005 spike**; `bridge/coco_exporter.py`; continuous-only warning; `data-format.md §3` mapping with documented data loss · *Fulfills: REF-TASK-0005*
-- [x] **`[IMPL-025]`** Nevergrad adapter — **blocked on REF-TASK-0006 spike**; `algorithms/adapters/nevergrad_adapter.py`; `ng.p.Dict` → `SearchSpace`; tutorial; `data-format.md §3` mapping · *Fulfills: REF-TASK-0006*
+- [x] **`[IMPL-023]`** IOHprofiler bridge — `bridge/iohprofiler.py`: full `.dat` export + `.meta.json` sidecar (seed, run_id, wall_time); round-trip test; `docs/03-technical-contracts/01-data-format/10-file-formats.md` mapping table · *Fulfills: REF-TASK-0007*
+- [ ] **`[IMPL-024]`** COCO bridge — **blocked on REF-TASK-0005 spike**; `bridge/coco_exporter.py`; continuous-only warning; `docs/03-technical-contracts/01-data-format/10-file-formats.md` mapping with documented data loss · *Fulfills: REF-TASK-0005*
+- [x] **`[IMPL-025]`** Nevergrad adapter — **blocked on REF-TASK-0006 spike**; `algorithms/adapters/nevergrad_adapter.py`; `ng.p.Dict` → `SearchSpace`; tutorial; `docs/03-technical-contracts/01-data-format/10-file-formats.md` mapping · *Fulfills: REF-TASK-0006*
 - [ ] **`[IMPL-026]`** LLM-as-judge — `analysis/llm_judge.py`: `ManifestoReview` Pydantic model, `StudyDesignJudge.review()`, Ollama structured output; optional `corvus-corone[llm]` extra
 - [ ] **`[IMPL-027]`** RAG over `papers/` — `papers_rag.py`: FAISS index, `PapersRAG.why(metric_id)` via Ollama; optional `corvus-corone[rag]` extra; references Bartz-Beielstein 2020
 

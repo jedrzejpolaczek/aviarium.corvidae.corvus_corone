@@ -14,7 +14,7 @@ CONNECTS TO:
   ← docs/02-design/01-software-requirement-specification/01-srs/01-SRS.md NFR-STAT-01 : non-functional requirement for statistical validity
   → docs/03-technical-contracts/metric-taxonomy.md    : metric properties (distribution, bounds) guide test selection here
   → docs/03-technical-contracts/interface-contracts.md §4 : Analyzer interface implements this methodology
-  → docs/03-technical-contracts/data-format.md §2.7   : Result Aggregate fields store uncertainty information defined here
+  → docs/03-technical-contracts/01-data-format/08-result-aggregate.md   : Result Aggregate fields store uncertainty information defined here
   → docs/04_scientific_practice/methodology/benchmarking-protocol.md : protocol's analysis step (Step 6) references this guide
   → docs/GLOSSARY.md            : terms like "Effect Size", "Anytime Performance" are defined there
 
@@ -44,7 +44,7 @@ The three-level framework is mandated by MANIFESTO Principle 13:
 Level 1 (Exploratory) → Level 2 (Confirmatory) → Level 3 (Practical)
 ```
 
-Hypotheses tested in Level 2 **MUST be pre-specified in the Study plan** (`docs/03-technical-contracts/data-format.md` §2.3 `pre_registered_hypotheses`) **before** Level 1 analysis begins. This is non-negotiable.
+Hypotheses tested in Level 2 **MUST be pre-specified in the Study plan** (`docs/03-technical-contracts/01-data-format/01-index.md` §2.3 `pre_registered_hypotheses`) **before** Level 1 analysis begins. This is non-negotiable.
 
 Post-hoc hypothesis selection — choosing what to test after seeing the data — is a form of p-hacking. It inflates the false positive rate without appearing to do so. MANIFESTO Principle 16 requires that experimental design precedes data collection; this extends to analysis design.
 
@@ -532,7 +532,7 @@ A catalogue of mistakes this methodology is designed to prevent. Each entry stat
 
 **MANIFESTO violation:** Principle 16 (planning precedes execution), Principle 29 (objectivity over promotion).
 
-**How this system prevents it:** Hypotheses are stored in the Study record's `pre_registered_hypotheses` field (`docs/03-technical-contracts/data-format.md` §2.3) before any data collection begins. The Analyzer interface (`docs/03-technical-contracts/interface-contracts.md` §4) only tests pre-registered hypotheses in Level 2; post-hoc observations are labeled "exploratory" in the output.
+**How this system prevents it:** Hypotheses are stored in the Study record's `pre_registered_hypotheses` field (`docs/03-technical-contracts/01-data-format/01-index.md` §2.3) before any data collection begins. The Analyzer interface (`docs/03-technical-contracts/interface-contracts.md` §4) only tests pre-registered hypotheses in Level 2; post-hoc observations are labeled "exploratory" in the output.
 
 ---
 

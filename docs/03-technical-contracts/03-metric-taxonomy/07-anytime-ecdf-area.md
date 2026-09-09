@@ -1,6 +1,6 @@
 # ANYTIME-ECDF_AREA
 
-> Index: [01-metric-taxonomy.md](01-index.md)
+> Index: [01-index.md](01-index.md)
 
 **Display name:** Area Under the ECDF Curve
 

@@ -70,10 +70,9 @@ Stateless. No instance variables.
 ## SRS Traceability
 
 - Entry point for the V1 use cases, UC-01 through UC-06; UC-07 through UC-11 are deferred with the Learner actor (SRS 1.4).
+- FR-39 (the facade is the V1 surface): the public namespace holds exactly the functions `04-public-api-contract.md` lists, and no others.
 - FR-28 (no silent methodological defaults): enforced at the boundary, where the Researcher meets it.
 - FR-29 (errors name the rule they enforce): every `ValidationError` the facade raises names the requirement, principle or ADR behind it.
-
-> **No requirement mandates the API surface itself.** The facade's stability is governed > by [`04-public-api-contract.md`](../../../../../03-technical-contracts/04-public-api-contract.md) and the CLI by ADR-016, both normative; but the SRS contains > no functional requirement stating that the system offers a Python facade or a command > line at all. Earlier revisions cited FR-28 and FR-29 for this, which were renumbered > to Study Design Guidance. The gap is real and is recorded in ROADMAP.
 
 > **Post-V1 surface removed.** Earlier revisions listed three visualization and
 > genealogy functions here, together with the view types they return. They belong to

@@ -169,7 +169,7 @@ Scope). They are listed here so that the use case inventory in this document mat
 
 ## 4. Functional Requirements
 
-Requirements FR-01 through FR-38 are defined in **[`03-functional-requirements/01-index.md`](../03-functional-requirements/01-index.md)**, grouped by C2 container:
+Requirements FR-01 through FR-42 are defined in **[`03-functional-requirements/01-index.md`](../03-functional-requirements/01-index.md)**, grouped by C2 container:
 
 | Group | Container | Requirements | File |
 |---|---|---|---|
@@ -182,6 +182,7 @@ Requirements FR-01 through FR-38 are defined in **[`03-functional-requirements/0
 | §4.7 | Ecosystem Integration | FR-23 – FR-26 | [08-fr-4.7-ecosystem-integration.md](../03-functional-requirements/08-fr-4.7-ecosystem-integration.md) |
 | §4.8 | Study Design Guidance | FR-27 – FR-31 | [09-fr-4.8-study-design-guidance.md](../03-functional-requirements/09-fr-4.8-study-design-guidance.md) |
 | §4.9 | Learner Actor *(deferred, Phase 4)* | FR-34 – FR-38 | [10-fr-4.9-learner-actor.md](../03-functional-requirements/10-fr-4.9-learner-actor.md) |
+| §4.10 | Programmatic & Command-Line Access | FR-39 – FR-42 | [11-fr-4.10-programmatic-and-cli-access.md](../03-functional-requirements/11-fr-4.10-programmatic-and-cli-access.md) |
 
 ---
 

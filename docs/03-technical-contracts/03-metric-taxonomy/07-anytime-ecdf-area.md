@@ -12,7 +12,13 @@
 
 **Interpretation:** Higher is better. An algorithm with high ANYTIME-ECDF_AREA reaches good solutions early and consistently across many budget levels.
 
-**Required inputs:** Full sequence of Performance Records (`evaluation_number` and `objective_value`) for all Runs. This is the primary reason Performance Records must be stored at every evaluation, not just at the endpoint.
+**Required inputs:** the logged Performance Records for all Runs, specifically
+`evaluation_number` and `best_so_far` (ADR-023). Records are not written at every
+evaluation: LOCF (ADR-003) reconstructs the value at any evaluation from the logged
+checkpoints produced by the ADR-002 triggers. Coarser sampling reduces storage without
+making the computation approximate, because the reconstructed curve is a step function
+and the sum over it is exact. The mandatory ADR-002 record at evaluation 1 ensures LOCF
+is defined from the start.
 
 **Statistical treatment:** Distribution depends on normalization; non-parametric tests generally appropriate. See `docs/04-scientific-practice/01-methodology/02-statistical-methodology.md` §5 (Anytime Analysis).
 

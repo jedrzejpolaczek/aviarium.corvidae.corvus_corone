@@ -6,7 +6,7 @@
 
 | Name | Type | Required | Notes |
 | --- | --- | --- | --- |
-| id | string | yes | Run ID |
+| id | string | yes | Run UUID (RFC 4122 v4) |
 | schema_version | string | yes | Version of the entity schema this record conforms to, e.g. `0.0.2`. Governs the shape of the record, not the identity of the entity. See [13-schema-versioning.md](13-schema-versioning.md) |
 | experiment_id | string | yes | ID of the Experiment this Run belongs to |
 | study_id | string | yes | ID of the Study this Run belongs to (denormalized for query convenience) |

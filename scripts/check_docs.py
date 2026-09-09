@@ -114,11 +114,11 @@ def defined_identifiers() -> dict[str, set[str]]:
     defined: dict[str, set[str]] = defaultdict(set)
 
     for path in markdown_files(SRS_DIR + "/03-functional-requirements"):
-        for m in re.finditer(r"^## (FR-[0-9]+)\s*$", read(path), re.M):
+        for m in re.finditer(r"^## (FR-[0-9]+)(?:\s+.*)?$", read(path), re.M):
             defined["FR"].add(m.group(1))
 
     for path in markdown_files(SRS_DIR + "/04-non-functional-requirements"):
-        for m in re.finditer(r"^## (NFR-[A-Z]+-[0-9]+)\s*$", read(path), re.M):
+        for m in re.finditer(r"^## (NFR-[A-Z]+-[0-9]+)(?:\s+.*)?$", read(path), re.M):
             defined["NFR"].add(m.group(1))
 
     index = os.path.join(SRS_DIR, "02-use-cases", "01-index.md")
@@ -164,10 +164,10 @@ def check_duplicate_definitions() -> list[str]:
     problems = []
     seen: dict[str, list[str]] = defaultdict(list)
     for path in markdown_files(SRS_DIR + "/03-functional-requirements"):
-        for m in re.finditer(r"^## (FR-[0-9]+)\s*$", read(path), re.M):
+        for m in re.finditer(r"^## (FR-[0-9]+)(?:\s+.*)?$", read(path), re.M):
             seen[m.group(1)].append(path)
     for path in markdown_files(SRS_DIR + "/04-non-functional-requirements"):
-        for m in re.finditer(r"^## (NFR-[A-Z]+-[0-9]+)\s*$", read(path), re.M):
+        for m in re.finditer(r"^## (NFR-[A-Z]+-[0-9]+)(?:\s+.*)?$", read(path), re.M):
             seen[m.group(1)].append(path)
     for identifier, paths in sorted(seen.items()):
         if len(paths) > 1:

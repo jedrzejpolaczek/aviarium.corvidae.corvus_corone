@@ -6,7 +6,7 @@
 
 | Name | Type | Required | Notes |
 | --- | --- | --- | --- |
-| id | string | yes | Performance Record ID |
+| id | string | yes | Performance Record UUID (RFC 4122 v4) |
 | run_id | string | yes | ID of the Run this record belongs to |
 | evaluation_number | int | yes | Number of objective evaluations completed so far in this Run |
 | elapsed_time | float | yes | Wall-clock seconds elapsed since Run start |

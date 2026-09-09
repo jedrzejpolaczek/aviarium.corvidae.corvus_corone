@@ -13,7 +13,7 @@ CONNECTS TO:
   → docs/02-design/01-software-requirement-specification/02-use-cases/02-uc-01.md
   → docs/04-scientific-practice/01-methodology/01-benchmarking-protocol.md : all 8 steps
   → docs/04-scientific-practice/01-methodology/02-statistical-methodology.md : Step 7 analysis
-  → docs/03-technical-contracts/01-data-format.md : Study, Experiment, Run, Report schemas
+  → docs/03-technical-contracts/01-data-format/01-index.md : Study, Experiment, Run, Report schemas
   → docs/03-technical-contracts/03-metric-taxonomy.md : Standard Reporting Set
   → docs/GLOSSARY.md : all entity names used here
 -->

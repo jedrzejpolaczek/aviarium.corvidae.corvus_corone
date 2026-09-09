@@ -11,17 +11,17 @@ NARRATIVE POSITION:
   Use Cases → Acceptance Test Strategy (each UC must have a passing end-to-end test)
 
 CONNECTS TO:
-  ← docs/01-manifesto/MANIFESTO.md                            : MANIFESTO principles motivate each UC
-  ← docs/02-design/02-architecture/c1-context.md              : actors defined there become UC actors here
-  → docs/02-design/01-software-requirement-specification/functional-requirements.md : each UC step drives FRs
-  → docs/02-design/01-software-requirement-specification/constraints.md             : constraints guard UC boundaries
-  → docs/02-design/01-software-requirement-specification/acceptance-test-strategy.md : each UC must be tested
-  → docs/03-technical-contracts/data-format.md                : entity schemas referenced in UC flows
-  → docs/03-technical-contracts/interface-contracts.md        : interfaces invoked in UC flows
+  ← docs/01-manifesto/MANIFESTO.md                                                        : MANIFESTO principles motivate each UC
+  ← docs/02-design/02-architecture/02-c4-leve1-context/01-c4-l1-context/01-c1-context.md : actors defined there become UC actors here
+  → docs/02-design/01-software-requirement-specification/03-functional-requirements/01-index.md : each UC step drives FRs
+  → docs/02-design/01-software-requirement-specification/05-constraints/01-index.md            : constraints guard UC boundaries
+  → docs/02-design/01-software-requirement-specification/07-acceptance-test-strategy/01-acceptance-test-strategy.md : each UC must be tested
+  → docs/03-technical-contracts/01-data-format/01-index.md    : entity schemas referenced in UC flows
+  → docs/03-technical-contracts/02-interface-contracts/01-index.md : interfaces invoked in UC flows
   → docs/04-scientific-practice/01-methodology/01-benchmarking-protocol.md : UC-01 maps to the 8-step protocol
 -->
 
-Stakeholders correspond directly to actors defined in `docs/02-design/02-architecture/02-c1-context.md`. Refer there for full actor descriptions; this section states their primary needs and the use cases they drive.
+Stakeholders correspond directly to actors defined in `docs/02-design/02-architecture/02-c4-leve1-context/01-c4-l1-context/01-c1-context.md`. Refer there for full actor descriptions; this section states their primary needs and the use cases they drive.
 
 ### Researcher
 

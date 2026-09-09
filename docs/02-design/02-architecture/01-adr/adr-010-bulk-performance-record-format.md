@@ -161,6 +161,12 @@ The Parquet query advantage over HDF5 (27×) is the most operationally significa
 result. Analytical workflows query by `run_id` heavily; this is the query the Analyzer
 runs for every (problem, algorithm) cell.
 
+> **Note:** The spike measured 6 fields (`run_id`, `evaluation_number`, `elapsed_time`,
+> `objective_value`, `is_improvement`, `trigger_reason`). The final Parquet column schema
+> adds `id` (the PerformanceRecord UUID) and `current_solution` (optional JSON map). The
+> `id` column is a `pa.string()` UUID — adding it increases file size by approximately 8%
+> at 150k records, which is negligible given the 9.3× size reduction over JSON Lines.
+
 ---
 
 ## Decision
@@ -191,6 +197,7 @@ the canonical record and the source of truth for V2 migration (ADR-001).
 
 | Column | Arrow type | Notes |
 |---|---|---|
+| `id` | `pa.string()` | UUID string; primary key for this PerformanceRecord; enables row-level matching to the canonical JSON record |
 | `run_id` | `pa.string()` | UUID string; used as row-group filter key |
 | `evaluation_number` | `pa.int32()` | 1-based; monotone within run |
 | `elapsed_time` | `pa.float64()` | Wall-clock seconds since Run start |

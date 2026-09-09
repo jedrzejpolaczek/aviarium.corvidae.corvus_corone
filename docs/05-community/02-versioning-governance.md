@@ -11,7 +11,7 @@ NARRATIVE POSITION:
 CONNECTS TO:
   ← MANIFESTO Principles 19–22 : directly operationalized here
   ← SRS NFR-REPRO, NFR-OPEN    : non-functional requirements this policy implements
-  → specs/data-format.md §6     : schema versioning details delegate to this policy
+  → docs/03-technical-contracts/01-data-format/13-schema-versioning.md     : schema versioning details delegate to this policy
   → community/contribution-guide.md : contributions enter the versioning pipeline described here
   → architecture/adr/           : versioning scheme choices (e.g., semantic vs. date-based) need ADRs
 
@@ -46,7 +46,7 @@ If something needs to change, deprecate and create a new version.
     for the same seed and observation sequence
     Non-breaking: documentation, logging improvements, performance optimization
 
-  ### Data Schemas (specs/data-format.md)
+  ### Data Schemas (docs/03-technical-contracts/01-data-format/01-index.md)
     Breaking change: removing a required field, renaming a field, changing a field type
     Non-breaking: adding optional fields, adding new entity types
     → Schema Version referenced in all stored artifacts → GLOSSARY: Schema Version
@@ -55,11 +55,11 @@ If something needs to change, deprecate and create a new version.
     Results are IMMUTABLE once written.
     A result's version is determined by the artifact versions used to produce it:
     (problem_version, algorithm_version, schema_version, runner_version)
-    → This version tuple is stored in the Experiment record: data-format.md §2.4
+    → This version tuple is stored in the Experiment record: docs/03-technical-contracts/01-data-format/05-experiment.md
 
   ### Analysis Tools and Metrics
     Breaking change: any change to a metric's definition that would produce different values
-    → deprecated metrics must remain in specs/metric-taxonomy.md §5 permanently
+    → deprecated metrics must remain in docs/03-technical-contracts/03-metric-taxonomy/01-index.md §5 permanently
 
   ### Documentation
     Documentation versions follow the system release version.

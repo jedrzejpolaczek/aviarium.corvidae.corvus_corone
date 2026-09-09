@@ -6,7 +6,7 @@
 
 | Name | Type | Required | Notes |
 | --- | --- | --- | --- |
-| id | string | yes | Algorithm Instance ID |
+| id | string | yes | Algorithm Instance UUID (RFC 4122 v4) |
 | schema_version | string | yes | Version of the entity schema this record conforms to, e.g. `0.0.2`. Governs the shape of the record, not the identity of the entity. See [13-schema-versioning.md](13-schema-versioning.md) |
 | name | string | yes | Human-readable name for this specific configuration eg. `NSGANet`, `Grid vs Random` |
 | version | string | yes | Version of this record. Structure is described in validation rules |

@@ -52,8 +52,7 @@ class StatisticalTester:
 
 3. **Precondition validation** — before applying any test, validates sample size requirements:
    - Wilcoxon: requires ≥ 6 paired observations. If fewer, records `test_result=null, reason="insufficient_samples"`.
-   - Kruskal-Wallis: requires ≥ 3 observations per group and ≥ 3 groups.
-   - Kruskal: requires ≥ 2 observations per group and ≥ 3 groups.
+   - Kruskal-Wallis: requires ≥ 2 observations per group and ≥ 3 groups.
 
 4. **Effect size computation** — computes Cliff's delta, as required by `02-statistical-methodology.md` 4, as the effect size estimate. If `pingouin` is not installed, effect size is `null` (not an error).
 

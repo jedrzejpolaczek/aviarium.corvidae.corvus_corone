@@ -44,11 +44,3 @@ follows.
 Trajectory and parameter-sensitivity plots are **not** Report visualizations. They answer a
 question about an algorithm's mechanism rather than about a comparison, and they belong to the
 deferred Algorithm Visualization Engine (ADR-018).
-
-
----
-
-## Open decisions
-
-- **REF-TASK-0043** — the Level 3 section of every researcher report is specified by §4 of
-  `02-statistical-methodology.md`, which has no content.

@@ -26,7 +26,7 @@ Generated: 2026-03-04. Updated: 2026-05-15. Update whenever a milestone closes o
 | C4 Code | — | — removed by ADR-028; behaviour is specified in `03-technical-contracts/` and nowhere else |
 | Architecture Decision Records | — | ✅ ADR-001..ADR-026 accepted |
 | SRS | — | ✅ UC-01..UC-11, FR-01..FR-42, 6 NFRs, 16 constraints, §7 interface requirements, §8 acceptance strategy for every V1 requirement, §9 traceability |
-| Statistical methodology | REF-TASK-0043, 0044 | ⚠️ §1–§3 and §7 written; **§4 Level 3, §5 anytime and §6 uncertainty are empty** (HTML comment only) |
+| Statistical methodology | — | ✅ all seven sections written: three-level framework, Level 1 with VIZ-L1-01..04, Level 2 test selection and correction, Level 3 effect sizes, anytime analysis, uncertainty reporting, pitfalls |
 | Metric taxonomy | REF-TASK-0014 | ✅ 9 metrics, Standard Reporting Set, selection guide; implementation references land with IMPL-011 |
 | Interface contracts | — | ✅ 6 interfaces + cross-cutting; every method carries semantics, preconditions, postconditions and exceptions |
 | Data format | — | ✅ 7 entity schemas, file formats, interoperability mappings, CV-001..CV-023, schema version 0.0.3 |
@@ -348,7 +348,7 @@ REF-TASK-0025 ──► 0026 ──► 0027 ──► 0028 ──► 0029 ──
 
 ### Methodology — sections that are empty
 
-- [ ] **[REF-TASK-0043] Write §4, §5 and §6 of `02-statistical-methodology.md`.** All three are
+- [x] **[REF-TASK-0043] Write §4, §5 and §6 of `02-statistical-methodology.md`.** *(Closed 2026-09-09.)* Level 3 answers whether a detected difference is worth anything, which with 30 repetitions on 5 problems is a different question from whether it is detectable. Cliff's delta everywhere, including the post-hoc comparisons §3.5.1 had assigned to rank-biserial: a Report carrying two effect-size measures on two interpretation scales asks its reader to hold both, and half those readers are Practitioners. Thresholds from Romano et al. (2006), recorded in `papers/README.md` and labelled in the document as conventions rather than measurements. §5 states that curves are read from `best_so_far` and never from `objective_value`, and that testing at several budgets is testing several hypotheses. §6 makes the bootstrap interval around the median the default, for the same reason §3 uses rank tests. Found while writing: `AnalysisIncompleteError`, cited by FR-15 and NFR-STAT-01, was in no taxonomy — added, per the CLAUDE.md rule that a missing member extends the taxonomy rather than being invented at the call site. All three are
   headings whose entire body is an HTML comment: §4 Level 3 Practical Significance, §5 Anytime
   Analysis, §6 Uncertainty Reporting. They are cited as if written by `05-analyzer-interface.md`
   (Cliff's delta → §4), ADR-007 (→ §5), FR-15, NFR-STAT-01, `03-report-format-spec.md` and four
@@ -448,7 +448,7 @@ Documentation tasks:
   *(Found by the C3 semantics pass, 2026-09-09; closed the same day.)*
 - [x] **REF-TASK-0041** — Run and Experiment failure model, closed by ADR-027
 - [x] **REF-TASK-0042** — semantics for four signature-only Repository methods
-- [ ] **REF-TASK-0043** — `02-statistical-methodology.md` §4, §5, §6 *(blocks IMPL-012, IMPL-013)*
+- [x] **REF-TASK-0043** — `02-statistical-methodology.md` §4, §5, §6
 - [x] **REF-TASK-0044** — parametric branch of the test selection tree, and the §3.7 default α
 - [x] **REF-TASK-0045** — ADR-010 Parquet columns against ADR-023, closed by ADR-025
 - [x] **REF-TASK-0046** — record the ADR-016/018/019 exception to ADR-012 normativity, closed by ADR-026

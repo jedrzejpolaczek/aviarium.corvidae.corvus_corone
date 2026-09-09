@@ -384,6 +384,26 @@ class AnalysisError(CorvusError):
         super().__init__(message, error_code, context)
 
 
+class AnalysisIncompleteError(AnalysisError):
+    """A report was requested before all three analysis levels completed.
+
+    FR-15 forbids producing a report without exploratory summaries, confirmatory
+    tests and effect sizes together; NFR-STAT-01 makes the three checks automated.
+
+    References
+    ----------
+    → interface-contracts.md §4 Analyzer Interface
+    → FR-15, NFR-STAT-01
+    """
+
+    def __init__(
+        self,
+        message: str,
+        context: dict[str, Any] | None = None,
+    ) -> None:
+        super().__init__(message, "ANALYSIS_INCOMPLETE", context)
+
+
 class ExperimentNotCompleteError(AnalysisError):
     """Report generation attempted before all Runs completed.
 

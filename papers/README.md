@@ -30,6 +30,16 @@ listed in `docs/01-manifesto/MANIFESTO.md`.
 > Translation Systems.** Provenance not recorded when the PDF was added; identify it before
 > citing it in any published study.
 
+> Romano, J., Kromrey, J. D., Coraggio, J., & Skowronek, J. (2006).
+> **Appropriate statistics for ordinal level data: Should we really be using t-test and Cohen's d
+> for evaluating group differences on the NSSE and other surveys?**
+> Annual meeting of the Florida Association of Institutional Research.
+>
+> The source of the Cliff's delta interpretation thresholds in
+> `docs/04-scientific-practice/01-methodology/02-statistical-methodology.md` §4.2 — 0.147, 0.33
+> and 0.474, obtained by mapping Cohen's conventional d values onto the delta scale. They are
+> conventions rather than measurements, and the document says so.
+
 ## Note for IMPL-027
 
 ROADMAP task IMPL-027 builds a retrieval index over this directory. The operator supplies the

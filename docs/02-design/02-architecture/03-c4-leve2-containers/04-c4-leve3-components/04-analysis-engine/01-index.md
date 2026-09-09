@@ -40,13 +40,3 @@ impossible without exploratory summaries, confirmatory tests and effect sizes to
 The interpolation strategy reads `best_so_far` and never `objective_value`: carrying the raw
 result of one evaluation forward would propagate a value worse than the best already seen
 (ADR-023). LOCF is exact rather than approximate, which is the argument in ADR-003.
-
-
----
-
-## Open decisions
-
-- **REF-TASK-0043** — §4, §5 and §6 of `02-statistical-methodology.md` are headings with no
-  content, including the Level 3 material this container implements. The Cliff's delta
-  interpretation thresholds exist nowhere in the corpus, and §3.5.1 and §4 disagree on which
-  effect size accompanies a post-hoc pairwise test.

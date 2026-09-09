@@ -350,7 +350,9 @@ Conduct pairwise Wilcoxon signed-rank tests for all $\binom{k}{2}$ algorithm pai
 **Holm-Bonferroni correction** (§3.6) to the resulting $m = \binom{k}{2}$ p-values.
 
 Report each pairwise result with: uncorrected p-value, corrected p-value, Holm step applied,
-reject/fail-to-reject at corrected α, rank-biserial correlation effect size.
+reject/fail-to-reject at corrected α, and Cliff's delta with its magnitude label (§4.1). Earlier
+revisions required rank-biserial correlation here and Cliff's delta in §4; one measure is reported,
+for the reason given in §4.1.
 
 ---
 
@@ -467,85 +469,204 @@ arXiv:2007.03488. §4 (Statistical Analysis of Benchmark Results).*
 
 ## 4. Level 3: Practical Significance Analysis
 
-<!--
-  Purpose:
-    Answer "does the difference matter in practice?" independently of statistical significance.
-    A difference can be statistically significant but practically negligible, or vice versa.
-    → MANIFESTO Principle 13 (three-level analysis), Principle 15 (practical utility)
+Level 2 answers whether a difference is detectable. Level 3 answers whether it is worth anything.
+The two are independent, and a study that reports only the first is the failure MANIFESTO
+Principle 13 exists to prevent: with thirty repetitions on five problems, a difference of 0.001 in
+validation loss can reach p < 0.01 and mean nothing to anyone deploying the algorithm.
 
-  ### Effect Size Measures
-  For each applicable test from Level 2, a corresponding effect size measure:
+FR-15 makes this level mandatory. A report without effect sizes is not produced; the Analyzer
+raises `AnalysisIncompleteError`.
 
-    | Test used           | Effect size measure    | Interpretation scale               |
-    |---------------------|------------------------|------------------------------------|
-    | [parametric test]   | Cohen's d              | small / medium / large thresholds  |
-    | [non-parametric]    | Cliff's delta          | negligible / small / medium / large|
+---
 
-  How to interpret effect sizes in the HPO domain:
-    Hint: a "large" statistical effect may be practically negligible if the objective
-    function values are all near the optimum. Context matters.
-    → Reference problem-specific baselines when interpreting effect sizes.
+### 4.1 The effect size is Cliff's delta
 
-  ### Practical Recommendations
-  When is it appropriate to recommend one algorithm over another?
-    - Statistical significance alone is NOT sufficient
-    - Effect size must exceed a threshold meaningful for practitioners
-    - The recommendation must be scoped to the tested problem characteristics
+**Every pairwise comparison reports Cliff's delta**, including the pairwise Wilcoxon tests that
+follow a significant Kruskal-Wallis omnibus (§3.5.1). One measure, one interpretation scale, one
+implementation.
 
-  ### Reporting Practical Significance
-    Every study report MUST include effect sizes alongside p-values.
-    → Reporting without effect sizes violates SRS NFR-STAT.
--->
+For two samples $A$ and $B$ of per-problem metric values,
+
+$$\delta = \frac{\#\{(a,b) : a > b\} - \#\{(a,b) : a < b\}}{|A| \cdot |B|}$$
+
+taken over all pairs. It is the probability that a randomly chosen value from $A$ exceeds one from
+$B$, minus the probability of the reverse. $\delta \in [-1, 1]$; $0$ means complete overlap,
+$\pm 1$ means the samples do not overlap at all.
+
+**Why Cliff's delta and not a parametric measure.** It is a rank statistic, so it makes the same
+distributional assumptions as the tests in §3 — none — and it is computable directly from the two
+samples with no optional dependency. Cohen's d would assume the normality that §3.3 declines to
+assume.
+
+**Why not rank-biserial correlation for the post-hoc case.** Rank-biserial is the natural partner
+of the Wilcoxon statistic and is defensible on its own. It was rejected because a Report that
+carries two effect-size measures on two interpretation scales asks its reader to hold both, and
+the reader is a Practitioner in half the cases. Earlier revisions of this document required
+rank-biserial in §3.5.1 and Cliff's delta here, which is how the corpus came to specify both.
+
+---
+
+### 4.2 Interpretation thresholds
+
+| $|\delta|$ | Magnitude |
+|---|---|
+| < 0.147 | negligible |
+| 0.147 – 0.33 | small |
+| 0.33 – 0.474 | medium |
+| ≥ 0.474 | large |
+
+These are the thresholds of Romano et al. (2006), derived by mapping Cohen's conventional d
+values of 0.2, 0.5 and 0.8 onto the delta scale. They are conventions, not measurements, and this
+document adopts them so that two studies in this system label the same difference the same way.
+
+**A label is not a conclusion.** The scale says how separated two distributions are; it does not
+say whether the separation matters, and it cannot, because that depends on the objective. A
+"large" delta between two algorithms whose final validation losses differ by 0.0004 is a
+statement about consistency, not about practical value. Both the magnitude label and the raw
+difference in the objective's own units belong in the Report, and §4.3 is where the reader is
+told how to combine them.
+
+---
+
+### 4.3 What the Report must say
+
+Every comparison in a Researcher Report carries four things together, and the Practitioner Report
+carries the first, third and fourth in prose:
+
+1. the corrected p-value and the reject / fail-to-reject decision at the declared α;
+2. Cliff's delta and its magnitude label;
+3. the difference in the objective's own units, with the unit named;
+4. the conditions under which the comparison holds — which Problem Instances, at which Budget.
+
+**A recommendation requires more than significance.** A Report may state that one Algorithm
+Instance outperformed another on the tested Problem Instances when the difference is statistically
+detected *and* the effect size is at least small *and* the difference is meaningful in the
+objective's units. Significance alone is not sufficient, and the Report says so where it applies:
+a detected difference with a negligible effect size is reported as a detected difference with a
+negligible effect size, not as a finding.
+
+None of this is a ranking. FR-21 and CONST-SCI-01 forbid ranking output entirely, and a
+recommendation scoped to the tested Problem Instances is not one — the scope statement is what
+makes the difference, and it is mandatory.
 
 ---
 
 ## 5. Anytime Analysis
 
-<!--
-  Why anytime analysis matters:
-    Final-budget performance ignores optimization dynamics.
-    An algorithm that reaches good solutions early may be preferable to one that
-    barely edges ahead at the maximum budget. → MANIFESTO Principle 14.
+An algorithm that reaches a good solution at evaluation 200 and one that reaches a marginally
+better solution at evaluation 10 000 are not the same algorithm, and a final-budget comparison
+cannot tell them apart. MANIFESTO Principle 14 requires full performance curves, and this section
+is how they are read.
 
-  ### Empirical Cumulative Distribution Functions (ECDF)
-    Definition: what does an ECDF show in this context?
-    How to compute: [procedural definition]
-    How to interpret: what does the area under the ECDF represent?
-    Multiple algorithms: how to overlay ECDFs for comparison?
+---
 
-  ### Performance Profiles
-    When to use performance profiles vs. ECDFs?
-    How to interpret a performance profile gap between algorithms?
+### 5.1 The curve
 
-  ### Budget-Sensitive Comparison
-    How to compare algorithms at multiple budget checkpoints?
-    → requires PerformanceRecord data: docs/03-technical-contracts/01-data-format/07-performance-record.md
-    Statistical considerations: applying Level 2 tests at multiple budgets introduces
-    multiple testing — how to handle?
+For each Run, the anytime curve is `best_so_far` as a function of `evaluation_number`. It is
+monotone in the objective's direction by construction, and it is defined at every evaluation in
+`1 .. B` even though a Performance Record exists only where a trigger fired: the value between two
+records is the value of the earlier one, because no improvement occurred in between — that is the
+LOCF rule of ADR-003, and it reconstructs rather than approximates.
 
-  ### Detecting Performance Crossovers
-    Sometimes algorithm A is better at low budget, B at high budget.
-    How to detect and report crossovers?
-    Why crossovers make global ranking impossible (connects to MANIFESTO Principle 2, NFL).
--->
+Curves are read from `best_so_far`, never from `objective_value`. The raw value of a single
+evaluation may be worse than the best already seen, and carrying it forward would produce a curve
+that is not monotone and not the algorithm's state (ADR-023).
+
+---
+
+### 5.2 Empirical cumulative distribution functions
+
+An ECDF over a Problem–Algorithm cell answers: by evaluation $k$, what fraction of the observable
+improvement range had the algorithm realised, averaged over its Runs?
+
+The value axis is normalised to the cell's own empirical bounds — `y_max` the worst initial value
+across its Runs, `y_min` the best final value (ADR-007). There is no known optimum to normalise
+against for a real ML objective, so the observable range is the only well-defined reference frame
+available, and it is a frame per cell rather than per study because two problems with objectives
+on different scales would otherwise not contribute equally.
+
+`ANYTIME-ECDF_AREA` is the area under that curve, normalised so that 1 would mean the cell sat at
+`y_min` from the first evaluation. The integration domain is the whole Budget, treated as $B$
+unit-width steps (ADR-024); the procedure and its reference case are in
+[`03-metric-taxonomy/07-anytime-ecdf-area.md`](../../03-technical-contracts/03-metric-taxonomy/07-anytime-ecdf-area.md).
+
+**Values are not comparable across studies.** The bounds come from the Runs of one study, so two
+studies differing in algorithm portfolio, repetition count or Budget produce different bounds on
+the same Problem Instance. Every Report states this in its limitations section; ADR-007 makes it a
+mandatory disclosure rather than a caveat the author may omit.
+
+---
+
+### 5.3 Comparing at more than one budget
+
+An algorithm's advantage can reverse. Where two curves cross, "which is better" has no
+budget-independent answer, and reporting one endpoint hides that entirely — Pitfall 6.
+
+Read the convergence curves (VIZ-L1-02) for crossings before reporting any single-budget
+comparison. Where a crossing is visible, the Report says so and scopes each conclusion to the
+budget region where it holds.
+
+**Testing at several budgets is testing several hypotheses.** Comparing two algorithms at
+evaluations 100, 1 000 and 10 000 is three comparisons, and §3.6 applies to the family exactly as
+it does to three pre-registered hypotheses. Choosing the budget after seeing the curves is
+Pitfall 1 wearing different clothes: budget checkpoints are declared in the Study before data
+collection, like everything else about the comparison.
 
 ---
 
 ## 6. Uncertainty Reporting Requirements
 
-<!--
-  What MUST accompany every reported metric value.
-  Reporting only a mean without spread is prohibited (MANIFESTO Principle 15).
+MANIFESTO Principle 15 requires spread, quantiles and success probabilities alongside averages.
+A mean with no spread is not a result: with five Problem Instances and thirty repetitions, the
+same mean can come from an algorithm that behaves identically every time and from one that
+succeeds brilliantly half the time and fails the rest, and those are different algorithms.
 
-  Required alongside every aggregate metric:
-    - Standard deviation OR interquartile range (depending on distribution shape)
-    - Sample size (n_runs)
-    - Success rate (if applicable — how many runs completed successfully)
-    - Confidence interval (specify level: 95%? 99?)
+---
 
-  → These map directly to ResultAggregate fields in docs/03-technical-contracts/01-data-format/08-result-aggregate.md
-  If a ResultAggregate is missing any of these, it fails validation.
--->
+### 6.1 What accompanies every reported metric value
+
+| Required | Notes |
+|---|---|
+| A measure of spread | Interquartile range by default. Standard deviation only where the distribution is approximately symmetric, which VIZ-L1-01 and VIZ-L1-04 are what the reader checks |
+| The number of Runs behind it | `ResultAggregate.n_runs`. A metric computed over three Runs and one computed over thirty are not comparable, and the Report must not present them as though they were |
+| The number that succeeded | Where a Run can fail or a metric can be undefined for a Run, the count that contributed is stated. A mean over the Runs that happened to finish is a selected sample |
+| The 95% confidence interval | For the median, computed by bootstrap over the Runs. 95% because it is the convention and a study that departs from it should say why |
+
+These map onto `AggregateValue.statistics` in
+[`01-data-format/08-result-aggregate.md`](../../03-technical-contracts/01-data-format/08-result-aggregate.md),
+whose one required field is `n_successful`. A Result Aggregate missing them fails validation, and
+a Report cannot be produced from an aggregate that failed validation.
+
+---
+
+### 6.2 Why the interval is bootstrapped and around the median
+
+The tests in §3 are rank-based and make no distributional assumption, and an interval computed
+from a normal approximation would reintroduce the assumption the whole of §3 declines to make.
+The bootstrap needs none: resample the Runs with replacement, recompute the statistic, take the
+2.5th and 97.5th percentiles of the resampled distribution.
+
+The median rather than the mean, for the same reason §3 uses rank tests: HPO metric distributions
+are frequently skewed, and the mean of a skewed distribution is not the value a reader thinks it
+is.
+
+**With few Runs, say so rather than widening quietly.** A bootstrap over five Runs produces an
+interval, and the interval is nearly meaningless. Where `n_runs` is below ten the Report states
+the count next to the interval so that the reader can discount it, rather than presenting a wide
+interval as though width were the only consequence.
+
+---
+
+### 6.3 What is never reported alone
+
+- A mean or median without spread.
+- A metric value without the count of Runs behind it.
+- A p-value without the effect size that accompanies it (§4.3).
+- Any of the above without the scope conditions under which they hold.
+
+Each of these is an omission that makes the number look stronger than it is, which is what
+MANIFESTO Principle 29 identifies as the failure mode of benchmarking that serves promotion rather
+than knowledge.
 
 ---
 

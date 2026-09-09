@@ -24,12 +24,12 @@ class PerformanceRecorder:
         objective_value: float,
         current_solution: dict[str, object] | None,
         elapsed_time: float,
-        trigger_reason: str,
     ) -> None:
         """Constructs a Performance Record and writes it to the JSONL writer.
 
-        `best_so_far` and `is_improvement` are computed here, not passed in: the
-        recorder is the only component that sees the whole sequence for a Run.
+        `best_so_far`, `is_improvement` and `trigger_reason` are computed here,
+        not passed in: the recorder is the only component that sees the whole
+        sequence for a Run, and the triggers of ADR-002 are defined over it.
         """
 ```
 

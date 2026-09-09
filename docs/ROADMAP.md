@@ -36,20 +36,30 @@ Generated: 2026-03-04. Updated: 2026-05-15. Update whenever a milestone closes o
 | Implementation — Autonomous (Pilot V3) | IMPL-037..047 | ⛔ Not started *(post-V1)* |
 | Learner Actor | REF-TASK-0025..0030, IMPL-044..046 | ⛔ Not started *(post-V1)* |
 
-> **C3 implementability, re-measured 2026-09-09 after the vocabulary sweep.** Three components
-> were specified from the documentation alone, counting each point where a decision had to be
-> invented: Study Builder, Evaluation Loop and Statistical Tester. Before the sweep they scored
-> 10, 11 and 7. After it they score zero, and `scripts/check_docs.py` reports no uncontracted
-> boundary vocabulary anywhere in the corpus.
+> **C3 implementability, measured three times.** The test is the audit's verdict criterion: a
+> component is specified from the documentation alone, and every point where a decision has to
+> be invented rather than read is counted.
 >
-> The three worst defects were semantic rather than lexical, so the gate could not have found
-> them: the Evaluation Loop called `ask()` and `tell()` where the Algorithm Interface defines
-> `suggest()` and `observe()`, recorded on every iteration where ADR-002 records only on a
-> trigger, and reported whole batches against the last suggestion. The Study Builder generated
-> its run plan in the opposite order to ADR-017, which changes every seed.
+> | Component | Before the vocabulary sweep | After it | After the semantics pass |
+> |---|---|---|---|
+> | Study Builder | 10 | 3 | 0 |
+> | Evaluation Loop | 11 | 6 | 0 |
+> | Statistical Tester | 7 | 5 | 0 |
 >
-> Eight component groups have not been re-measured. The gate covers their vocabulary; their
-> semantics have not been read against the contracts.
+> The middle column corrects an earlier entry here that recorded zero. It was measured against
+> the vocabulary gate, which had reached zero, and the two were not the same thing: the gate
+> finds an identifier no contract defines, and every count above is a statement that reads
+> correctly and says the wrong thing. `alpha: float = 0.05` names nothing uncontracted and is a
+> significance threshold chosen after the data exists, which FR-28 forbids. Two of the six
+> found in the Evaluation Loop had been introduced by the sweep itself, which split
+> `best_so_far` across two documents without saying which owns it.
+>
+> The eight remaining component groups were read against their contracts on 2026-09-09 and
+> repaired; the defects are listed in that commit. What the third column does **not** claim is
+> that those eight now measure zero: three components were specified end to end, not eleven.
+>
+> One gap is not repairable by editing and is open as REF-TASK-0038: the Public API + CLI
+> container is in V1 scope with no functional requirement behind it.
 
 ---
 

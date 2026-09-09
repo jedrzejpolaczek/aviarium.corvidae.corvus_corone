@@ -23,15 +23,28 @@ class StudyBuilder:
         raw_config: dict,
         algorithm_registry: AlgorithmRepository,
         problem_repo: ProblemRepository,
-    ) -> Study:
+    ) -> str:
         """
-        Validates raw_config, resolves entity IDs, returns a complete Study.
-        Raises ValidationError with a list of all validation failures (not just the first).
+        Validates raw_config, resolves entity IDs, assembles the Study and persists
+        it through StudyRepository.create_study(). Returns the identifier that
+        repository assigned; the Study is left in draft status.
+        Raises ValidationError listing every validation failure, not just the first.
         """
 
-    def generate_run_plan(self, study_config: Study) -> list[Run]:
+    def lock(self, study_id: str) -> None:
         """
-        Returns the run plan in ADR-017 order: problems, then algorithms, then repetitions.
+        Runs the lock-time checks and calls StudyRepository.lock_study().
+        Raises ValidationError listing every unresolved decision at once (FR-27).
+        """
+
+    def generate_run_plan(self, study: Study) -> list[tuple[str, str, int]]:
+        """
+        Returns the plan in the ADR-017 order: problems, then algorithms, then
+        repetitions. Each entry is a (problem_id, algorithm_id, repetition_index)
+        triple, not a Run: a Run record cannot exist before the Seed Manager has
+        assigned its seed, and the plan is what fixes the spawn order it uses.
+        The plan is an ordered sequence, deliberately not a named type: no contract
+        defines one, and a descriptive document may not coin it (ADR-012).
         """
 ```
 
@@ -62,7 +75,7 @@ class StudyBuilder:
    persists it through `StudyRepository.create_study()`. The repository assigns the UUID;
    the caller does not supply one. No component constructs a path into the store (ADR-001).
 
-5. **Lock-time validation** — `lock_study()` re-runs the checks above and adds the ones
+5. **Lock-time validation** — `lock()` re-runs the checks above and adds the ones
    that only make sense on a complete plan: at least one pre-registered hypothesis
    (ADR-021) and the ADR-009 diversity floor unless the Study is exploratory. Every
    unresolved decision is reported at once, with its consequence (FR-27).
@@ -87,4 +100,4 @@ No persistent in-memory state. All persistent data written to Results Store.
 ## SRS Traceability
 
 - UC-01 (create study): Study Builder is the implementation of the study creation step.
-- FR-08 (study validation): all Study fields must be validated before execution begins.
+- FR-08 (pre-registration gate): the problem set, algorithm set, experimental design and hypotheses are locked before any Run executes.

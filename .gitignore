@@ -12,3 +12,5 @@ __pycache__
 others
 others/*
 .vscode/*
+papers/*.pdf
+papers/**/*.pdf

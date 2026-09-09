@@ -87,6 +87,7 @@ Full architecture documentation: [docs/02-design/02-architecture/](docs/02-desig
 │   ├── pre-push                <- Git pre-push hook (docs check, linters, tests)
 │   ├── check_docs.py           <- Documentation integrity gate (links, identifiers)
 │   └── create_github_issues.py <- Syncs ROADMAP tasks to GitHub Issues
+├── papers/                     <- Citations only; PDFs are not redistributed
 ├── spikes/                     <- Exploratory prototypes (not production code)
 ├── Makefile                    <- Developer commands (lint, format, type, test)
 ├── pyproject.toml              <- uv workspace root
@@ -256,9 +257,14 @@ Two practical notes:
 
 ## Contact Information
 
-**TODO — before opening the repository.** Needs a maintainer contact and an issue-reporting
-route, both of which the contribution guide assumes exist. Tracked with the other launch
-blockers in [the pre-launch checklist](docs/05-community/04-pre-launch-checklist.md).
+**GitHub issues are the only supported channel**, for bug reports, questions and proposals
+alike: <https://github.com/jedrzejpolaczek/aviarium.corvidae.corvus_corone/issues>
+
+There is no mailing list and no private support address. Keeping every exchange in the issue
+tracker is deliberate: a benchmarking framework whose design decisions are argued in private
+cannot claim the transparency its own MANIFESTO asks for (Principles 19 and 24). Security
+reports are the one exception and should use GitHub's private vulnerability reporting on the
+same repository.
 
 ## Acknowledgments
 

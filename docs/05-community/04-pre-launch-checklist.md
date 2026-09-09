@@ -19,7 +19,12 @@ are therefore not tidiness; each one is something that cannot be quietly fixed a
 
 ## 1. Stray branch `initial_implementation`
 
-**Status: open. Requires a decision.**
+**Status: resolved 2026-09-09, deleted.**
+
+The branch was last touched on 2025-11-24, six days after the repository's first commit and ten
+months before the decision. It held an abandoned architecture, not work in progress. Deleted
+locally and from `origin`, which is the only option that removes the credentials from what gets
+published.
 
 The branch exists on `origin` and holds 25 commits of a different codebase: a layered
 architecture with a web UI, an auth service and a `docker-compose.yml`, 89 files in total. It is
@@ -44,7 +49,7 @@ above. Deleting is the only option that removes the credentials from what gets p
 
 ## 2. Remote branch count
 
-**Status: open. Requires a decision.**
+**Status: resolved 2026-09-09, pruned to `main` and `dev`.**
 
 `origin` carries 38 branches beyond `main`, most of them per-task branches named after closed
 `REF-TASK` items. They make the branch list unreadable for a newcomer and suggest work in
@@ -54,7 +59,11 @@ progress that has in fact been merged.
 
 ## 3. Redistribution of papers
 
-**Status: open. Requires a decision.**
+**Status: resolved 2026-09-09, PDFs removed.**
+
+`papers/` now holds a `README.md` of citations with arXiv identifiers and links, and
+`papers/*.pdf` is ignored. IMPL-027 builds its index from files the operator fetches locally,
+which is the correct arrangement in any case.
 
 `papers/` holds 4.4 MB of PDFs across three documents.
 
@@ -74,12 +83,16 @@ PDFs themselves, which is the correct arrangement anyway.
 
 ## 4. Contact details
 
-**Status: open.** The README section is a TODO and the contribution guide assumes an issue
-reporting route exists. Needs a maintainer contact before strangers arrive.
+**Status: resolved 2026-09-09, GitHub issues only.**
+
+One public channel, stated in the README and in the contribution guide. No mailing list and no
+private support address: a design decision argued in private cannot be checked by anyone who was
+not present, which is the transparency the MANIFESTO asks of its own users. Security reports use
+GitHub's private vulnerability reporting.
 
 ## 5. Secret scan on the final history
 
-**Status: done once, repeat before publishing.** A pattern scan over all branches found the
+**Status: rerun 2026-09-09 after the branch deletion.** A pattern scan over all branches found the
 credentials in item 1 and nothing else: no private keys, no provider tokens, no `.env` files at
 any point in the history. Re-run after item 1 is resolved, because deleting a branch changes
 what is reachable.

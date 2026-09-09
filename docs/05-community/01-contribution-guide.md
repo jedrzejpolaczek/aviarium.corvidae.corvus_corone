@@ -56,6 +56,17 @@ GPL-2.0-only do not (CONST-TECH-06).
 
 ---
 
+## Where to raise something
+
+Everything goes through GitHub issues: <https://github.com/jedrzejpolaczek/aviarium.corvidae.corvus_corone/issues>. Bug reports, questions, proposals
+for a new problem or algorithm, and disagreements with a design decision all belong there.
+There is no private channel, because a decision argued in private cannot be checked by anyone
+who was not in the room, and this project asks that of its users
+(MANIFESTO Principles 19 and 24). Security reports are the exception and should use GitHub's
+private vulnerability reporting.
+
+---
+
 ## Types of Contributions
 
 <!--

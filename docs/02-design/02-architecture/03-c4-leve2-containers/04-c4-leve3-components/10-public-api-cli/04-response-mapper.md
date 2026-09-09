@@ -57,7 +57,7 @@ Stateless.
 
 ## SRS Traceability
 
-- The Response Mapper is what keeps the public shapes in `04-public-api-contract.md` independent of the internal domain objects. No functional requirement covers the API surface; see the note in [02-api-facade.md](02-api-facade.md).
+- FR-39 (the facade is the V1 surface): the Response Mapper is what keeps the public shapes in `04-public-api-contract.md` independent of the internal domain objects, so that an internal refactor cannot change what a caller receives.
 
 > **Post-V1 surface removed.** Earlier revisions listed three visualization and
 > genealogy functions here, together with the view types they return. They belong to

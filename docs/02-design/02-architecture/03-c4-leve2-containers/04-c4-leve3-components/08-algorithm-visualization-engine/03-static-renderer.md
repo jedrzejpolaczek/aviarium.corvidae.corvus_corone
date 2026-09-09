@@ -75,5 +75,5 @@ No persistent state.
 ## SRS Traceability
 
 - UC-07 steps 3–5 (trajectory, sensitivity, genealogy visualizations).
-- no functional requirement yet: the Algorithm Visualization Engine is outside V1 (SRS 1, V1 Release Scope) and its requirements are written when the Learner actor enters scope (static visualization output): PNG and SVG formats required.
+- FR-34 `[DEFERRED]` (at least one visual representation of a registered Algorithm Instance): the parameter-sensitivity heatmap and the search-trajectory plot are this component's two static forms, rendered to PNG and SVG. The Algorithm Visualization Engine is outside V1 (SRS 1.4); the requirement exists and is deferred with the Learner actor.
 - ADR-011: matplotlib is the core rendering library for all static output.

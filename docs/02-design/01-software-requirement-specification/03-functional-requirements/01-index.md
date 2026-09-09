@@ -22,7 +22,7 @@ CONNECTS TO:
   → 08-traceability-matrix/01-traceability-matrix.md       : full cross-reference table
 
 NOTE ON CONTAINER MAPPING:
-  The subsection groupings (4.1–4.8) correspond to C2 container responsibilities defined in
+  The subsection groupings (4.1–4.10) correspond to C2 container responsibilities defined in
   docs/02-design/02-architecture/03-c4-leve2-containers/01-index.md. Each FR group is in its own file.
 -->
 
@@ -41,3 +41,4 @@ NOTE ON CONTAINER MAPPING:
 | 4.7 Ecosystem Integration | Ecosystem Bridge | FR-23..FR-26 | [08-fr-4.7-ecosystem-integration.md](08-fr-4.7-ecosystem-integration.md) |
 | 4.8 Study Design Guidance | Study Orchestrator, Public API + CLI | FR-27..FR-31 | [09-fr-4.8-study-design-guidance.md](09-fr-4.8-study-design-guidance.md) |
 | 4.9 Learner Actor *(deferred, Phase 4)* | Algorithm Visualization Engine, Corvus Pilot, Reporting Engine | FR-34..FR-38 | [10-fr-4.9-learner-actor.md](10-fr-4.9-learner-actor.md) |
+| 4.10 Programmatic & Command-Line Access | Public API + CLI | FR-39..FR-42 | [11-fr-4.10-programmatic-and-cli-access.md](11-fr-4.10-programmatic-and-cli-access.md) |

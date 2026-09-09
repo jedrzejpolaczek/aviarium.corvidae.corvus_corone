@@ -80,6 +80,10 @@ CONNECTS TO:
 | FR-36 | 28 | `03-functional-requirements/01-index.md` §4.9 | Corvus Pilot | UC-09 | Usability | Deferred (Phase 4) |
 | FR-37 | 25 | `03-functional-requirements/01-index.md` §4.9 | Algorithm Visualization Engine | UC-10 | Usability | Deferred (Phase 4) |
 | FR-38 | 3, 25 | `03-functional-requirements/01-index.md` §4.9 | Reporting Engine, Corvus Pilot | UC-11 | Constraint enforcement | Deferred (Phase 4) |
+| FR-39 | 28 | `03-functional-requirements/01-index.md` §4.10 | Public API + CLI | UC-01..UC-06 | Interface conformance | Defined |
+| FR-40 | 28 | `03-functional-requirements/01-index.md` §4.10 | Public API + CLI | UC-01..UC-06 | Interface conformance | Defined |
+| FR-41 | 28 | `03-functional-requirements/01-index.md` §4.10 | Public API + CLI | UC-05, UC-06 | Interface conformance | Defined |
+| FR-42 | 28 | `03-functional-requirements/01-index.md` §4.10 | Public API + CLI | UC-05, UC-06 | Interface conformance | Defined |
 
 ---
 

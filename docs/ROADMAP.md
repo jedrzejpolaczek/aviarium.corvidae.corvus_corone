@@ -58,8 +58,9 @@ Generated: 2026-03-04. Updated: 2026-05-15. Update whenever a milestone closes o
 > repaired; the defects are listed in that commit. What the third column does **not** claim is
 > that those eight now measure zero: three components were specified end to end, not eleven.
 >
-> One gap is not repairable by editing and is open as REF-TASK-0038: the Public API + CLI
-> container is in V1 scope with no functional requirement behind it.
+> One gap was not repairable by editing and was opened as REF-TASK-0040: the Public API +
+> CLI container was in V1 scope with no functional requirement behind it. Closed the same
+> day as FR §4.10.
 
 ---
 
@@ -294,14 +295,15 @@ REF-TASK-0025 ──► 0026 ──► 0027 ──► 0028 ──► 0029 ──
 All documentation REF-TASKs are tracked by the milestone sections above (✅ = complete, [ ] = pending).
 The authoritative status for each task is the checkbox in the relevant milestone section — not this index.
 
-Open documentation tasks:
+Documentation tasks:
 - [ ] **REF-TASK-0014** — Metric taxonomy extensions *(Post-V1, deferred — requires real study data)*
 - [ ] **REF-TASK-0018** — Research question archetypes *(Post-V1, deferred — requires real study data)*
-- [ ] **REF-TASK-0038** — Requirements for the Python facade and the CLI. The Public API + CLI
-  container is in V1 scope and has no functional requirement behind it: the C3 components cited
-  FR-28 and FR-29, which were renumbered to Study Design Guidance. `04-public-api-contract.md`
-  and ADR-016 define the surface, but nothing in the SRS states that the system offers one.
-  *(Found by the C3 semantics pass, 2026-09-09.)*
+- [x] **REF-TASK-0040** — Requirements for the Python facade and the CLI. The Public API + CLI
+  container was in V1 scope with no functional requirement behind it: the C3 components cited
+  FR-28 and FR-29, which had been renumbered to Study Design Guidance. Closed by FR §4.10
+  (FR-39..FR-42), which promotes the decisions already recorded in `04-public-api-contract.md`,
+  `02-cli-spec.md` and ADR-015/ADR-016 to the layer that decides what V1 contains.
+  *(Found by the C3 semantics pass, 2026-09-09; closed the same day.)*
 
 ### Implementation Tasks (IMPL)
 

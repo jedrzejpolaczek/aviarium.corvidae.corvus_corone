@@ -72,5 +72,5 @@ No persistent state.
 ## SRS Traceability
 
 - UC-07 step 3 (convergence animation): the convergence GIF is generated here.
-- no functional requirement yet: the Algorithm Visualization Engine is outside V1 (SRS 1, V1 Release Scope) and its requirements are written when the Learner actor enters scope (convergence animation): animated GIF format required.
+- FR-34 `[DEFERRED]` (at least one visual representation of a registered Algorithm Instance): the convergence animation is this component's form of it, rendered as an animated GIF. Deferred with the Learner actor (SRS 1.4).
 - ADR-011: matplotlib.animation is the animation rendering approach.

@@ -32,11 +32,11 @@ not reachable from `main`.
 
 Three things make it a launch blocker rather than clutter:
 
-- It contains hardcoded credentials in added lines: `researcher123` in
-  `src/presentation-layer/web-ui/index.html` and both `researcher123` and `admin123` in
-  `src/support-layer/auth-service/main.py`. They are demonstration passwords, not production
-  secrets, but a public repository containing credentials invites automated scanners and reads
-  as carelessness.
+- It contained hardcoded credentials in added lines, in the web UI template and in the auth
+  service entry point. They were demonstration passwords rather than production secrets, but a
+  public repository containing credentials invites automated scanners and reads as carelessness.
+  The literals are deliberately not reproduced here, so that removing the branch also removes
+  them from the corpus.
 - It carries its own `LICENSE`, MIT, copyright 2024 Aviarium Software. `main` is
   AGPL-3.0-or-later (ADR-022). Two licences in one repository is a question every prospective
   user will have to resolve for themselves, and the wrong answer is permissive.

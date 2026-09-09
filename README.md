@@ -237,7 +237,22 @@ refused (FR-27).
 
 ## License
 
-WIP: license pending ADR decision (REF-TASK-0011). The intent from the manifesto is open code and open data under licenses that support scientific reuse and community contributions.
+**GNU Affero General Public License, version 3.0 or later** ([`LICENSE`](LICENSE),
+[ADR-022](docs/02-design/02-architecture/01-adr/adr-022-agpl-licence-and-dependency-policy.md)).
+
+You may use, modify and redistribute this code, provided that what you build on it is released
+under the same licence. The Affero clause extends that to network use: offering Corvus Corone,
+or a modified version of it, as a hosted service obliges you to publish the corresponding source.
+
+Two practical notes:
+
+- **Private benchmarking is unrestricted.** The obligations attach on distribution and on network
+  service, not on private use. Benchmarking a proprietary optimizer for your own purposes requires
+  nothing of you.
+- **Contributing an algorithm adapter does trigger the licence.** An adapter submitted to the
+  shared registry is a derivative work, so a proprietary optimizer cannot be contributed without
+  being licensed compatibly. This narrows the algorithm portfolio, which is a cost accepted
+  deliberately and argued in ADR-022.
 
 ## Contact Information
 

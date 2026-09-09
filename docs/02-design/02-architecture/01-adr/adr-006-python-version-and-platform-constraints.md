@@ -1,6 +1,12 @@
 # ADR-006: Python Version, Platform, and Dependency License Constraints
 
-**Status:** Accepted
+**Status:** Accepted; the licensing clauses are superseded by
+[ADR-022](adr-022-agpl-licence-and-dependency-policy.md)
+
+> **Superseded in part.** The statement that Corvus Corone is MIT-licensed, and the
+> dependency policy that follows from it, are replaced by ADR-022: the project is
+> AGPL-3.0-or-later, and the dependency rule is compatibility with that licence rather
+> than exclusion of copyleft. The Python version and platform decisions below stand.
 
 **Date:** 2026-03-23
 

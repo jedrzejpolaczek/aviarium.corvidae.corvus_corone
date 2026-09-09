@@ -72,9 +72,9 @@ flowchart LR
 
 | Component | File | Responsibility |
 |---|---|---|
-| API Facade | [api-facade.md](02-api-facade.md) | Top-level `cc.*` functions; input validation; delegation to core containers |
-| CLI Command Group | [cli-command-group.md](03-cli-command-group.md) | Click-based CLI mapping subcommands to API Facade calls |
-| Response Mapper | [response-mapper.md](04-response-mapper.md) | Transforms internal domain objects to stable, versioned API return types |
+| API Facade | [02-api-facade.md](02-api-facade.md) | Top-level `cc.*` functions; input validation; delegation to core containers |
+| CLI Command Group | [03-cli-command-group.md](03-cli-command-group.md) | Click-based CLI mapping subcommands to API Facade calls |
+| Response Mapper | [04-response-mapper.md](04-response-mapper.md) | Transforms internal domain objects to stable, versioned API return types |
 
 ---
 

@@ -37,7 +37,7 @@
 
 - Anti-pattern: AP-4 (Opaque analysis pipelines)
 - Prevents: Opacity in analysis outputs
-- Enforced by: FR-15, FR-16 (three-level analysis with inspectable outputs)
+- Enforced by: FR-15 (three-level analysis), FR-16 (multiple-testing correction)
 
 ## CONST-SCI-05
 

@@ -7,15 +7,15 @@ Without it, the same data can support contradictory conclusions.
 
 NARRATIVE POSITION:
   MANIFESTO Principles 13, 15 → Statistical Methodology → (how we analyze and report)
-  → methodology/benchmarking-protocol.md §Step 6: the protocol invokes this guide there
+  → docs/04-scientific-practice/01-methodology/01-benchmarking-protocol.md §Step 6: the protocol invokes this guide there
 
 CONNECTS TO:
   ← docs/01-manifesto/MANIFESTO.md Principles 13, 15 : directly operationalized by this document
   ← docs/02-design/01-software-requirement-specification/01-srs/01-SRS.md NFR-STAT-01 : non-functional requirement for statistical validity
-  → docs/03-technical-contracts/metric-taxonomy.md    : metric properties (distribution, bounds) guide test selection here
-  → docs/03-technical-contracts/interface-contracts.md §4 : Analyzer interface implements this methodology
+  → docs/03-technical-contracts/03-metric-taxonomy/01-index.md    : metric properties (distribution, bounds) guide test selection here
+  → docs/03-technical-contracts/02-interface-contracts/01-index.md §4 : Analyzer interface implements this methodology
   → docs/03-technical-contracts/01-data-format/08-result-aggregate.md   : Result Aggregate fields store uncertainty information defined here
-  → docs/04_scientific_practice/methodology/benchmarking-protocol.md : protocol's analysis step (Step 6) references this guide
+  → docs/04-scientific-practice/01-methodology/01-benchmarking-protocol.md : protocol's analysis step (Step 6) references this guide
   → docs/GLOSSARY.md            : terms like "Effect Size", "Anytime Performance" are defined there
 
 NOTE: This document describes methodology — what to do and why.
@@ -532,7 +532,7 @@ A catalogue of mistakes this methodology is designed to prevent. Each entry stat
 
 **MANIFESTO violation:** Principle 16 (planning precedes execution), Principle 29 (objectivity over promotion).
 
-**How this system prevents it:** Hypotheses are stored in the Study record's `pre_registered_hypotheses` field (`docs/03-technical-contracts/01-data-format/01-index.md` §2.3) before any data collection begins. The Analyzer interface (`docs/03-technical-contracts/interface-contracts.md` §4) only tests pre-registered hypotheses in Level 2; post-hoc observations are labeled "exploratory" in the output.
+**How this system prevents it:** Hypotheses are stored in the Study record's `pre_registered_hypotheses` field (`docs/03-technical-contracts/01-data-format/01-index.md` §2.3) before any data collection begins. The Analyzer interface (`docs/03-technical-contracts/02-interface-contracts/01-index.md` §4) only tests pre-registered hypotheses in Level 2; post-hoc observations are labeled "exploratory" in the output.
 
 ---
 
@@ -544,7 +544,7 @@ A catalogue of mistakes this methodology is designed to prevent. Each entry stat
 
 **MANIFESTO violation:** Principle 15 ("we report not only averages, but also spread, quantiles, success probabilities").
 
-**Prevention:** §6 Uncertainty Reporting Requirements — the system enforces that `ROBUSTNESS-RESULT_STABILITY` and `RELIABILITY-SUCCESS_RATE` are always reported alongside `QUALITY-BEST_VALUE_AT_BUDGET` in the Standard Reporting Set (`docs/03-technical-contracts/metric-taxonomy.md` §3).
+**Prevention:** §6 Uncertainty Reporting Requirements — the system enforces that `ROBUSTNESS-RESULT_STABILITY` and `RELIABILITY-SUCCESS_RATE` are always reported alongside `QUALITY-BEST_VALUE_AT_BUDGET` in the Standard Reporting Set (`docs/03-technical-contracts/03-metric-taxonomy/01-index.md` §3).
 
 ---
 
@@ -568,7 +568,7 @@ A catalogue of mistakes this methodology is designed to prevent. Each entry stat
 
 **MANIFESTO violation:** Principle 3 (understanding before generalizing), Principle 30 (NFL limitations).
 
-**Prevention:** Every system-generated conclusion includes an explicit scope statement: for which Problem Instances and Algorithm Instances the conclusion holds. Extrapolation is labeled and must be separately justified. See `docs/04_scientific_practice/methodology/benchmarking-protocol.md` Step 7 (Scope and Report Conclusions).
+**Prevention:** Every system-generated conclusion includes an explicit scope statement: for which Problem Instances and Algorithm Instances the conclusion holds. Extrapolation is labeled and must be separately justified. See `docs/04-scientific-practice/01-methodology/01-benchmarking-protocol.md` Step 7 (Scope and Report Conclusions).
 
 ---
 
@@ -592,4 +592,4 @@ A catalogue of mistakes this methodology is designed to prevent. Each entry stat
 
 **MANIFESTO violation:** Principle 14 (full performance curves, not just endpoints).
 
-**Prevention:** `ANYTIME-ECDF_AREA` is mandatory in the Standard Reporting Set (`docs/03-technical-contracts/metric-taxonomy.md` §3). Full Performance Records are required to be stored for all Runs, enabling comparison at any budget level.
+**Prevention:** `ANYTIME-ECDF_AREA` is mandatory in the Standard Reporting Set (`docs/03-technical-contracts/03-metric-taxonomy/01-index.md` §3). Full Performance Records are required to be stored for all Runs, enabling comparison at any budget level.

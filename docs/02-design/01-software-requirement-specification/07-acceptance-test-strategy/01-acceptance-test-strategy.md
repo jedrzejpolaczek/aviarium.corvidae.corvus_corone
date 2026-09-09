@@ -11,11 +11,11 @@ NARRATIVE POSITION:
   Use Cases → End-to-end integration tests + tutorials
 
 CONNECTS TO:
-  ← functional-requirements.md                                : every FR must be covered by a test category
-  ← non-functional-requirements.md                            : every NFR has a designated test category
-  ← constraints.md                                            : CONST-XX constraints have enforcement tests
-  ← use-cases.md                                              : every UC must have an end-to-end test
-  → docs/02-design/02-architecture/c3-components.md           : test file paths aligned to C3 components
+  ← 03-functional-requirements/01-index.md                                : every FR must be covered by a test category
+  ← 04-non-functional-requirements/01-index.md                            : every NFR has a designated test category
+  ← 05-constraints/01-index.md                                            : CONST-XX constraints have enforcement tests
+  ← 02-use-cases/01-index.md                                              : every UC must have an end-to-end test
+  → docs/02-design/02-architecture/03-c4-leve2-containers/04-c4-leve3-components/01-c4-l3-components/01-c4-l3-components.md           : test file paths aligned to C3 components
   
 NOTE ON TEST FILE PATHS:
   Paths under tests/unit/ and tests/e2e/test_uc03–06/ are planned; they will be created as
@@ -39,7 +39,7 @@ A requirement is considered accepted when its designated test category passes.
 | Validation rejection tests | Invalid entity registrations are rejected with specific errors | FR-02, FR-06, FR-07 | UC-02 F1–F4; UC-04 F1 |
 | Interoperability tests | Export round-trips produce loadable files; information-loss manifest is produced | NFR-INTEROP-01; FR-23, FR-24, FR-25, FR-26 | UC-06 |
 | Plugin tests | New Algorithm Instance and Problem Instance can be contributed and used without modifying core library | NFR-MODULAR-01; FR-01–FR-07 | UC-02, UC-04 |
-| Constraint enforcement tests | CONST-SCI-01 through CONST-SCI-06 cannot be violated by any API path | FR-21; `constraints.md` Scientific Constraints | UC-03 F1 |
+| Constraint enforcement tests | CONST-SCI-01 through CONST-SCI-06 cannot be violated by any API path | FR-21; `05-constraints/01-index.md` Scientific Constraints | UC-03 F1 |
 | Usability tests | Timed tutorial completion within stated targets | NFR-USABILITY-01 | UC-01, UC-02 |
 | Open format compliance tests | Raw Data export formats are on the approved open-format list | NFR-OPEN-01; FR-22; CONST-COM-03 | UC-01 Step 10 |
 

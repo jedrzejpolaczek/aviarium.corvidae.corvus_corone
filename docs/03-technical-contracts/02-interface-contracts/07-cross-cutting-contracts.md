@@ -140,6 +140,6 @@ the following sections:
 | **Returns** | Type and semantics of the return value |
 | **Raises** | Every exception from §Error Taxonomy that this method raises, with the condition that triggers it |
 | **Example** | At least one usage example |
-| **References** | Links to relevant specs (e.g., `metric_name → metric-taxonomy.md §2.1`) |
+| **References** | Links to relevant specs (e.g., `metric_name → 03-metric-taxonomy/01-index.md §2.1`) |
 
 → C4 code documents specify additional per-component docstring requirements.

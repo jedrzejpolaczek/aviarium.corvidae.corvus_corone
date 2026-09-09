@@ -62,10 +62,10 @@ flowchart LR
 
 | Component | File | Responsibility |
 |---|---|---|
-| Result Reader | [result-reader.md](02-result-reader.md) | Loads aggregated MetricResults and entity metadata from the Results Store |
-| Mandatory Viz Renderer | [mandatory-viz-renderer.md](03-mandatory-viz-renderer.md) | Generates the visualizations that must appear in every report via the Algorithm Visualization Engine |
-| HTML Template Renderer | [html-template-renderer.md](04-html-template-renderer.md) | Assembles the complete HTML report from component outputs using Jinja2 templates |
-| Limitations Enforcer | [limitations-enforcer.md](05-limitations-enforcer.md) | Validates that all required report sections are present; raises `ValidationError` if any are missing |
+| Result Reader | [02-result-reader.md](02-result-reader.md) | Loads aggregated MetricResults and entity metadata from the Results Store |
+| Mandatory Viz Renderer | [03-mandatory-viz-renderer.md](03-mandatory-viz-renderer.md) | Generates the visualizations that must appear in every report via the Algorithm Visualization Engine |
+| HTML Template Renderer | [04-html-template-renderer.md](04-html-template-renderer.md) | Assembles the complete HTML report from component outputs using Jinja2 templates |
+| Limitations Enforcer | [05-limitations-enforcer.md](05-limitations-enforcer.md) | Validates that all required report sections are present; raises `ValidationError` if any are missing |
 
 ---
 

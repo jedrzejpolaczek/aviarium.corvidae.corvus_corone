@@ -16,7 +16,7 @@ CONNECTS TO:
 
 MAINTENANCE RULE:
   When an ADR changes the meaning or scope of a term, update this glossary first.
-  When a new interface is defined in docs/03-technical-contracts/interface-contracts.md, add any new terms here first.
+  When a new interface is defined in docs/03-technical-contracts/02-interface-contracts/01-index.md, add any new terms here first.
   If a term appears in more than one document with slightly different meanings, that is a bug —
   resolve it here, then update all documents.
 -->
@@ -177,7 +177,7 @@ Terms are listed alphabetically within sections.
 
 **Distinguished from:** *Performance Record* (raw per-evaluation snapshot within a single Run), *Run* (a single execution). A Result Aggregate is always computed — never directly recorded during execution.
 
-**Used in:** `docs/01-manifesto/MANIFESTO.md` Principles 12–14, `docs/03-technical-contracts/01-data-format/08-result-aggregate.md`, `docs/03-technical-contracts/03-metric-taxonomy/01-metric-taxonomy.md`.
+**Used in:** `docs/01-manifesto/MANIFESTO.md` Principles 12–14, `docs/03-technical-contracts/01-data-format/08-result-aggregate.md`, `docs/03-technical-contracts/03-metric-taxonomy/01-index.md`.
 
 ---
 
@@ -337,11 +337,11 @@ Terms are listed alphabetically within sections.
 
 ### Performance Metric
 
-**Definition:** A scalar quantity derived from one or more Runs that quantifies a specific aspect of algorithm behavior. All Performance Metrics used in this system are formally defined in `docs/03-technical-contracts/03-metric-taxonomy/01-metric-taxonomy.md`.
+**Definition:** A scalar quantity derived from one or more Runs that quantifies a specific aspect of algorithm behavior. All Performance Metrics used in this system are formally defined in `docs/03-technical-contracts/03-metric-taxonomy/01-index.md`.
 
 **Distinguished from:** raw objective function values (unaggregated outputs of individual evaluations). A Performance Metric is always computed from the results of one or more complete Runs.
 
-**Used in:** `docs/01-manifesto/MANIFESTO.md` Principle 12, `docs/03-technical-contracts/03-metric-taxonomy/01-metric-taxonomy.md`, `docs/04-scientific-practice/01-methodology/02-statistical-methodology.md`.
+**Used in:** `docs/01-manifesto/MANIFESTO.md` Principle 12, `docs/03-technical-contracts/03-metric-taxonomy/01-index.md`, `docs/04-scientific-practice/01-methodology/02-statistical-methodology.md`.
 
 ---
 
@@ -571,7 +571,7 @@ Terms are listed alphabetically within sections.
 
 **Distinguished from:** an algorithm's *mathematical specification* (which describes how it works, not where it came from) and from *Algorithm Visualization* (which depicts how an algorithm searches, not its historical context). Algorithm Genealogy answers "where did this algorithm come from?"; Algorithm Visualization answers "how does it behave?".
 
-**Used in:** `docs/02-design/01-software-requirement-specification/02-use-cases/11-uc-10.md` (UC-10: Algorithm History), `docs/02-design/02-architecture/04-c4-leve3-components/02-corvus-pilot.md`. IMPL-046.
+**Used in:** `docs/02-design/01-software-requirement-specification/02-use-cases/11-uc-10.md` (UC-10: Algorithm History), `docs/02-design/02-architecture/04-c4-leve3-components/02-corvus-pilot/01-index.md`. IMPL-046.
 
 **Example:** The CMA-ES genealogy includes Evolution Strategies (1960s–1970s) as ancestors, CMA (1996) as the covariance-matrix refinement, and variants such as BIPOP-CMA-ES and separable CMA-ES as descendants. The genealogy records the design problem each step solved (e.g., "how to adapt step size without manual tuning").
 
@@ -607,6 +607,6 @@ Terms are listed alphabetically within sections.
 
 **Distinguished from:** *direct-answer mode* (the default Corvus Pilot mode, which answers factual and task queries immediately). Socratic Mode is explicitly opt-in: activated by the `--mode socratic` CLI flag or by `mode: "socratic"` in `PilotState`. The two modes differ in routing, output structure (question vs answer), and goal (maximise Learner's independent reasoning vs minimise turns to resolution). Socratic Mode is implemented as a separate LangGraph node (`socratic_guide`), not as a prompt modification of the direct-answer node.
 
-**Used in:** `docs/02-design/01-software-requirement-specification/02-use-cases/10-uc-09.md` (UC-09: Socratic Guided Deduction), `docs/02-design/02-architecture/03-c4-leve2-containers/14-corvus-pilot.md`, `docs/02-design/02-architecture/04-c4-leve3-components/02-corvus-pilot.md` (Socratic Guide Node, Query Router), `docs/06-tutorials/05-learner-socratic-mode.md`. IMPL-045.
+**Used in:** `docs/02-design/01-software-requirement-specification/02-use-cases/10-uc-09.md` (UC-09: Socratic Guided Deduction), `docs/02-design/02-architecture/03-c4-leve2-containers/14-corvus-pilot.md`, `docs/02-design/02-architecture/04-c4-leve3-components/02-corvus-pilot/01-index.md` (Socratic Guide Node, Query Router), `docs/06-tutorials/05-learner-socratic-mode.md`. IMPL-045.
 
 **Example:** Learner asks: "Why does CMA-ES use a covariance matrix?" Socratic Mode response: "What does the covariance matrix represent geometrically? Think about what information it encodes about the search space." The system does not answer the original question; it asks a question that helps the Learner derive the answer themselves.

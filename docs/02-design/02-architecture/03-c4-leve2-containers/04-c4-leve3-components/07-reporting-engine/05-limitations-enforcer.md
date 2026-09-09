@@ -27,7 +27,7 @@ class LimitationsEnforcer:
     # VIZ-L1-04 (violin) is required only for cells contributing more than 50 Runs,
     # where it replaces VIZ-L1-01. Trajectory and sensitivity plots are NOT report
     # sections: they belong to the Algorithm Visualization Engine, which is outside
-    # V1. See ADR-018 and statistical-methodology.md 2.1.
+    # V1. See ADR-018 and 02-statistical-methodology.md 2.1.
 
     def validate(
         self,

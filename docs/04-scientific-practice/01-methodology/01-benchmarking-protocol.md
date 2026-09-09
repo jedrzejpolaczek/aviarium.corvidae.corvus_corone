@@ -13,9 +13,9 @@ NARRATIVE POSITION:
 CONNECTS TO:
   ← docs/01-manifesto/MANIFESTO.md Principles 1–3, 4–7, 8–11, 16–18 : each step implements these principles
   ← docs/02-design/01-software-requirement-specification/01-srs/01-SRS.md §3   : use case UC-01 maps to this protocol
-  → docs/04_scientific_practice/methodology/statistical-methodology.md : Steps 7–8 (Analyze, Report) delegate to that guide
-  → docs/03-technical-contracts/metric-taxonomy.md §4 : Step 5 (Specify metrics) uses the selection guide there
-  → docs/03-technical-contracts/interface-contracts.md : Steps 3–4 (configure algorithms/problems) must follow contracts
+  → docs/04-scientific-practice/01-methodology/02-statistical-methodology.md : Steps 7–8 (Analyze, Report) delegate to that guide
+  → docs/03-technical-contracts/03-metric-taxonomy/01-index.md §4 : Step 5 (Specify metrics) uses the selection guide there
+  → docs/03-technical-contracts/02-interface-contracts/01-index.md : Steps 3–4 (configure algorithms/problems) must follow contracts
   → docs/03-technical-contracts/01-data-format/01-index.md    : every step produces artifacts conforming to schemas there
   → docs/GLOSSARY.md        : exact terms used throughout — Algorithm Instance, Problem Instance, Study, Run, Budget
   
@@ -49,7 +49,7 @@ Step 5: Specify Measurements  ← metrics and budget locked here
     ↓
 Step 6: Execute the Experiment (data collection)
     ↓
-Step 7: Analyze Results  →  statistical-methodology.md (three-level)
+Step 7: Analyze Results  →  02-statistical-methodology.md (three-level)
     ↓
 Step 8: Scope and Report Conclusions
     │
@@ -98,7 +98,7 @@ A valid Research Question (→ GLOSSARY) must contain four elements:
 
 **Why this step must come before data collection:**
 
-Hypotheses selected after seeing data are observations, not predictions. They are statistically invalid as confirmatory tests — see `docs/04_scientific_practice/methodology/statistical-methodology.md` §7, Pitfall 1 (Post-hoc hypothesis selection). MANIFESTO Principle 16 is explicit: experimental design is consciously planned before data collection.
+Hypotheses selected after seeing data are observations, not predictions. They are statistically invalid as confirmatory tests — see `docs/04-scientific-practice/01-methodology/02-statistical-methodology.md` §7, Pitfall 1 (Post-hoc hypothesis selection). MANIFESTO Principle 16 is explicit: experimental design is consciously planned before data collection.
 
 **What to specify for each hypothesis:**
 
@@ -106,12 +106,12 @@ Hypotheses selected after seeing data are observations, not predictions. They ar
 2. **H₁ (alternative hypothesis):** The directional or non-directional alternative (e.g., "Algorithm A achieves better `QUALITY-BEST_VALUE_AT_BUDGET` than Algorithm B")
 3. **Statistical test planned:** Which test will be used — use the decision tree in `docs/04-scientific-practice/01-methodology/02-statistical-methodology.md` §3 (Wilcoxon signed-rank for 2 algorithms; Kruskal-Wallis for >2)
 4. **Significance threshold α:** Typically 0.05, but must be stated explicitly
-5. **Multiple testing correction:** If more than one hypothesis is tested — state which correction method (Holm-Bonferroni is the default; see `statistical-methodology.md` §3)
-6. **Metrics involved:** Which metric IDs from `docs/03-technical-contracts/metric-taxonomy.md` are used to evaluate this hypothesis
+5. **Multiple testing correction:** If more than one hypothesis is tested — state which correction method (Holm-Bonferroni is the default; see `02-statistical-methodology.md` §3)
+6. **Metrics involved:** Which metric IDs from `docs/03-technical-contracts/03-metric-taxonomy/01-index.md` are used to evaluate this hypothesis
 
 **System enforcement:**
 
-Pre-registered hypotheses are stored in the Study record before the Experiment begins. The Analyzer (`docs/03-technical-contracts/interface-contracts.md` §4) only tests hypotheses found in this pre-registered list in Level 2 (Confirmatory) analysis. Any hypothesis tested outside this list is automatically labeled "post-hoc / exploratory" in the output and cannot appear in the confirmatory section of the report.
+Pre-registered hypotheses are stored in the Study record before the Experiment begins. The Analyzer (`docs/03-technical-contracts/02-interface-contracts/01-index.md` §4) only tests hypotheses found in this pre-registered list in Level 2 (Confirmatory) analysis. Any hypothesis tested outside this list is automatically labeled "post-hoc / exploratory" in the output and cannot appear in the confirmatory section of the report.
 
 **Exploratory analysis is still valuable — but it is separate:**
 
@@ -159,7 +159,7 @@ exempt but produce no Level 2 (Confirmatory) output.
 
 | Rule | Requirement | Rationale |
 |---|---|---|
-| D-1 | ≥ 5 Problem Instances | Minimum for Wilcoxon signed-rank power (statistical-methodology.md §3.4) |
+| D-1 | ≥ 5 Problem Instances | Minimum for Wilcoxon signed-rank power (02-statistical-methodology.md §3.4) |
 | D-2 | Instances from ≥ 2 of: low (≤5 dims), medium (6–20), high (>20) | Results must span more than one dimensionality regime to be generalisable |
 | D-3 | ≥ 1 stochastic + ≥ 1 deterministic (`objective.noise_level`) | Noise fundamentally changes algorithm behaviour; both classes must be represented |
 
@@ -228,7 +228,7 @@ Principle 11 produces actionable documentation rather than a checkbox.
 
 **Required metrics — Standard Reporting Set:**
 
-All four metrics from `docs/03-technical-contracts/metric-taxonomy.md` §3 must be included in every study. No exceptions:
+All four metrics from `docs/03-technical-contracts/03-metric-taxonomy/01-index.md` §3 must be included in every study. No exceptions:
 
 | Metric | Why mandatory |
 |---|---|
@@ -239,7 +239,7 @@ All four metrics from `docs/03-technical-contracts/metric-taxonomy.md` §3 must 
 
 **Optional additional metrics:**
 
-Use the Metric Selection Guide (`docs/03-technical-contracts/metric-taxonomy.md` §4) to select metrics appropriate for your Research Question type. For each additional metric, document *why* it was chosen — metric selection that cannot be justified from the Research Question is a sign of post-hoc cherry-picking and will be flagged in the Confirmatory analysis step.
+Use the Metric Selection Guide (`docs/03-technical-contracts/03-metric-taxonomy/01-index.md` §4) to select metrics appropriate for your Research Question type. For each additional metric, document *why* it was chosen — metric selection that cannot be justified from the Research Question is a sign of post-hoc cherry-picking and will be flagged in the Confirmatory analysis step.
 
 **Performance curve sampling strategy:**
 
@@ -305,7 +305,7 @@ Long studies should use the Runner's resume capability to recover from infrastru
 
 **This step does not permit revisiting or modifying Steps 1–6.** The Study plan is locked. The analysis follows the pre-registered hypotheses.
 
-Delegate the full analysis to `docs/04_scientific_practice/methodology/statistical-methodology.md`. The required sequence is the three-level framework (§1 of that document):
+Delegate the full analysis to `docs/04-scientific-practice/01-methodology/02-statistical-methodology.md`. The required sequence is the three-level framework (§1 of that document):
 
 **Level 1 — Exploratory Data Analysis:**
 Visualize all Run data and Performance curves. Identify anomalies (failed Runs, outliers) and document them. Produce observations — not conclusions. If anomalies indicate a bug or setup error, investigate before proceeding; do not silently exclude problematic Runs.
@@ -319,7 +319,7 @@ Any observation from Level 1 that suggests an untested hypothesis must be docume
 For every hypothesis where Level 2 produces a statistically significant result, compute the Effect Size (→ GLOSSARY). Report the Effect Size alongside the p-value. A result is only actionable if both levels agree it is significant.
 
 **Standard Reporting Set:**
-Compute and report all metrics from the Standard Reporting Set (`docs/03-technical-contracts/metric-taxonomy.md` §3) for every (Algorithm Instance, Problem Instance) combination. These four metrics are non-negotiable:
+Compute and report all metrics from the Standard Reporting Set (`docs/03-technical-contracts/03-metric-taxonomy/01-index.md` §3) for every (Algorithm Instance, Problem Instance) combination. These four metrics are non-negotiable:
 - `QUALITY-BEST_VALUE_AT_BUDGET`
 - `RELIABILITY-SUCCESS_RATE`
 - `ROBUSTNESS-RESULT_STABILITY`
@@ -369,6 +369,6 @@ This section is not optional or a gesture toward humility. It is the primary mec
 
 **Archival (Principles 19–22):**
 
-Archive the complete Study record + Experiment record + all Run data + analysis scripts under a versioned identifier. Publish to the long-term artifact repository configured in `docs/05-community/versioning-governance.md` §4.
+Archive the complete Study record + Experiment record + all Run data + analysis scripts under a versioned identifier. Publish to the long-term artifact repository configured in `docs/05-community/02-versioning-governance.md` §4.
 
 This archival is what makes the study reproducible by a different team years from now — the core scientific value of this system.

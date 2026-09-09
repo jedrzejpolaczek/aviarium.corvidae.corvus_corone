@@ -7,10 +7,10 @@ and every MANIFESTO principle should produce at least one requirement.
 
 NARRATIVE POSITION:
   MANIFESTO (WHY) → SRS (index) → child documents (WHAT the system must do)
-  C1 (actors) feeds §3 (stakeholders and use cases) → use-cases.md
-  C2 (containers) feeds §4 (functional requirement grouping) → functional-requirements.md
-  interface-requirements.md feeds → docs/03-technical-contracts/interface-contracts.md and docs/03-technical-contracts/01-data-format/01-index.md (how)
-  acceptance-test-strategy.md feeds → tasks/tickets (what to test and verify)
+  C1 (actors) feeds §3 (stakeholders and use cases) → 02-use-cases/01-index.md
+  C2 (containers) feeds §4 (functional requirement grouping) → 03-functional-requirements/01-index.md
+  06-interface-requirements/01-index.md feeds → docs/03-technical-contracts/02-interface-contracts/01-index.md and docs/03-technical-contracts/01-data-format/01-index.md (how)
+  01-acceptance-test-strategy.md feeds → tasks/tickets (what to test and verify)
 
 FILE STRUCTURE — this SRS is an index document; detailed content lives in:
   ../02-use-cases/01-index.md                          : UC-01 through UC-11 (UC-07..UC-11 are post-V1)
@@ -26,7 +26,7 @@ CONNECTS TO:
   ← docs/02-design/02-architecture/02-c4-leve1-context/01-c4-l1-context/01-c1-context.md : actors become stakeholders; external systems become interface requirements
   ← docs/02-design/02-architecture/03-c4-leve2-containers/01-index.md : container grouping organizes the functional requirements
   → docs/03-technical-contracts/01-data-format/01-index.md : interface requirement data is detailed there
-  → docs/03-technical-contracts/02-interface-contracts/         : interface-requirements.md specifications are formalized there
+  → docs/03-technical-contracts/02-interface-contracts/         : 06-interface-requirements/01-index.md specifications are formalized there
   → docs/04-scientific-practice/01-methodology/02-statistical-methodology.md : NFR-STAT-01 operationalized there
   → docs/05-community/02-versioning-governance.md               : NFR-REPRO-01 and CONST-COM-XX operationalized there
   → docs/02-design/02-architecture/01-adr/                      : when a requirement drives an architectural decision, link the ADR

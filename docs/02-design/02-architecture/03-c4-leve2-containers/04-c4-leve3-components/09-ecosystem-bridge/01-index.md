@@ -65,10 +65,10 @@ flowchart LR
 
 | Component | File | Responsibility |
 |---|---|---|
-| COCO Exporter | [coco-exporter.md](02-coco-exporter.md) | Exports Study results to COCO BBOB format |
-| IOH Exporter | [ioh-exporter.md](03-ioh-exporter.md) | Exports Study results to IOHprofiler format |
-| Nevergrad Adapter | [nevergrad-adapter.md](04-nevergrad-adapter.md) | Bidirectional bridge between Corvus and Nevergrad optimizer API |
-| Loss Auditor | [loss-auditor.md](05-loss-auditor.md) | Validates export completeness and writes the information-loss manifest |
+| COCO Exporter | [02-coco-exporter.md](02-coco-exporter.md) | Exports Study results to COCO BBOB format |
+| IOH Exporter | [03-ioh-exporter.md](03-ioh-exporter.md) | Exports Study results to IOHprofiler format |
+| Nevergrad Adapter | [04-nevergrad-adapter.md](04-nevergrad-adapter.md) | Bidirectional bridge between Corvus and Nevergrad optimizer API |
+| Loss Auditor | [05-loss-auditor.md](05-loss-auditor.md) | Validates export completeness and writes the information-loss manifest |
 
 ---
 

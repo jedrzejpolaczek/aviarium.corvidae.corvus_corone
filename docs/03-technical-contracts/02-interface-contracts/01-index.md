@@ -15,14 +15,14 @@ and plug into the system without reading other implementations.
 NARRATIVE POSITION:
   C3 (component boundaries) → Interface Contracts → (formal boundary definitions)
   → C4 (code): concrete classes implement these contracts
-  → community/contribution-guide.md: contributors implement these contracts
+  → docs/05-community/01-contribution-guide.md: contributors implement these contracts
 
 CONNECTS TO:
   ← C3                          : each component boundary visible there is formalized here
   ← SRS §4, §7                  : requirements for interoperability and modularity
   → docs/03-technical-contracts/01-data-format/01-index.md        : all input/output types reference entities defined there
   → docs/03-technical-contracts/03-metric-taxonomy/01-index.md    : metric-related return types reference taxonomy names
-  → community/contribution-guide.md : all contribution types must implement a contract here
+  → docs/05-community/01-contribution-guide.md : all contribution types must implement a contract here
   → C4                          : code-level abstractions implement these contracts
   → Docstrings                  : every public method must have docstrings that document
                                   the contracts stated here (pre/postconditions, exceptions)

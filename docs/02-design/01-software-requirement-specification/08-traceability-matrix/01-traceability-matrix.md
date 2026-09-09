@@ -10,11 +10,11 @@ NARRATIVE POSITION:
 
 CONNECTS TO:
   ← docs/01-manifesto/MANIFESTO.md                : MANIFESTO Principles column source
-  ← use-cases.md                                   : UC rows and UC exercised column
-  ← functional-requirements.md                     : FR rows
-  ← non-functional-requirements.md                 : NFR rows
-  ← constraints.md                                 : CONST rows
-  ← acceptance-test-strategy.md                    : test category column
+  ← 02-use-cases/01-index.md                                   : UC rows and UC exercised column
+  ← 03-functional-requirements/01-index.md                     : FR rows
+  ← 04-non-functional-requirements/01-index.md                 : NFR rows
+  ← 05-constraints/01-index.md                                 : CONST rows
+  ← 01-acceptance-test-strategy.md                    : test category column
   → docs/02-design/02-architecture/03-c4-leve2-containers/01-index.md : C2 Container column
 -->
 
@@ -42,44 +42,44 @@ CONNECTS TO:
 
 | Req ID | MANIFESTO Principles | File | C2 Container | UC exercised | Test Category | Status |
 |---|---|---|---|---|---|---|
-| FR-01 | 4, 7 | `functional-requirements.md` §4.1 | Problem Repository | UC-04 | Unit, Validation rejection | Defined |
-| FR-02 | 7 | `functional-requirements.md` §4.1 | Problem Repository | UC-04 F1 | Validation rejection | Defined |
-| FR-03 | 6, 21 | `functional-requirements.md` §4.1 | Problem Repository | UC-04, UC-05 | Unit | Defined |
-| FR-04 | 21 | `functional-requirements.md` §4.1 | Problem Repository, Study Orchestrator | UC-01 | Integration | Defined |
-| FR-05 | 8, 10 | `functional-requirements.md` §4.2 | Algorithm Registry | UC-02 | Unit, Validation rejection | Defined |
-| FR-06 | 8, 19 | `functional-requirements.md` §4.2 | Algorithm Registry | UC-02 F2 | Validation rejection | Defined |
-| FR-07 | 10 | `functional-requirements.md` §4.2 | Algorithm Registry | UC-02 F3 | Validation rejection | Defined |
-| FR-08 | 16 | `functional-requirements.md` §4.3 | Study Orchestrator | UC-01 F3 | Pre-registration gate | Defined |
-| FR-09 | 18 | `functional-requirements.md` §4.3 | Experiment Runner | UC-01 | Integration, Reproducibility | Defined |
-| FR-10 | 19 | `functional-requirements.md` §4.3 | Experiment Runner | UC-01, UC-05 | Integration, Reproducibility | Defined |
-| FR-11 | 18 | `functional-requirements.md` §4.3 | Experiment Runner | UC-01 | Integration | Defined |
-| FR-12 | 19 | `functional-requirements.md` §4.3 | Experiment Runner | UC-01 F2 | Integration | Defined |
-| FR-13 | 12, 14 | `functional-requirements.md` §4.4 | Analysis Engine | UC-01 Step 7 | Integration, Statistical validity | Defined |
-| FR-14 | 14 | `functional-requirements.md` §4.4 | Experiment Runner | UC-01 | Unit | Defined |
-| FR-15 | 13 | `functional-requirements.md` §4.4 | Analysis Engine | UC-01 Step 8 | Statistical validity | Defined |
-| FR-16 | 15 | `functional-requirements.md` §4.4 | Analysis Engine | UC-01 Step 8 | Statistical validity | Defined |
-| FR-17 | 19, 21; ADR-001 | `functional-requirements.md` §4.5 | All | UC-01, UC-05 | Integration, Reproducibility | Defined |
-| FR-18 | 19 | `functional-requirements.md` §4.5 | Results Store | UC-05 | Reproducibility | Defined |
-| FR-19 | ADR-001 | `functional-requirements.md` §4.5 | All | UC-01 | Unit | Defined |
-| FR-20 | 25 | `functional-requirements.md` §4.6 | Reporting Engine | UC-01 Step 9, UC-03 | Integration | Defined |
-| FR-21 | 24 | `functional-requirements.md` §4.6 | Reporting Engine | UC-01 Step 9, UC-03 | Constraint enforcement | Defined |
-| FR-22 | 20, 25 | `functional-requirements.md` §4.6 | Reporting Engine | UC-01 Step 10 | Open format compliance | Defined |
-| FR-23 | 26 | `functional-requirements.md` §4.7 | Ecosystem Bridge | UC-06 | Interoperability | Defined |
-| FR-24 | 26 | `functional-requirements.md` §4.7 | Ecosystem Bridge | UC-06 | Interoperability | Defined |
-| FR-25 | 26 | `functional-requirements.md` §4.7 | Ecosystem Bridge, Algorithm Registry | UC-02, UC-06 | Interoperability, Plugin | Defined |
-| FR-26 | 24 | `functional-requirements.md` §4.7 | Ecosystem Bridge | UC-06 | Interoperability | Defined |
-| FR-27 | 16, 28 | `functional-requirements.md` §4.8 | Study Orchestrator, Public API + CLI | UC-01 | Usability, Validation rejection | Defined |
-| FR-28 | 16, 19 | `functional-requirements.md` §4.8 | Public API + CLI | UC-01 | Validation rejection | Defined |
-| FR-29 | 28 | `functional-requirements.md` §4.8 | All | UC-01, UC-02, UC-04 | Usability | Defined |
-| FR-30 | 4, 5 | `functional-requirements.md` §4.8 | Study Orchestrator | UC-01 | Statistical validity | Defined |
-| FR-31 | 3, 13 | `functional-requirements.md` §4.8 | Study Orchestrator, Reporting Engine | UC-01 | Constraint enforcement | Defined |
-| FR-32 | 4, 5 | `functional-requirements.md` §4.1 | Problem Repository, Study Orchestrator | UC-01 | Statistical validity | Defined |
-| FR-33 | 5 | `functional-requirements.md` §4.1 | Problem Repository, Study Orchestrator | UC-01 | Statistical validity | Defined |
-| FR-34 | 25, 28 | `functional-requirements.md` §4.9 | Algorithm Visualization Engine | UC-07 | Usability | Deferred (Phase 4) |
-| FR-35 | 25, 28 | `functional-requirements.md` §4.9 | Corvus Pilot | UC-08 | Usability | Deferred (Phase 4) |
-| FR-36 | 28 | `functional-requirements.md` §4.9 | Corvus Pilot | UC-09 | Usability | Deferred (Phase 4) |
-| FR-37 | 25 | `functional-requirements.md` §4.9 | Algorithm Visualization Engine | UC-10 | Usability | Deferred (Phase 4) |
-| FR-38 | 3, 25 | `functional-requirements.md` §4.9 | Reporting Engine, Corvus Pilot | UC-11 | Constraint enforcement | Deferred (Phase 4) |
+| FR-01 | 4, 7 | `03-functional-requirements/01-index.md` §4.1 | Problem Repository | UC-04 | Unit, Validation rejection | Defined |
+| FR-02 | 7 | `03-functional-requirements/01-index.md` §4.1 | Problem Repository | UC-04 F1 | Validation rejection | Defined |
+| FR-03 | 6, 21 | `03-functional-requirements/01-index.md` §4.1 | Problem Repository | UC-04, UC-05 | Unit | Defined |
+| FR-04 | 21 | `03-functional-requirements/01-index.md` §4.1 | Problem Repository, Study Orchestrator | UC-01 | Integration | Defined |
+| FR-05 | 8, 10 | `03-functional-requirements/01-index.md` §4.2 | Algorithm Registry | UC-02 | Unit, Validation rejection | Defined |
+| FR-06 | 8, 19 | `03-functional-requirements/01-index.md` §4.2 | Algorithm Registry | UC-02 F2 | Validation rejection | Defined |
+| FR-07 | 10 | `03-functional-requirements/01-index.md` §4.2 | Algorithm Registry | UC-02 F3 | Validation rejection | Defined |
+| FR-08 | 16 | `03-functional-requirements/01-index.md` §4.3 | Study Orchestrator | UC-01 F3 | Pre-registration gate | Defined |
+| FR-09 | 18 | `03-functional-requirements/01-index.md` §4.3 | Experiment Runner | UC-01 | Integration, Reproducibility | Defined |
+| FR-10 | 19 | `03-functional-requirements/01-index.md` §4.3 | Experiment Runner | UC-01, UC-05 | Integration, Reproducibility | Defined |
+| FR-11 | 18 | `03-functional-requirements/01-index.md` §4.3 | Experiment Runner | UC-01 | Integration | Defined |
+| FR-12 | 19 | `03-functional-requirements/01-index.md` §4.3 | Experiment Runner | UC-01 F2 | Integration | Defined |
+| FR-13 | 12, 14 | `03-functional-requirements/01-index.md` §4.4 | Analysis Engine | UC-01 Step 7 | Integration, Statistical validity | Defined |
+| FR-14 | 14 | `03-functional-requirements/01-index.md` §4.4 | Experiment Runner | UC-01 | Unit | Defined |
+| FR-15 | 13 | `03-functional-requirements/01-index.md` §4.4 | Analysis Engine | UC-01 Step 8 | Statistical validity | Defined |
+| FR-16 | 15 | `03-functional-requirements/01-index.md` §4.4 | Analysis Engine | UC-01 Step 8 | Statistical validity | Defined |
+| FR-17 | 19, 21; ADR-001 | `03-functional-requirements/01-index.md` §4.5 | All | UC-01, UC-05 | Integration, Reproducibility | Defined |
+| FR-18 | 19 | `03-functional-requirements/01-index.md` §4.5 | Results Store | UC-05 | Reproducibility | Defined |
+| FR-19 | ADR-001 | `03-functional-requirements/01-index.md` §4.5 | All | UC-01 | Unit | Defined |
+| FR-20 | 25 | `03-functional-requirements/01-index.md` §4.6 | Reporting Engine | UC-01 Step 9, UC-03 | Integration | Defined |
+| FR-21 | 24 | `03-functional-requirements/01-index.md` §4.6 | Reporting Engine | UC-01 Step 9, UC-03 | Constraint enforcement | Defined |
+| FR-22 | 20, 25 | `03-functional-requirements/01-index.md` §4.6 | Reporting Engine | UC-01 Step 10 | Open format compliance | Defined |
+| FR-23 | 26 | `03-functional-requirements/01-index.md` §4.7 | Ecosystem Bridge | UC-06 | Interoperability | Defined |
+| FR-24 | 26 | `03-functional-requirements/01-index.md` §4.7 | Ecosystem Bridge | UC-06 | Interoperability | Defined |
+| FR-25 | 26 | `03-functional-requirements/01-index.md` §4.7 | Ecosystem Bridge, Algorithm Registry | UC-02, UC-06 | Interoperability, Plugin | Defined |
+| FR-26 | 24 | `03-functional-requirements/01-index.md` §4.7 | Ecosystem Bridge | UC-06 | Interoperability | Defined |
+| FR-27 | 16, 28 | `03-functional-requirements/01-index.md` §4.8 | Study Orchestrator, Public API + CLI | UC-01 | Usability, Validation rejection | Defined |
+| FR-28 | 16, 19 | `03-functional-requirements/01-index.md` §4.8 | Public API + CLI | UC-01 | Validation rejection | Defined |
+| FR-29 | 28 | `03-functional-requirements/01-index.md` §4.8 | All | UC-01, UC-02, UC-04 | Usability | Defined |
+| FR-30 | 4, 5 | `03-functional-requirements/01-index.md` §4.8 | Study Orchestrator | UC-01 | Statistical validity | Defined |
+| FR-31 | 3, 13 | `03-functional-requirements/01-index.md` §4.8 | Study Orchestrator, Reporting Engine | UC-01 | Constraint enforcement | Defined |
+| FR-32 | 4, 5 | `03-functional-requirements/01-index.md` §4.1 | Problem Repository, Study Orchestrator | UC-01 | Statistical validity | Defined |
+| FR-33 | 5 | `03-functional-requirements/01-index.md` §4.1 | Problem Repository, Study Orchestrator | UC-01 | Statistical validity | Defined |
+| FR-34 | 25, 28 | `03-functional-requirements/01-index.md` §4.9 | Algorithm Visualization Engine | UC-07 | Usability | Deferred (Phase 4) |
+| FR-35 | 25, 28 | `03-functional-requirements/01-index.md` §4.9 | Corvus Pilot | UC-08 | Usability | Deferred (Phase 4) |
+| FR-36 | 28 | `03-functional-requirements/01-index.md` §4.9 | Corvus Pilot | UC-09 | Usability | Deferred (Phase 4) |
+| FR-37 | 25 | `03-functional-requirements/01-index.md` §4.9 | Algorithm Visualization Engine | UC-10 | Usability | Deferred (Phase 4) |
+| FR-38 | 3, 25 | `03-functional-requirements/01-index.md` §4.9 | Reporting Engine, Corvus Pilot | UC-11 | Constraint enforcement | Deferred (Phase 4) |
 
 ---
 
@@ -107,7 +107,7 @@ CONNECTS TO:
 | CONST-SCI-05 | Anti-pattern 6 | `05-constraints/01-index.md` | UC-01, UC-03 | FR-21 (mandatory limitations section) | Defined |
 | CONST-SCI-06 | Principle 3 | `05-constraints/01-index.md` | UC-01, UC-03 | FR-21 (scoped conclusions) | Defined |
 | CONST-COM-01 | Principle 20 | `05-constraints/01-index.md` | All | CONST-TECH-06 (licensecheck CI gate); ADR-006 | Defined |
-| CONST-COM-02 | Principle 20 | `05-constraints/01-index.md` | UC-01, UC-04 | versioning-governance.md §5 | Defined |
+| CONST-COM-02 | Principle 20 | `05-constraints/01-index.md` | UC-01, UC-04 | 02-versioning-governance.md §5 | Defined |
 | CONST-COM-03 | Principle 22 | `05-constraints/01-index.md` | UC-01 Step 10 | FR-22 (open format export) | Defined |
 | CONST-TECH-01 | ADR-001 | `05-constraints/01-index.md` | All | Repository interface design | Defined |
 | CONST-TECH-02 | ADR-001 | `05-constraints/01-index.md` | All | docs/03-technical-contracts/01-data-format/01-index.md | Defined |

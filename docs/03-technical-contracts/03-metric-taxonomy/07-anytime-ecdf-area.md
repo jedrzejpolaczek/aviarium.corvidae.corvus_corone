@@ -195,7 +195,7 @@ formula, which was not true before ADR-024.
 - *Recommended as default primary metric* for most research questions
 
 **Normative references:**
-- `ADR-003-anytime-curve-interpolation.md` — LOCF interpolation (§1 of computation procedure)
-- `ADR-007-ecdf-area-normalization.md` — empirical min/max bounds (§2 of computation procedure)
+- `adr-003-anytime-curve-interpolation.md` — LOCF interpolation (§1 of computation procedure)
+- `adr-007-ecdf-area-normalization.md` — empirical min/max bounds (§2 of computation procedure)
 
 **Implementation reference:** Pending IMPL-011 — `corvus_corone/analysis/metrics.py` → `compute_anytime_ecdf_area(performance_records)`

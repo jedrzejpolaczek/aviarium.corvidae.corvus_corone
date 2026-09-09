@@ -14,7 +14,7 @@ CONNECTS TO:
   → docs/04-scientific-practice/01-methodology/01-benchmarking-protocol.md : all 8 steps
   → docs/04-scientific-practice/01-methodology/02-statistical-methodology.md : Step 7 analysis
   → docs/03-technical-contracts/01-data-format/01-index.md : Study, Experiment, Run, Report schemas
-  → docs/03-technical-contracts/03-metric-taxonomy.md : Standard Reporting Set
+  → docs/03-technical-contracts/03-metric-taxonomy/01-index.md : Standard Reporting Set
   → docs/GLOSSARY.md : all entity names used here
 -->
 
@@ -438,10 +438,10 @@ corvus verify <experiment_id>
 ## What You Learned
 
 - **How to formulate a scoped research question** that prevents over-generalization
-  → [benchmarking-protocol.md Step 1](../04-scientific-practice/01-methodology/01-benchmarking-protocol.md#step-1-formulate-the-research-question)
+  → [01-benchmarking-protocol.md Step 1](../04-scientific-practice/01-methodology/01-benchmarking-protocol.md#step-1-formulate-the-research-question)
 
 - **Why pre-registration locks the study** and what happens if you try to change it
-  → [benchmarking-protocol.md Step 2](../04-scientific-practice/01-methodology/01-benchmarking-protocol.md#step-2-pre-register-hypotheses)
+  → [01-benchmarking-protocol.md Step 2](../04-scientific-practice/01-methodology/01-benchmarking-protocol.md#step-2-pre-register-hypotheses)
 
 - **How the sampling strategy works** — scheduled checkpoints + improvement records
   give you anytime analysis without storing every evaluation
@@ -449,7 +449,7 @@ corvus verify <experiment_id>
 
 - **How confirmatory and exploratory analysis are separated** in the report — post-hoc
   observations are valid but cannot masquerade as pre-registered findings
-  → [statistical-methodology.md](../04-scientific-practice/01-methodology/02-statistical-methodology.md)
+  → [02-statistical-methodology.md](../04-scientific-practice/01-methodology/02-statistical-methodology.md)
 
 - **What the limitations section is for** — not humility, but the primary mechanism
   against over-generalization (MANIFESTO Principle 24)
@@ -461,9 +461,9 @@ corvus verify <experiment_id>
 
 | What you want to do next | Where to go |
 |---|---|
-| Add your own HPO problem to the registry | `03-contributor-add-problem.md` *(coming soon)* |
-| Wrap your own optimizer (e.g., SMAC, HyperOpt) | `04-algorithm-author-wrap-optimizer.md` *(coming soon)* |
-| Understand the three-level statistical analysis in depth | [statistical-methodology.md](../04-scientific-practice/01-methodology/02-statistical-methodology.md) |
-| Export your results to IOHprofiler for visualization | `05-researcher-export-iohprofiler.md` *(coming soon)* |
-| Reproduce a study from a published archive | `06-researcher-reproduce-study.md` *(coming soon)* |
-| Understand what metrics are computed and why | [metric-taxonomy.md](../03-technical-contracts/03-metric-taxonomy/01-index.md) |
+| Add your own HPO problem to the registry | `02-researcher-design-and-execute-study.md` *(coming soon)* |
+| Wrap your own optimizer (e.g., SMAC, HyperOpt) | `04-algorithm-author-onboarding.md` *(coming soon)* |
+| Understand the three-level statistical analysis in depth | [02-statistical-methodology.md](../04-scientific-practice/01-methodology/02-statistical-methodology.md) |
+| Export your results to IOHprofiler for visualization | `03-nevergrad-adapter.md` *(coming soon)* |
+| Reproduce a study from a published archive | `02-researcher-design-and-execute-study.md` *(coming soon)* |
+| Understand what metrics are computed and why | [03-metric-taxonomy/01-index.md](../03-technical-contracts/03-metric-taxonomy/01-index.md) |

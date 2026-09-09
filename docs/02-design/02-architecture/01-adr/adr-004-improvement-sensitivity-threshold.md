@@ -10,7 +10,7 @@ CONNECTS TO:
   → docs/03-technical-contracts/01-data-format/04-study.md (improvement_epsilon field)
   → docs/03-technical-contracts/01-data-format/07-performance-record.md (is_improvement field)
   → docs/02-design/01-software-requirement-specification/05-constraints/02-const-scientific.md
-  → ADR-002-performance-recording-strategy.md : improvement trigger is one of the three triggers
+  → adr-002-performance-recording-strategy.md : improvement trigger is one of the three triggers
 -->
 
 ---
@@ -188,5 +188,5 @@ scale-invariant.
 |---|---|
 | `docs/03-technical-contracts/01-data-format/04-study.md` | Study — `improvement_epsilon` field governed by this ADR |
 | `docs/03-technical-contracts/01-data-format/07-performance-record.md` | PerformanceRecord — `is_improvement` semantics governed by this ADR |
-| `ADR-002-performance-recording-strategy.md` | Improvement trigger is one of the three triggers defined there; this ADR defines when it fires |
-| `ADR-005-performance-record-storage-cap.md` | Storage consequences of high improvement-record counts mitigated there |
+| `adr-002-performance-recording-strategy.md` | Improvement trigger is one of the three triggers defined there; this ADR defines when it fires |
+| `adr-005-performance-record-storage-cap.md` | Storage consequences of high improvement-record counts mitigated there |

@@ -10,7 +10,7 @@ NARRATIVE POSITION:
   Tutorials are the END of the documentation reading path for most users.
 
 CONNECTS TO:
-  → methodology/benchmarking-protocol.md : each tutorial demonstrates one or more protocol steps
+  → docs/04-scientific-practice/01-methodology/01-benchmarking-protocol.md : each tutorial demonstrates one or more protocol steps
   → docs/03-technical-contracts/02-interface-contracts/01-index.md : tutorials show how to implement or use interfaces
   → docs/GLOSSARY.md             : use defined terms; hyperlink on first use per tutorial
   → SRS §3                       : each tutorial covers at least one use case end-to-end
@@ -19,16 +19,16 @@ TUTORIAL TYPES to create (one file per tutorial):
   - Getting started: run your first benchmarking study
   - Contribute a benchmark problem: implement Problem Interface and submit
   - Contribute an algorithm: implement Algorithm Interface and submit
-  - Design a study: walk through benchmarking-protocol.md Steps 1–5
-  - Analyze results: walk through statistical-methodology.md three levels
+  - Design a study: walk through 01-benchmarking-protocol.md Steps 1–5
+  - Analyze results: walk through 02-statistical-methodology.md three levels
   - Export to IOHprofiler / COCO: interoperability workflow
   - Reproduce a published study: reproducibility verification workflow
   → Each tutorial corresponds to a use case in SRS §3.
 
 FILE NAMING: [audience]-[action]-[object].md
-  Example: researcher-design-study.md
-           contributor-add-problem.md
-           practitioner-select-algorithm.md
+  Example: 02-researcher-design-and-execute-study.md
+           02-researcher-design-and-execute-study.md
+           02-researcher-design-and-execute-study.md
 
 SELF-CONTAINMENT RULE: A reader should be able to complete this tutorial
 without reading other documents first. Cross-references are "for more detail",
@@ -234,8 +234,8 @@ The export prints an information-loss manifest before it writes anything (FR-24)
   Connect each point to the relevant document for further reading.
 
   Example:
-    - How to formulate a valid research question → methodology/benchmarking-protocol.md §Step 1
-    - How pre-registration prevents p-hacking → methodology/statistical-methodology.md §3
+    - How to formulate a valid research question → docs/04-scientific-practice/01-methodology/01-benchmarking-protocol.md §Step 1
+    - How pre-registration prevents p-hacking → docs/04-scientific-practice/01-methodology/02-statistical-methodology.md §3
     - How the seed contract ensures reproducibility → docs/03-technical-contracts/02-interface-contracts/01-index.md §6
 -->
 

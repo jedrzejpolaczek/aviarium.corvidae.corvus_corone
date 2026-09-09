@@ -6,7 +6,7 @@
 expected by external benchmarking platforms (COCO/BBOB, IOHprofiler, Nevergrad), and publish
 versioned datasets to artifact repositories (Zenodo, Figshare). Every export call returns an
 explicit information-loss manifest documenting every field that was dropped or approximated
-during translation (FR-26, NFR-INTEROP-01).
+during translation (FR-24, NFR-INTEROP-01).
 
 **Technology:** Python.
 
@@ -47,5 +47,7 @@ the export is produced. The caller confirms before proceeding.
 **Actors served:** Researcher (primary — cross-platform comparison and dataset publication,
 UC-06).
 
-**Relevant SRS section:** FR-23 (COCO export), FR-24 (IOHprofiler export), FR-25 (Nevergrad
-adapter), FR-26 (information-loss manifest), NFR-INTEROP-01 (lossless or documented export).
+**Relevant SRS section:** FR-23 (export in at least one external benchmark format), FR-24
+(information-loss manifest before any export), FR-25 (reject unsupported formats and
+incomplete exports), FR-26 (mappings documented and versioned with the schema),
+NFR-INTEROP-01 (lossless or documented export).

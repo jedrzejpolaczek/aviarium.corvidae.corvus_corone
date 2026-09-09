@@ -360,6 +360,6 @@ expects it. It is better to declare the dependency explicitly.
 |---|---|
 | `docs/03-technical-contracts/01-data-format/10-file-formats.md §3.3` | Operational specification for bulk storage that this ADR drives |
 | `docs/03-technical-contracts/01-data-format/07-performance-record.md` | §2.6 schema; column types in the Parquet file mirror this schema |
-| `ADR-001-library-with-server-ready-data-layer.md` | Primary-JSON constraint that makes `.jsonl` permanent alongside `.parquet` |
-| `ADR-005-performance-record-storage-cap.md` | Cap opt-out becomes less necessary when bulk Parquet storage makes per-record cost negligible |
-| `ADR-006-python-version-and-platform-constraints.md` | Platform support constraints consulted when adding pyarrow as a core dependency |
+| `adr-001-library-with-server-ready-data-layer.md` | Primary-JSON constraint that makes `.jsonl` permanent alongside `.parquet` |
+| `adr-005-performance-record-storage-cap.md` | Cap opt-out becomes less necessary when bulk Parquet storage makes per-record cost negligible |
+| `adr-006-python-version-and-platform-constraints.md` | Platform support constraints consulted when adding pyarrow as a core dependency |

@@ -6,7 +6,7 @@
 CONNECTS TO:
   ← §2 entity schemas     : every file described here stores an entity defined in §2
   → ADR-001               : the server-compatibility design constraint that shapes this layout
-  → interface-contracts.md §5 : Repository interface — the layout is its implementation detail
+  → 02-interface-contracts/01-index.md §5 : Repository interface — the layout is its implementation detail
   → src/corvus_corone/repository/local_file.py : the production implementation of this layout
 -->
 

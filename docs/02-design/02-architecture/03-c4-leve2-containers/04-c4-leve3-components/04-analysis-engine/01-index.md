@@ -55,10 +55,10 @@ flowchart LR
 
 | Component | File | Responsibility |
 |---|---|---|
-| Metric Dispatcher | [metric-dispatcher.md](02-metric-dispatcher.md) | Loads PerformanceRecords, computes configured metrics, and routes to Statistical Tester |
-| Statistical Tester | [statistical-tester.md](03-statistical-tester.md) | Applies pre-registered statistical tests (Wilcoxon signed-rank for 2 algorithms, Kruskal-Wallis with Holm-Bonferroni for more) via SciPy |
-| Scope Annotator | [scope-annotator.md](04-scope-annotator.md) | Tags every MetricResult with problem+algorithm+budget scope for downstream filtering |
-| LOCF Interpolator | [locf-interpolator.md](05-locf-interpolator.md) | Fills missing convergence observations using Last Observation Carried Forward |
+| Metric Dispatcher | [02-metric-dispatcher.md](02-metric-dispatcher.md) | Loads PerformanceRecords, computes configured metrics, and routes to Statistical Tester |
+| Statistical Tester | [03-statistical-tester.md](03-statistical-tester.md) | Applies pre-registered statistical tests (Wilcoxon signed-rank for 2 algorithms, Kruskal-Wallis with Holm-Bonferroni for more) via SciPy |
+| Scope Annotator | [04-scope-annotator.md](04-scope-annotator.md) | Tags every MetricResult with problem+algorithm+budget scope for downstream filtering |
+| LOCF Interpolator | [05-locf-interpolator.md](05-locf-interpolator.md) | Fills missing convergence observations using Last Observation Carried Forward |
 
 ---
 

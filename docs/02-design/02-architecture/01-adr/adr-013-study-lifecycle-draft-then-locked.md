@@ -11,7 +11,7 @@ CONNECTS TO:
   → docs/03-technical-contracts/04-public-api-contract.md : cc.create_study, cc.update_study
   → docs/03-technical-contracts/01-data-format/04-study.md : Study.status
   → docs/02-design/01-software-requirement-specification/03-functional-requirements/04-fr-4.3-experiment-runner.md : FR-08
-  → ADR-021-pre-registered-hypotheses-mandatory.md
+  → adr-021-pre-registered-hypotheses-mandatory.md
 -->
 
 ---
@@ -129,4 +129,4 @@ creation and locking coincide naturally and the draft phase adds nothing.
 | `docs/03-technical-contracts/04-public-api-contract.md` | Corrected by this ADR |
 | `docs/03-technical-contracts/02-interface-contracts/06-repository-interface.md` | Already describes this lifecycle |
 | `docs/03-technical-contracts/01-data-format/04-study.md` | `Study.status` enumeration |
-| `ADR-021-pre-registered-hypotheses-mandatory.md` | Defines what must be present before locking |
+| `adr-021-pre-registered-hypotheses-mandatory.md` | Defines what must be present before locking |

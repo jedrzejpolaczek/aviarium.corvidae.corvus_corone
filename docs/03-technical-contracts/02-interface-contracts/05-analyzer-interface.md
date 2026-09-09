@@ -31,13 +31,13 @@ Runs in an Experiment are complete.
   visualizations, and scoped conclusions
 
 **Semantics:**
-Runs the three-level analysis (→ statistical-methodology.md) on all completed Runs in the
+Runs the three-level analysis (→ 02-statistical-methodology.md) on all completed Runs in the
 specified Experiment. Computes metrics for each `(problem, algorithm)` pair, applies the
 specified statistical tests, and generates scoped conclusions.
 
 **Preconditions:**
 - `experiment.status == "completed"` — raises `ExperimentNotCompleteError` otherwise
-- all `metric_names` in `config` are valid entries in metric-taxonomy.md
+- all `metric_names` in `config` are valid entries in 03-metric-taxonomy/01-index.md
 
 **Postconditions:**
 - returned `AnalysisReport` contains one `ResultAggregate` per `(problem, algorithm)` pair
@@ -49,7 +49,7 @@ specified statistical tests, and generates scoped conclusions.
 
 **Exceptions:**
 - `ExperimentNotCompleteError` — experiment is still running or aborted
-- `UnknownMetricError` — a `metric_name` in `config` is not in metric-taxonomy.md
+- `UnknownMetricError` — a `metric_name` in `config` is not in 03-metric-taxonomy/01-index.md
 
 ---
 
@@ -57,7 +57,7 @@ specified statistical tests, and generates scoped conclusions.
 
 **Signature:**
 - `run_ids: list[str]` — IDs of completed Runs to aggregate over
-- `metric_names: list[str]` — metric names from metric-taxonomy.md
+- `metric_names: list[str]` — metric names from 03-metric-taxonomy/01-index.md
 - returns: `list[ResultAggregate]` — one aggregate per `(problem, algorithm)` group found
   in the specified runs
 
@@ -67,14 +67,14 @@ statistical tests or generate the full report. Used for partial or custom analys
 
 **Preconditions:**
 - all `run_ids` reference Runs with `status="completed"`
-- all `metric_names` are valid entries in metric-taxonomy.md
+- all `metric_names` are valid entries in 03-metric-taxonomy/01-index.md
 
 **Postconditions:**
 - every `metric_name` from the input is present in every `ResultAggregate` in the output
 - `ResultAggregate.n_runs` equals the count of contributing Runs per group
 
 **Exceptions:**
-- `UnknownMetricError` — a `metric_name` is not in metric-taxonomy.md
+- `UnknownMetricError` — a `metric_name` is not in 03-metric-taxonomy/01-index.md
 - `RunNotCompleteError` — a `run_id` references a Run that is not completed
 
 ---
@@ -84,19 +84,19 @@ statistical tests or generate the full report. Used for partial or custom analys
 **Signature:**
 - `experiment_id: str` — ID of a completed Experiment
 - `algorithm_ids: list[str]` — two or more algorithm IDs to compare
-- `metric_name: str` — metric name from metric-taxonomy.md
+- `metric_name: str` — metric name from 03-metric-taxonomy/01-index.md
 - `test_config: TestConfig` — `{ test: str, alpha: float }` (e.g., `"wilcoxon"`, `0.05`)
 - returns: `StatisticalTestResult` — `{ test_name, p_value, effect_size, conclusion_scope, pre_registered }`
 
 **Semantics:**
 Applies a specified statistical test to compare algorithms on a single metric.
 Two algorithms → Wilcoxon signed-rank test. More than two → Kruskal-Wallis + Holm-Bonferroni
-correction (→ statistical-methodology.md §3).
+correction (→ 02-statistical-methodology.md §3).
 
 **Preconditions:**
 - `experiment.status == "completed"`
 - `len(algorithm_ids) ≥ 2`
-- `metric_name` is valid in metric-taxonomy.md
+- `metric_name` is valid in 03-metric-taxonomy/01-index.md
 - `test_config.alpha` is in `(0, 1)`
 
 **Postconditions:**
@@ -104,7 +104,7 @@ correction (→ statistical-methodology.md §3).
   prevents over-generalization (MANIFESTO Principle 3)
 - `pre_registered` is `true` if this exact comparison appears in `Study.pre_registered_hypotheses`,
   `false` otherwise (exploratory)
-- `effect_size` uses Cliff's delta (→ statistical-methodology.md §4)
+- `effect_size` uses Cliff's delta (→ 02-statistical-methodology.md §4)
 
 **Exceptions:**
 - `InsufficientRunsError` — fewer than 2 completed Runs per algorithm for this metric

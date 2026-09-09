@@ -52,10 +52,10 @@ flowchart TB
 
 | Component | File | Responsibility |
 |---|---|---|
-| Seed Manager | [seed-manager.md](02-seed-manager.md) | Generates, stores, and injects per-Run random seeds into Python's random stack |
-| Run Isolator | [run-isolator.md](03-run-isolator.md) | Wraps each Run in a subprocess with resource limits and failure handling |
-| Evaluation Loop | [evaluation-loop.md](04-evaluation-loop.md) | Drives the algorithm's ask/tell cycle within budget; records each observation |
-| Performance Recorder | [performance-recorder.md](05-performance-recorder.md) | Receives observation data and writes PerformanceRecord objects to the Results Store |
+| Seed Manager | [02-seed-manager.md](02-seed-manager.md) | Generates, stores, and injects per-Run random seeds into Python's random stack |
+| Run Isolator | [03-run-isolator.md](03-run-isolator.md) | Wraps each Run in a subprocess with resource limits and failure handling |
+| Evaluation Loop | [04-evaluation-loop.md](04-evaluation-loop.md) | Drives the algorithm's ask/tell cycle within budget; records each observation |
+| Performance Recorder | [05-performance-recorder.md](05-performance-recorder.md) | Receives observation data and writes PerformanceRecord objects to the Results Store |
 
 ---
 

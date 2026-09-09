@@ -19,7 +19,7 @@ and format are implementation details — callers interact only through these in
   version-addressed retrieval and no `version` parameter. The `version` field on an entity is
   human-readable metadata for display and citation, never an addressing key —
   required for reproducibility (MANIFESTO Principle 19).
-  → versioning policy: [versioning-governance.md §1](../../05-community/02-versioning-governance.md)
+  → versioning policy: [02-versioning-governance.md §1](../../05-community/02-versioning-governance.md)
 - **Server-compatible IDs.** All entity IDs are UUIDs. No file paths in method signatures.
   → ADR-001
 
@@ -173,7 +173,7 @@ Returns all Performance Records for the given Run, sorted ascending by `evaluati
 Persists a batch of Result Aggregates. All aggregates must reference the same Experiment.
 
 **Preconditions:** all docs/03-technical-contracts/01-data-format/08-result-aggregate.md validation rules pass; metric names in `metrics`
-are valid entries in metric-taxonomy.md
+are valid entries in 03-metric-taxonomy/01-index.md
 
 ---
 

@@ -31,7 +31,7 @@ CONNECTS TO:
   ← MANIFESTO Principles 7, 8, 19–22 : directly operationalized by this document
   → docs/03-technical-contracts/02-interface-contracts/01-index.md : method signatures use entity types from here
   → docs/03-technical-contracts/03-metric-taxonomy/01-index.md     : metric definitions must match Result Aggregate fields here
-  → community/versioning-governance.md : how schema versions are managed and deprecated
+  → docs/05-community/02-versioning-governance.md : how schema versions are managed and deprecated
   → architecture/adr/            : format choices (e.g., JSON vs HDF5) should have ADRs
 
 GLOSSARY: All entity names used here are defined in docs/GLOSSARY.md.
@@ -53,7 +53,7 @@ This means every entity definition in §2 MUST satisfy all of the following:
 | **Globally unique ID (UUID format)** | Entity references use IDs, not local file paths. The same ID is valid in local file storage (V1) and in a server database (V2) without migration. |
 | **JSON-serializable primary schema** | No binary-only fields in the canonical entity representation. JSON is required for REST API compatibility (V2) and for COCO/IOHprofiler/Nevergrad interoperability (NFR-INTEROP-01). |
 | **Cross-entity references by ID only** | No field may reference another entity by file path or local directory structure. All foreign keys are entity IDs. |
-| **No file system assumptions** | Entity schemas do not encode directory layout, file naming, or path separators. Storage layout is an implementation detail of the `Repository` (see `interface-contracts.md`). |
+| **No file system assumptions** | Entity schemas do not encode directory layout, file naming, or path separators. Storage layout is an implementation detail of the `Repository` (see `02-interface-contracts/01-index.md`). |
 
 Bulk data storage (e.g., high-volume Performance Records) uses **Parquet with snappy compression** as a secondary representation for Runs exceeding 1,000 records (ADR-010). The primary JSON schema remains canonical and is never removed. See §3.3 for the operational specification.
 

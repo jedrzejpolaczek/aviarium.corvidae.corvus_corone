@@ -338,9 +338,9 @@ search space.
 
 | What to do next | Where to go |
 |---|---|
-| Submit this adapter as a community contribution | [contribution-guide.md §3](../05-community/01-contribution-guide.md#3-adding-an-algorithm-implementation) |
+| Submit this adapter as a community contribution | [01-contribution-guide.md §3](../05-community/01-contribution-guide.md#3-adding-an-algorithm-implementation) |
 | Full contribution walkthrough with checklist | [uc-02-contribute-algorithm.md](uc-02-contribute-algorithm.md) |
-| Add a sensitivity report (required for contribution) | [algorithm-instance.md §2.2.1](../03-technical-contracts/01-data-format/03-algorithm-instance.md#221-sensitivityreport-sub-schema) |
+| Add a sensitivity report (required for contribution) | [03-algorithm-instance.md §2.2.1](../03-technical-contracts/01-data-format/03-algorithm-instance.md#221-sensitivityreport-sub-schema) |
 | Use your algorithm in a Study | [02-researcher-design-and-execute-study.md](02-researcher-design-and-execute-study.md) |
 | Wrap a Nevergrad optimizer instead | [03-nevergrad-adapter.md](03-nevergrad-adapter.md) |
 | Full Algorithm Interface specification | [§2 Algorithm Interface](../03-technical-contracts/02-interface-contracts/03-algorithm-interface.md) |

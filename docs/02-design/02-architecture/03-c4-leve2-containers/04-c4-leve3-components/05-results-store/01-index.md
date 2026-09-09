@@ -72,11 +72,11 @@ flowchart TB
 
 | Component | File | Responsibility |
 |---|---|---|
-| Local File Repository | [local-file-repository.md](02-local-file-repository.md) | Manages the filesystem path hierarchy and directory structure for all artifacts |
-| JSON Entity Store | [json-entity-store.md](03-json-entity-store.md) | Reads and writes domain entities (Study, Experiment, Run) as JSON files |
-| JSONL Performance Writer | [jsonl-performance-writer.md](04-jsonl-performance-writer.md) | Streams PerformanceRecord observations to JSONL files during Run execution |
-| Parquet Performance Writer | [parquet-performance-writer.md](05-parquet-performance-writer.md) | Converts completed Run JSONL files to Parquet/snappy format post-Run |
-| Performance Record Reader | [performance-record-reader.md](06-performance-record-reader.md) | Unified read interface over JSONL and Parquet; detects format automatically |
+| Local File Repository | [02-local-file-repository.md](02-local-file-repository.md) | Manages the filesystem path hierarchy and directory structure for all artifacts |
+| JSON Entity Store | [03-json-entity-store.md](03-json-entity-store.md) | Reads and writes domain entities (Study, Experiment, Run) as JSON files |
+| JSONL Performance Writer | [04-jsonl-performance-writer.md](04-jsonl-performance-writer.md) | Streams PerformanceRecord observations to JSONL files during Run execution |
+| Parquet Performance Writer | [05-parquet-performance-writer.md](05-parquet-performance-writer.md) | Converts completed Run JSONL files to Parquet/snappy format post-Run |
+| Performance Record Reader | [06-performance-record-reader.md](06-performance-record-reader.md) | Unified read interface over JSONL and Parquet; detects format automatically |
 
 ---
 

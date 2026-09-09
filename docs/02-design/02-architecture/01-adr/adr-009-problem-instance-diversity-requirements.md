@@ -6,7 +6,7 @@ narrow for the conclusions it claims. Without this, a researcher can test 2 algo
 a single problem and the system produces a report — a scientific validity failure.
 
 The requirements here are minimums, not ideals. They are set at the lowest values where
-the statistical machinery (§3 of statistical-methodology.md) remains valid and where the
+the statistical machinery (§3 of 02-statistical-methodology.md) remains valid and where the
 diversity dimension (noise vs. deterministic, low vs. high dimensionality) is at least
 represented once. They are not "good practice" targets — researchers should exceed them.
 
@@ -38,7 +38,7 @@ problem class" cannot arise from a study with a single problem or a homogeneous 
 
 Two independent constraints produce the minimum requirements:
 
-1. **Statistical validity:** The Wilcoxon signed-rank test (statistical-methodology.md §3.4)
+1. **Statistical validity:** The Wilcoxon signed-rank test (02-statistical-methodology.md §3.4)
    requires $P \geq 5$ Problem Instances to have sufficient power. Below 5, the test cannot
    distinguish signal from noise at standard α levels, and its result must be labeled
    "exploratory" regardless of p-value. The statistical floor and the scientific floor are

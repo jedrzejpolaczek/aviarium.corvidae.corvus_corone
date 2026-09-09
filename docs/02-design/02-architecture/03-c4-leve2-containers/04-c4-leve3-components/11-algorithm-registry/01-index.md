@@ -50,9 +50,9 @@ flowchart LR
 
 | Component | File | Responsibility |
 |---|---|---|
-| Instance Validator | [instance-validator.md](02-instance-validator.md) | Validates AlgorithmInstance schema and required fields on registration |
-| Version Manager | [version-manager.md](03-version-manager.md) | Manages version history and prevents modification of registered versions |
-| Entity Store | [entity-store.md](04-entity-store.md) | Persists algorithm instances as JSON; resolves IDs; supports the deprecation flag |
+| Instance Validator | [02-instance-validator.md](02-instance-validator.md) | Validates AlgorithmInstance schema and required fields on registration |
+| Version Manager | [03-version-manager.md](03-version-manager.md) | Manages version history and prevents modification of registered versions |
+| Entity Store | [04-entity-store.md](04-entity-store.md) | Persists algorithm instances as JSON; resolves IDs; supports the deprecation flag |
 
 ---
 

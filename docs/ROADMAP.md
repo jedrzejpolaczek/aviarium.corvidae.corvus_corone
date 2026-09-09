@@ -3,7 +3,7 @@
 <!--
 Derived from: MANIFESTO.md, 01-srs/01-SRS.md, C1/C2 architecture, ADR-001,
 docs/03-technical-contracts/02-interface-contracts/01-index.md, docs/03-technical-contracts/01-data-format/01-index.md, docs/03-technical-contracts/03-metric-taxonomy/01-index.md,
-statistical-methodology.md, benchmarking-protocol.md,
+02-statistical-methodology.md, 01-benchmarking-protocol.md,
 scripts/create_github_issues.py
 Generated: 2026-03-04. Updated: 2026-05-15. Update whenever a milestone closes or a new REF-TASK is created.
 -->
@@ -107,10 +107,10 @@ Six milestones group all open documentation and design tasks.
 
 - [x] **[REF-TASK-0016] ANYTIME-ECDF_AREA computation procedure** — exact normalization (ADR-007 *(planned)*: empirical min/max) and aggregation across problems
 - [x] **[REF-TASK-0017] TIME-EVALUATIONS_TO_TARGET Standard Reporting Set decision** — weigh pre-specification burden vs. efficiency metric value; create ADR
-- [x] **[REF-TASK-0020] Statistical test selection procedure** — decision tree: Wilcoxon (2 algorithms) vs Kruskal-Wallis + Holm-Bonferroni (>2); document in `statistical-methodology.md §3`
+- [x] **[REF-TASK-0020] Statistical test selection procedure** — decision tree: Wilcoxon (2 algorithms) vs Kruskal-Wallis + Holm-Bonferroni (>2); document in `02-statistical-methodology.md §3`
 - [x] **[REF-TASK-0021] Problem instance diversity minimum requirements** — quantitative floor (ADR-008 *(planned)* candidate: ≥5 instances, ≥2 dimensionality ranges, ≥1 noise + ≥1 deterministic)
 - [x] **[REF-TASK-0022] Algorithm sensitivity documentation format** — `SensitivityReport` schema field in `AlgorithmInstance`; requires `docs/03-technical-contracts/01-data-format/03-algorithm-instance.md`
-- [x] **[REF-TASK-0019] Level 1 required visualizations** — mandatory EDA set (boxplot, convergence curves, ECDF, violin); document in `statistical-methodology.md §2`
+- [x] **[REF-TASK-0019] Level 1 required visualizations** — mandatory EDA set (boxplot, convergence curves, ECDF, violin); document in `02-statistical-methodology.md §2`
 - [x] **[REF-TASK-0015] Metric implementation references** — link each metric definition to `corvus_corone/analysis/metrics.py`; fulfilled as part of IMPL-011
 - [ ] **[REF-TASK-0014] Metric taxonomy extensions** *(Post-V1)* — new metrics after first real studies
 - [ ] **[REF-TASK-0018] Research question archetypes** *(Post-V1)* — Metric Selection Guide additions from real study patterns
@@ -148,12 +148,12 @@ Six milestones group all open documentation and design tasks.
 - [ ] **`[IMPL-003]`** SearchSpace types — `problems/search_space.py`: `ContinuousVariable`, `IntegerVariable`, `CategoricalVariable` with Pydantic v2
 - [ ] **`[IMPL-004]`** Algorithm Interface — `algorithms/base.py`: `Algorithm` ABC (ask-tell: `suggest`, `observe`, `reset`), `AlgorithmInstanceRecord`, `RunContext`
 - [ ] **`[IMPL-005]`** Algorithm Registry + RandomSearch — `algorithms/registry.py`, `algorithms/random_search.py`; `numpy.random.default_rng` seed handling
-- [ ] **`[IMPL-006]`** Optuna TPE adapter — `algorithms/adapters/optuna_adapter.py` in ≤ 15 lines; tutorial `docs/06-tutorials/01_wrap_optuna_sampler.md` · *Fulfills: REF-TASK-0004*
+- [ ] **`[IMPL-006]`** Optuna TPE adapter — `algorithms/adapters/optuna_adapter.py` in ≤ 15 lines; tutorial `docs/06-tutorials/04-algorithm-author-onboarding.md` · *Fulfills: REF-TASK-0004*
 - [ ] **`[IMPL-007]`** Experiment Runner — `runner/runner.py`: `deepcopy` isolation per run, determinism test, independence test · *Refs: MANIFESTO Principle 18*
 - [ ] **`[IMPL-008]`** Seed Manager — `runner/seed_manager.py`: `generate_seeds()` via `numpy.random.SeedSequence.spawn()`
 - [ ] **`[IMPL-009]`** Data entities — `storage/entities.py`: `RunRecord`, `PerformanceRecord`, `StudyRecord` (UUID IDs, JSON round-trip) · *Refs: docs/03-technical-contracts/01-data-format/01-index.md, ADR-001*
 - [x] **`[IMPL-010]`** Repository interface + LocalFileRepository — `storage/repository.py`: `Repository` ABC, `LocalFileRepository`, `RepositoryContractTest` · *Fulfills: REF-TASK-0023*
-- [ ] **`[IMPL-011]`** Metric taxonomy — `analysis/metrics.py`: `@metric` registry; `QUALITY-BEST_VALUE_AT_BUDGET`, `TIME-EVALUATIONS_TO_TARGET`, `RELIABILITY-SUCCESS_RATE`; implementation refs added to `metric-taxonomy.md` · *Fulfills: REF-TASK-0015*
+- [ ] **`[IMPL-011]`** Metric taxonomy — `analysis/metrics.py`: `@metric` registry; `QUALITY-BEST_VALUE_AT_BUDGET`, `TIME-EVALUATIONS_TO_TARGET`, `RELIABILITY-SUCCESS_RATE`; implementation refs added to `03-metric-taxonomy/01-index.md` · *Fulfills: REF-TASK-0015*
 - [ ] **`[IMPL-012]`** Statistical analysis — `analysis/statistical.py`: three-level (exploratory summary, Wilcoxon/Kruskal-Wallis + Holm-Bonferroni, Cliff's delta); `ThreeLevelAnalysis.analyze()` requires all three levels · *Fulfills: REF-TASK-0020*
 - [ ] **`[IMPL-013]`** Anytime performance — `analysis/anytime.py`: `compute_anytime_curve`, `compute_ecdf`, `compute_ecdf_area` (empirical normalization per ADR-007 *(planned)*; LOCF per ADR-003); basic IOHprofiler `.dat` export · *Fulfills: REF-TASK-0016*
 - [ ] **`[IMPL-014]`** Reporting Engine — `reporting/reports.py`: `StudyReport` (required `scope_statement`, `limitations`); Jinja2 templates for researcher + practitioner reports; raises `ValueError` when scope absent · *Fulfills: REF-TASK-0019*
@@ -170,9 +170,9 @@ Six milestones group all open documentation and design tasks.
 - [ ] **`[IMPL-009a]`** PerformanceRecord carries `best_so_far` alongside `objective_value`; the Runner maintains the running best; anytime reconstruction reads `best_so_far` · *Fulfills: ADR-023*
 - [ ] **`[IMPL-013a]`** ECDF_AREA integrates over the full Budget; the reference case asserts `0.4375` · *Fulfills: ADR-024*
 - [ ] **`[IMPL-018]`** ADR-006: Technical constraints — `pyproject.toml` `requires-python = ">=3.10"`, MIT license, optional extras (`optuna`, `rag`, `all`), CI license check · *Fulfills: REF-TASK-0011*
-- [ ] **`[IMPL-019]`** ADR-007 + ADR-008: ECDF_AREA normalization (empirical min/max, limitations documented) + Standard Reporting Set definition; update `metric-taxonomy.md §3` · *Fulfills: REF-TASK-0016, REF-TASK-0017*
-- [ ] **`[IMPL-020]`** ADR-008 + statistical-methodology.md: diversity requirements (≥5 problems, ≥2 dimensionality ranges); Level 1 VIZ-L1-01..03 spec in §2; Wilcoxon/Kruskal decision tree in §3 · *Fulfills: REF-TASK-0019, REF-TASK-0020, REF-TASK-0021*
-- [ ] **`[IMPL-021]`** Sensitivity documentation — `SensitivityReport(BaseModel)` in `storage/entities.py`, `docs/03-technical-contracts/01-data-format/03-algorithm-instance.md`, `contribution-guide.md §2` · *Fulfills: REF-TASK-0022*
+- [ ] **`[IMPL-019]`** ADR-007 + ADR-008: ECDF_AREA normalization (empirical min/max, limitations documented) + Standard Reporting Set definition; update `03-metric-taxonomy/01-index.md §3` · *Fulfills: REF-TASK-0016, REF-TASK-0017*
+- [ ] **`[IMPL-020]`** ADR-008 + 02-statistical-methodology.md: diversity requirements (≥5 problems, ≥2 dimensionality ranges); Level 1 VIZ-L1-01..03 spec in §2; Wilcoxon/Kruskal decision tree in §3 · *Fulfills: REF-TASK-0019, REF-TASK-0020, REF-TASK-0021*
+- [ ] **`[IMPL-021]`** Sensitivity documentation — `SensitivityReport(BaseModel)` in `storage/entities.py`, `docs/03-technical-contracts/01-data-format/03-algorithm-instance.md`, `01-contribution-guide.md §2` · *Fulfills: REF-TASK-0022*
 - [ ] **`[IMPL-022]`** Bulk PerformanceRecord storage — **blocked on REF-TASK-0024 spike**; ADR-009 from benchmark evidence; `LocalFileRepository.save_bulk_records()`; round-trip test · *Fulfills: REF-TASK-0024*
 - [x] **`[IMPL-023]`** IOHprofiler bridge — `bridge/iohprofiler.py`: full `.dat` export + `.meta.json` sidecar (seed, run_id, wall_time); round-trip test; `docs/03-technical-contracts/01-data-format/10-file-formats.md` mapping table · *Fulfills: REF-TASK-0007*
 - [ ] **`[IMPL-024]`** COCO bridge — **blocked on REF-TASK-0005 spike**; `bridge/coco_exporter.py`; continuous-only warning; `docs/03-technical-contracts/01-data-format/10-file-formats.md` mapping with documented data loss · *Fulfills: REF-TASK-0005*
@@ -207,7 +207,7 @@ Six milestones group all open documentation and design tasks.
 - [ ] **`[IMPL-041]`** Autonomous cycle — `v3_autonomous/cycle.py`, `dvc.yaml` (stages: fetch_studies → train_predictor → run_autonomous_cycle), `.github/workflows/autonomous.yml` (weekly cron + push trigger)
 - [ ] **`[IMPL-042]`** Shadow/canary deployment — `v3_autonomous/deployment.py`: `ModelRouter`, deterministic A/B routing by `md5(thread_id)`, shadow mode (log but never serve), canary (5%→50%→100%)
 - [ ] **`[IMPL-043]`** Agent evaluation harness — `v3_autonomous/evals.py`: `pass_at_k(n, c, k)` (Chen et al. 2021), 10 standard test cases; targets: pass@1 ≥ 0.6, safety_violations = 0; CI trigger on PRs to `v3_autonomous/`
-- [ ] **`[IMPL-047]`** Portfolio — `README.md` (V1/V2/V3 narrative), `docs/architecture.md` (C1 Mermaid + design philosophy), `demo/demo.py` + `demo/demo_autonomous.py`; demo scripts run in CI
+- [ ] **`[IMPL-047]`** Portfolio — `README.md` (V1/V2/V3 narrative), `docs/architecture.md` (C1 Mermaid + design philosophy), `demo/demo.py` + `demo/demo_autonomous.py`; demo scripts run in CI <!-- check-docs: planned -->
 
 ---
 
@@ -216,7 +216,7 @@ Six milestones group all open documentation and design tasks.
 
 - [ ] **`[IMPL-044]`** Algorithm Visualization Engine — `learner/visualization_engine.py`: convergence animation, parameter sensitivity heatmap, search trajectory, Pareto front, algorithm genealogy timeline · *Refs: REF-TASK-0027, UC-06*
 - [ ] **`[IMPL-045]`** Socratic Guide — `v2_researcher/agents/socratic_guide.py`: LangGraph node activated by `state["interaction_mode"] == "socratic"`, generates bridging questions, never direct answers; CLI `--mode socratic` · *Fulfills: REF-TASK-0028, UC-08*
-- [ ] **`[IMPL-046]`** Algorithm Genealogy — `learner/genealogy.py` + `learner/data/genealogy_data.json`: `AlgorithmNode`, `Genealogy` directed graph, lineage (MAB 1933 → BayesOpt 1998 → TPE 2011) and CMA-ES/NSGA-II history; tutorial `docs/06-tutorials/06_algorithm_genealogy_explorer.md` · *Refs: REF-TASK-0030, UC-09*
+- [ ] **`[IMPL-046]`** Algorithm Genealogy — `learner/genealogy.py` + `learner/data/genealogy_data.json`: `AlgorithmNode`, `Genealogy` directed graph, lineage (MAB 1933 → BayesOpt 1998 → TPE 2011) and CMA-ES/NSGA-II history; tutorial `docs/06-tutorials/07-learner-algorithm-genealogy.md` · *Refs: REF-TASK-0030, UC-09*
 
 ---
 
@@ -252,7 +252,7 @@ MANIFESTO ──► C1 ──► C2/C3/C4 (complete)
                            │
                            ├──► SRS §4/§8 (REF-TASK-0008, 0013) — unblocked after Phase 1
                            ├──► docs/03-technical-contracts/01-data-format/01-index.md update (REF-TASK-0022) — after IMPL-021
-                           └──► interface-contracts.md (REF-TASK-0023) — after IMPL-010
+                           └──► 02-interface-contracts/01-index.md (REF-TASK-0023) — after IMPL-010
 
 REF-TASK-0005/0006/0007 spikes ──► IMPL-024/025/023 bridges ──► SRS §7 (REF-TASK-0012)
 REF-TASK-0024 spike ──► IMPL-022 bulk storage (ADR-006)
@@ -303,7 +303,7 @@ Open documentation tasks (the only two remaining):
 | IMPL-008 — Seed Manager | Phase 1 | `runner/seed_manager.py`, SeedSequence |
 | IMPL-009 — Data entities | Phase 1 | `storage/entities.py`, UUID + JSON round-trip |
 | IMPL-010 — Repository + LocalFileRepository | Phase 1 | `storage/repository.py`, contract tests |
-| IMPL-011 — Metric taxonomy | Phase 1 | `analysis/metrics.py`, metric-taxonomy.md refs |
+| IMPL-011 — Metric taxonomy | Phase 1 | `analysis/metrics.py`, 03-metric-taxonomy/01-index.md refs |
 | IMPL-012 — Statistical analysis | Phase 1 | `analysis/statistical.py`, ThreeLevelAnalysis |
 | IMPL-013 — Anytime performance | Phase 1 | `analysis/anytime.py`, ECDF, basic .dat export |
 | IMPL-014 — Reporting Engine | Phase 1 | `reporting/reports.py`, Jinja2 templates |
@@ -311,8 +311,8 @@ Open documentation tasks (the only two remaining):
 | IMPL-016 — Study Orchestrator | Phase 1 | `orchestrator.py`, StudyConfig, Facade |
 | IMPL-017 — Public API + CLI | Phase 1 | `api.py`, `cli.py`, corvus run/list commands · *Blocked on REF-TASK-0037* |
 | IMPL-018 — ADR-006 technical constraints | Phase 2 | ADR-006, pyproject.toml finalized |
-| IMPL-019 — ADR-007 + ADR-008 ECDF + SRS | Phase 2 | ADR-007/008, metric-taxonomy.md §3 |
-| IMPL-020 — ADR-008 + statistical-methodology | Phase 2 | ADR-008, statistical-methodology.md §2/§3 |
+| IMPL-019 — ADR-007 + ADR-008 ECDF + SRS | Phase 2 | ADR-007/008, 03-metric-taxonomy/01-index.md §3 |
+| IMPL-020 — ADR-008 + statistical-methodology | Phase 2 | ADR-008, 02-statistical-methodology.md §2/§3 |
 | IMPL-021 — Sensitivity documentation | Phase 2 | SensitivityReport schema, docs/03-technical-contracts/01-data-format/03-algorithm-instance.md |
 | IMPL-022 — Bulk PerformanceRecord storage | Phase 2 | ADR-009, `save_bulk_records()` (spike first) |
 | IMPL-023 — IOHprofiler bridge | Phase 2 | `bridge/iohprofiler.py`, .dat + .meta.json |
@@ -339,4 +339,4 @@ Open documentation tasks (the only two remaining):
 | IMPL-044 — Algorithm Visualization Engine | Phase 4 | `learner/visualization_engine.py` |
 | IMPL-045 — Socratic Guide | Phase 4 | `agents/socratic_guide.py`, --mode socratic |
 | IMPL-046 — Algorithm Genealogy | Phase 4 | `learner/genealogy.py`, genealogy_data.json |
-| IMPL-047 — Portfolio | Phase 3b | README, docs/architecture.md, demo scripts |
+| IMPL-047 — Portfolio | Phase 3b | README, docs/architecture.md, demo scripts | <!-- check-docs: planned -->

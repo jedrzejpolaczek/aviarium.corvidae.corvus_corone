@@ -28,8 +28,8 @@ Generated: 2026-03-04. Updated: 2026-05-15. Update whenever a milestone closes o
 | SRS | — | ✅ UC-01..UC-11, FR-01..FR-42, 6 NFRs, 16 constraints, §7 interface requirements, §8 acceptance strategy for every V1 requirement, §9 traceability |
 | Statistical methodology | REF-TASK-0043, 0044 | ⚠️ §1–§3 and §7 written; **§4 Level 3, §5 anytime and §6 uncertainty are empty** (HTML comment only) |
 | Metric taxonomy | REF-TASK-0014 | ✅ 9 metrics, Standard Reporting Set, selection guide; implementation references land with IMPL-011 |
-| Interface contracts | REF-TASK-0042 | ✅ 6 interfaces + cross-cutting. ⚠️ four Repository methods carry a signature and no semantics |
-| Data format | REF-TASK-0045 | ✅ 7 entity schemas, file formats, interoperability mappings, CV-001..CV-023, schema version 0.0.2 |
+| Interface contracts | — | ✅ 6 interfaces + cross-cutting; every method carries semantics, preconditions, postconditions and exceptions |
+| Data format | REF-TASK-0045 | ✅ 7 entity schemas, file formats, interoperability mappings, CV-001..CV-023, schema version 0.0.3 |
 | Ecosystem integration | — | ✅ COCO, IOHprofiler and Nevergrad mappings documented; IOH and Nevergrad bridges implemented |
 | Implementation — Core Library | IMPL-000..027 | ⚠️ IMPL-000, 010, 023, 025 done; IMPL-001..009, 011..022, 024, 026, 027 not started |
 | Implementation — Researcher Agent (Pilot V2) | IMPL-028..036 | ⛔ Not started *(post-V1)* |
@@ -329,7 +329,7 @@ REF-TASK-0025 ──► 0026 ──► 0027 ──► 0028 ──► 0029 ──
   `max_workers` is settled already — SRS §1.4 B-01 reserves it for V2 — and must not return.
   *Blocks IMPL-007, IMPL-016.*
 
-- [ ] **[REF-TASK-0042] Specify the four Repository methods that carry only a signature.**
+- [x] **[REF-TASK-0042] Specify the four Repository methods that carry only a signature.** *(Closed 2026-09-09.)* All four now carry semantics, preconditions, postconditions and exceptions. The larger finding was underneath: `deprecated`, `deprecation_reason` and `superseded_by` were in neither entity schema, although ADR-020 states that the contract already defines them and both implementations write them. Added, together with the supersession rules the model needs (resolvable, same kind, not self, acyclic) and the removal of the `version must be updated on every field change` rule that ADR-020 had superseded. Schema version 0.0.2 → 0.0.3. Implemented in both backends with 20 contract tests.
   `deprecate_algorithm(id, reason, superseded_by)`, `list_experiments()`,
   `list_result_aggregates()` and `list_reports()` in `06-repository-interface.md` have no
   semantics, preconditions, postconditions or exceptions, against the method template the
@@ -433,7 +433,7 @@ Documentation tasks:
   `02-cli-spec.md` and ADR-015/ADR-016 to the layer that decides what V1 contains.
   *(Found by the C3 semantics pass, 2026-09-09; closed the same day.)*
 - [ ] **REF-TASK-0041** — Run and Experiment failure model *(blocks IMPL-007, IMPL-016)*
-- [ ] **REF-TASK-0042** — semantics for four signature-only Repository methods
+- [x] **REF-TASK-0042** — semantics for four signature-only Repository methods
 - [ ] **REF-TASK-0043** — `02-statistical-methodology.md` §4, §5, §6 *(blocks IMPL-012, IMPL-013)*
 - [ ] **REF-TASK-0044** — parametric branch of the test selection tree, and the §3.7 default α
 - [ ] **REF-TASK-0045** — ADR-010 Parquet columns against ADR-023 *(blocks IMPL-022)*

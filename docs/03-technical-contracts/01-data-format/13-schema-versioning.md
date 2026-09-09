@@ -20,7 +20,7 @@ Schema versions follow **semantic versioning** `MAJOR.MINOR.PATCH`:
 | `PATCH` | A **correction** — typo fixes, clarifying text, no structural change | `1.0.0` → `1.0.1` |
 
 The current schema version is declared at the top of [`01-index.md`](01-index.md).
-It is `0.0.2` and stays below `1.0.0` until the V1 release, so pre-release schema changes are
+It is `0.0.3` and stays below `1.0.0` until the V1 release, so pre-release schema changes are
 not breaking changes and do not owe a migration guide.
 
 ---

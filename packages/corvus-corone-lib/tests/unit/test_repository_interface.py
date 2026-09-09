@@ -181,6 +181,51 @@ class TestProblemRepository:
         problem = factory.problems.get_problem(pid)
         assert problem["deprecated"] is True
 
+    def test_deprecate_empty_reason_raises(self, factory: RepositoryFactory) -> None:
+        """A deprecation without a stated reason cannot be reviewed (ADR-020)."""
+        pid = factory.problems.register_problem(VALID_PROBLEM.copy())
+        with pytest.raises(ValidationError):
+            factory.problems.deprecate_problem(pid, reason="   ")
+
+    def test_superseded_by_records_the_replacement(self, factory: RepositoryFactory) -> None:
+        """superseded_by carries the UUID of the entity that replaces this one."""
+        old = factory.problems.register_problem({**VALID_PROBLEM, "name": "Old"})
+        new = factory.problems.register_problem({**VALID_PROBLEM, "name": "New"})
+        factory.problems.deprecate_problem(old, reason="Revised bounds", superseded_by=new)
+        assert factory.problems.get_problem(old)["superseded_by"] == new
+
+    def test_superseded_by_unknown_id_raises(self, factory: RepositoryFactory) -> None:
+        """superseded_by must resolve to an existing entity of the same kind."""
+        pid = factory.problems.register_problem(VALID_PROBLEM.copy())
+        with pytest.raises(EntityNotFoundError):
+            factory.problems.deprecate_problem(
+                pid,
+                reason="Revised",
+                superseded_by="00000000-0000-4000-8000-000000000000",
+            )
+
+    def test_superseded_by_self_raises(self, factory: RepositoryFactory) -> None:
+        """An entity cannot supersede itself."""
+        pid = factory.problems.register_problem(VALID_PROBLEM.copy())
+        with pytest.raises(ValidationError):
+            factory.problems.deprecate_problem(pid, reason="Revised", superseded_by=pid)
+
+    def test_supersession_cycle_raises(self, factory: RepositoryFactory) -> None:
+        """Supersession is a lineage, not a graph: A → B → A is rejected."""
+        a = factory.problems.register_problem({**VALID_PROBLEM, "name": "A"})
+        b = factory.problems.register_problem({**VALID_PROBLEM, "name": "B"})
+        factory.problems.deprecate_problem(a, reason="Replaced by B", superseded_by=b)
+        with pytest.raises(ValidationError):
+            factory.problems.deprecate_problem(b, reason="Replaced by A", superseded_by=a)
+
+    def test_redeprecation_overwrites_reason(self, factory: RepositoryFactory) -> None:
+        """Deprecating an already-deprecated entity is a correction, not an error."""
+        pid = factory.problems.register_problem(VALID_PROBLEM.copy())
+        factory.problems.deprecate_problem(pid, reason="Typo in teh reason")
+        factory.problems.deprecate_problem(pid, reason="Superseded by a corrected instance")
+        record = factory.problems.get_problem(pid)
+        assert record["deprecation_reason"] == "Superseded by a corrected instance"
+
     def test_landscape_characteristics_filter(self, factory: RepositoryFactory) -> None:
         """Filter by landscape_characteristics performs subset match."""
         factory.problems.register_problem(
@@ -241,6 +286,33 @@ class TestAlgorithmRepository:
         good = {**VALID_ALGORITHM, "code_reference": "git+https://github.com/org/repo@abc123"}
         aid = factory.algorithms.register_algorithm(good)
         assert_uuid(aid)
+
+    def test_deprecate_empty_reason_raises(self, factory: RepositoryFactory) -> None:
+        """A deprecation without a stated reason cannot be reviewed (ADR-020)."""
+        aid = factory.algorithms.register_algorithm(VALID_ALGORITHM.copy())
+        with pytest.raises(ValidationError):
+            factory.algorithms.deprecate_algorithm(aid, reason="")
+
+    def test_supersession_lineage(self, factory: RepositoryFactory) -> None:
+        """A three-step lineage is legal; only a cycle is not."""
+        a = factory.algorithms.register_algorithm({**VALID_ALGORITHM, "name": "A"})
+        b = factory.algorithms.register_algorithm({**VALID_ALGORITHM, "name": "B"})
+        c = factory.algorithms.register_algorithm({**VALID_ALGORITHM, "name": "C"})
+        factory.algorithms.deprecate_algorithm(a, reason="Replaced", superseded_by=b)
+        factory.algorithms.deprecate_algorithm(b, reason="Replaced", superseded_by=c)
+        assert factory.algorithms.get_algorithm(a)["superseded_by"] == b
+        with pytest.raises(ValidationError):
+            factory.algorithms.deprecate_algorithm(c, reason="Loop", superseded_by=a)
+
+    def test_superseded_by_unknown_id_raises(self, factory: RepositoryFactory) -> None:
+        """superseded_by must resolve to an existing Algorithm Instance."""
+        aid = factory.algorithms.register_algorithm(VALID_ALGORITHM.copy())
+        with pytest.raises(EntityNotFoundError):
+            factory.algorithms.deprecate_algorithm(
+                aid,
+                reason="Revised",
+                superseded_by="00000000-0000-4000-8000-000000000000",
+            )
 
     def test_list_with_family_filter(self, factory: RepositoryFactory) -> None:
         factory.algorithms.register_algorithm(
@@ -512,6 +584,15 @@ class TestResultAggregateRepository:
         result = factory.aggregates.list_result_aggregates("exp-001")
         assert len(result) == 1
         assert result[0]["problem_id"] == "prob-001"
+
+    def test_list_unknown_experiment_returns_empty(self, factory: RepositoryFactory) -> None:
+        """An unknown experiment_id returns [], not an exception.
+
+        A caller cannot tell a typo from an Experiment that has not been analysed
+        yet by catching an exception, so the contract does not raise one.
+        """
+        assert factory.aggregates.list_result_aggregates("no-such-experiment") == []
+        assert factory.reports.list_reports("no-such-experiment") == []
 
     def test_list_by_experiment_id(self, factory: RepositoryFactory) -> None:
         factory.aggregates.save_result_aggregates(

@@ -7,7 +7,7 @@
 | Name | Type | Required | Notes |
 | --- | --- | --- | --- |
 | id | string | yes | Study UUID (RFC 4122 v4) |
-| schema_version | string | yes | Version of the entity schema this record conforms to, e.g. `0.0.2`. Governs the shape of the record, not the identity of the entity. See [13-schema-versioning.md](13-schema-versioning.md) |
+| schema_version | string | yes | Version of the entity schema this record conforms to, e.g. `0.0.3`. Governs the shape of the record, not the identity of the entity. See [13-schema-versioning.md](13-schema-versioning.md) |
 | name | string | yes | Title of the study |
 | version | string | yes | Version of this study, updated automatically after each change. Structure is described in validation rules |
 | research_question | string | yes | The motivating research question; free text |

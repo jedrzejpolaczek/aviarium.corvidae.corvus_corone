@@ -43,6 +43,7 @@ from __future__ import annotations
 import json
 import os
 import uuid
+from collections.abc import Callable
 from copy import deepcopy
 from pathlib import Path
 from typing import Any
@@ -162,6 +163,55 @@ _EXPERIMENT_IMMUTABLE_FIELDS = frozenset({"study_id", "execution_environment"})
 # ---------------------------------------------------------------------------
 
 
+def _check_supersession(
+    entity_type: str,
+    id: str,
+    reason: str,
+    superseded_by: str | None,
+    exists: "Callable[[str], bool]",
+    superseded_by_of: "Callable[[str], str | None]",
+) -> None:
+    """Preconditions of deprecate_problem / deprecate_algorithm (ADR-020).
+
+    Supersession is a lineage, not a graph: a cycle would make "what replaced
+    this?" unanswerable, so the chain is walked before the link is written.
+
+    → 02-interface-contracts/06-repository-interface.md §deprecate_*
+    """
+    if not reason or not reason.strip():
+        raise ValidationError(
+            f"{entity_type}: 'reason' must be a non-empty string. "
+            "A deprecation without a stated reason cannot be reviewed (ADR-020).",
+            context={"id": id, "field": "reason"},
+        )
+    if superseded_by is None:
+        return
+    if superseded_by == id:
+        raise ValidationError(
+            f"{entity_type}: 'superseded_by' must not be the entity being deprecated (id='{id}').",
+            context={"id": id, "superseded_by": superseded_by},
+        )
+    if not exists(superseded_by):
+        raise EntityNotFoundError(
+            f"{entity_type} with id='{superseded_by}' not found; "
+            "'superseded_by' must resolve to an existing entity of the same kind.",
+            context={"id": id, "superseded_by": superseded_by},
+        )
+    seen = {id, superseded_by}
+    cursor: str | None = superseded_by_of(superseded_by)
+    while cursor is not None:
+        if cursor == id:
+            raise ValidationError(
+                f"{entity_type}: 'superseded_by' would close a supersession cycle "
+                f"back to id='{id}'.",
+                context={"id": id, "superseded_by": superseded_by},
+            )
+        if cursor in seen:
+            break
+        seen.add(cursor)
+        cursor = superseded_by_of(cursor)
+
+
 class _FileProblemRepository(ProblemRepository):
     """File-backed ProblemRepository. Each instance stored as <uuid>.json."""
 
@@ -224,6 +274,14 @@ class _FileProblemRepository(ProblemRepository):
                 f"ProblemInstance with id='{id}' not found.",
                 context={"id": id},
             )
+        _check_supersession(
+            "ProblemInstance",
+            id,
+            reason,
+            superseded_by,
+            exists=lambda x: self._path(x).exists(),
+            superseded_by_of=lambda x: _read_json(self._path(x)).get("superseded_by"),
+        )
         record = _read_json(p)
         record["deprecated"] = True
         record["deprecation_reason"] = reason
@@ -311,6 +369,14 @@ class _FileAlgorithmRepository(AlgorithmRepository):
                 f"AlgorithmInstance with id='{id}' not found.",
                 context={"id": id},
             )
+        _check_supersession(
+            "AlgorithmInstance",
+            id,
+            reason,
+            superseded_by,
+            exists=lambda x: self._path(x).exists(),
+            superseded_by_of=lambda x: _read_json(self._path(x)).get("superseded_by"),
+        )
         record = _read_json(p)
         record["deprecated"] = True
         record["deprecation_reason"] = reason

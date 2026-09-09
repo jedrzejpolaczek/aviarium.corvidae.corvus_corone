@@ -56,6 +56,12 @@ returns the same record, including for deprecated entities (ADR-020).
 
 **Exceptions:** `EntityNotFoundError`
 
+
+> **Ordering.** No `list_*` method guarantees an order. A caller that needs a stable one
+> sorts by `id`, which every entity has and which never changes. Specifying an order here
+> would bind every backend to it, and the V2 `ServerRepository` (ADR-001) will not be
+> returning rows in local-file directory order.
+
 #### list_problems(filters: ProblemFilter | None = None) → list[ProblemInstanceSummary]
 Returns summaries of all non-deprecated Problem Instances matching the filter.
 `ProblemFilter` fields: `provenance`, `real_or_synthetic`, `min_dimensions`, `max_dimensions`,
@@ -68,8 +74,40 @@ Validates and persists a new Problem Instance. Returns the assigned ID.
 **Exceptions:** `ValidationError`
 
 #### deprecate_problem(id: str, reason: str, superseded_by: str | None = None) → None
-Marks a Problem Instance as deprecated. Deprecated instances are excluded from
-`list_problems()` but remain retrievable by exact ID for reproducibility.
+Marks the Problem Instance as deprecated. Deprecation is the **only** permitted mutation of an
+otherwise immutable entity (ADR-020): it changes how the entity is listed, never what it
+contains, so a Run that referenced it still resolves to the same bytes.
+
+Sets `deprecated` to `true`, `deprecation_reason` to `reason`, and, when given,
+`superseded_by` to the identifier of the replacement.
+
+**Preconditions:**
+- the entity exists
+- `reason` is a non-empty string. A deprecation without a stated reason cannot be
+  reviewed, and the deprecation policy that will govern the review is
+  `05-community/02-versioning-governance.md` §3 (not yet written; REF-TASK-0048)
+- when `superseded_by` is given, it resolves to an existing entity of the **same kind**,
+  is not the entity being deprecated, and does not already reach that entity by following
+  `superseded_by` links. Supersession is a lineage, not a graph: a cycle would make
+  "what replaced this?" unanswerable
+
+**Postconditions:**
+- the entity no longer appears in `list_*` results
+- `get_*(id)` still returns it, byte-identical apart from the three supersession fields
+- deprecating an already-deprecated entity succeeds and overwrites `deprecation_reason`
+  and `superseded_by`. It is a correction, not an error: the alternative would make a
+  mistyped reason permanent on an entity that cannot be replaced
+
+**Exceptions:**
+- `EntityNotFoundError` — no entity with this ID, or `superseded_by` names one that does
+  not exist
+- `ValidationError` — `reason` is empty, `superseded_by` is the entity itself, of the
+  wrong kind, or would close a supersession cycle
+
+**Referenced by a locked Study?** Deprecation still succeeds. `CV-018` rejects a Study
+whose references are deprecated *at lock time*; afterwards the Study is a historical
+record and its entities must stay resolvable, which is the whole reason deprecation
+replaced deletion.
 
 ---
 
@@ -90,6 +128,40 @@ resolvable and version-pinned (UC-02 F2); `configuration_justification` is non-e
 **Exceptions:** `ValidationError`, `CodeReferenceError`
 
 #### deprecate_algorithm(id: str, reason: str, superseded_by: str | None = None) → None
+Marks the Algorithm Instance as deprecated. Deprecation is the **only** permitted mutation of an
+otherwise immutable entity (ADR-020): it changes how the entity is listed, never what it
+contains, so a Run that referenced it still resolves to the same bytes.
+
+Sets `deprecated` to `true`, `deprecation_reason` to `reason`, and, when given,
+`superseded_by` to the identifier of the replacement.
+
+**Preconditions:**
+- the entity exists
+- `reason` is a non-empty string. A deprecation without a stated reason cannot be
+  reviewed, and the deprecation policy that will govern the review is
+  `05-community/02-versioning-governance.md` §3 (not yet written; REF-TASK-0048)
+- when `superseded_by` is given, it resolves to an existing entity of the **same kind**,
+  is not the entity being deprecated, and does not already reach that entity by following
+  `superseded_by` links. Supersession is a lineage, not a graph: a cycle would make
+  "what replaced this?" unanswerable
+
+**Postconditions:**
+- the entity no longer appears in `list_*` results
+- `get_*(id)` still returns it, byte-identical apart from the three supersession fields
+- deprecating an already-deprecated entity succeeds and overwrites `deprecation_reason`
+  and `superseded_by`. It is a correction, not an error: the alternative would make a
+  mistyped reason permanent on an entity that cannot be replaced
+
+**Exceptions:**
+- `EntityNotFoundError` — no entity with this ID, or `superseded_by` names one that does
+  not exist
+- `ValidationError` — `reason` is empty, `superseded_by` is the entity itself, of the
+  wrong kind, or would close a supersession cycle
+
+**Referenced by a locked Study?** Deprecation still succeeds. `CV-018` rejects a Study
+whose references are deprecated *at lock time*; afterwards the Study is a historical
+record and its entities must stay resolvable, which is the whole reason deprecation
+replaced deletion.
 
 ---
 
@@ -121,6 +193,14 @@ Transitions Study from `"draft"` to `"locked"`. After locking, `sampling_strateg
 **Exceptions:** `EntityNotFoundError`
 
 #### list_experiments(study_id: str | None = None) → list[ExperimentSummary]
+Returns summaries of Experiments. With `study_id`, only those whose `study_id` matches;
+without it, all of them. Experiments are never deprecated, so nothing is filtered out.
+
+**Postconditions:** a `study_id` that matches no Experiment returns `[]`. It is not an
+error: a Study that has been locked but not yet run legitimately has no Experiments, and a
+caller cannot distinguish that from a typo by catching an exception anyway.
+
+**Exceptions:** none.
 
 #### create_experiment(experiment: Experiment) → str
 Persists a new Experiment in `"running"` status. Returns the assigned ID.
@@ -168,6 +248,14 @@ Returns all Performance Records for the given Run, sorted ascending by `evaluati
 **Exceptions:** `EntityNotFoundError`
 
 #### list_result_aggregates(experiment_id: str) → list[ResultAggregate]
+Returns every Result Aggregate belonging to the Experiment — one per
+(Problem Instance, Algorithm Instance) cell that produced completed Runs.
+
+**Postconditions:** an Experiment with no analysis run yet returns `[]`, and so does an
+unknown `experiment_id`. Callers that need to tell the two apart call `get_experiment()`
+first.
+
+**Exceptions:** none.
 
 #### save_result_aggregates(aggregates: list[ResultAggregate]) → None
 Persists a batch of Result Aggregates. All aggregates must reference the same Experiment.
@@ -183,6 +271,13 @@ are valid entries in 03-metric-taxonomy/01-index.md
 **Exceptions:** `EntityNotFoundError`
 
 #### list_reports(experiment_id: str) → list[Report]
+Returns every Report belonging to the Experiment. A completed Experiment has exactly two,
+one `researcher` and one `practitioner` (ADR-019, `CV-015`); before reporting it has none.
+
+**Postconditions:** an unknown `experiment_id` returns `[]`, as for the other `list_*`
+methods.
+
+**Exceptions:** none.
 
 #### save_report(report: Report) → str
 Persists a Report and its artifact. Returns the assigned ID.

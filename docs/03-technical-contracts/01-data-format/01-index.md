@@ -1,6 +1,9 @@
 # Data Format Specification
 
-> **Current schema version: `0.0.2`.**
+> **Current schema version: `0.0.3`.**
+> Moved from `0.0.2` by REF-TASK-0042, which added `deprecated`, `deprecation_reason` and
+> `superseded_by` to the Problem Instance and Algorithm Instance schemas. ADR-020 records the
+> supersession model and states that the contract already defines those fields; it did not.
 > Every entity record carries this value in its `schema_version` field. The version governs the
 > *shape* of the records, not the identity or lifecycle of the entities they describe. The rules
 > for bumping it, and for reading an artifact whose version differs, are in

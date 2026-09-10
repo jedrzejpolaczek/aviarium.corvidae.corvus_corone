@@ -34,11 +34,11 @@ the Runner writes them but does not hold them.
 
 **Failure handling:** A Run that raises an unexpected exception is logged as
 `status="failed"` with `failure_reason` populated; execution continues with remaining Runs.
-Critical errors (seed collision, storage unavailable) abort the entire Experiment
-(`status="aborted"`).
+Errors that make the Experiment itself impossible (seed collision, storage unavailable) stop it
+with `status="failed"`; there is no failure policy to configure (ADR-027).
 
 **Actors served:** Researcher (indirectly, via Study Orchestrator — UC-01 main execution
 workflow, UC-05 reproducibility).
 
-**Relevant SRS section:** FR-08 (study execution), FR-09 (seed injection), FR-10 (execution environment recording), FR-11 (Run isolation — no shared mutable state), FR-12 (failure handling — skip vs abort),
+**Relevant SRS section:** FR-08 (study execution), FR-09 (seed injection), FR-10 (execution environment recording), FR-11 (Run isolation — no shared mutable state), FR-12 (failed Runs recorded with their reason),
 FR-19 (entity ID cross-references — no file paths).

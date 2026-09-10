@@ -48,7 +48,7 @@ specified statistical tests, and generates scoped conclusions.
   any additional comparisons are marked `"pre_registered": false` (exploratory)
 
 **Exceptions:**
-- `ExperimentNotCompleteError` — experiment is still running or aborted
+- `ExperimentNotCompleteError` — `experiment.status` is not `"completed"`: it is `"planned"`, `"running"` or `"failed"` (`05-experiment.md`)
 - `UnknownMetricError` — a `metric_name` in `config` is not in 03-metric-taxonomy/01-index.md
 
 ---

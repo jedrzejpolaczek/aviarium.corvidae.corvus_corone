@@ -446,10 +446,17 @@ normal approximation. The `exact` option is available in standard scientific Pyt
 
 The Analyzer must produce for each tested hypothesis:
 
+> **Not yet reconciled with the contract.** `05-analyzer-interface.md` defines
+> `StatisticalTestResult` with a different field set and different names — `p_value_adjusted`
+> where this table has `corrected_p_value`, and `effect_size` with `effect_size_measure` as two
+> fields where this table nests them. Under ADR-026 this document is authoritative for the
+> procedure, not for field names, so the contract governs wherever the two differ. Which of the
+> fields below the procedure needs and the contract lacks is open as REF-TASK-0055.
+
 | Field | Description |
 |---|---|
 | `hypothesis_id` | Matches `pre_registered_hypotheses` ID from Study record |
-| `test_name` | e.g., `wilcoxon_signed_rank`, `kruskal_wallis`, `mccnemar` |
+| `test_name` | e.g., `wilcoxon_signed_rank`, `kruskal_wallis` |
 | `n_problems` | Number of Problem Instances used in the test |
 | `n_runs_per_algorithm` | Runs per algorithm (for within-cell aggregation if applicable) |
 | `test_statistic` | Raw test statistic value |
@@ -458,7 +465,7 @@ The Analyzer must produce for each tested hypothesis:
 | `corrected_p_value` | After correction (equals `p_value` if `none`) |
 | `alpha` | Declared significance threshold |
 | `reject` | Boolean: `true` if `corrected_p_value ≤ alpha` |
-| `effect_size` | Value and measure name (e.g., `{"measure": "rank_biserial", "value": 0.42}`) |
+| `effect_size` | Value and measure name (e.g., `{"measure": "cliffs_delta", "value": 0.42}`; §4.1) |
 | `conclusion_scope` | Explicit scope: algorithm IDs, problem IDs, budget, metric ID |
 
 `conclusion_scope` is the primary mechanism preventing over-generalization (Pitfall 4). It

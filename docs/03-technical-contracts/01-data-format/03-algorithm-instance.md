@@ -9,7 +9,7 @@
 | id | string | yes | Algorithm Instance UUID (RFC 4122 v4) |
 | schema_version | string | yes | Version of the entity schema this record conforms to, e.g. `0.0.3`. Governs the shape of the record, not the identity of the entity. See [13-schema-versioning.md](13-schema-versioning.md) |
 | name | string | yes | Human-readable name for this specific configuration eg. `NSGANet`, `Grid vs Random` |
-| version | string | yes | Version of this record. Structure is described in validation rules |
+| version | string | yes | Human-readable version for display and citation; never an addressing key (ADR-020). See validation rules |
 | algorithm_family | string | yes | The abstract Algorithm this is an instance of (e.g., `Random Search`, `TPE`, `CMA-ES`) |
 | hyperparameters | map[string, any] | yes | Key-value map of configuration parameter name → value. All hyperparameters must be fully specified |
 | configuration_justification | string | yes | Why this configuration was chosen (required for fairness, Principle 10) |

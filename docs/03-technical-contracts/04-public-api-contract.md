@@ -398,10 +398,11 @@ class Experiment:
 
 **Notes:**
 
-- An Experiment returned by `cc.run()` will have `status="completed"` if all Runs finished
-  without error, `"failed"` if any Run failed and the experiment could not recover, or
-  `"running"` if the call returns before all Runs complete (not the case in V1 — `cc.run()`
-  is synchronous in V1 and always returns a terminal-status Experiment).
+- An Experiment returned by `cc.run()` has `status="completed"` once every Run in the plan has
+  been attempted, including when some Runs failed (ADR-027). `"failed"` marks an Experiment that
+  could not proceed at all, whose error propagates from `cc.run()` rather than being returned.
+  `"running"` is never returned in V1: `cc.run()` is synchronous and returns only a
+  terminal-status Experiment.
 - `run_ids` contains IDs in the order the Runs were created. The length equals
   `repetitions × len(problem_ids) × len(algorithm_ids)` for a completed Experiment.
 
@@ -956,10 +957,12 @@ def run(study_id: str) -> Experiment:
 |---|---|---|---|
 | `study_id` | `str` | Yes | The ID of the Study to execute. The Study must exist and have `status="locked"`. |
 
-**Returns:** `Experiment` — the completed (or failed) experiment. `experiment.status` is
-`"completed"` if all Runs succeeded, `"failed"` if at least one Run failed and the
-experiment could not recover. In either case, `experiment.run_ids` is populated with all
-Run IDs that were created.
+**Returns:** `Experiment` — the completed experiment. `experiment.status` is `"completed"` once
+every Run in the plan has been attempted, including when individual Runs failed: a failed Run is
+recorded with `Run.status="failed"` and the Experiment continues (ADR-027). `"failed"` is
+reserved for an Experiment that could not proceed at all — a seed collision, an unavailable
+repository — and the error that caused it propagates to the caller (ADR-027).
+`experiment.run_ids` is populated with all Run IDs that were created.
 
 **Raises:**
 
@@ -1213,7 +1216,7 @@ at this path at the time the function returns.
 |---|---|
 | `cc.EntityNotFoundError` | No Experiment with `experiment_id` exists. |
 | `cc.UnsupportedFormatError` | `format` is not one of the recognised values (`"json"`, `"csv"`). |
-| `cc.ExportValidationError` | The exported data is missing mandatory fields (e.g., `eval_number`, `objective_value`, `run_id`). This indicates a data integrity problem in the repository. |
+| `cc.ExportValidationError` | The exported data is missing mandatory fields (e.g., `evaluation_number`, `objective_value`, `run_id`). This indicates a data integrity problem in the repository. |
 
 **Example:**
 
@@ -1417,7 +1420,7 @@ strings dynamically from user input without validation.
 **Raised by:** `cc.export_raw_data()`
 
 **When:** During export, one or more PerformanceRecords are missing mandatory fields
-(`eval_number`, `objective_value`, `run_id`). This indicates a data integrity problem in
+(`evaluation_number`, `objective_value`, `run_id`). This indicates a data integrity problem in
 the repository — the stored data does not conform to the schema defined in
 `docs/03-technical-contracts/01-data-format/07-performance-record.md`.
 

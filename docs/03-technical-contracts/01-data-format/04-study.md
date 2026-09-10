@@ -9,11 +9,11 @@
 | id | string | yes | Study UUID (RFC 4122 v4) |
 | schema_version | string | yes | Version of the entity schema this record conforms to, e.g. `0.0.3`. Governs the shape of the record, not the identity of the entity. See [13-schema-versioning.md](13-schema-versioning.md) |
 | name | string | yes | Title of the study |
-| version | string | yes | Version of this study, updated automatically after each change. Structure is described in validation rules |
+| version | string | yes | Human-readable version for display and citation; never an addressing key (ADR-020). See validation rules |
 | research_question | string | yes | The motivating research question; free text |
 | research_question_tags | list[string] | | List of structured tags for research question (e.g., `topic:generalization`, `domain:NLP`) |
-| problem_instance_ids | list[string] | yes | Ordered list of Problem Instance UUIDs included in this study, with pinned versions |
-| algorithm_instance_ids | list[string] | yes | Ordered list of Algorithm Instance UUIDs included in this study, with pinned versions |
+| problem_instance_ids | list[string] | yes | Ordered list of Problem Instance UUIDs included in this study. A UUID never changes meaning, so it pins the instance exactly (ADR-020) |
+| algorithm_instance_ids | list[string] | yes | Ordered list of Algorithm Instance UUIDs included in this study. A UUID never changes meaning, so it pins the instance exactly (ADR-020) |
 | experimental_design.budget_type | string | yes | Unit of budget measurement: `evaluations` (integer count), `wall_time` (seconds, float), or `combined`; must be consistent with all referenced ProblemInstance `evaluation.budget_type` values; locked before execution begins |
 | experimental_design.repetitions | int | yes | Number of independent runs per (problem, algorithm) pair. Must be declared before data collection begins |
 | experimental_design.seed_strategy | string | yes | How seeds are generated and assigned (e.g., `sequential`, `random`, `latin-hypercube`) |
@@ -27,8 +27,6 @@
 | log_scale_schedule | object | yes | Parameters of the log-scale scheduled trigger. Fields: `base_points: list[int]` (default `[1, 2, 5]`), `multiplier_base: int` (default `10`). Produces checkpoints at `base_points[i] × multiplier_base^j` up to the run budget. Must be locked before execution begins |
 | improvement_epsilon | float \| null | yes | Minimum improvement required to trigger an improvement record. `null` means strict inequality (any improvement triggers a record). Non-null values must be scientifically justified and appear in the Report limitations section (FR-21). Must be locked before execution begins |
 | max_records_per_run | int \| null | no | Optional hard cap on PerformanceRecords per Run. `null` means no cap. If set, improvement records stop when the cap is reached; scheduled records continue. A `cap_reached_at_evaluation` field is set on the affected Run and a limitations note is added to the Report automatically (FR-21) |
-| study_type | string | no | `"standard"` (default) or `"exploratory"`. When set to `"exploratory"`, diversity validation rules FR-32 (minimum 5 Problem Instances) and FR-33 (dimensionality and noise coverage) are waived and the study produces no Level 2 (Confirmatory) output. |
-| status | string | yes | `"draft"` or `"locked"`. Set to `"draft"` on creation; transitions to `"locked"` via `StudyRepository.lock_study()`. After locking, execution fields are immutable. |
 | created_by | string | yes | Author (may be a non person) that created this study |
 | created_at | datetime | yes | ISO 8601 UTC timestamp of creation |
 
@@ -37,7 +35,7 @@
 - `algorithm_instance_ids` must contain at least 1 entry
 - `experimental_design.repetitions` must be ≥ 1 and must not be modified after any Run referencing this Study has been created
 - `sampling_strategy`, `log_scale_schedule`, and `improvement_epsilon` must not be modified after any Run referencing this Study has been created
-- `version` must be updated on every field change: `X` increments on schema-breaking changes, `Y` on additions, `Z` on corrections
+- `version` is descriptive metadata for display and citation, never an addressing key (ADR-020)
 - `pre_registered_hypotheses` must contain at least 1 entry before `lock_study()` succeeds (ADR-021)
 - `status` is `draft` on creation and may only transition to `locked`; the reverse transition does not exist (ADR-013)
 - `root_seed` must not be modified after any Run referencing this Study has been created

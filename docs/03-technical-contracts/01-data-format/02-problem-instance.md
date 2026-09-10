@@ -9,7 +9,7 @@
 | id | string | yes | Problem Instance UUID (RFC 4122 v4) |
 | schema_version | string | yes | Version of the entity schema this record conforms to, e.g. `0.0.3`. Governs the shape of the record, not the identity of the entity. See [13-schema-versioning.md](13-schema-versioning.md) |
 | name | string | yes | Human-readable name |
-| version | string | yes | Version of this record. Structure is described in validation rules |
+| version | string | yes | Human-readable version for display and citation; never an addressing key (ADR-020). See validation rules |
 | provenance | string | yes | Source of this problem (e.g., `real_ml_task`, `synthetic`, `adapted_from_coco`) |
 | dimensions | int | yes | Number of hyperparameters in the search space |
 | variables | list[object] | yes | List of variable descriptors; each entry has `name`, `type` (`continuous`/`integer`/`categorical`), and `bounds` or `choices` |

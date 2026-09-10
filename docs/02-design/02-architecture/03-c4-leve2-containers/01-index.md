@@ -220,7 +220,14 @@ flowchart TB
 
 ### Flow 2: Register a new benchmark problem
 
-**Use case:** UC-04 · **Trigger:** Community Contributor calls `corvus verify` or `cc.register_problem()` with a new `ProblemInstance` record
+**Use case:** UC-04 · **Trigger:** Community Contributor submits a new `ProblemInstance` record for registration
+
+> **No public entry point yet.** `04-public-api-contract.md` defines no registration function, and
+> `corvus verify` checks the integrity of a completed Experiment rather than registering a record
+> (`02-cli-spec.md`). The only registration method in the contracts is `register_problem()` on the
+> repository interface, which is outside the public API. FR-39 requires UC-04 to be executable
+> through the facade; the gap is open as REF-TASK-0052, and the steps below describe the intended
+> flow, not a contracted one.
 
 | # | From | To | Data exchanged |
 |---|---|---|---|
@@ -236,7 +243,14 @@ flowchart TB
 
 ### Flow 3: Register a new algorithm implementation
 
-**Use case:** UC-02 · **Trigger:** Algorithm Author calls `corvus verify` or `cc.register_algorithm()` with a new `AlgorithmInstance` record
+**Use case:** UC-02 · **Trigger:** Algorithm Author submits a new `AlgorithmInstance` record for registration
+
+> **No public entry point yet.** `04-public-api-contract.md` defines no registration function, and
+> `corvus verify` checks the integrity of a completed Experiment rather than registering a record
+> (`02-cli-spec.md`). The only registration method in the contracts is `register_algorithm()` on the
+> repository interface, which is outside the public API. FR-39 requires UC-02 to be executable
+> through the facade; the gap is open as REF-TASK-0052, and the steps below describe the intended
+> flow, not a contracted one.
 
 | # | From | To | Data exchanged |
 |---|---|---|---|
@@ -268,7 +282,13 @@ flowchart TB
 
 ### Flow 5: Export results to IOHprofiler / COCO
 
-**Use case:** UC-06 · **Trigger:** Researcher calls `corvus export` or `cc.export_raw_data()` with a target format
+**Use case:** UC-06 · **Trigger:** Researcher requests an export in a target ecosystem format
+
+> **No public entry point yet.** `cc.export_raw_data()` and `corvus export` write JSON or CSV and
+> return a file path; they accept no ecosystem format and have nowhere to return the
+> information-loss manifest FR-24 requires of every export. The Ecosystem Bridge has no interface
+> contract. Both are open as REF-TASK-0053, and the steps below describe the intended flow, not a
+> contracted one.
 
 | # | From | To | Data exchanged |
 |---|---|---|---|

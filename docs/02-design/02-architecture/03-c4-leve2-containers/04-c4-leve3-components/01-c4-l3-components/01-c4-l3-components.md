@@ -40,15 +40,15 @@ flowchart TD
     end
     subgraph ERSG["Experiment Runner"]
       sm["Seed Manager\nSeedSequence(root_seed)\nspawn per Run (ADR-017)"]
-      ri["Run Isolator\nSubprocess spawn\nResource limits"]
-      el["Evaluation Loop\nask/tell cycle\nBudget tracking"]
+      ri["Run Isolator\nFresh execution context\nper Run (FR-11)"]
+      el["Evaluation Loop\nsuggest/observe cycle\nBudget tracking"]
       perf["Performance Recorder\nObservation → PerformanceRecord\nWrites to Results Store"]
     end
     subgraph AESG["Analysis Engine"]
       md["Metric Dispatcher\nRoutes metrics to\ncorrect calculator"]
       stat["Statistical Tester\nWilcoxon · Kruskal-Wallis\nHolm-Bonferroni via SciPy"]
       sa["Scope Annotator\nAttaches run / study\nscope metadata"]
-      locf["LOCF Interpolator\nFills missing budget\npoints (last-obs carry-fwd)"]
+      locf["Interpolation Strategy\nReconstructs best_so_far\nat unlogged budgets (ADR-003)"]
     end
   end
 

@@ -93,7 +93,7 @@ all taken from the Study record.
 
 Every report MUST contain a non-empty Limitations section. A report that reaches
 the template rendering step without a limitations section MUST fail with a
-`ValueError` (not silently produce a report with an empty section).
+`ValidationError` (ADR-015; not silently produce a report with an empty section).
 
 Required elements of the Limitations section:
 

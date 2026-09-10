@@ -153,9 +153,10 @@ Observations from Level 1 analysis may suggest new hypotheses. These are valid a
 
 **Minimum diversity requirements (ADR-009; FR-32, FR-33):**
 
-The system validates the following three rules before any Experiment begins. Failure raises
-`DiversityValidationError`. Studies declared `exploratory` in the `study_type` field are
-exempt but produce no Level 2 (Confirmatory) output.
+The system validates the following three rules when the Study is locked (`CV-021`), which is
+before any Experiment can begin. Failure makes `cc.lock_study()` raise `ValidationError`, whose
+message lists every rule that failed (`04-public-api-contract.md`). Studies declared `exploratory`
+in the `study_type` field are exempt but produce no Level 2 (Confirmatory) output.
 
 | Rule | Requirement | Rationale |
 |---|---|---|
@@ -293,7 +294,7 @@ At this point, the Study record is complete and locked. **No changes to problems
 
 **Checkpointing:**
 
-Long studies should use the Runner's resume capability to recover from infrastructure interruptions without restarting from scratch. See `docs/03-technical-contracts/02-interface-contracts/04-runner-interface.md` for the `resume()` contract. A resumed Experiment continues from the last successfully completed Run; no PerformanceRecords from completed Runs are re-generated.
+The Runner contract defines `resume()` (`docs/03-technical-contracts/02-interface-contracts/04-runner-interface.md`), which re-executes the incomplete Runs of an interrupted Experiment. It is not reachable in V1: there is no facade function and no `corvus resume` command (ADR-016). An interrupted V1 Study is executed again with `cc.run()`. Executing a Study again produces a new Experiment linked to the same Study (UC-05), and the `root_seed` regenerates every Run seed (ADR-017), so the repeated Runs receive the same seeds as the ones lost, at the cost of the compute already spent.
 
 → NFR-REPRO: the full execution environment must be recorded automatically (no researcher action required)
 

@@ -69,7 +69,7 @@ and will be created as the corresponding feature is implemented.
 | FR-04 | A Study resolves to the entity it referenced, for the lifetime of the Study (ADR-020) | Integration | 🚧 `tests/e2e/test_uc01_researcher_study.py` |
 | FR-32 | Validate Study has ≥ 5 Problem Instances before Experiment begins | Unit, Validation rejection | 🚧 `tests/unit/test_problem_repository.py` |
 | FR-33 | Validate Study Problem Instance set covers diversity rules (D-2, D-3) | Unit, Validation rejection | 🚧 `tests/unit/test_problem_repository.py` |
-| FR-05 | Store AlgorithmInstance with all required fields | Unit, Validation rejection | ✅ `tests/unit/test_repository_interface.py` (round-trip); 🚧 `tests/unit/test_algorithm_registry.py` (all 13 required fields) |
+| FR-05 | Store AlgorithmInstance with all required fields | Unit, Validation rejection | ✅ `tests/unit/test_repository_interface.py` (round-trip); 🚧 `tests/unit/test_algorithm_registry.py` (every field `03-algorithm-instance.md` marks required) |
 | FR-06 | Reject unpinned code_reference | Validation rejection | ✅ `tests/unit/test_repository_interface.py` |
 | FR-07 | Require non-empty configuration_justification | Validation rejection | ✅ `tests/unit/test_repository_interface.py` |
 | FR-08 | Enforce pre-registration gate; reject modifications after lock | Pre-registration gate | ✅ `tests/unit/test_repository_interface.py` (`StudyAlreadyLockedError` on re-lock, draft → locked transition); 🚧 `tests/e2e/test_uc01_researcher_study.py` (field immutability, timestamped log) |

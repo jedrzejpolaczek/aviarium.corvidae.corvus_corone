@@ -4,7 +4,8 @@
 > Moved from `0.0.2` by REF-TASK-0042, which added `deprecated`, `deprecation_reason` and
 > `superseded_by` to the Problem Instance and Algorithm Instance schemas. ADR-020 records the
 > supersession model and states that the contract already defines those fields; it did not.
-> Every entity record carries this value in its `schema_version` field. The version governs the
+> Every entity record except the Performance Record carries this value in its `schema_version`
+> field; for the Performance Record it is undecided (REF-TASK-0057). The version governs the
 > *shape* of the records, not the identity or lifecycle of the entities they describe. The rules
 > for bumping it, and for reading an artifact whose version differs, are in
 > [13-schema-versioning.md](13-schema-versioning.md).
@@ -119,5 +120,5 @@ flowchart TD
 | §2.8 Report | [09-report.md](09-report.md) | ✅ Formal schema |
 | §3 File Formats and Storage | [10-file-formats.md](10-file-formats.md) | ✅ §3.1 IOHprofiler export, §3.2 LocalFileRepository layout, §3.3 Parquet bulk format complete |
 | §4 Interoperability Mappings | [11-interoperability-mappings.md](11-interoperability-mappings.md) | ✅ §4.1 COCO, §4.2 IOHprofiler, §4.3 Nevergrad complete |
-| §5 Validation Rules (Cross-Entity) | [12-cross-entity-validation.md](12-cross-entity-validation.md) | ✅ CV-001..CV-023 |
+| §5 Validation Rules (Cross-Entity) | [12-cross-entity-validation.md](12-cross-entity-validation.md) | ✅ CV-001..CV-024 |
 | §6 Schema Versioning | [13-schema-versioning.md](13-schema-versioning.md) | ✅ Defined |

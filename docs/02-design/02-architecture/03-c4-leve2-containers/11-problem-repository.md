@@ -15,7 +15,7 @@ execution time.
 | Surface | Form | Who uses it |
 |---|---|---|
 | Problem lookup | `get_problem(id)` / `list_problems(filters)` | Public API (`cc.list_problems()`, `cc.get_problem()`), Experiment Runner (loads instance per Run) |
-| Problem registration | `register_problem(problem)` → `id` | Community Contributor (via `corvus verify`, UC-04) |
+| Problem registration | `register_problem(problem)` → `id` | Community Contributor (UC-04). No public entry point yet: the facade defines no registration function, and `corvus verify` checks the integrity of a completed Experiment (REF-TASK-0052) |
 | Problem deprecation | `deprecate_problem(id, reason, superseded_by)` | Maintainer |
 
 Full interface contract: [`../../../03-technical-contracts/02-interface-contracts/06-repository-interface.md`](../../../03-technical-contracts/02-interface-contracts/06-repository-interface.md) (§ ProblemRepository)
@@ -24,7 +24,7 @@ Full interface contract: [`../../../03-technical-contracts/02-interface-contract
 persistence layer (local file store in V1).
 
 **Data owned:** All `ProblemInstance` records and their supersession lineage. Stored under the
-`LocalFileRepository` root (`problems/<id>/`).
+`LocalFileRepository` root (`problems/<id>.json`, `10-file-formats.md`).
 
 **Versioning:** entities are immutable and there is no `version` parameter (ADR-020).
 `get_problem(id)` returns the same bytes forever; a revision is registered as a new entity
@@ -36,6 +36,6 @@ human-readable metadata for display and citation, never as an addressing key.
 **Actors served:** Researcher (study design — problem selection); Experiment Runner
 (execution-time instance loading); Community Contributor (registration, UC-04).
 
-**Relevant SRS section:** FR-01 (problem registration with validation), FR-02 (problem
-versioning and deprecation), FR-03 (list and filter problems), FR-04 (problem interface
-contract enforcement).
+**Relevant SRS section:** FR-01 (Problem Instance records stored to the schema),
+FR-02 (completeness validated on registration), FR-03 (a revision is a new entity; the original stays retrievable),
+FR-04 (Studies reference instances by identifier only).

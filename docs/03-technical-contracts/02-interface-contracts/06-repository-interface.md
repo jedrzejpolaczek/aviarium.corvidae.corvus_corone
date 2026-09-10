@@ -84,8 +84,8 @@ Sets `deprecated` to `true`, `deprecation_reason` to `reason`, and, when given,
 **Preconditions:**
 - the entity exists
 - `reason` is a non-empty string. A deprecation without a stated reason cannot be
-  reviewed, and the deprecation policy that will govern the review is
-  `05-community/02-versioning-governance.md` §3 (not yet written; REF-TASK-0048)
+  reviewed, and the deprecation policy that governs the review is
+  `05-community/02-versioning-governance.md` §3
 - when `superseded_by` is given, it resolves to an existing entity of the **same kind**,
   is not the entity being deprecated, and does not already reach that entity by following
   `superseded_by` links. Supersession is a lineage, not a graph: a cycle would make
@@ -125,7 +125,9 @@ Validates and persists a new Algorithm Instance. Returns the assigned ID.
 
 **Preconditions:** all docs/03-technical-contracts/01-data-format/03-algorithm-instance.md validation rules pass; `code_reference` is
 resolvable and version-pinned (UC-02 F2); `configuration_justification` is non-empty (UC-02 F3)
-**Exceptions:** `ValidationError`, `CodeReferenceError`
+**Exceptions:** `ValidationError`, `CodeReferenceError`, `InterfaceViolationError` — the
+registered Algorithm does not satisfy the Algorithm Interface (ADR-015; UC-02 F1). How registration
+obtains the implementation it checks is not yet specified (REF-TASK-0058)
 
 #### deprecate_algorithm(id: str, reason: str, superseded_by: str | None = None) → None
 Marks the Algorithm Instance as deprecated. Deprecation is the **only** permitted mutation of an
@@ -138,8 +140,8 @@ Sets `deprecated` to `true`, `deprecation_reason` to `reason`, and, when given,
 **Preconditions:**
 - the entity exists
 - `reason` is a non-empty string. A deprecation without a stated reason cannot be
-  reviewed, and the deprecation policy that will govern the review is
-  `05-community/02-versioning-governance.md` §3 (not yet written; REF-TASK-0048)
+  reviewed, and the deprecation policy that governs the review is
+  `05-community/02-versioning-governance.md` §3
 - when `superseded_by` is given, it resolves to an existing entity of the **same kind**,
   is not the entity being deprecated, and does not already reach that entity by following
   `superseded_by` links. Supersession is a lineage, not a graph: a cycle would make

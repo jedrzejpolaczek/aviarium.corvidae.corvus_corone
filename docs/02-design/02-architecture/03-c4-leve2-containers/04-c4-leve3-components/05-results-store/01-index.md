@@ -38,7 +38,7 @@ never deleted; it stays the source of truth.
 | Every repository method, its preconditions and its exceptions | [`02-interface-contracts/06-repository-interface.md`](../../../../../03-technical-contracts/02-interface-contracts/06-repository-interface.md) |
 | Directory layout, JSON Lines and Parquet formats, round-trip invariant | [`01-data-format/10-file-formats.md`](../../../../../03-technical-contracts/01-data-format/10-file-formats.md) |
 | The seven entity schemas | [`01-data-format/01-index.md`](../../../../../03-technical-contracts/01-data-format/01-index.md) |
-| Cross-entity rules `CV-001` … `CV-023` | [`01-data-format/12-cross-entity-validation.md`](../../../../../03-technical-contracts/01-data-format/12-cross-entity-validation.md) |
+| Cross-entity rules `CV-001` … `CV-024` | [`01-data-format/12-cross-entity-validation.md`](../../../../../03-technical-contracts/01-data-format/12-cross-entity-validation.md) |
 
 Entities are immutable. A revision is a new entity with a new UUID, and the superseded one carries
 `superseded_by`; deprecation is the only write a stored entity ever receives (ADR-020).

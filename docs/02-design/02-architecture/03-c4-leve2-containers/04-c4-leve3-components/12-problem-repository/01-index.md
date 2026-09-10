@@ -3,79 +3,40 @@
 > C2 Container: [11-problem-repository.md](../../11-problem-repository.md)
 > C3 Index: [C3 overview](../01-c4-l3-components/01-c4-l3-components.md)
 
-The Problem Repository stores and serves ProblemInstance registrations with the same versioning and deprecation architecture as the Algorithm Registry. Each problem instance is validated on registration and immutable thereafter.
-Actors: Study Orchestrator and Public API read from it; developers register new problem instances during library development or benchmarking suite expansion.
+> **Descriptive page. It defines nothing.** Under ADR-012 this layer explains how a container is
+> decomposed and why the boundaries fall where they do. Every type, field name, enumeration
+> value, exception class and signature it mentions is defined in the contracts listed under
+> *Where the vocabulary comes from*; a statement here that those contracts do not support is a
+> defect in this page, never in them. ADR-028 removed the per-component files this page used to
+> link to, for the reason recorded there.
 
----
+The Problem Repository stores Problem Instances under the same identity model as the Algorithm
+Registry: validated once, immutable afterwards, superseded rather than edited (ADR-020).
 
-## Component Diagram
-
-```mermaid
----
-config:
-  look: neo
-  theme: redux-dark
-  themeVariables:
-    background: transparent
----
-flowchart LR
-  dev["Developer"] L_dev_iv@-- register --> iv
-
-  subgraph PR["Problem Repository"]
-    iv["Instance Validator\nValidates ProblemInstance\nschema on registration"]
-    vm["Supersession Manager\nRecords superseded_by lineage\nEntities are immutable"]
-    es["Entity Store\nPersists instances as JSON\nResolves IDs + deprecation"]
-  end
-
-  iv L_iv_vm@--> vm
-  vm L_vm_es@--> es
-
-  api["Public API\nStudy Orchestrator\nPilot MCP"] L_api_es@-- read --> es
-
-  style PR fill:#161616,stroke:#46EDC8,color:#aaaaaa
-
-  linkStyle 0 stroke:#FFD600,fill:none
-  linkStyle 1,2 stroke:#46EDC8,fill:none
-  linkStyle 3 stroke:#2962FF,fill:none
-
-  L_dev_iv@{ animation: slow }
-  L_iv_vm@{ animation: fast }
-  L_vm_es@{ animation: fast }
-  L_api_es@{ animation: fast }
-```
+Its validation carries more weight than the registry's, because a Problem Instance is where the
+scientific claim of a Study is grounded. FR-02 checks the instance itself; FR-32 and FR-33 check
+the *set* an entire Study proposes to use, against the diversity floor of ADR-009.
 
 ---
 
 ## Components
 
-| Component | File | Responsibility |
+| Component | Responsibility | Implements |
 |---|---|---|
-| Instance Validator | [02-instance-validator.md](02-instance-validator.md) | Validates ProblemInstance schema and required fields on registration |
-| Supersession Manager | [03-supersession-manager.md](03-supersession-manager.md) | Records the `superseded_by` lineage between an entity and the registration that replaces it (ADR-020) |
-| Entity Store | [04-entity-store.md](04-entity-store.md) | Persists problem instances as JSON; resolves IDs; supports the deprecation flag |
+| Instance Validator | Applies the registration rules — dimension agreement, variable bounds, required provenance | FR-01, FR-02; [`02-problem-instance.md`](../../../../../03-technical-contracts/01-data-format/02-problem-instance.md) |
+| Supersession Manager | Records the lineage between an instance and the registration that replaces it | ADR-020; [`06-repository-interface.md`](../../../../../03-technical-contracts/02-interface-contracts/06-repository-interface.md) |
+| Entity Store | Persists instances and resolves identifiers | [`06-repository-interface.md`](../../../../../03-technical-contracts/02-interface-contracts/06-repository-interface.md) |
 
 ---
 
-## Cross-Cutting Concerns
+## Where the vocabulary comes from
 
-### Logging & Observability
+| Subject | Contract |
+|---|---|
+| Problem Instance fields and validation rules | [`01-data-format/02-problem-instance.md`](../../../../../03-technical-contracts/01-data-format/02-problem-instance.md) |
+| `register_problem`, `get_problem`, `list_problems`, `deprecate_problem` | [`02-interface-contracts/06-repository-interface.md`](../../../../../03-technical-contracts/02-interface-contracts/06-repository-interface.md) |
+| The interface a registered problem must satisfy | [`02-interface-contracts/02-problem-interface.md`](../../../../../03-technical-contracts/02-interface-contracts/02-problem-interface.md) |
+| The diversity floor a Study's problem set must clear | ADR-009 D-1 … D-3; cross-entity rule `CV-021` |
 
-Same pattern as Algorithm Registry: one log entry per registration and per deprecation at INFO level.
-
-### Error Handling
-
-- `ValidationError`: raised by Instance Validator on schema violations.
-- `ValidationError`: raised on duplicate `(id, version)` registration.
-- `EntityNotFoundError`: raised by Entity Store on missing problem ID.
-
-### Randomness / Seed Management
-
-No random state.
-
-### Configuration
-
-The Repository reads its storage path from `CORVUS_PROBLEM_REPO_DIR` (env) or defaults to the package's bundled `data/problem_repository/` directory.
-
-### Testing Strategy
-
-Same pattern as Algorithm Registry: unit tests per component, integration tests for round-trip fidelity.
+The diversity check belongs to the Study Orchestrator, not here: it is a property of a Study's
+problem *set*, and this container knows only about instances.

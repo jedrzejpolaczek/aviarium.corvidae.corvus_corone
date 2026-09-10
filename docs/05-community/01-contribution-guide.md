@@ -69,6 +69,11 @@ private vulnerability reporting.
 
 ## Types of Contributions
 
+> **Not written.** This section is an empty heading, and saying so is better than letting a
+> reader conclude the process is undocumented because they missed it. UC-04 names this guide
+> as the contribution process, so §2 in particular is a gap rather than a deferral.
+> Tracked as REF-TASK-0048.
+
 <!--
   Overview table of contribution types and where to start for each.
 
@@ -102,6 +107,11 @@ etc.
 ---
 
 ## 2. Adding a Benchmark Problem
+
+> **Not written.** This section is an empty heading, and saying so is better than letting a
+> reader conclude the process is undocumented because they missed it. UC-04 names this guide
+> as the contribution process, so §2 in particular is a gap rather than a deferral.
+> Tracked as REF-TASK-0048.
 
 <!--
   When to contribute a new problem:
@@ -193,6 +203,11 @@ etc.
 
 ## 4. Adding Analysis Tools or Metrics
 
+> **Not written.** This section is an empty heading, and saying so is better than letting a
+> reader conclude the process is undocumented because they missed it. UC-04 names this guide
+> as the contribution process, so §2 in particular is a gap rather than a deferral.
+> Tracked as REF-TASK-0048.
+
 <!--
   When to contribute a new metric:
     - It captures an aspect of performance not covered by the Standard Reporting Set
@@ -215,6 +230,11 @@ etc.
 ---
 
 ## 5. Documentation Contributions
+
+> **Not written.** This section is an empty heading, and saying so is better than letting a
+> reader conclude the process is undocumented because they missed it. UC-04 names this guide
+> as the contribution process, so §2 in particular is a gap rather than a deferral.
+> Tracked as REF-TASK-0048.
 
 <!--
   Types of documentation contributions:
@@ -246,6 +266,11 @@ etc.
 
 ## 6. Bug Fixes
 
+> **Not written.** This section is an empty heading, and saying so is better than letting a
+> reader conclude the process is undocumented because they missed it. UC-04 names this guide
+> as the contribution process, so §2 in particular is a gap rather than a deferral.
+> Tracked as REF-TASK-0048.
+
 <!--
   For all bug fixes:
     - Reference the issue / task that describes the bug
@@ -262,6 +287,11 @@ etc.
 ---
 
 ## 7. Review Process
+
+> **Not written.** This section is an empty heading, and saying so is better than letting a
+> reader conclude the process is undocumented because they missed it. UC-04 names this guide
+> as the contribution process, so §2 in particular is a gap rather than a deferral.
+> Tracked as REF-TASK-0048.
 
 <!--
   Stages of contribution review:
@@ -298,6 +328,11 @@ etc.
 ---
 
 ## 8. Quality Checklist
+
+> **Not written.** This section is an empty heading, and saying so is better than letting a
+> reader conclude the process is undocumented because they missed it. UC-04 names this guide
+> as the contribution process, so §2 in particular is a gap rather than a deferral.
+> Tracked as REF-TASK-0048.
 
 <!--
   Every contribution must pass this checklist before requesting review.

@@ -3,113 +3,43 @@
 > C2 Container: [12-results-store.md](../../12-results-store.md)
 > C3 Index: [C3 overview](../01-c4-l3-components/01-c4-l3-components.md)
 
-The Results Store persists and retrieves all study artifacts to the local filesystem. PerformanceRecords are stored in dual format: JSONL for streaming write during Run execution, and Parquet/snappy for bulk query after Run completion (ADR-010: 20× write throughput, 9.3× smaller files, 59× faster range queries vs. SQLite).
-Actors: written to by Experiment Runner and Analysis Engine; read by Reporting Engine, Analysis Engine, and Public API.
+> **Descriptive page. It defines nothing.** Under ADR-012 this layer explains how a container is
+> decomposed and why the boundaries fall where they do. Every type, field name, enumeration
+> value, exception class and signature it mentions is defined in the contracts listed under
+> *Where the vocabulary comes from*; a statement here that those contracts do not support is a
+> defect in this page, never in them. ADR-028 removed the per-component files this page used to
+> link to, for the reason recorded there.
 
----
+The Results Store is the only component in the system that touches persistent storage. Everything
+else reaches it through the repository interface, which is what makes the V1 local-file backend
+replaceable by a V2 server without changing a single caller (ADR-001).
 
-## Component Diagram
-
-```mermaid
----
-config:
-  look: neo
-  theme: redux-dark
-  themeVariables:
-    background: transparent
----
-flowchart TB
-  subgraph RS["Results Store"]
-    lfr["Local File Repository\nBase path management\nDirectory structure"]
-    jes["JSON Entity Store\nStudy / Run / Experiment\nJSON files"]
-    jw["JSONL Performance Writer\nStreaming append\nper-evaluation write"]
-    pw["Parquet Performance Writer\nBatch write after Run\n≥1000 records → Parquet"]
-    rr["Performance Record Reader\nUnified read\nJSONL + Parquet detection"]
-  end
-
-  er["Experiment Runner"] L_er_jw@--> jw
-  jw L_jw_lfr@--> lfr
-  pw L_pw_lfr@--> lfr
-  jes L_jes_lfr@--> lfr
-  rr L_rr_lfr@--> lfr
-
-  orch["Study Orchestrator"] L_orch_jes@--> jes
-  ae["Analysis Engine"] L_ae_rr@--> rr
-  ae L_ae_jes@--> jes
-  rep["Reporting Engine"] L_rep_rr@--> rr
-  api["Public API"] L_api_rr@--> rr
-  api L_api_jes@--> jes
-
-  jw -.->|"post-Run\n≥1000 records"| pw
-
-  style RS fill:#161616,stroke:#00C853,color:#aaaaaa
-
-  linkStyle 0,1,2,3 stroke:#00C853,fill:none
-  linkStyle 4 stroke:#2962FF,fill:none
-  linkStyle 5 stroke:#00C853,fill:none
-  linkStyle 6 stroke:#2962FF,fill:none
-  linkStyle 7 stroke:#00C853,fill:none
-  linkStyle 8,9 stroke:#2962FF,fill:none
-  linkStyle 10 stroke:#FF6D00,fill:none
-  linkStyle 11 stroke:#FF6D00,fill:none
-
-  L_er_jw@{ animation: fast }
-  L_jw_lfr@{ animation: fast }
-  L_pw_lfr@{ animation: fast }
-  L_jes_lfr@{ animation: fast }
-  L_rr_lfr@{ animation: fast }
-  L_orch_jes@{ animation: fast }
-  L_ae_rr@{ animation: fast }
-  L_ae_jes@{ animation: fast }
-  L_rep_rr@{ animation: fast }
-  L_api_rr@{ animation: fast }
-  L_api_jes@{ animation: fast }
-```
+Performance Records are written twice over: JSON Lines during the Run, and Parquet afterwards when
+a Run is large enough for the columnar format to pay for itself (ADR-010). The JSON Lines file is
+never deleted; it stays the source of truth.
 
 ---
 
 ## Components
 
-| Component | File | Responsibility |
+| Component | Responsibility | Implements |
 |---|---|---|
-| Local File Repository | [02-local-file-repository.md](02-local-file-repository.md) | Manages the filesystem path hierarchy and directory structure for all artifacts |
-| JSON Entity Store | [03-json-entity-store.md](03-json-entity-store.md) | Reads and writes domain entities (Study, Experiment, Run) as JSON files |
-| JSONL Performance Writer | [04-jsonl-performance-writer.md](04-jsonl-performance-writer.md) | Streams PerformanceRecord observations to JSONL files during Run execution |
-| Parquet Performance Writer | [05-parquet-performance-writer.md](05-parquet-performance-writer.md) | Converts completed Run JSONL files to Parquet/snappy format post-Run |
-| Performance Record Reader | [06-performance-record-reader.md](06-performance-record-reader.md) | Unified read interface over JSONL and Parquet; detects format automatically |
+| Local File Repository | Implements the repository interface against a directory tree, and owns the layout, which is not part of the interface | ADR-001; [`06-repository-interface.md`](../../../../../03-technical-contracts/02-interface-contracts/06-repository-interface.md) |
+| Entity Store | Reads and writes the seven entity types as JSON | [`01-data-format/`](../../../../../03-technical-contracts/01-data-format/01-index.md) |
+| Performance Record Writer | Appends a record for each fired trigger during a Run, and converts to the bulk format afterwards | ADR-002, ADR-010; [`10-file-formats.md`](../../../../../03-technical-contracts/01-data-format/10-file-formats.md) |
+| Performance Record Reader | Serves records from whichever format is present, so that callers cannot tell which was used | [`10-file-formats.md`](../../../../../03-technical-contracts/01-data-format/10-file-formats.md) |
 
 ---
 
-## Cross-Cutting Concerns
+## Where the vocabulary comes from
 
-### Logging & Observability
+| Subject | Contract |
+|---|---|
+| Every repository method, its preconditions and its exceptions | [`02-interface-contracts/06-repository-interface.md`](../../../../../03-technical-contracts/02-interface-contracts/06-repository-interface.md) |
+| Directory layout, JSON Lines and Parquet formats, round-trip invariant | [`01-data-format/10-file-formats.md`](../../../../../03-technical-contracts/01-data-format/10-file-formats.md) |
+| The seven entity schemas | [`01-data-format/01-index.md`](../../../../../03-technical-contracts/01-data-format/01-index.md) |
+| Cross-entity rules `CV-001` … `CV-024` | [`01-data-format/12-cross-entity-validation.md`](../../../../../03-technical-contracts/01-data-format/12-cross-entity-validation.md) |
 
-File I/O operations are not individually logged (too high volume). The Results Store logs one structured entry per entity write (Study, Run, Experiment) at DEBUG level: `action`, `entity_type`, `entity_id`, `path`, `size_bytes`.
+Entities are immutable. A revision is a new entity with a new UUID, and the superseded one carries
+`superseded_by`; deprecation is the only write a stored entity ever receives (ADR-020).
 
-Parquet conversion completion is logged at INFO level: `experiment_id`, `run_id`, `records_converted`, `jsonl_size_bytes`, `parquet_size_bytes`.
-
-### Error Handling
-
-- **Write failures**: if a JSONL write fails mid-Run (e.g., disk full), the writer raises `StorageError` immediately. The Run Isolator catches this and marks the Run `aborted`.
-- **Read failures**: if neither JSONL nor Parquet exists for a requested run_id, the reader raises `EntityNotFoundError`. Callers are expected to handle this.
-- **Partial Parquet conversion**: if the Parquet writer fails mid-conversion, the JSONL file is preserved (not deleted). The next read operation will fall back to JSONL. The failed Parquet file is deleted to avoid partial reads.
-
-### Randomness / Seed Management
-
-No random state. The Results Store is purely I/O.
-
-### Configuration
-
-| Parameter | Source | Scope |
-|---|---|---|
-| `results_dir` | Study / env `CORVUS_RESULTS_DIR` | Global |
-| `parquet_threshold` | Study (default: 1000 records) | Per-Run |
-| `compression` | Study (default: `snappy`) | Per-Run Parquet |
-
-### Testing Strategy
-
-- **Local File Repository**: unit-tested; verifies directory creation, path construction, and cleanup.
-- **JSON Entity Store**: unit-tested with all entity types; verifies round-trip serialisation fidelity.
-- **JSONL Performance Writer**: unit-tested with synthetic PerformanceRecords; verifies streaming write and flush guarantees.
-- **Parquet Performance Writer**: integration-tested; verifies conversion correctness (record count match) and that the JSONL file is preserved if conversion fails.
-- **Performance Record Reader**: integration-tested with both JSONL and Parquet sources; verifies identical read results from both formats for the same data.

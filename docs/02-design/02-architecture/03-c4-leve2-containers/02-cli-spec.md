@@ -61,7 +61,7 @@ Error: <ErrorType>: <human-readable message>
 Examples:
 
 ```
-Error: NotFoundError: Study with id '3f2e1a00-...' not found.
+Error: EntityNotFoundError: Study with id '3f2e1a00-...' not found.
 Error: ValidationError: create_study(): problem_ids: unknown problem id 'foo-bar'.
 Error: SeedCollisionError: Seed collision detected in Experiment 'abc-...': seed 42 would be assigned to multiple Runs.
 ```
@@ -76,7 +76,7 @@ parse stderr to identify the error category without parsing the free-form messag
 |---|---|
 | `0` | Command completed successfully. |
 | `1` | General error — invalid arguments, validation failure, unwritable output path. |
-| `2` | Entity not found — `NotFoundError` from the Python API. |
+| `2` | Entity not found — `EntityNotFoundError` from the Python API (ADR-015). |
 | `3` | Locked entity — `StudyAlreadyLockedError` from the Python API (ADR-015). |
 | `4` | Unsupported format — `UnsupportedFormatError` from the Python API. |
 | `5` | Export validation failure — `ExportValidationError` or integrity check failed. |
@@ -306,8 +306,8 @@ Experiment 3f2e1a00-...: FAILED
   300 runs verified.
   3 integrity issues found.
   ERROR: Run 'abc-123': PerformanceRecord 'xyz-456' missing field 'objective_value'.
-  ERROR: Run 'def-789': PerformanceRecord 'uvw-012' missing field 'eval_number'.
-  ERROR: Run 'def-789': PerformanceRecord 'rst-345' missing field 'eval_number'.
+  ERROR: Run 'def-789': PerformanceRecord 'uvw-012' missing field 'evaluation_number'.
+  ERROR: Run 'def-789': PerformanceRecord 'rst-345' missing field 'evaluation_number'.
 ```
 
 **Exit codes:**
@@ -436,7 +436,8 @@ Exported 30 000 PerformanceRecords to /home/researcher/sphere-study-raw.csv
 
 ## Relation to Python API
 
-Every CLI command delegates to a public API function. The table below shows the mapping.
+Every CLI command is required to delegate to a public API function (FR-40). The table below shows
+the mapping, and the one command that does not yet satisfy the requirement.
 For full parameter documentation, exception details, and return type descriptions, see
 `docs/03-technical-contracts/04-public-api-contract.md`.
 
@@ -446,14 +447,15 @@ For full parameter documentation, exception details, and return type description
 | `corvus list-algorithms [--family ...]` | `cc.list_algorithms(family=...)` |
 | `corvus run <study_id>` | `cc.run(study_id)` |
 | `corvus report <experiment_id>` | `cc.generate_reports(experiment_id)` |
-| `corvus verify <experiment_id>` | `cc.export_raw_data(experiment_id)` (internal check) |
+| `corvus verify <experiment_id>` | *none.* The facade has no integrity-check function, so this command offers a capability the facade lacks, which FR-40 forbids. Open as REF-TASK-0054 |
 | `corvus export <experiment_id>` | `cc.export_raw_data(experiment_id, format=...)` |
 
-**Note:** `cc.create_study()`, `cc.get_experiment()`, `cc.get_runs()`,
-`cc.get_result_aggregates()`, and `cc.update_study()` have no CLI equivalents in V1.
-These operations are available only through the Python API. The rationale is that
-`create_study()` requires structured data (lists, dicts) that is awkward to pass as
-CLI arguments, and the retrieval functions are intended for use in analysis scripts
+**Note:** `cc.create_study()`, `cc.update_study()`, `cc.lock_study()`, `cc.get_problem()`,
+`cc.get_algorithm()`, `cc.get_experiment()`, `cc.get_runs()` and `cc.get_result_aggregates()`
+have no CLI equivalents in V1. These operations are available only through the Python API.
+The rationale is that `create_study()` requires structured data (lists, dicts) that is awkward
+to pass as CLI arguments, that locking completes the authoring a Study receives in Python
+(ADR-013, ADR-016), and that the retrieval functions are intended for use in analysis scripts
 rather than interactive shell sessions.
 
 ---

@@ -68,13 +68,13 @@ CONNECTS TO:
 | FR-24 | 26 | `03-functional-requirements/01-index.md` §4.7 | Ecosystem Bridge | UC-06 | Interoperability | Defined |
 | FR-25 | 26 | `03-functional-requirements/01-index.md` §4.7 | Ecosystem Bridge, Algorithm Registry | UC-02, UC-06 | Interoperability, Plugin | Defined |
 | FR-26 | 24 | `03-functional-requirements/01-index.md` §4.7 | Ecosystem Bridge | UC-06 | Interoperability | Defined |
-| FR-27 | 16, 28 | `03-functional-requirements/01-index.md` §4.8 | Study Orchestrator, Public API + CLI | UC-01 | Usability, Validation rejection | Defined |
-| FR-28 | 16, 19 | `03-functional-requirements/01-index.md` §4.8 | Public API + CLI | UC-01 | Validation rejection | Defined |
-| FR-29 | 28 | `03-functional-requirements/01-index.md` §4.8 | All | UC-01, UC-02, UC-04 | Usability | Defined |
-| FR-30 | 4, 5 | `03-functional-requirements/01-index.md` §4.8 | Study Orchestrator | UC-01 | Statistical validity | Defined |
-| FR-31 | 3, 13 | `03-functional-requirements/01-index.md` §4.8 | Study Orchestrator, Reporting Engine | UC-01 | Constraint enforcement | Defined |
-| FR-32 | 4, 5 | `03-functional-requirements/01-index.md` §4.1 | Problem Repository, Study Orchestrator | UC-01 | Statistical validity | Defined |
-| FR-33 | 5 | `03-functional-requirements/01-index.md` §4.1 | Problem Repository, Study Orchestrator | UC-01 | Statistical validity | Defined |
+| FR-27 | 16, 28 | `03-functional-requirements/01-index.md` §4.8 | Study Orchestrator, Public API + CLI | UC-01 | Guidance quality, Validation rejection | Defined |
+| FR-28 | 16, 19 | `03-functional-requirements/01-index.md` §4.8 | Public API + CLI | UC-01 | Interface conformance, Validation rejection | Defined |
+| FR-29 | 28 | `03-functional-requirements/01-index.md` §4.8 | All | UC-01, UC-02, UC-04 | Guidance quality | Defined |
+| FR-30 | 4, 5 | `03-functional-requirements/01-index.md` §4.8 | Study Orchestrator | UC-01 | Guidance quality, Validation rejection | Defined |
+| FR-31 | 3, 13 | `03-functional-requirements/01-index.md` §4.8 | Study Orchestrator, Reporting Engine | UC-01 | Constraint enforcement, Statistical validity | Defined |
+| FR-32 | 4, 5 | `03-functional-requirements/01-index.md` §4.1 | Problem Repository, Study Orchestrator | UC-01 | Unit, Validation rejection | Defined |
+| FR-33 | 5 | `03-functional-requirements/01-index.md` §4.1 | Problem Repository, Study Orchestrator | UC-01 | Unit, Validation rejection | Defined |
 | FR-34 | 25, 28 | `03-functional-requirements/01-index.md` §4.9 | Algorithm Visualization Engine | UC-07 | Usability | Deferred (Phase 4) |
 | FR-35 | 25, 28 | `03-functional-requirements/01-index.md` §4.9 | Corvus Pilot | UC-08 | Usability | Deferred (Phase 4) |
 | FR-36 | 28 | `03-functional-requirements/01-index.md` §4.9 | Corvus Pilot | UC-09 | Usability | Deferred (Phase 4) |

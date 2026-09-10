@@ -14,7 +14,13 @@ CONNECTS TO:
 
 ---
 
-**Status:** Accepted
+**Status:** Accepted; the component document this ADR instructs is absorbed into
+[`03-experiment-runner/01-index.md`](../03-c4-leve2-containers/04-c4-leve3-components/03-experiment-runner/01-index.md)
+
+> **Target absorbed.** This ADR requires `03-experiment-runner/02-seed-manager.md` to be
+> corrected to the `SeedSequence` mechanism or removed under ADR-012. It was corrected first,
+> and [ADR-028](adr-028-consolidate-the-c3-layer-and-remove-c4.md) then consolidated the C3 layer, so the Seed Manager is described in its
+> group index. The decision is unchanged; only the document it points at has moved.
 
 **Date:** 2026-09-08
 

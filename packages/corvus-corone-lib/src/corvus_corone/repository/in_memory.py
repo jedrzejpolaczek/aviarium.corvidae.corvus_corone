@@ -23,6 +23,7 @@ References
 from __future__ import annotations
 
 import uuid
+from collections.abc import Callable
 from copy import deepcopy
 from typing import Any
 
@@ -70,6 +71,55 @@ def _require(entity: dict[str, Any], *fields: str, entity_type: str) -> None:
 # ---------------------------------------------------------------------------
 
 
+def _check_supersession(
+    entity_type: str,
+    id: str,
+    reason: str,
+    superseded_by: str | None,
+    exists: "Callable[[str], bool]",
+    superseded_by_of: "Callable[[str], str | None]",
+) -> None:
+    """Preconditions of deprecate_problem / deprecate_algorithm (ADR-020).
+
+    Supersession is a lineage, not a graph: a cycle would make "what replaced
+    this?" unanswerable, so the chain is walked before the link is written.
+
+    → 02-interface-contracts/06-repository-interface.md §deprecate_*
+    """
+    if not reason or not reason.strip():
+        raise ValidationError(
+            f"{entity_type}: 'reason' must be a non-empty string. "
+            "A deprecation without a stated reason cannot be reviewed (ADR-020).",
+            context={"id": id, "field": "reason"},
+        )
+    if superseded_by is None:
+        return
+    if superseded_by == id:
+        raise ValidationError(
+            f"{entity_type}: 'superseded_by' must not be the entity being deprecated (id='{id}').",
+            context={"id": id, "superseded_by": superseded_by},
+        )
+    if not exists(superseded_by):
+        raise EntityNotFoundError(
+            f"{entity_type} with id='{superseded_by}' not found; "
+            "'superseded_by' must resolve to an existing entity of the same kind.",
+            context={"id": id, "superseded_by": superseded_by},
+        )
+    seen = {id, superseded_by}
+    cursor: str | None = superseded_by_of(superseded_by)
+    while cursor is not None:
+        if cursor == id:
+            raise ValidationError(
+                f"{entity_type}: 'superseded_by' would close a supersession cycle "
+                f"back to id='{id}'.",
+                context={"id": id, "superseded_by": superseded_by},
+            )
+        if cursor in seen:
+            break
+        seen.add(cursor)
+        cursor = superseded_by_of(cursor)
+
+
 class _InMemoryProblemRepository(ProblemRepository):
     """In-memory ProblemRepository.
 
@@ -83,7 +133,6 @@ class _InMemoryProblemRepository(ProblemRepository):
     def get_problem(
         self,
         id: str,
-        version: str | None = None,
     ) -> dict[str, Any]:
         if id not in self._store:
             raise EntityNotFoundError(
@@ -133,6 +182,14 @@ class _InMemoryProblemRepository(ProblemRepository):
                 f"ProblemInstance with id='{id}' not found.",
                 context={"id": id},
             )
+        _check_supersession(
+            "ProblemInstance",
+            id,
+            reason,
+            superseded_by,
+            exists=lambda x: x in self._store,
+            superseded_by_of=lambda x: self._store[x].get("superseded_by"),
+        )
         self._store[id]["deprecated"] = True
         self._store[id]["deprecation_reason"] = reason
         if superseded_by is not None:
@@ -160,7 +217,6 @@ class _InMemoryAlgorithmRepository(AlgorithmRepository):
     def get_algorithm(
         self,
         id: str,
-        version: str | None = None,
     ) -> dict[str, Any]:
         if id not in self._store:
             raise EntityNotFoundError(
@@ -229,6 +285,14 @@ class _InMemoryAlgorithmRepository(AlgorithmRepository):
                 f"AlgorithmInstance with id='{id}' not found.",
                 context={"id": id},
             )
+        _check_supersession(
+            "AlgorithmInstance",
+            id,
+            reason,
+            superseded_by,
+            exists=lambda x: x in self._store,
+            superseded_by_of=lambda x: self._store[x].get("superseded_by"),
+        )
         self._store[id]["deprecated"] = True
         self._store[id]["deprecation_reason"] = reason
         if superseded_by is not None:
@@ -275,7 +339,6 @@ class _InMemoryStudyRepository(StudyRepository):
     def get_study(
         self,
         id: str,
-        version: str | None = None,
     ) -> dict[str, Any]:
         if id not in self._store:
             raise EntityNotFoundError(

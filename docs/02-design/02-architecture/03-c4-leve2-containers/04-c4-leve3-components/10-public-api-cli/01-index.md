@@ -3,101 +3,42 @@
 > C2 Container: [04-public-api-cli.md](../../04-public-api-cli.md)
 > C3 Index: [C3 overview](../01-c4-l3-components/01-c4-l3-components.md)
 
-The Public API + CLI is the user-facing entry point for the library. It exposes `cc.*` Python functions and a Click-based CLI, validates inputs at the system boundary, and delegates to internal containers. The Response Mapper transforms internal return types to stable, versioned API objects.
-Actors: Researcher, Learner (Python or CLI); Corvus Pilot V2 (via MCP server which calls `cc.*` functions).
+> **Descriptive page. It defines nothing.** Under ADR-012 this layer explains how a container is
+> decomposed and why the boundaries fall where they do. Every type, field name, enumeration
+> value, exception class and signature it mentions is defined in the contracts listed under
+> *Where the vocabulary comes from*; a statement here that those contracts do not support is a
+> defect in this page, never in them. ADR-028 removed the per-component files this page used to
+> link to, for the reason recorded there.
 
----
+The Public API + CLI is the only way into the system. Every V1 use case is reachable through the
+Python facade, and the command line is a strict subset of it: a command exists only where a facade
+function exists, and a capability offered only on the command line would be a defect (FR-39,
+FR-40).
 
-## Component Diagram
-
-```mermaid
----
-config:
-  look: neo
-  theme: redux-dark
-  themeVariables:
-    background: transparent
----
-flowchart LR
-  user["User (Python / CLI)"]
-  pilot["Corvus Pilot V2\n(MCP Server)"]
-
-  user L_user_api@--> api_facade
-  user L_user_cli@--> cli
-  pilot L_pilot_api@--> api_facade
-
-  subgraph PA["Public API + CLI"]
-    api_facade["API Facade\ncc.* functions\nInput validation"]
-    cli["CLI Command Group\nClick commands\ncorvus run / list / export"]
-    rm["Response Mapper\nDomain objects → API objects\nStable schema"]
-  end
-
-  api_facade L_af_rm@--> rm
-  cli L_cli_af@--> api_facade
-  rm L_rm_user@--> user
-
-  api_facade L_af_orch@--> orch["Study Orchestrator"]
-  api_facade L_af_registry@--> registry["Algorithm Registry"]
-  api_facade L_af_repo@--> repo["Problem Repository"]
-  api_facade L_af_store@--> store["Results Store"]
-  api_facade L_af_bridge@--> bridge["Ecosystem Bridge"]
-  api_facade L_af_ave@--> ave["Algorithm Visualization Engine"]
-
-  style PA fill:#161616,stroke:#FFD600,color:#aaaaaa
-
-  linkStyle 0,1,2,3,4,5 stroke:#FFD600,fill:none
-  linkStyle 6 stroke:#FF6D00,fill:none
-  linkStyle 7,8 stroke:#46EDC8,fill:none
-  linkStyle 9 stroke:#2962FF,fill:none
-  linkStyle 10 stroke:#D50000,fill:none
-  linkStyle 11 stroke:#00BCD4,fill:none
-
-  L_user_api@{ animation: slow }
-  L_user_cli@{ animation: slow }
-  L_pilot_api@{ animation: fast }
-  L_af_rm@{ animation: fast }
-  L_cli_af@{ animation: fast }
-  L_rm_user@{ animation: fast }
-  L_af_orch@{ animation: fast }
-  L_af_registry@{ animation: fast }
-  L_af_repo@{ animation: fast }
-  L_af_store@{ animation: fast }
-  L_af_bridge@{ animation: fast }
-  L_af_ave@{ animation: fast }
-```
+Study authoring has no command-line form in V1. A Study is written in Python and executed from
+either surface (ADR-016).
 
 ---
 
 ## Components
 
-| Component | File | Responsibility |
+| Component | Responsibility | Implements |
 |---|---|---|
-| API Facade | [02-api-facade.md](02-api-facade.md) | Top-level `cc.*` functions; input validation; delegation to core containers |
-| CLI Command Group | [03-cli-command-group.md](03-cli-command-group.md) | Click-based CLI mapping subcommands to API Facade calls |
-| Response Mapper | [04-response-mapper.md](04-response-mapper.md) | Transforms internal domain objects to stable, versioned API return types |
+| API Facade | The `cc.*` functions, their validation, and delegation inward | [`04-public-api-contract.md`](../../../../../03-technical-contracts/04-public-api-contract.md) |
+| CLI Command Group | The `corvus` commands, each delegating to a facade function | ADR-016; `03-c4-leve2-containers/02-cli-spec.md` |
+| Response Mapper | Turns internal records into the read-only view objects the facade returns | [`04-public-api-contract.md`](../../../../../03-technical-contracts/04-public-api-contract.md) §View Objects |
 
 ---
 
-## Cross-Cutting Concerns
+## Where the vocabulary comes from
 
-### Logging & Observability
+| Subject | Contract |
+|---|---|
+| Function signatures, view objects, exceptions raised | [`03-technical-contracts/04-public-api-contract.md`](../../../../../03-technical-contracts/04-public-api-contract.md) |
+| Command names, arguments, options, output conventions, error grammar, exit codes | `03-c4-leve2-containers/02-cli-spec.md` (authoritative for this surface, per ADR-016 and ADR-026) |
+| Exception taxonomy the error messages name | [`02-interface-contracts/07-cross-cutting-contracts.md`](../../../../../03-technical-contracts/02-interface-contracts/07-cross-cutting-contracts.md) |
 
-Public API calls are not individually logged (too high volume for interactive use). CLI commands log one entry per invocation: `command`, `args`, `status`, `duration_ms` at DEBUG level.
+The view objects the Response Mapper produces are deliberately not the storage entities. A caller
+needing a storage-level field goes through the repository interface, which is outside the public
+API.
 
-### Error Handling
-
-All validation errors at the API Facade boundary are raised as `ValidationError` with a structured error dict listing all validation failures (not just the first). Internal container errors (the critical error itself (`SeedCollisionError`, `StorageError`) propagates; aborting is the Runner's response to it, not a separate exception type (ADR-015), `EntityNotFoundError`, etc.) are caught and re-raised as corresponding `cc.*Error` subclasses with user-friendly messages.
-
-### Randomness / Seed Management
-
-The API Facade generates a Study-level `base_seed` if not provided by the user (via `secrets.randbelow(2**31)` — cryptographically random, not from `random` module). This seed is passed to the Study Builder.
-
-### Configuration
-
-The Public API reads `CORVUS_RESULTS_DIR` from the environment as the default `results_dir`. All other configuration is passed explicitly via function arguments or `Study`.
-
-### Testing Strategy
-
-- **API Facade**: unit-tested for all validation paths; integration-tested for the happy path (run a minimal 1-run study end-to-end).
-- **CLI Command Group**: tested via `click.testing.CliRunner`; verifies all subcommands produce expected output and exit codes.
-- **Response Mapper**: unit-tested with fixture domain objects; snapshot-tested for API object schema stability.

@@ -8,9 +8,11 @@ Key design decisions (from interface-contracts.md §5):
 
 - **Domain-specific repositories.** One interface per entity type. Independent
   versioning and testing per domain.
-- **Versioning semantics.** ``get_*(id, version=None)`` returns the latest
-  non-deprecated version. ``get_*(id, version="X.Y.Z")`` returns exactly that
-  version — required for reproducibility (MANIFESTO Principle 19).
+- **Immutable entities (ADR-020).** ``get_*(id)`` returns the same record
+  forever; there is no ``version`` parameter. A revision is registered as a new
+  entity with a new UUID, and the superseded one carries ``superseded_by``.
+  ``list_*`` excludes deprecated entities; ``get_*`` still retrieves them, which
+  is what reproducing an archived study needs (MANIFESTO Principle 19).
 - **Server-compatible IDs.** All entity IDs are UUID strings. No file paths in
   any method signature (ADR-001).
 
@@ -137,17 +139,17 @@ class ProblemRepository(ABC):
     def get_problem(
         self,
         id: str,
-        version: str | None = None,
     ) -> dict[str, Any]:
         """Return the Problem Instance with the given ID.
+
+        The record is immutable, so the identifier alone is exact (ADR-020).
+        Deprecated instances are still returned here; only ``list_problems``
+        filters them out.
 
         Parameters
         ----------
         id:
             UUID string of the Problem Instance.
-        version:
-            If ``None``, returns the latest non-deprecated version.
-            If a semantic version string, returns exactly that version.
 
         Returns
         -------
@@ -158,8 +160,6 @@ class ProblemRepository(ABC):
         ------
         EntityNotFoundError
             If no Problem Instance with the given ID exists.
-        VersionNotFoundError
-            If ``version`` is specified and that version does not exist.
 
         Example
         -------
@@ -230,7 +230,7 @@ class ProblemRepository(ABC):
         """Mark a Problem Instance as deprecated.
 
         Deprecated instances are excluded from :meth:`list_problems` but remain
-        retrievable by exact ID and version for reproducibility.
+        retrievable by exact ID for reproducibility (ADR-020).
 
         Parameters
         ----------
@@ -265,16 +265,17 @@ class AlgorithmRepository(ABC):
     def get_algorithm(
         self,
         id: str,
-        version: str | None = None,
     ) -> dict[str, Any]:
         """Return the Algorithm Instance with the given ID.
+
+        The record is immutable, so the identifier alone is exact (ADR-020).
+        Deprecated instances are still returned here; only ``list_algorithms``
+        filters them out.
 
         Parameters
         ----------
         id:
             UUID string of the Algorithm Instance.
-        version:
-            ``None`` → latest non-deprecated; version string → exact version.
 
         Returns
         -------
@@ -285,8 +286,6 @@ class AlgorithmRepository(ABC):
         ------
         EntityNotFoundError
             If no Algorithm Instance with the given ID exists.
-        VersionNotFoundError
-            If a specific version is requested and does not exist.
 
         Example
         -------
@@ -397,16 +396,15 @@ class StudyRepository(ABC):
     def get_study(
         self,
         id: str,
-        version: str | None = None,
     ) -> dict[str, Any]:
         """Return the Study with the given ID.
+
+        The record is immutable, so the identifier alone is exact (ADR-020).
 
         Parameters
         ----------
         id:
             UUID of the Study.
-        version:
-            ``None`` → latest version; version string → exact version.
 
         Returns
         -------
@@ -417,8 +415,6 @@ class StudyRepository(ABC):
         ------
         EntityNotFoundError
             If no Study with the given ID exists.
-        VersionNotFoundError
-            If a specific version is requested and does not exist.
 
         Example
         -------

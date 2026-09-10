@@ -12,7 +12,8 @@ as a consequence of an edit to a different file:
   5. Every document filename named in prose exists.
   6. A requirement cited with a descriptive label is not describing a different one.
 
-A file may opt out of the identifier checks by carrying the marker
+A file may opt out of checks 2, 4, 5 and 6 — every check except link resolution
+and duplicate requirement definitions — by carrying the marker
 ``<!-- check-docs: allow-undefined -->``. This is for documents that legitimately
 quote identifiers as evidence, such as the ADR template and the ADR that records
 which invented identifiers were removed.
@@ -107,6 +108,12 @@ CITE_PATTERNS = {
     "ADR": re.compile(r"\bADR-[0-9]+\b"),
     "AP": re.compile(r"\bAP-[0-9]+\b"),
     "CONST": re.compile(r"\bCONST-[A-Z]+-[0-9]+\b"),
+    # Cross-entity validation rules. Added after two accepted ADRs were found citing
+    # "CEV-11" and "CEV-06", identifiers no rule carries: the contract defines
+    # CV-001..CV-023, and the rules at those numbers are about something else. The
+    # pattern matches the wrong prefix too, so that a CEV- citation is reported as
+    # undefined rather than silently ignored.
+    "CV": re.compile(r"\bC(?:E)?V-[0-9]+\b"),
     "METRIC": re.compile(r"\b(?:QUALITY|TIME|RELIABILITY|ROBUSTNESS|ANYTIME)-[A-Z_]+\b"),
 }
 
@@ -136,6 +143,11 @@ def defined_identifiers() -> dict[str, set[str]]:
     if os.path.exists(MANIFESTO):
         for m in re.finditer(r"^\|\s*(AP-[0-9]+)\s*\|", read(MANIFESTO), re.M):
             defined["AP"].add(m.group(1))
+
+    cross_entity = "docs/03-technical-contracts/01-data-format/12-cross-entity-validation.md"
+    if os.path.exists(cross_entity):
+        for m in re.finditer(r"^### (CV-[0-9]+)\s*$", read(cross_entity), re.M):
+            defined["CV"].add(m.group(1))
 
     for path in markdown_files(SRS_DIR + "/05-constraints"):
         for m in re.finditer(r"\b(CONST-[A-Z]+-[0-9]+)\b", read(path)):
@@ -207,8 +219,8 @@ def check_identifiers(files: list[str], defined: dict[str, set[str]]) -> list[st
 CONTRACTS_DIR = "docs/03-technical-contracts"
 
 DESCRIPTIVE_DIRS = [
+    "docs/02-design/02-architecture/02-c4-leve1-context",
     "docs/02-design/02-architecture/03-c4-leve2-containers",
-    "docs/02-design/02-architecture/05-c4-level4-code",
 ]
 
 # Names that belong to Python, the standard library or a declared third-party
@@ -251,6 +263,9 @@ FOREIGN_NAMES = {
     "H3",
     "Wrap",
     "None",
+    # sample terminal output inside a fenced block: `Experiment <id>: OK`
+    "OK",
+    "FAILED",
 }
 
 
@@ -270,7 +285,7 @@ def _iter_identifiers(text: str):
     # requiring every component class to be pre-declared in the contracts would push
     # implementation detail into the layer that defines the boundary. What must come
     # from the contracts is anything a component hands to, or receives from, another.
-    for block in re.findall(r"```(?:python)?\r\n(.*?)```", text, re.S):
+    for block in re.findall(r"```(?:python)?\r?\n(.*?)```", text, re.S):
         for m in re.finditer(r":\s*([A-Z][A-Za-z0-9]*)\b", block):
             yield "type", m.group(1)
         for m in re.finditer(r"->\s*([A-Z][A-Za-z0-9]*)\b", block):
@@ -383,8 +398,14 @@ def check_vocabulary() -> list[str]:
 # prose has none, so a rename leaves it behind silently. This is how references to
 # a monolithic data-format.md survived long after it was split into thirteen files.
 
+_REPO_PATHS: set[str] | None = None
+
 LINK_TARGET = re.compile(r"\]\([^)]*\)")
-DOC_NAME = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]*\.md\b")
+# A prose reference is either a bare filename or a whole path. Both are checked, and
+# the path form matters more: comparing basenames alone accepted
+# docs/02-design/02-architecture/04-c4-leve3-components/... , a directory that does
+# not exist, because some 01-index.md exists somewhere else in the tree.
+DOC_NAME = re.compile(r"(?:[A-Za-z0-9._-]+/)*[A-Za-z0-9][A-Za-z0-9._-]*\.md\b")
 
 # Files named in prose that are not expected to exist in this repository.
 EXTERNAL_DOCS = {"README.md", "CLAUDE.md", "CONTRIBUTING.md", "LICENSE.md"}
@@ -400,19 +421,74 @@ def existing_basenames() -> set[str]:
     return names
 
 
+def _repository_paths() -> set[str]:
+    """Every file path in the repository, normalised to forward slashes."""
+    global _REPO_PATHS
+    if _REPO_PATHS is None:
+        found: set[str] = set()
+        for dirpath, _, filenames in os.walk("."):
+            if any(part in dirpath for part in (".git", ".venv", "__pycache__", "node_modules")):
+                continue
+            for name in filenames:
+                found.add(os.path.join(dirpath, name).replace(os.sep, "/").lstrip("./"))
+        _REPO_PATHS = found
+    return _REPO_PATHS
+
+
+def _path_reference_resolves(name: str, source: str) -> bool:
+    """True when a slash-bearing prose reference names a real location.
+
+    The corpus cites paths at every depth: full from the repository root, relative to
+    the citing document, and as a fragment such as "03-metric-taxonomy/01-index.md"
+    that names the tail of a real path. All three are legitimate shorthand and all
+    three are accepted, so the test is suffix containment rather than resolution
+    against a fixed set of roots.
+
+    What suffix containment still rejects is the case this check exists for: a
+    reference whose directory component is wrong. No file path ends with
+    "02-architecture/04-c4-leve3-components/02-corvus-pilot/01-index.md", even though
+    a file named 01-index.md exists in several places, which is why comparing
+    basenames alone let that reference survive four renames.
+    """
+    fragment = name.replace("\\", "/")
+    # ".../x/y.md" is an author's elision of a long path, not a relative path.
+    while fragment.startswith(("../", "./", ".../")):
+        fragment = fragment.split("/", 1)[1]
+    if not fragment:
+        return True
+    resolved = os.path.normpath(os.path.join(os.path.dirname(source), name))
+    if os.path.exists(resolved):
+        return True
+    suffix = "/" + fragment
+    return any(p == fragment or p.endswith(suffix) for p in _repository_paths())
+
+
+# An accepted ADR is a historical record and may name a document that has since been
+# absorbed elsewhere. ADR-025 makes the Status line the one edit such an ADR may receive,
+# and ADR-028 uses it to say where the named documents went. An ADR carrying that
+# declaration is exempt from this check and from this check only; every other check still
+# applies to it. The declaration is in the file, so the exemption is reviewable.
+TARGETS_ABSORBED = re.compile(r"^\*\*Status:\*\*[^\r\n]*absorbed into", re.M)
+
+
 def check_prose_filenames(files: list[str]) -> list[str]:
     problems = []
     real = existing_basenames()
     for path in files:
         text = read(path)
-        if ALLOW_MARKER in text:
+        if ALLOW_MARKER in text or TARGETS_ABSORBED.search(text):
             continue
         # blank out link targets so only prose remains
         prose = LINK_TARGET.sub(lambda m: " " * len(m.group(0)), text)
         seen: set[str] = set()
         for m in DOC_NAME.finditer(prose):
             name = m.group(0)
-            if name in real or name in EXTERNAL_DOCS or name in seen:
+            if name in seen:
+                continue
+            if "/" in name:
+                if _path_reference_resolves(name, path):
+                    continue
+            elif name in real or name in EXTERNAL_DOCS:
                 continue
             line_start = prose.rfind("\n", 0, m.start()) + 1
             line_end = prose.find("\n", m.end())
@@ -486,7 +562,7 @@ def requirement_statements() -> dict[str, set[str]]:
     for path in markdown_files(SRS_DIR + "/03-functional-requirements"):
         text = read(path)
         for m in re.finditer(
-            r"^## (FR-[0-9]+)(?:[^\r\n]*)\r\n\s*\r\n\*\*(.+?)\*\*", text, re.M | re.S
+            r"^## (FR-[0-9]+)(?:[^\r\n]*)\r?\n\s*\r?\n\*\*(.+?)\*\*", text, re.M | re.S
         ):
             out[m.group(1)] = _words(m.group(2)[:400])
     return out

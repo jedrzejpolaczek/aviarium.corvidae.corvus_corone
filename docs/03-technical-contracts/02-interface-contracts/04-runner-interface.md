@@ -13,13 +13,16 @@ persists results via the Repository Interface (§5).
   breaking changes: `run_study()` accepts no parallelism parameters in V1, but the isolation
   contract (no shared mutable state between Runs) is a hard requirement precisely to enable
   future parallel implementations. `max_workers` is reserved for V2.
-- **Run failure: Skip.** When a single Run raises an unexpected exception, the Runner logs
-  the failure (`status="failed"`, `failure_reason` populated), increments a failure counter,
-  and continues with the remaining Runs. The Experiment `status` is `"completed"` even if
-  some Runs failed — callers must inspect individual Run statuses.
-- **Critical errors: Abort.** Errors that invalidate the entire Experiment
-  (seed collision, repository unavailable, Study not locked) cause `status="aborted"` on
-  the Experiment and raise an exception immediately. No further Runs are attempted.
+- **A failed Run is recorded, not configured (ADR-027).** When a single Run raises an
+  unexpected exception, the Runner writes it with `status="failed"` and a non-empty
+  `failure_reason`, and continues with the remaining Runs. There is no failure policy to
+  select. The Experiment `status` is `"completed"` even if some Runs failed — callers must
+  inspect individual Run statuses.
+- **An Experiment that cannot proceed ends `"failed"` (ADR-027).** Errors that make the
+  Experiment itself impossible (seed collision, repository unavailable) set `status="failed"`
+  on the Experiment and propagate as their own exception class (ADR-015). No further Runs are
+  attempted. `05-experiment.md` admits no other terminal failure status. A Study that is not
+  locked is refused before any Experiment exists (`StudyNotLockedError`).
 
 ---
 
@@ -27,7 +30,7 @@ persists results via the Repository Interface (§5).
 
 **Signature:**
 - `study: Study` — a locked Study record (→ docs/03-technical-contracts/01-data-format/04-study.md)
-- returns: `Experiment` — completed or partially-completed Experiment record (→ docs/03-technical-contracts/01-data-format/05-experiment.md)
+- returns: `Experiment` — the Experiment record, `completed` or `failed` (→ docs/03-technical-contracts/01-data-format/05-experiment.md)
 
 **Semantics:**
 Executes all Runs defined by the Study plan. For each `(problem, algorithm, repetition)`
@@ -43,12 +46,12 @@ combination: resolves the instances from the Repository, generates a seed, calls
   for all Runs that were attempted (including failed ones)
 - all seeds within the Experiment are unique per `(problem_id, algorithm_id)` pair
 - `experiment.status` is `"completed"` if all Runs were attempted (some may have `status="failed"`),
-  or `"aborted"` if a critical error halted execution early
+  or `"failed"` if an error that makes the Experiment impossible halted execution early (ADR-027)
 
 **Exceptions:**
 - `StudyNotLockedError` — study is not in locked state
-- `SeedCollisionError` (critical) — duplicate seed detected; Experiment aborted
-- `StorageError` (critical) — Repository unavailable; Experiment aborted
+- `SeedCollisionError` (critical) — duplicate seed detected; Experiment ends `"failed"`
+- `StorageError` (critical) — Repository unavailable; Experiment ends `"failed"`
 
 ---
 
@@ -90,7 +93,7 @@ Incomplete Runs (those with `status != "completed"` and `status != "failed"`) ar
 from the beginning — partial Run state is discarded and the Run is re-run with the same seed.
 
 **Preconditions:**
-- Experiment exists in the Repository with `status == "running"` or `status == "aborted"`
+- Experiment exists in the Repository with `status == "running"` or `status == "failed"`
 - the Study referenced by the Experiment is still locked and unchanged
 
 **Postconditions:**

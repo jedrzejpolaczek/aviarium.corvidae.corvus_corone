@@ -20,7 +20,7 @@ Schema versions follow **semantic versioning** `MAJOR.MINOR.PATCH`:
 | `PATCH` | A **correction** — typo fixes, clarifying text, no structural change | `1.0.0` → `1.0.1` |
 
 The current schema version is declared at the top of [`01-index.md`](01-index.md).
-It is `0.0.2` and stays below `1.0.0` until the V1 release, so pre-release schema changes are
+It is `0.0.3` and stays below `1.0.0` until the V1 release, so pre-release schema changes are
 not breaking changes and do not owe a migration guide.
 
 ---
@@ -62,19 +62,23 @@ Old artifacts remain fully valid under the new MINOR version; no migration is ne
 
 ## 6.3 The `schema_version` Field
 
-Every stored artifact **must** include a `schema_version` field recording the schema version
-under which it was created. This field is part of the provenance record for every entity
-(→ `docs/05-community/02-versioning-governance.md` §2):
+Every entity record listed below **must** include a `schema_version` field recording the schema
+version under which it was created. The field is declared in each entity schema in this
+directory, which together with cross-entity rules `CV-001`..`CV-024` is where the provenance
+chain is enforced:
 
 ```
 Problem Instance record:    schema_version
 Algorithm Instance record:  schema_version
 Study record:               schema_version
 Experiment record:          schema_version  (+ runner_version, platform details)
-Run record:                 inherited from Experiment
+Run record:                 schema_version
 ResultAggregate:            schema_version
 Report:                     schema_version
 ```
+
+The Performance Record is not listed. Whether it carries the field, inherits it from its Run,
+or is versioned through its file format is undecided (REF-TASK-0057).
 
 The full reproducibility provenance tuple stored in an Experiment record is:
 

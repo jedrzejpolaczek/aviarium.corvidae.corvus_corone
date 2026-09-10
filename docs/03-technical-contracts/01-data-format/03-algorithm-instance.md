@@ -7,9 +7,9 @@
 | Name | Type | Required | Notes |
 | --- | --- | --- | --- |
 | id | string | yes | Algorithm Instance UUID (RFC 4122 v4) |
-| schema_version | string | yes | Version of the entity schema this record conforms to, e.g. `0.0.2`. Governs the shape of the record, not the identity of the entity. See [13-schema-versioning.md](13-schema-versioning.md) |
+| schema_version | string | yes | Version of the entity schema this record conforms to, e.g. `0.0.3`. Governs the shape of the record, not the identity of the entity. See [13-schema-versioning.md](13-schema-versioning.md) |
 | name | string | yes | Human-readable name for this specific configuration eg. `NSGANet`, `Grid vs Random` |
-| version | string | yes | Version of this record. Structure is described in validation rules |
+| version | string | yes | Human-readable version for display and citation; never an addressing key (ADR-020). See validation rules |
 | algorithm_family | string | yes | The abstract Algorithm this is an instance of (e.g., `Random Search`, `TPE`, `CMA-ES`) |
 | hyperparameters | map[string, any] | yes | Key-value map of configuration parameter name → value. All hyperparameters must be fully specified |
 | configuration_justification | string | yes | Why this configuration was chosen (required for fairness, Principle 10) |
@@ -19,6 +19,9 @@
 | framework_version | string | yes | Pinned version of the framework |
 | known_assumptions | list[string] | yes | Problem properties this algorithm assumes (e.g., `continuous search space`, `noise-free evaluations`) |
 | sensitivity_report | SensitivityReport | no | Documents how performance changes when key parameters are varied (MANIFESTO Principle 11). Required for algorithm contributions submitted via the contribution process; see §2.2.1 |
+| deprecated | bool | yes | `true` once `deprecate_algorithm()` has been called; `false` on registration. Deprecated entities are excluded from `list_algorithms()` and still returned by `get_algorithm()` (ADR-020) |
+| deprecation_reason | string | no | Why the entity was deprecated. Required when `deprecated` is `true`, `null` otherwise |
+| superseded_by | string | no | UUID of the entity that replaces this one, when there is one. Deprecation without a replacement is legitimate — a problem may simply be withdrawn — so this stays optional even when `deprecated` is `true` |
 | contributed_by | string | yes | Author or system that registered this algorithm instance |
 | created_at | datetime | yes | ISO 8601 UTC timestamp of creation |
 
@@ -26,7 +29,9 @@
 - All keys in `hyperparameters` must match the algorithm's declared parameter schema
 - `code_reference` must be resolvable and version-pinned (no floating references such as branch names)
 - Two Algorithm Instances with identical `hyperparameters` and `code_reference` but different `id` are distinct records and must not be deduplicated silently
-- `version` must be updated on every field change: `X` increments on schema-breaking changes, `Y` on additions, `Z` on corrections
+- `version` is descriptive metadata for display and citation, never an addressing key (ADR-020). Entities are immutable: a revision is a **new** entity with a new UUID, and the old one is deprecated with `superseded_by` pointing at it
+- `deprecation_reason` is required when `deprecated` is `true`
+- `superseded_by`, when set, must resolve to an Algorithm Instance, must not be this entity, and must not close a cycle of `superseded_by` links
 - If `sensitivity_report` is present, it must pass the sub-schema validation in §2.2.1; `null` is valid (the field is optional in the schema but required by the contribution process)
 
 ---

@@ -13,7 +13,14 @@ CONNECTS TO:
 
 ---
 
-**Status:** Accepted
+**Status:** Accepted; the component document this ADR instructs is absorbed into
+[`10-public-api-cli/01-index.md`](../03-c4-leve2-containers/04-c4-leve3-components/10-public-api-cli/01-index.md)
+
+> **Target absorbed.** This ADR instructs `10-public-api-cli/03-cli-command-group.md` to lose
+> its command definitions and cite `02-cli-spec.md` instead. That was done, and [ADR-028](adr-028-consolidate-the-c3-layer-and-remove-c4.md)
+> then consolidated the C3 layer, so the CLI Command Group is described in its group index
+> rather than in a file of its own. The decision is unchanged; only the document it points at
+> has moved.
 
 **Date:** 2026-09-08
 

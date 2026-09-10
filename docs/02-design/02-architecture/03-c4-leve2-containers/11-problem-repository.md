@@ -14,8 +14,8 @@ execution time.
 
 | Surface | Form | Who uses it |
 |---|---|---|
-| Problem lookup | `get_problem(id, version)` / `list_problems(filters)` | Public API (`cc.list_problems()`, `cc.get_problem()`), Experiment Runner (loads instance per Run) |
-| Problem registration | `register_problem(problem)` → `id` | Community Contributor (via `corvus verify`, UC-04) |
+| Problem lookup | `get_problem(id)` / `list_problems(filters)` | Public API (`cc.list_problems()`, `cc.get_problem()`), Experiment Runner (loads instance per Run) |
+| Problem registration | `register_problem(problem)` → `id` | Community Contributor (UC-04). No public entry point yet: the facade defines no registration function, and `corvus verify` checks the integrity of a completed Experiment (REF-TASK-0052) |
 | Problem deprecation | `deprecate_problem(id, reason, superseded_by)` | Maintainer |
 
 Full interface contract: [`../../../03-technical-contracts/02-interface-contracts/06-repository-interface.md`](../../../03-technical-contracts/02-interface-contracts/06-repository-interface.md) (§ ProblemRepository)
@@ -23,17 +23,19 @@ Full interface contract: [`../../../03-technical-contracts/02-interface-contract
 **Dependencies:** None. The Problem Repository is a leaf component; it depends only on the
 persistence layer (local file store in V1).
 
-**Data owned:** All `ProblemInstance` records and their version history. Stored under the
-`LocalFileRepository` root (`problems/<id>/`).
+**Data owned:** All `ProblemInstance` records and their supersession lineage. Stored under the
+`LocalFileRepository` root (`problems/<id>.json`, `10-file-formats.md`).
 
-**Versioning:** `get_problem(id, version=None)` returns the latest non-deprecated version.
-An explicit version string returns exactly that version — required for reproducibility
-(MANIFESTO Principle 19). Deprecated instances remain retrievable by exact ID for
-study reproduction.
+**Versioning:** entities are immutable and there is no `version` parameter (ADR-020).
+`get_problem(id)` returns the same bytes forever; a revision is registered as a new entity
+with a new UUID, and the old one carries `superseded_by`. `list_problems()` excludes
+deprecated entities; `get_problem(id)` still retrieves them, which is what study
+reproduction needs (MANIFESTO Principle 19). The `version` field remains on the record as
+human-readable metadata for display and citation, never as an addressing key.
 
 **Actors served:** Researcher (study design — problem selection); Experiment Runner
 (execution-time instance loading); Community Contributor (registration, UC-04).
 
-**Relevant SRS section:** FR-01 (problem registration with validation), FR-02 (problem
-versioning and deprecation), FR-03 (list and filter problems), FR-04 (problem interface
-contract enforcement).
+**Relevant SRS section:** FR-01 (Problem Instance records stored to the schema),
+FR-02 (completeness validated on registration), FR-03 (a revision is a new entity; the original stays retrievable),
+FR-04 (Studies reference instances by identifier only).

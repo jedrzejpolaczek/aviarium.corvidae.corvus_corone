@@ -3,6 +3,11 @@ name = "corvus-corone-lib"
 version = "0.1.0"
 description = "HPO benchmarking core library."
 requires-python = ">=3.10"
+# ADR-022: AGPL-3.0-or-later.
+license = { text = "AGPL-3.0-or-later" }
+classifiers = [
+	"License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)",
+]
 dependencies = [
 	"gitpython>=3.1.46",
 	"pydantic>=2.7.0",

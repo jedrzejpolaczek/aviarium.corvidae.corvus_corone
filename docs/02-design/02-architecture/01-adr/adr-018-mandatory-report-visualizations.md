@@ -14,7 +14,14 @@ CONNECTS TO:
 
 ---
 
-**Status:** Accepted
+**Status:** Accepted; the component documents this ADR names are absorbed into
+[`07-reporting-engine/01-index.md`](../03-c4-leve2-containers/04-c4-leve3-components/07-reporting-engine/01-index.md)
+
+> **Targets absorbed.** This ADR scopes `03-mandatory-viz-renderer.md` to the four VIZ-L1
+> plots and corrects `REQUIRED_SECTIONS` in `05-limitations-enforcer.md`. Both were done, and
+> [ADR-028](adr-028-consolidate-the-c3-layer-and-remove-c4.md) then consolidated the C3 layer, so the Reporting Engine components are
+> described in their group index. The decision is unchanged; only the documents it points at
+> have moved.
 
 **Date:** 2026-09-08
 

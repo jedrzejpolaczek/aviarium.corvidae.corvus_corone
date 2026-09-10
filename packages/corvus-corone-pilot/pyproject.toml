@@ -3,6 +3,11 @@ name = "corvus-corone-pilot"
 version = "0.1.0"
 description = "AI-powered pilot for HPO benchmarking."
 requires-python = ">=3.10"
+# ADR-022: AGPL-3.0-or-later.
+license = { text = "AGPL-3.0-or-later" }
+classifiers = [
+	"License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)",
+]
 dependencies = [
 	"corvus-corone-lib",
 	"langgraph>=0.2",

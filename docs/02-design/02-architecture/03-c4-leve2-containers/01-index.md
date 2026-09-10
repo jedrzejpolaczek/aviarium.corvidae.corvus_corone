@@ -220,7 +220,14 @@ flowchart TB
 
 ### Flow 2: Register a new benchmark problem
 
-**Use case:** UC-04 · **Trigger:** Community Contributor calls `corvus verify` or `cc.register_problem()` with a new `ProblemInstance` record
+**Use case:** UC-04 · **Trigger:** Community Contributor submits a new `ProblemInstance` record for registration
+
+> **No public entry point yet.** `04-public-api-contract.md` defines no registration function, and
+> `corvus verify` checks the integrity of a completed Experiment rather than registering a record
+> (`02-cli-spec.md`). The only registration method in the contracts is `register_problem()` on the
+> repository interface, which is outside the public API. FR-39 requires UC-04 to be executable
+> through the facade; the gap is open as REF-TASK-0052, and the steps below describe the intended
+> flow, not a contracted one.
 
 | # | From | To | Data exchanged |
 |---|---|---|---|
@@ -236,7 +243,14 @@ flowchart TB
 
 ### Flow 3: Register a new algorithm implementation
 
-**Use case:** UC-02 · **Trigger:** Algorithm Author calls `corvus verify` or `cc.register_algorithm()` with a new `AlgorithmInstance` record
+**Use case:** UC-02 · **Trigger:** Algorithm Author submits a new `AlgorithmInstance` record for registration
+
+> **No public entry point yet.** `04-public-api-contract.md` defines no registration function, and
+> `corvus verify` checks the integrity of a completed Experiment rather than registering a record
+> (`02-cli-spec.md`). The only registration method in the contracts is `register_algorithm()` on the
+> repository interface, which is outside the public API. FR-39 requires UC-02 to be executable
+> through the facade; the gap is open as REF-TASK-0052, and the steps below describe the intended
+> flow, not a contracted one.
 
 | # | From | To | Data exchanged |
 |---|---|---|---|
@@ -268,7 +282,13 @@ flowchart TB
 
 ### Flow 5: Export results to IOHprofiler / COCO
 
-**Use case:** UC-06 · **Trigger:** Researcher calls `corvus export` or `cc.export_raw_data()` with a target format
+**Use case:** UC-06 · **Trigger:** Researcher requests an export in a target ecosystem format
+
+> **No public entry point yet.** `cc.export_raw_data()` and `corvus export` write JSON or CSV and
+> return a file path; they accept no ecosystem format and have nowhere to return the
+> information-loss manifest FR-24 requires of every export. The Ecosystem Bridge has no interface
+> contract. Both are open as REF-TASK-0053, and the steps below describe the intended flow, not a
+> contracted one.
 
 | # | From | To | Data exchanged |
 |---|---|---|---|
@@ -286,18 +306,18 @@ flowchart TB
 
 ### Flow 6: Reproduce a published study
 
-**Use case:** UC-05 · **Trigger:** Researcher retrieves archived Study artifacts and calls `cc.run()` using the archived Study plan and original seeds
+**Use case:** UC-05 · **Trigger:** Researcher retrieves archived Study artifacts and calls `cc.run()` on the archived Study plan. Seeds are not transported: the Study's `root_seed` regenerates the identical assignment (ADR-017), and FR-09 forbids an API for setting individual seeds
 
 | # | From | To | Data exchanged |
 |---|---|---|---|
-| 1 | Researcher | External artifact repository | Retrieves archived `Study` record, `AlgorithmInstance` versions, `ProblemInstance` versions, `Run` seed assignments |
-| 2 | Researcher | Public API + CLI | Imports archived `Study` record (status `"locked"`) and pinned entity versions |
-| 3 | Public API + CLI | Algorithm Registry | `register_algorithm()` for each pinned `AlgorithmInstance` version (if not already present) |
-| 4 | Public API + CLI | Problem Repository | `register_problem()` for each pinned `ProblemInstance` version (if not already present) |
-| 5 | Public API + CLI | Study Orchestrator | `run_study(study)` — locked `Study` with seeds from archived `Run` records (not re-generated) |
-| 6 | Study Orchestrator | Experiment Runner | `run_study(study)` — seeds injected from archived records |
-| 7 | Experiment Runner | Algorithm Registry | `get_algorithm(id, version="<pinned>")` — exact archived version |
-| 8 | Experiment Runner | Problem Repository | `get_problem(id, version="<pinned>")` — exact archived version |
+| 1 | Researcher | External artifact repository | Retrieves the archived `Study` record (including `root_seed`), the `AlgorithmInstance` and `ProblemInstance` records it references, and the original `Run` records for comparison |
+| 2 | Researcher | Public API + CLI | Imports the archived `Study` record (status `"locked"`) and the referenced entities |
+| 3 | Public API + CLI | Algorithm Registry | `register_algorithm()` for each referenced `AlgorithmInstance`, preserving its UUID (if not already present) |
+| 4 | Public API + CLI | Problem Repository | `register_problem()` for each referenced `ProblemInstance`, preserving its UUID (if not already present) |
+| 5 | Public API + CLI | Study Orchestrator | `run_study(study)` — the locked `Study`, carrying the archived `root_seed` |
+| 6 | Study Orchestrator | Experiment Runner | `run_study(study)` — the Runner rebuilds `SeedSequence(root_seed)` and spawns children in run-plan order, reproducing every `Run.seed` (ADR-017) |
+| 7 | Experiment Runner | Algorithm Registry | `get_algorithm(id)` — the UUID never changes meaning, so identifier alone is exact (ADR-020) |
+| 8 | Experiment Runner | Problem Repository | `get_problem(id)` — same |
 | 9 | Experiment Runner | Results Store | Writes new `Experiment` record linked to original `Study.id`; `Run[]` + `PerformanceRecord[]` |
 | 10 | Study Orchestrator | Analysis Engine | `analyze(experiment_id, config)` on the new Experiment |
 | 11 | Public API + CLI | Researcher | New `ResultAggregate[]` for comparison against original published aggregates |

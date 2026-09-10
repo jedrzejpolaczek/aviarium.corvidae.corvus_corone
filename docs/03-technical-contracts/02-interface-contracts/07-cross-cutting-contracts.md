@@ -97,6 +97,8 @@ CorvusError (base)
 │   ├── UnsupportedFormatError   (Ecosystem Bridge — unknown export format)
 │   └── ExportValidationError    (Ecosystem Bridge — source data incomplete for export)
 └── AnalysisError         — analysis precondition not met
+    ├── AnalysisIncompleteError     (§4 Analyzer — a report was requested before all three
+    │                                analysis levels completed; FR-15, NFR-STAT-01)
     ├── ExperimentNotCompleteError  (§4 Analyzer)
     ├── RunNotCompleteError         (§4 Analyzer — Run status is not "completed")
     ├── MetricUndefinedError        (§4 Analyzer — metric undefined for the given data)

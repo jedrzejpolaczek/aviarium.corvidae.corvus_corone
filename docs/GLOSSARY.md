@@ -143,7 +143,7 @@ Terms are listed alphabetically within sections.
 
 ### Performance Record
 
-**Definition:** A single timestamped snapshot of a Run's progress, capturing the evaluation count, elapsed wall-clock time, current best objective value, and whether that value is an improvement over all prior snapshots. A sequence of Performance Records for one Run forms its anytime performance curve.
+**Definition:** A single timestamped snapshot of a Run's progress, capturing the evaluation count, elapsed wall-clock time, the raw `objective_value` of that evaluation, the `best_so_far` observed up to it, and whether that evaluation changed `best_so_far` (ADR-023). A sequence of Performance Records for one Run forms its anytime performance curve.
 
 **Distinguished from:** *Run* (the full execution that produces Performance Records), *Result Aggregate* (statistics computed across multiple Runs). A Performance Record is raw per-evaluation data; a Result Aggregate is a derived summary.
 
@@ -257,7 +257,7 @@ Terms are listed alphabetically within sections.
 
 ### best_so_far
 
-**Definition:** The minimum objective value (for minimization problems) or maximum (for maximization) observed across all evaluations from the start of a Run up to and including the current Evaluation Number. The `objective_value` field of a Performance Record always stores `best_so_far`, not the raw evaluation output at that step.
+**Definition:** The minimum objective value (for minimization problems) or maximum (for maximization) observed across all evaluations from the start of a Run up to and including the current Evaluation Number. It is a required field of the Performance Record in its own right; the sibling `objective_value` field holds the raw result of the evaluation at that step and is not cumulative (ADR-023). Every anytime metric reconstructs `best_so_far`, never `objective_value`.
 
 **Distinguished from:** the raw objective value of a single evaluation (which may be worse than previous evaluations). `best_so_far` is a monotonically non-increasing sequence for minimization problems throughout a Run.
 
@@ -505,7 +505,7 @@ Terms are listed alphabetically within sections.
 
 ### Deprecation
 
-**Definition:** The act of marking an Algorithm Instance or Problem Instance as superseded, preventing it from appearing in new Study designs while preserving it indefinitely for exact reproduction of historical Experiments. A deprecated entity remains retrievable by explicit ID and version; it is excluded only from Registry listing results.
+**Definition:** The act of marking an Algorithm Instance or Problem Instance as one that should not be used in new work, while preserving it indefinitely for exact reproduction of historical Experiments. A deprecated entity remains retrievable by identifier — entities are immutable and there is no version to address (ADR-020) — and is excluded only from Registry listing results. It is the only permitted mutation of a stored entity. Nothing is ever deleted: a UUID that stops resolving breaks every archived study that referenced it.
 
 **Distinguished from:** deletion (which would break reproducibility of historical Experiments). Deprecation is a status change that preserves access for reproducibility; entities are never deleted from the Registry.
 
@@ -559,7 +559,7 @@ Terms are listed alphabetically within sections.
 
 **Format:** `MAJOR.MINOR.PATCH` where MAJOR increments on breaking changes (removed/renamed fields, type changes), MINOR increments on non-breaking additions (new optional fields, new entity types), and PATCH increments on corrections only.
 
-**Used in:** `docs/03-technical-contracts/01-data-format/13-schema-versioning.md` §6.3–6.4, `docs/05-community/02-versioning-governance.md` §1–2; present in every entity record (Problem Instance, Algorithm Instance, Study, Experiment, Run, ResultAggregate, Report).
+**Used in:** `docs/03-technical-contracts/01-data-format/13-schema-versioning.md` §6.3–6.4; present in every entity record (Problem Instance, Algorithm Instance, Study, Experiment, Run, ResultAggregate, Report).
 
 ---
 
@@ -571,7 +571,7 @@ Terms are listed alphabetically within sections.
 
 **Distinguished from:** an algorithm's *mathematical specification* (which describes how it works, not where it came from) and from *Algorithm Visualization* (which depicts how an algorithm searches, not its historical context). Algorithm Genealogy answers "where did this algorithm come from?"; Algorithm Visualization answers "how does it behave?".
 
-**Used in:** `docs/02-design/01-software-requirement-specification/02-use-cases/11-uc-10.md` (UC-10: Algorithm History), `docs/02-design/02-architecture/04-c4-leve3-components/02-corvus-pilot/01-index.md`. IMPL-046.
+**Used in:** `docs/02-design/01-software-requirement-specification/02-use-cases/11-uc-10.md` (UC-10: Algorithm History), `docs/02-design/02-architecture/03-c4-leve2-containers/04-c4-leve3-components/02-corvus-pilot/01-index.md`. IMPL-046.
 
 **Example:** The CMA-ES genealogy includes Evolution Strategies (1960s–1970s) as ancestors, CMA (1996) as the covariance-matrix refinement, and variants such as BIPOP-CMA-ES and separable CMA-ES as descendants. The genealogy records the design problem each step solved (e.g., "how to adapt step size without manual tuning").
 
@@ -607,6 +607,6 @@ Terms are listed alphabetically within sections.
 
 **Distinguished from:** *direct-answer mode* (the default Corvus Pilot mode, which answers factual and task queries immediately). Socratic Mode is explicitly opt-in: activated by the `--mode socratic` CLI flag or by `mode: "socratic"` in `PilotState`. The two modes differ in routing, output structure (question vs answer), and goal (maximise Learner's independent reasoning vs minimise turns to resolution). Socratic Mode is implemented as a separate LangGraph node (`socratic_guide`), not as a prompt modification of the direct-answer node.
 
-**Used in:** `docs/02-design/01-software-requirement-specification/02-use-cases/10-uc-09.md` (UC-09: Socratic Guided Deduction), `docs/02-design/02-architecture/03-c4-leve2-containers/14-corvus-pilot.md`, `docs/02-design/02-architecture/04-c4-leve3-components/02-corvus-pilot/01-index.md` (Socratic Guide Node, Query Router), `docs/06-tutorials/05-learner-socratic-mode.md`. IMPL-045.
+**Used in:** `docs/02-design/01-software-requirement-specification/02-use-cases/10-uc-09.md` (UC-09: Socratic Guided Deduction), `docs/02-design/02-architecture/03-c4-leve2-containers/14-corvus-pilot.md`, `docs/02-design/02-architecture/03-c4-leve2-containers/04-c4-leve3-components/02-corvus-pilot/01-index.md` (Socratic Guide Node, Query Router), `docs/06-tutorials/05-learner-socratic-mode.md`. IMPL-045.
 
 **Example:** Learner asks: "Why does CMA-ES use a covariance matrix?" Socratic Mode response: "What does the covariance matrix represent geometrically? Think about what information it encodes about the search space." The system does not answer the original question; it asks a question that helps the Learner derive the answer themselves.

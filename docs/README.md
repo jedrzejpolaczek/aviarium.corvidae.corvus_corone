@@ -12,12 +12,24 @@ MANIFESTO  →  SRS  →  ADR  →  03-technical-contracts/  →  C2 / C3 / C4  
 
 - **[`03-technical-contracts/`](03-technical-contracts/)** is the only place that *defines*
   identifiers, signatures, field names and types, enumeration values, error classes, metric
-  identifiers and file formats.
+  identifiers and file formats — with exactly three exceptions, named by
+  [ADR-026](02-design/02-architecture/01-adr/adr-026-named-exceptions-to-contract-exclusivity.md)
+  and listed below. A fourth requires an ADR that amends that list.
+
+  | Document | Authoritative for | By |
+  |---|---|---|
+  | [`02-cli-spec.md`](02-design/02-architecture/03-c4-leve2-containers/02-cli-spec.md) | command names, arguments, options, output conventions, error-message grammar, exit codes | ADR-016 |
+  | [`03-report-format-spec.md`](02-design/02-architecture/03-c4-leve2-containers/03-report-format-spec.md) | section structure and audience language of both Reports | ADR-018, ADR-019 |
+  | [`02-statistical-methodology.md`](04-scientific-practice/01-methodology/02-statistical-methodology.md) | the `VIZ-L1-NN` identifiers and the statistical procedures | ADR-011, ADR-018 |
+
+  Each exception is *per surface*. `02-cli-spec.md` is authoritative for the command line and
+  for nothing else; it may not coin an entity field, an exception class or a metric identifier.
 - **[SRS](02-design/01-software-requirement-specification/01-srs/01-SRS.md)** is the only place
   that defines `FR-*`, `NFR-*`, `UC-*` and `CONST-*`, and, in §1, the V1 release scope.
 - **[ADRs](02-design/02-architecture/01-adr/)** are the only place that records decisions.
 - **C2, C3 and C4 are descriptive.** They explain how the normative material is grouped into
-  containers and components and why. They may cite, never coin.
+  containers and components and why. They may cite, never coin — outside the two C2 documents
+  named above, and only for the surface named there.
 
 ---
 
@@ -28,7 +40,6 @@ MANIFESTO  →  SRS  →  ADR  →  03-technical-contracts/  →  C2 / C3 / C4  
 → [C1 System Context](02-design/02-architecture/02-c4-leve1-context/01-c4-l1-context/01-c1-context.md)
 → [C2 Containers](02-design/02-architecture/03-c4-leve2-containers/01-index.md)
 → [C3 Components](02-design/02-architecture/03-c4-leve2-containers/04-c4-leve3-components/01-c4-l3-components/01-c4-l3-components.md)
-→ [C4 Code](02-design/02-architecture/05-c4-level4-code/01-index.md)
 → docstrings in `packages/`
 
 Start here if you want to know what the system is and why its parts are drawn where they are.

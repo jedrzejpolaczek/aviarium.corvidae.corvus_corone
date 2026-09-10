@@ -3,102 +3,45 @@
 > C2 Container: [13-ecosystem-bridge.md](../../13-ecosystem-bridge.md)
 > C3 Index: [C3 overview](../01-c4-l3-components/01-c4-l3-components.md)
 
-The Ecosystem Bridge exports Study results to external benchmarking ecosystems (COCO BBOB, IOHprofiler) and wraps Nevergrad optimizers for use within Corvus studies (and vice versa). Every export produces an information-loss manifest documenting what data could not be faithfully represented in the target format.
-Actors: called by Public API + CLI; reads from Results Store; writes to external format files.
+> **Descriptive page. It defines nothing.** Under ADR-012 this layer explains how a container is
+> decomposed and why the boundaries fall where they do. Every type, field name, enumeration
+> value, exception class and signature it mentions is defined in the contracts listed under
+> *Where the vocabulary comes from*; a statement here that those contracts do not support is a
+> defect in this page, never in them. ADR-028 removed the per-component files this page used to
+> link to, for the reason recorded there.
 
----
+The Ecosystem Bridge is how a Corvus Experiment reaches the tools researchers already use. It
+exports to COCO and IOHprofiler, and imports optimizers from Nevergrad; V1 does not read either
+archive format back (SRS §1.4, boundary B-04).
 
-## Component Diagram
-
-```mermaid
----
-config:
-  look: neo
-  theme: redux-dark
-  themeVariables:
-    background: transparent
----
-flowchart LR
-  api["Public API + CLI"] L_api_eb@--> eb
-
-  subgraph eb["Ecosystem Bridge"]
-    ce["COCO Exporter\nCOCO BBOB format\n+ loss manifest"]
-    ie["IOH Exporter\nIOHprofiler format\n+ loss manifest"]
-    na["Nevergrad Adapter\nBidirectional bridge\nCorvus ↔ Nevergrad"]
-    la["Loss Auditor\nValidates export\nproduces manifest"]
-  end
-
-  ce L_ce_la@--> la
-  ie L_ie_la@--> la
-  na L_na_la@--> la
-
-  store["Results Store"] L_store_ce@--> ce
-  store L_store_ie@--> ie
-  store L_store_na@--> na
-
-  ce L_ce_coco@--> coco["COCO output files"]
-  ie L_ie_ioh@--> ioh["IOH output files"]
-  na L_na_ng@--> ng["Nevergrad Study\nor export files"]
-
-  style eb fill:#161616,stroke:#D50000,color:#aaaaaa
-
-  linkStyle 0 stroke:#FFD600,fill:none
-  linkStyle 1,2,3 stroke:#D50000,fill:none
-  linkStyle 4,5,6 stroke:#2962FF,fill:none
-  linkStyle 7,8,9 stroke:#D50000,fill:none
-
-  L_api_eb@{ animation: fast }
-  L_ce_la@{ animation: fast }
-  L_ie_la@{ animation: fast }
-  L_na_la@{ animation: fast }
-  L_store_ce@{ animation: fast }
-  L_store_ie@{ animation: fast }
-  L_store_na@{ animation: fast }
-  L_ce_coco@{ animation: fast }
-  L_ie_ioh@{ animation: fast }
-  L_na_ng@{ animation: fast }
-```
+Every export returns an information-loss manifest, and the manifest is never empty. That is the
+point of it: a caller who receives a file with no warning attached cannot tell a faithful export
+from a lossy one, and FR-24 makes the manifest a precondition of the export rather than a
+commentary on it.
 
 ---
 
 ## Components
 
-| Component | File | Responsibility |
+| Component | Responsibility | Implements |
 |---|---|---|
-| COCO Exporter | [02-coco-exporter.md](02-coco-exporter.md) | Exports Study results to COCO BBOB format |
-| IOH Exporter | [03-ioh-exporter.md](03-ioh-exporter.md) | Exports Study results to IOHprofiler format |
-| Nevergrad Adapter | [04-nevergrad-adapter.md](04-nevergrad-adapter.md) | Bidirectional bridge between Corvus and Nevergrad optimizer API |
-| Loss Auditor | [05-loss-auditor.md](05-loss-auditor.md) | Validates export completeness and writes the information-loss manifest |
+| COCO Exporter | Writes the COCO archive formats, with the known losses declared | FR-23 – FR-26; [`11-interoperability-mappings.md`](../../../../../03-technical-contracts/01-data-format/11-interoperability-mappings.md) §4.1 |
+| IOH Exporter | Writes the IOHprofiler formats and the sidecar carrying what they cannot hold | [`11-interoperability-mappings.md`](../../../../../03-technical-contracts/01-data-format/11-interoperability-mappings.md) §4.2 |
+| Nevergrad Adapter | Presents a Nevergrad optimizer through the Algorithm Interface | [`03-algorithm-interface.md`](../../../../../03-technical-contracts/02-interface-contracts/03-algorithm-interface.md); [`11-interoperability-mappings.md`](../../../../../03-technical-contracts/01-data-format/11-interoperability-mappings.md) §4.3 |
+| Loss Auditor | Assembles the manifest and blocks an export whose losses exceed what the caller accepted | FR-24, FR-25 |
 
 ---
 
-## Cross-Cutting Concerns
+## Where the vocabulary comes from
 
-### Logging & Observability
+| Subject | Contract |
+|---|---|
+| Field-by-field mappings and every `LOSS-*` manifest item | [`01-data-format/11-interoperability-mappings.md`](../../../../../03-technical-contracts/01-data-format/11-interoperability-mappings.md) |
+| File formats produced | [`01-data-format/10-file-formats.md`](../../../../../03-technical-contracts/01-data-format/10-file-formats.md) |
+| Exception classes for unsupported formats and incomplete source data | [`02-interface-contracts/07-cross-cutting-contracts.md`](../../../../../03-technical-contracts/02-interface-contracts/07-cross-cutting-contracts.md) |
+| Interface requirements per external system | `01-software-requirement-specification/06-interface-requirements/01-index.md` |
 
-One structured log entry per export: `export_type`, `experiment_id`, `records_exported`, `records_lost`, `manifest_path`, `output_path`, `duration_s`. The manifest file provides per-field detail on information loss.
+The IOHprofiler `raw_y` column reads `PerformanceRecord.best_so_far`, and the COCO current-value
+column reads `objective_value`. The two are different fields, which is why ADR-023 was able to
+withdraw a documented information loss rather than add one.
 
-### Error Handling
-
-- **Missing data**: if the requested experiment has no PerformanceRecords, raises `EntityNotFoundError`.
-- **Format conversion failure**: if a specific record cannot be converted (e.g., unsupported parameter type for COCO), the record is excluded from the export, added to the loss manifest, and export continues. Never aborts on individual record failure.
-- **External library absent**: `coco-experiment` or `ioh` Python packages may not be installed. Import checks at call time raise `ImportError` with install instructions.
-
-### Randomness / Seed Management
-
-No random state. Exports are deterministic given the same input records.
-
-### Configuration
-
-| Parameter | Source | Scope |
-|---|---|---|
-| `output_dir` | export call parameter | Per call |
-| `include_skipped_runs` | export call parameter (default: False) | Per call |
-| `coco_suite` | export call parameter (default: `bbob`) | Per COCO export |
-
-### Testing Strategy
-
-- **COCO Exporter**: integration-tested with a small synthetic Study; verifies that COCO `Observer` output files are created and readable by `cocopp`.
-- **IOH Exporter**: integration-tested; verifies IOH JSON output format against the IOHprofiler schema.
-- **Nevergrad Adapter**: tested in both directions; verifies a Nevergrad optimizer run through Corvus produces valid PerformanceRecords, and that Corvus results export to Nevergrad format.
-- **Loss Auditor**: unit-tested; verifies the manifest lists all injected information-loss cases.

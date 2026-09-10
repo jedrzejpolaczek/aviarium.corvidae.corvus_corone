@@ -46,7 +46,7 @@ This tutorial walks through a complete Socratic session on one question:
 You will not find the answer written here. You will find it yourself, guided by the system.
 
 This tutorial demonstrates UC-09 (Socratic Guided Deduction) and uses the Socratic Guide
-component of Corvus Pilot V2 (→ `docs/02-design/02-architecture/04-c4-leve3-components/02-corvus-pilot/01-index.md`).
+component of Corvus Pilot V2 (→ `docs/02-design/02-architecture/03-c4-leve2-containers/04-c4-leve3-components/02-corvus-pilot/01-index.md`).
 
 ---
 
@@ -72,7 +72,7 @@ To start, ask me something about any algorithm you want to understand.
 **Why this step matters:** The `--mode socratic` flag sets `interaction_mode = "socratic"`
 in `PilotState` for the entire session. All queries in this session will be routed to the
 Socratic Guide node, not the Direct Answer node.
-→ Query routing design: [`../docs/02-design/02-architecture/04-c4-leve3-components/02-corvus-pilot/01-index.md`](../02-design/02-architecture/03-c4-leve2-containers/04-c4-leve3-components/02-corvus-pilot/01-index.md) (Query Router section)
+→ Query routing design: [`../docs/02-design/02-architecture/03-c4-leve2-containers/04-c4-leve3-components/02-corvus-pilot/01-index.md`](../02-design/02-architecture/03-c4-leve2-containers/04-c4-leve3-components/02-corvus-pilot/01-index.md) (Query Router section)
 
 **Expected result:** The session is active. You see the Socratic mode header.
 
@@ -246,4 +246,4 @@ completed successfully.
 - **Algorithm mechanics (direct answers):** [`09-uc-08.md`](../02-design/01-software-requirement-specification/02-use-cases/09-uc-08.md) — UC-08: Contextual Algorithm Help (when you want the explanation without the Socratic loop)
 - **See algorithm behavior visually:** [`../02-design/01-software-requirement-specification/02-use-cases/08-uc-07.md`](../02-design/01-software-requirement-specification/02-use-cases/08-uc-07.md) — UC-07: Algorithm Visualisation
 - **Explore a completed study's results:** [`12-uc-11.md`](../02-design/01-software-requirement-specification/02-use-cases/12-uc-11.md) — UC-11: Learner Explores Researcher Study Results
-- **Architectural design of the Socratic Guide:** [`../02-design/02-architecture/04-c4-leve3-components/02-corvus-pilot/01-index.md`](../02-design/02-architecture/03-c4-leve2-containers/04-c4-leve3-components/02-corvus-pilot/01-index.md)
+- **Architectural design of the Socratic Guide:** [`../02-design/02-architecture/03-c4-leve2-containers/04-c4-leve3-components/02-corvus-pilot/01-index.md`](../02-design/02-architecture/03-c4-leve2-containers/04-c4-leve3-components/02-corvus-pilot/01-index.md)

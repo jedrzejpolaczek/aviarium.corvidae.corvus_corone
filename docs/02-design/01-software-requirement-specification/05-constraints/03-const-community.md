@@ -17,7 +17,7 @@
 **All experimental data and results produced by the system MUST be publishable under an open data license.**
 
 - Source: MANIFESTO Principle 20
-- Operationalized in: `docs/05-community/02-versioning-governance.md` §5
+- Operationalized in: `docs/02-design/02-architecture/01-adr/adr-022-agpl-licence-and-dependency-policy.md` (code licence, AGPL-3.0-or-later) and `docs/02-design/01-software-requirement-specification/05-constraints/04-const-technical.md` (dependency licences). The data licence is undecided and `02-versioning-governance.md` §5 is deferred (REF-TASK-0048)
 
 ## CONST-COM-03
 

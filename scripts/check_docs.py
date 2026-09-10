@@ -12,7 +12,8 @@ as a consequence of an edit to a different file:
   5. Every document filename named in prose exists.
   6. A requirement cited with a descriptive label is not describing a different one.
 
-A file may opt out of the identifier checks by carrying the marker
+A file may opt out of checks 2, 4, 5 and 6 — every check except link resolution
+and duplicate requirement definitions — by carrying the marker
 ``<!-- check-docs: allow-undefined -->``. This is for documents that legitimately
 quote identifiers as evidence, such as the ADR template and the ADR that records
 which invented identifiers were removed.
@@ -218,8 +219,8 @@ def check_identifiers(files: list[str], defined: dict[str, set[str]]) -> list[st
 CONTRACTS_DIR = "docs/03-technical-contracts"
 
 DESCRIPTIVE_DIRS = [
+    "docs/02-design/02-architecture/02-c4-leve1-context",
     "docs/02-design/02-architecture/03-c4-leve2-containers",
-    "docs/02-design/02-architecture/05-c4-level4-code",
 ]
 
 # Names that belong to Python, the standard library or a declared third-party

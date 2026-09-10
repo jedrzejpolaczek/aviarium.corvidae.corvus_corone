@@ -5,7 +5,7 @@ Derived from: MANIFESTO.md, 01-srs/01-SRS.md, C1/C2 architecture, ADR-001,
 docs/03-technical-contracts/02-interface-contracts/01-index.md, docs/03-technical-contracts/01-data-format/01-index.md, docs/03-technical-contracts/03-metric-taxonomy/01-index.md,
 02-statistical-methodology.md, 01-benchmarking-protocol.md,
 scripts/create_github_issues.py
-Generated: 2026-03-04. Updated: 2026-05-15. Update whenever a milestone closes or a new REF-TASK is created.
+Generated: 2026-03-04. Updated: 2026-09-10. Update whenever a milestone closes or a new REF-TASK is created.
 -->
 
 ---
@@ -24,12 +24,12 @@ Generated: 2026-03-04. Updated: 2026-05-15. Update whenever a milestone closes o
 | C2 Containers | — | ⚠️ Principles complete |
 | C3 Components | — | ✅ 11 group indexes, decomposition and responsibility only; each component row names the contract that specifies it (ADR-028) |
 | C4 Code | — | — removed by ADR-028; behaviour is specified in `03-technical-contracts/` and nowhere else |
-| Architecture Decision Records | — | ✅ ADR-001..ADR-026 accepted |
+| Architecture Decision Records | — | ✅ ADR-001..ADR-030 accepted |
 | SRS | — | ✅ UC-01..UC-11, FR-01..FR-42, 6 NFRs, 16 constraints, §7 interface requirements, §8 acceptance strategy for every V1 requirement, §9 traceability |
 | Statistical methodology | — | ✅ all seven sections written: three-level framework, Level 1 with VIZ-L1-01..04, Level 2 test selection and correction, Level 3 effect sizes, anytime analysis, uncertainty reporting, pitfalls |
 | Metric taxonomy | REF-TASK-0014 | ✅ 9 metrics, Standard Reporting Set, selection guide; implementation references land with IMPL-011 |
 | Interface contracts | — | ✅ 6 interfaces + cross-cutting; every method carries semantics, preconditions, postconditions and exceptions |
-| Data format | — | ✅ 7 entity schemas, file formats, interoperability mappings, CV-001..CV-023, schema version 0.0.3 |
+| Data format | — | ✅ 7 entity schemas, file formats, interoperability mappings, CV-001..CV-024, schema version 0.0.3 |
 | Ecosystem integration | — | ✅ COCO, IOHprofiler and Nevergrad mappings documented; IOH and Nevergrad bridges implemented |
 | Implementation — Core Library | IMPL-000..027 | ⚠️ IMPL-000, 010, 023, 025 done; IMPL-001..009, 011..022, 024, 026, 027 not started |
 | Implementation — Researcher Agent (Pilot V2) | IMPL-028..036 | ⛔ Not started *(post-V1)* |
@@ -105,12 +105,52 @@ Generated: 2026-03-04. Updated: 2026-05-15. Update whenever a milestone closes o
 > The Execution Coordinator was not re-measured: its page is gone and the exercise was not redone
 > against `04-runner-interface.md` and ADR-027, so its 13 stands unrefuted rather than improved.
 > The verdict remains a statement about the components actually measured.
+>
+> **Sixth measurement, 2026-09-10 (second consistency audit).** Same method as the fifth, on three
+> components no earlier pass had touched, plus a correction to the fifth.
+>
+> | Component | Before the repairs | After the repairs (self-assessed, not binding) |
+> |---|---|---|
+> | Limitations Enforcer | 6 | 4 |
+> | Loss Auditor | 6 | 6 |
+> | Instance Validator (Algorithm Registry) | 7 | 4 |
+> | Statistical Tester | at least 4 (the fifth pass recorded 0) | 2 |
+>
+> **The fifth pass's "0" for the Statistical Tester was wrong.** The Analysis Engine index names two
+> sources for that component — `05-analyzer-interface.md` and `02-statistical-methodology.md` §3 —
+> and the pass read the first. §3.9 of the second defined `StatisticalTestResult` again with a
+> different field set, called the adjusted p-value `corrected_p_value` against the contract's
+> `p_value_adjusted` and FR-16's `adjusted_p_value`, gave `rank_biserial` as the example effect size
+> a few dozen lines before §4.1 rejects it, and offered `mccnemar` as a test name no decision tree
+> or enumeration contains. The fourth pass had found the earlier measurement one level too shallow;
+> this one was one source too narrow.
+>
+> Every count left after the repairs is an open task rather than an unfinished edit: the Loss
+> Auditor's six are REF-TASK-0053, the Limitations Enforcer's four are REF-TASK-0056 and
+> REF-TASK-0059, the Instance Validator's four are REF-TASK-0058, and the Statistical Tester's two
+> are REF-TASK-0055. Where a gap was a missing decision it was written down as one; none was closed
+> by writing text that would bring a count to zero. `check_docs.py` reported zero before and after.
+> It was calibrated against known-bad input first, so both zeros are real — and none of the
+> findings was of a kind it can see.
+>
+> **The right-hand column is a self-assessment.** It was taken by the session that made the repairs,
+> and a later self-check by the same session found repairs that had not propagated: `aborted` still
+> in `05-analyzer-interface.md`, the pre-ADR-027 outcome rule twice in `04-public-api-contract.md`,
+> registration through `corvus verify` in both registry container documents, "13 required fields" in
+> the acceptance strategy, and a contract sentence on `InterfaceViolationError` that presumed a
+> decision REF-TASK-0058 leaves open. All are corrected and none moves the four counts, but they are
+> exactly what a repairer's own re-measurement is placed to overlook. The binding figure is taken by a
+> separate session.
+>
+> The Execution Coordinator is still not re-measured. Its contract lost `"aborted"` in this pass,
+> which bears on its 13 without re-counting them; `run_study()` still both returns an Experiment
+> and raises when that Experiment fails, which is a guess that remains.
 
 ---
 
 ## GitHub Milestones
 
-Seven milestones group all open documentation and design tasks.
+Eight milestones group all open documentation and design tasks.
 
 | Milestone | Focus |
 |---|---|
@@ -121,6 +161,7 @@ Seven milestones group all open documentation and design tasks.
 | Post-V1 — Continuous Improvement | Tasks requiring empirical data from real studies before they can be completed |
 | Learner Actor — Education Platform *(post-V1)* | New actor: C1/SRS/C2 updates, GLOSSARY, tutorials |
 | V1 Consistency — audit follow-up | Ten decisions the 2026-09-09 consistency audit found missing: failure model, four unspecified Repository methods, three empty methodology sections, test-tree scope, ADR-010/ADR-023 reconciliation, the ADR-012 exception, Pilot V3 against AP-4/AP-7, governance document, acceptance-test coverage, and the future of the C3/C4 layers |
+| V1 Consistency — second audit | Eleven decisions the 2026-09-10 repairs could not make by editing, and one measurement: registration and ecosystem export on the facade, `corvus verify`, the statistical result's names and shape, where a Report's scope lives, `schema_version` on the Performance Record, the undefined Algorithm Instance registration rules, how the Limitations Enforcer checks, the ADR-009 clauses later ADRs reversed without recording it, the exceptions of the Algorithm Interface, `StorageError` on the facade, and the binding re-measurement |
 
 ---
 
@@ -212,7 +253,7 @@ Seven milestones group all open documentation and design tasks.
 - [ ] **`[IMPL-011]`** Metric taxonomy — `analysis/metrics.py`: `@metric` registry; `QUALITY-BEST_VALUE_AT_BUDGET`, `TIME-EVALUATIONS_TO_TARGET`, `RELIABILITY-SUCCESS_RATE`; implementation refs added to `03-metric-taxonomy/01-index.md` · *Fulfills: REF-TASK-0015*
 - [ ] **`[IMPL-012]`** Statistical analysis — `analysis/statistical.py`: three-level (exploratory summary, Wilcoxon/Kruskal-Wallis + Holm-Bonferroni, Cliff's delta); `ThreeLevelAnalysis.analyze()` requires all three levels · *Fulfills: REF-TASK-0020*
 - [ ] **`[IMPL-013]`** Anytime performance — `analysis/anytime.py`: `compute_anytime_curve`, `compute_ecdf`, `compute_ecdf_area` (empirical normalization per ADR-007, integration domain per ADR-024; LOCF over `best_so_far` per ADR-003 and ADR-023); basic IOHprofiler `.dat` export · *Fulfills: REF-TASK-0016*
-- [ ] **`[IMPL-014]`** Reporting Engine — `reporting/reports.py`: `StudyReport` (required `scope_statement`, `limitations`); Jinja2 templates for researcher + practitioner reports; raises `ValueError` when scope absent · *Fulfills: REF-TASK-0019*
+- [ ] **`[IMPL-014]`** Reporting Engine — `reporting/reports.py`: `StudyReport` (required `scope_statement`, `limitations`); Jinja2 templates for researcher + practitioner reports; raises `ValidationError` (ADR-015) when the scope statement or limitations section is absent · *Fulfills: REF-TASK-0019*
 - [ ] **`[IMPL-015]`** Visualizations — `reporting/visualizations.py`: VIZ-L1-01 boxplot, VIZ-L1-02 convergence curves, VIZ-L1-03 ECDF (`plt.step(where='post')`), VIZ-L1-04 violin (n > 50); auto-generated for every report
 - [ ] **`[IMPL-016]`** Study Orchestrator — `orchestrator.py`: `StudyConfig`, `StudyOrchestrator.run()`, diversity validation, `SeedSequence` seed generation, Facade over all modules · *Refs: REF-TASK-0021*
 - [ ] **`[IMPL-017]`** Public API + CLI — `api.py`, `cli.py` (Click): `corvus run`, `corvus list-problems`, `corvus list-algorithms`; `CliRunner` tests · *Refs: REF-TASK-0004, NFR-MODULAR-01*
@@ -309,7 +350,7 @@ Seven milestones group all open documentation and design tasks.
 ## Dependency Graph (critical path)
 
 ```
-MANIFESTO ──► C1 ──► C2/C3/C4 (complete)
+MANIFESTO ──► C1 ──► C2/C3 (C4 removed by ADR-028)
                            │
                            ├──► SRS §4/§8 (REF-TASK-0008, 0013) — unblocked after Phase 1
                            ├──► docs/03-technical-contracts/01-data-format/01-index.md update (REF-TASK-0022) — after IMPL-021
@@ -458,6 +499,146 @@ REF-TASK-0025 ──► 0026 ──► 0027 ──► 0028 ──► 0029 ──
 
 ---
 
+## Milestone: V1 Consistency — second audit (2026-09-10)
+> Findings from the second consistency audit (2026-09-10) that could not be
+> closed by editing. Each is a missing decision; the editable findings were repaired in the same
+> change. None was visible to `check_docs.py`: each is either a sentence built from contracted
+> names that says something untrue, or two normative documents that disagree with each other.
+
+### Public surface — V1 use cases with no way in
+
+- [ ] **[REF-TASK-0052] Decide how UC-02 and UC-04 reach registration.** FR-39 requires every V1
+  use case, UC-01 through UC-06, to be executable through the functions of
+  `04-public-api-contract.md` alone. Those thirteen functions include no registration:
+  `register_problem()` and `register_algorithm()` exist only on the repository interface, which
+  `10-public-api-cli/01-index.md` places outside the public API. The C2 flows for UC-02 and UC-04
+  called `cc.register_problem()` and `cc.register_algorithm()`, which no contract defines, and named
+  `corvus verify` as the registration command, which `02-cli-spec.md` defines as an integrity check
+  of a completed Experiment; both flows now state that the entry point is missing. The gate passed
+  the facade calls because `register_problem` is a contracted name — of another surface. Either
+  the facade gains the two functions, and FR-39's set-equality test with it, or FR-39 and the V1
+  actor table stop claiming UC-02 and UC-04 are reachable through it. *Blocks IMPL-017.*
+
+- [ ] **[REF-TASK-0053] Write the Ecosystem Bridge interface contract, and decide its facade
+  function.** The Ecosystem Bridge is a V1 container serving UC-06 and FR-23..FR-26, and
+  `02-interface-contracts/` has no section for it; FR-23 links to one that does not exist.
+  `cc.export_raw_data()` writes JSON or CSV and returns a path, so it can neither take an
+  ecosystem format nor return the information-loss manifest FR-24 requires of every export. The
+  contract needs the decisions the Loss Auditor measurement found missing: the export's signature
+  and return value; the type of a manifest item; which severity blocks an export (`LOSS-COCO-01`
+  is critical and does not block, `LOSS-COCO-05` is critical and does); what "the losses the
+  caller accepted" are and how a caller states them; the override mapping `LOSS-COCO-05` refers to
+  and nothing defines; and whether withdrawn items such as `LOSS-COCO-09` are listed. *Blocks
+  IMPL-024 and IMPL-017; IMPL-023 was built without it.*
+
+- [ ] **[REF-TASK-0054] Decide whether `corvus verify` has a facade function.** FR-40 forbids a
+  command whose capability the facade lacks. `corvus verify` checks the integrity of a completed
+  Experiment and no facade function does; the mapping table in `02-cli-spec.md` had covered the gap
+  by naming `cc.export_raw_data()` with "(internal check)", which is a different operation. The
+  row now states the violation. Either the facade gains an integrity check or the command leaves
+  V1.
+
+### Contracts — names and shapes that disagree
+
+- [ ] **[REF-TASK-0055] Name the adjusted p-value once, and give `StatisticalTestResult` one
+  shape.** FR-16's acceptance criterion calls it `adjusted_p_value`; `05-analyzer-interface.md`
+  defines `p_value_adjusted`; `02-statistical-methodology.md` §3.9 lists `corrected_p_value`.
+  Precedence does not settle it: the SRS outranks the contract but may not define field names.
+  Beyond the name, §3.9 lists fields the contract lacks (`hypothesis_id`, `n_problems`,
+  `n_runs_per_algorithm`, `test_statistic`, `alpha`, `reject`), nests `effect_size` where the
+  contract splits it, and composes `conclusion_scope` differently. Under ADR-026 the methodology
+  is authoritative for procedures and not for field names, and §3.9 now says the contract governs
+  where the two differ; what is missing is the decision about which of §3.9's fields the procedure
+  needs — FR-16 puts per-hypothesis values in the Report, which `hypothesis_id` would carry.
+  *Blocks IMPL-012, IMPL-014.*
+
+- [ ] **[REF-TASK-0056] Decide where a Report's scope lives.** FR-20's acceptance criterion
+  requires "a `scope` field explicitly naming the Algorithm Instance IDs and Problem Instance IDs
+  tested" on objects of types `ResearcherReport` and `PractitionerReport`. `09-report.md` has one
+  entity, `Report`, with `type` and no `scope`; `03-report-format-spec.md` makes the scope
+  statement a mandatory section of the HTML. Either the schema gains the field and its shape, or
+  FR-20's criterion tests the rendered section. No component is assigned the scope-statement check:
+  the Limitations Enforcer cites FR-21 only. *Blocks IMPL-014.*
+
+- [ ] **[REF-TASK-0057] Decide whether a Performance Record carries `schema_version`.** Every
+  other entity declares the field; `07-performance-record.md` does not and `10-file-formats.md`
+  does not mention it. `13-schema-versioning.md` §6.3 said the Run inherits the field from the
+  Experiment while `06-run.md` declares it; the Run is now listed as its schema says. For a record
+  written hundreds of thousands of times per Study into JSON Lines and Parquet, carrying the field
+  per record, inheriting it from the Run and versioning it through the file format are three
+  different answers, and `01-index.md` now says the question is open. *Blocks IMPL-009, IMPL-022.*
+
+- [ ] **[REF-TASK-0058] Specify the Algorithm Instance registration rules that cannot be
+  implemented.** Measured in the Instance Validator. "All keys in `hyperparameters` must match the
+  algorithm's declared parameter schema" is cited by five documents and defined by none;
+  `03-algorithm-interface.md` has no method that declares one. "`code_reference` must be
+  resolvable" does not say whether registration fetches the reference or checks its form, which
+  decides whether registration works offline. `deprecated` is required on a record whose value at
+  registration the system always sets. `sensitivity_report` is required "via the contribution
+  process", which the validator cannot observe and `01-contribution-guide.md` §2 does not yet
+  describe. The same decision governs `InterfaceViolationError`, which `register_algorithm()` lists
+  for an Algorithm that does not satisfy its interface: the check needs the implementation, and
+  neither repository backend raises it yet. *Blocks IMPL-002, IMPL-005.*
+
+- [ ] **[REF-TASK-0059] Decide how the Limitations Enforcer checks a Report.**
+  `03-report-format-spec.md` requires the prohibited-output check "in the Jinja2 template **or**"
+  as a post-render scan, which is two different components, and defines the prohibited patterns as
+  three example phrases "or any equivalent", which is not a check. *Blocks IMPL-014.*
+
+### ADR practice — supersessions never recorded
+
+- [ ] **[REF-TASK-0060] Record what later ADRs reversed in ADR-009's Enforcement section.**
+  ADR-009 §Enforcement raises `DiversityValidationError`, validates at "Study plan submission"
+  after which "the Study is not persisted", and re-validates at Experiment start in case a Problem
+  Instance's `noise_level` "was corrected". Three later decisions reversed all three clauses:
+  ADR-015 made the exception taxonomy exclusive and it has no such class; ADR-013 persists a Study
+  as a draft and checks it at `lock_study()`, which `CV-021` implements; ADR-020 makes a Problem
+  Instance immutable, so there is nothing to re-check. None of the three names the clause, and
+  ADR-009's Status line says only "Accepted" — the gap ADR-025 exists to close, and closed on
+  behalf of an accepted ADR for ADR-010 alone. `01-benchmarking-protocol.md` had repeated the class
+  name and now follows the taxonomy. Recording a supersession on behalf of ADRs that are already
+  accepted is a decision ADR-025 took once, for one case; doing it again needs a record rather than
+  an edit. *Found by an experimental widening of the vocabulary gate to `04-scientific-practice/`.*
+
+### Found by the self-check of the same audit
+
+- [ ] **[REF-TASK-0061] Decide which exceptions the Algorithm Interface raises, and bring the
+  Nevergrad interface requirement into the taxonomy.** `06-interface-requirements/04-ir-7.3-nevergrad-algorithm.md`
+  §Failure Handling specifies `ImportError` when `nevergrad` is not installed, `RuntimeError` when
+  `suggest()` or `observe()` is called before `initialize()`, and `ValueError` for an unsupported
+  variable type — three classes outside the ADR-015 taxonomy, from which every interface
+  implementation must raise. `nevergrad_adapter.py` raises exactly those three. The contract cannot
+  settle it: `initialize()` in `03-algorithm-interface.md` states a precondition on variable types and
+  has no *Exceptions* section. Candidates: `ValidationError` for an unsupported type, which is input
+  that does not conform to the contract; `IntegrationError` for a missing optional dependency, an
+  external system that is unavailable; the call-order violation is a Runner defect rather than bad
+  input, and needs either a member of the taxonomy or an explicit statement that it is outside the
+  contract. *Blocks IMPL-004; the IMPL-025 adapter follows the decision.*
+
+- [ ] **[REF-TASK-0062] Decide how `StorageError` reaches the facade and the command line.**
+  ADR-027 makes an Experiment that cannot proceed end `"failed"` and propagate its error, and the
+  Runner contract names `StorageError` as one of the two errors that do so. The facade's list of the
+  classes "a caller of the facade can encounter" (`04-public-api-contract.md` §Exception Hierarchy)
+  does not include it; the *Raises* table of `cc.run()` lists `EntityNotFoundError` and
+  `SeedCollisionError` only, while that same list attributes `StudyNotLockedError` to `cc.run()`;
+  and `02-cli-spec.md` §Exit codes has no row for it, which FR-42 requires. Adding a class to the
+  facade surface brings an exit code with it, so this is a decision rather than an edit.
+  *Blocks IMPL-017.*
+
+- [ ] **[REF-TASK-0063] Take the binding measurement, and read the layers this audit left unread.**
+  The post-repair figures of the sixth measurement are self-assessed (see Current State). A separate
+  session working from the revised audit brief should re-measure the Limitations Enforcer, the Loss
+  Auditor, the Instance Validator and the Statistical Tester; measure the Execution Coordinator,
+  whose 13 from the fourth pass was never re-measured; and read the C1 layer, the use cases other
+  than UC-05, the non-functional requirements and the interface requirements other than §7.3. The
+  first contact with those layers produced REF-TASK-0061 and corrections to UC-05 and FR-03. Leads
+  that were found and not checked: FR-09 and the acceptance strategy derive seeds from
+  `seed_strategy` where ADR-017 derives them from `root_seed`; and
+  `06-tutorials/02-researcher-design-and-execute-study.md` shows `cc.export_raw_data()` writing a
+  directory of several files, where the contract returns the path of one file.
+
+---
+
 ## Open Tasks Index
 
 ### Documentation Tasks (REF-TASK)
@@ -485,6 +666,18 @@ Documentation tasks:
 - [x] **REF-TASK-0049** — acceptance tests for FR-27..FR-31 and FR-39..FR-42
 - [x] **REF-TASK-0050** — decide the future of the C3 and C4 layers, closed by ADR-028
 - [x] **REF-TASK-0051** — `study_type` and `test_type: "none"`, reconciled by ADR-029 and `CV-024`
+- [ ] **REF-TASK-0052** — registration has no facade function, so UC-02 and UC-04 are unreachable through FR-39's surface
+- [ ] **REF-TASK-0053** — Ecosystem Bridge interface contract and its facade function (UC-06, FR-23..FR-26)
+- [ ] **REF-TASK-0054** — `corvus verify` has no facade function (FR-40)
+- [ ] **REF-TASK-0055** — one name for the adjusted p-value, one shape for `StatisticalTestResult`
+- [ ] **REF-TASK-0056** — where a Report's scope lives (FR-20)
+- [ ] **REF-TASK-0057** — `schema_version` on the Performance Record
+- [ ] **REF-TASK-0058** — Algorithm Instance registration rules with no definition
+- [ ] **REF-TASK-0059** — where, and against what, the Limitations Enforcer checks
+- [ ] **REF-TASK-0060** — ADR-009 enforcement clauses reversed by ADR-013, ADR-015 and ADR-020, unrecorded
+- [ ] **REF-TASK-0061** — exceptions of the Algorithm Interface; the Nevergrad requirement outside the ADR-015 taxonomy
+- [ ] **REF-TASK-0062** — `StorageError` on the facade exception list and the CLI exit codes
+- [ ] **REF-TASK-0063** — binding re-measurement, and the layers the second audit left unread
 
 ### Implementation Tasks (IMPL)
 
